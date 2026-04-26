@@ -18,7 +18,7 @@ import { ADVANCED_STUDY_GUIDE } from './lib/advancedStudyData';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './useAuth';
 import { 
-  loginWithGoogle, logout, createUserProfile, UserProfile, updateProgress, 
+  loginWithGoogle, registerWithEmail, loginWithEmail, logout, createUserProfile, UserProfile, updateProgress, 
   updatePoints, getUserProfile, getQuestions, updateUserLevel, 
   getGlobalAnnouncement, saveDuelResult 
 } from './firebase';
@@ -81,44 +81,20 @@ const AnnouncementBanner = () => {
   );
 };
 
+import { AuthModal } from './components/AuthModal';
+
 const Navbar = () => {
   const { user, profile, loading } = useAuth();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (user && !loading && !profile && window.location.pathname !== '/select-level') {
       navigate('/select-level');
     }
   }, [user, loading, profile, navigate]);
-
-  const handleLogin = async () => {
-    if (isLoggingIn) return;
-    setIsLoggingIn(true);
-    try {
-      const firebaseUser = await loginWithGoogle();
-      if (firebaseUser) {
-        const existingProfile = await getUserProfile(firebaseUser.uid);
-        if (!existingProfile) {
-          navigate('/select-level');
-        } else {
-          navigate('/dashboard');
-        }
-      }
-    } catch (error: any) {
-      if (error.code === 'auth/popup-blocked') {
-        alert('Please allow popups for this site to sign in with Google.');
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        console.log('Login popup was closed or cancelled.');
-      } else {
-        console.error('Login error:', error);
-      }
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
 
   const NavLinks = () => {
     const isAdmin = profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com';
@@ -203,15 +179,15 @@ const Navbar = () => {
           </>
         ) : (
           <button
-            onClick={handleLogin}
-            disabled={isLoggingIn}
+            onClick={() => setIsAuthModalOpen(true)}
             className="px-10 py-3.5 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-sky-600 dark:hover:bg-sky-500 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 flex items-center gap-3"
           >
-            {isLoggingIn && <Loader2 className="w-4 h-4 animate-spin" />}
-            {isLoggingIn ? 'Authenticating...' : 'Get Started'}
+            Get Started
           </button>
         )}
       </div>
+
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       <AnimatePresence>
         {isMenuOpen && (
@@ -250,35 +226,13 @@ const Navbar = () => {
 const Landing = () => {
   const { user, profile, setProfile } = useAuth();
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<'secondary' | 'undergraduate'>('secondary');
 
   const handleStart = async (level: 'secondary' | 'undergraduate') => {
     if (!user) {
-      try {
-        const firebaseUser = await loginWithGoogle();
-        if (firebaseUser) {
-          const existingProfile = await getUserProfile(firebaseUser.uid);
-          if (!existingProfile) {
-            const newProfile = await createUserProfile(firebaseUser, level);
-            setProfile(newProfile);
-            navigate('/dashboard');
-          } else {
-            // Update level if different
-            if (existingProfile.level !== level) {
-              await updateUserLevel(firebaseUser.uid, level);
-              setProfile({ ...existingProfile, level });
-            } else {
-              setProfile(existingProfile);
-            }
-            navigate('/dashboard');
-          }
-        }
-      } catch (error: any) {
-        if (error.code === 'auth/popup-blocked') {
-          alert('Please allow popups for this site to sign in with Google.');
-        } else {
-          console.error(error);
-        }
-      }
+      setSelectedLevel(level);
+      setIsAuthModalOpen(true);
       return;
     }
     
@@ -294,6 +248,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-paper transition-colors duration-500">
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultLevel={selectedLevel} />
       {/* Hero Section */}
       <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 px-6 md:px-10 overflow-hidden">
         {/* Background Elements */}
