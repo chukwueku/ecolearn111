@@ -1,9 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY!;
-const genAI = new GoogleGenAI({ apiKey });
+const getGenAI = () => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.warn("GEMINI_API_KEY is not defined.");
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const generateStudyGuide = async (topicTitle: string, level: string, description: string) => {
+  const genAI = getGenAI();
+  if (!genAI) return "Failed to generate study guide. API key is missing.";
   const model = "gemini-3-flash-preview";
   const prompt = `You are an expert Economics tutor. Generate a comprehensive study guide for a ${level} student on the topic: "${topicTitle}". 
   Description: ${description}
@@ -32,6 +40,8 @@ export const generateStudyGuide = async (topicTitle: string, level: string, desc
 };
 
 export const generateQuestions = async (topicTitle: string, level: string, count: number = 5) => {
+  const genAI = getGenAI();
+  if (!genAI) return [];
   const model = "gemini-3-flash-preview";
   const prompt = `You are an expert Economics examiner. Generate ${count} multiple-choice questions for a ${level} student on the topic: "${topicTitle}".
   
