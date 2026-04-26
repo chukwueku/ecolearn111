@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Anton&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.40/dist/katex.min.css');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-serif: "Playfair Display", serif;
+
+  --color-ink: #0f172a;
+  --color-paper: #fcfaf8;
+  --color-accent: #0284c7;
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-card: #ffffff;
+}
+
+.dark {
+  --color-ink: #f8fafc;
+  --color-paper: #020617;
+  --color-border: #1e293b;
+  --color-muted: #94a3b8;
+  --color-card: #0f172a;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-ink bg-paper antialiased transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-semibold tracking-tight text-ink;
+  }
+}
+
+@layer utilities {
+  .text-display {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  
+  .card-minimal {
+    @apply bg-card border border-border rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-sky-500/5 transition-all duration-500;
+  }
+
+  .glass {
+    @apply bg-card/70 backdrop-blur-xl border-b border-border;
+  }
+
+  .bg-grid {
+    background-image: radial-gradient(circle at 1px 1px, var(--color-border) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+
+  .marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    width: 100%;
+  }
+
+  .marquee-content {
+    display: inline-block;
+    animation: marquee 30s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+/* KaTeX Math Overflow Fix */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 0;
+}
+
+.katex {
+  font-size: 1.1em !important;
+}
+
+/* Ensure tables within prose look good */
+.prose table {
+  margin: 0 !important;
+}
