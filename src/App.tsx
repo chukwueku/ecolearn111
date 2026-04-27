@@ -185,7 +185,7 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => { setAuthMode('signup'); setIsAuthModalOpen(true); }}
-              className="flex px-8 py-3 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-sky-600 dark:hover:bg-sky-500 transition-all shadow-xl shadow-slate-900/10 items-center gap-3"
+              className="btn-premium py-2.5 px-6"
             >
               Get Started
             </button>
@@ -259,10 +259,9 @@ const Landing = () => {
       <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 px-6 md:px-10 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-          <div className="absolute top-[-10%] right-[-10%] w-[80vw] h-[80vw] bg-accent/5 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-slate-500/5 rounded-full blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+          <div className="bg-noise" />
+          <div className="atmosphere-layer" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-grid" />
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto">
@@ -270,7 +269,7 @@ const Landing = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-10 inline-flex items-center gap-3 px-6 py-2 bg-card border border-border rounded-full shadow-xl transition-colors duration-500"
+              className="mb-10 inline-flex items-center gap-3 px-6 py-2 bg-card border border-border rounded-full shadow-lg transition-colors duration-500"
             >
               <div className="flex -space-x-2">
                 {[1, 2, 3].map(i => (
@@ -279,7 +278,7 @@ const Landing = () => {
                   </div>
                 ))}
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+              <span className="text-micro">
                 Joined by 50,000+ Scholars
               </span>
             </motion.div>
@@ -287,7 +286,7 @@ const Landing = () => {
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-[12vw] md:text-[8vw] lg:text-[7vw] font-bold text-ink tracking-tight leading-[0.85] mb-12 max-w-5xl"
+              className="text-display mb-8 max-w-5xl"
             >
               Master <span className="text-accent italic font-serif font-normal">the</span> <br />
               Economics <span className="text-slate-400 dark:text-slate-600">Universe</span>
@@ -310,17 +309,17 @@ const Landing = () => {
             >
               <button 
                 onClick={() => handleStart('secondary')}
-                className="group px-12 py-6 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-[2rem] hover:bg-sky-600 dark:hover:bg-sky-700 transition-all flex items-center gap-4 shadow-2xl shadow-slate-900/20 dark:shadow-sky-500/20"
+                className="btn-premium group"
               >
                 Secondary Education
-                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <button 
                 onClick={() => handleStart('undergraduate')}
-                className="group px-12 py-6 bg-card text-ink border border-border text-[11px] font-bold uppercase tracking-[0.2em] rounded-[2rem] hover:border-accent hover:text-accent transition-all flex items-center gap-4 shadow-xl shadow-slate-100 dark:shadow-none transition-colors duration-500"
+                className="btn-outline group"
               >
                 Undergraduate Level
-                <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </motion.div>
           </div>
@@ -389,7 +388,7 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="relative z-10 bg-card p-12 rounded-[3rem] border border-border shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-2 transition-all duration-500 group text-center transition-colors"
+                className="relative z-10 bg-card p-12 rounded-[3rem] border-none ring-1 ring-ink/5 dark:ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_rgba(2,132,199,0.1)] hover:-translate-y-2 transition-all duration-500 group text-center"
               >
                 <div className="w-16 h-16 bg-slate-900 dark:bg-sky-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-xl font-bold group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-xl shadow-slate-900/10">
                   <item.icon size={24} />
@@ -418,7 +417,7 @@ const Landing = () => {
         <div className="grid md:grid-cols-2 gap-12">
           <motion.div 
             whileHover={{ y: -10 }}
-            className="bg-card p-16 rounded-[4rem] border border-border shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden transition-colors duration-500"
+            className="bg-card p-16 rounded-[4rem] border-none ring-1 ring-ink/5 dark:ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_rgba(2,132,199,0.1)] transition-all group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-12 opacity-[0.03] dark:opacity-[0.07] group-hover:opacity-[0.1] transition-opacity text-ink pointer-events-none transition-colors duration-500">
               <School size={240} />
@@ -447,7 +446,7 @@ const Landing = () => {
 
               <button 
                 onClick={() => handleStart('secondary')}
-                className="w-full py-6 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-sky-600 dark:hover:bg-sky-700 transition-all flex items-center justify-center gap-4 group shadow-xl shadow-slate-900/10"
+                className="w-full py-5 btn-premium justify-center mt-auto"
               >
                 Start Roadmap
                 <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -457,7 +456,7 @@ const Landing = () => {
 
           <motion.div 
             whileHover={{ y: -10 }}
-            className="bg-card p-16 rounded-[4rem] border border-border shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden transition-colors duration-500"
+            className="bg-card p-16 rounded-[4rem] border-none ring-1 ring-ink/5 dark:ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_50px_rgba(2,132,199,0.1)] transition-all group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-12 opacity-[0.03] dark:opacity-[0.07] group-hover:opacity-[0.1] transition-opacity text-ink pointer-events-none transition-colors duration-500">
               <GraduationCap size={240} />
@@ -480,7 +479,7 @@ const Landing = () => {
 
               <button 
                 onClick={() => handleStart('undergraduate')}
-                className="w-full py-6 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-800 dark:hover:bg-sky-700 transition-all flex items-center justify-center gap-4 group shadow-xl shadow-slate-900/10"
+                className="w-full py-5 btn-premium justify-center mt-auto"
               >
                 Start Roadmap
                 <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -525,7 +524,7 @@ const Landing = () => {
 
               <Link 
                 to="/live"
-                className="inline-flex items-center gap-4 px-12 py-6 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-sky-600 transition-all shadow-2xl shadow-slate-900/10"
+                className="btn-premium inline-flex py-5"
               >
                 Go to Arena
                 <Swords size={20} />
@@ -687,7 +686,7 @@ const Landing = () => {
               <motion.div 
                 key={i}
                 whileHover={{ y: -5 }}
-                className="bg-card p-10 rounded-[3rem] border border-border shadow-sm"
+                className="bg-card p-10 rounded-[3rem] border-none ring-1 ring-ink/5 dark:ring-white/10 shadow-sm hover:shadow-[0_20px_50px_rgba(2,132,199,0.1)] transition-all"
               >
                 <Quote className="text-sky-500 mb-6" size={32} />
                 <p className="text-muted text-lg leading-relaxed mb-8 font-medium italic">"{t.text}"</p>
@@ -748,13 +747,13 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
                 onClick={() => handleStart('secondary')}
-                className="w-full sm:w-auto px-12 py-6 bg-white text-slate-900 text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-slate-100 transition-all shadow-2xl"
+                className="w-full sm:w-auto px-12 py-6 bg-white text-slate-900 text-[11px] font-bold uppercase tracking-[0.2em] rounded-full hover:bg-slate-100 transition-all shadow-2xl hover:scale-105 active:scale-95"
               >
                 Get Started Now
               </button>
               <Link 
                 to="/leaderboard"
-                className="w-full sm:w-auto px-12 py-6 bg-transparent border border-white/30 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-all"
+                className="w-full sm:w-auto px-12 py-6 bg-transparent border border-white/30 text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-full hover:bg-white/10 transition-all hover:scale-105 active:scale-95 flex justify-center items-center"
               >
                 View Leaderboard
               </Link>

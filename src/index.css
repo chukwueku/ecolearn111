@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Anton&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Anton&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/katex@0.16.40/dist/katex.min.css');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -9,11 +9,11 @@
   --font-mono: "JetBrains Mono", monospace;
   --font-serif: "Playfair Display", serif;
 
-  --color-ink: #0f172a;
-  --color-paper: #fcfaf8;
+  --color-ink: #020617;
+  --color-paper: #ffffff;
   --color-accent: #0284c7;
   --color-muted: #64748b;
-  --color-border: #e2e8f0;
+  --color-border: #f1f5f9;
   --color-card: #ffffff;
 }
 
@@ -31,29 +31,68 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-semibold tracking-tight text-ink;
+    @apply font-display font-semibold tracking-tight text-ink;
   }
 }
 
 @layer utilities {
   .text-display {
-    font-size: clamp(2.5rem, 8vw, 5rem);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    font-weight: 700;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    @apply font-display;
+  }
+
+  .text-micro {
+    @apply font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-muted;
   }
   
   .card-minimal {
-    @apply bg-card border border-border rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-sky-500/5 transition-all duration-500;
+    @apply bg-card border border-border rounded-3xl shadow-sm hover:shadow-xl hover:shadow-sky-500/10 transition-all duration-500;
+  }
+
+  .btn-premium {
+    @apply px-8 py-3 bg-ink text-paper text-[11px] font-bold uppercase tracking-widest rounded-full hover:scale-105 active:scale-95 transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 border border-transparent;
+  }
+
+  .dark .btn-premium {
+    @apply bg-paper text-ink shadow-[0_8px_30px_rgba(255,255,255,0.1)];
+  }
+
+  .btn-outline {
+    @apply px-8 py-3 bg-transparent text-ink border border-border text-[11px] font-bold uppercase tracking-widest rounded-full hover:border-ink active:scale-95 transition-all flex items-center gap-3;
   }
 
   .glass {
-    @apply bg-card/70 backdrop-blur-xl border-b border-border;
+    @apply bg-paper/70 backdrop-blur-2xl border-b border-border/50 supports-[backdrop-filter]:bg-paper/50;
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    mix-blend-mode: overlay;
   }
 
   .bg-grid {
     background-image: radial-gradient(circle at 1px 1px, var(--color-border) 1px, transparent 0);
-    background-size: 40px 40px;
+    background-size: 32px 32px;
+  }
+
+  .atmosphere-layer {
+    background: radial-gradient(circle at 50% 0%, var(--color-accent) 0%, transparent 50%);
+    opacity: 0.15;
+    filter: blur(80px);
+    pointer-events: none;
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    right: -20%;
+    bottom: -20%;
+    z-index: 0;
   }
 
   .marquee-container {
