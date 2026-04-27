@@ -89,10 +89,14 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
 
   useEffect(() => {
     if (user && !loading && !profile && window.location.pathname !== '/select-level') {
       navigate('/select-level');
+    }
+    if (!user) {
+      setIsMenuOpen(false);
     }
   }, [user, loading, profile, navigate]);
 
@@ -178,16 +182,18 @@ const Navbar = () => {
             </button>
           </>
         ) : (
-          <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="px-10 py-3.5 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-sky-600 dark:hover:bg-sky-500 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50 flex items-center gap-3"
-          >
-            Get Started
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => { setAuthMode('signup'); setIsAuthModalOpen(true); }}
+              className="flex px-8 py-3 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-2xl hover:bg-sky-600 dark:hover:bg-sky-500 transition-all shadow-xl shadow-slate-900/10 items-center gap-3"
+            >
+              Get Started
+            </button>
+          </div>
         )}
       </div>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultIsLogin={authMode === 'login'} />
 
       <AnimatePresence>
         {isMenuOpen && (
@@ -210,7 +216,7 @@ const Navbar = () => {
               <NavLinks />
             </div>
             <button 
-              onClick={logout}
+              onClick={() => { setIsMenuOpen(false); logout(); }}
               className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors pt-6 mt-2 border-t border-border"
             >
               <LogOut size={18} />
@@ -248,7 +254,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-paper transition-colors duration-500">
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultLevel={selectedLevel} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultLevel={selectedLevel} defaultIsLogin={false} />
       {/* Hero Section */}
       <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 px-6 md:px-10 overflow-hidden">
         {/* Background Elements */}

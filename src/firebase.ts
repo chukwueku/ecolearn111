@@ -36,7 +36,6 @@ export const registerWithEmail = async (email: string, password: string) => {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
-    console.error('Registration error:', error);
     throw error;
   }
 };
@@ -46,7 +45,6 @@ export const loginWithEmail = async (email: string, password: string) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
-    console.error('Login error:', error);
     throw error;
   }
 };
@@ -57,7 +55,6 @@ export const loginWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error) {
-    console.error('Login error:', error);
     throw error;
   }
 };

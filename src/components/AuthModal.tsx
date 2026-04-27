@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Loader2, Mail, Lock, User as UserIcon } from 'lucide-react';
 import { loginWithGoogle, registerWithEmail, loginWithEmail, createUserProfile, getUserProfile, updateUserLevel } from '../firebase';
@@ -9,15 +10,25 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultLevel?: 'secondary' | 'undergraduate';
+  defaultIsLogin?: boolean;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLevel = 'secondary' }) => {
-  const [isLogin, setIsLogin] = useState(true);
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLevel = 'secondary', defaultIsLogin = true }) => {
+  const [isLogin, setIsLogin] = useState(defaultIsLogin);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsLogin(defaultIsLogin);
+      setError('');
+      setPassword('');
+      // optionally don't clear email so they don't have to retype it if they flipped to login
+    }
+  }, [isOpen, defaultIsLogin]);
   
   const navigate = useNavigate();
   const { setProfile, user } = useAuth();
@@ -27,7 +38,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLe
       const existingProfile = await getUserProfile(firebaseUser.uid);
       if (!existingProfile) {
         // Provide a default level if registering new
-        const newProfile = await createUserProfile({ ...firebaseUser, displayName: name || firebaseUser.displayName }, defaultLevel);
+        const newProfile = await createUserProfile({ 
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: name || firebaseUser.displayName 
+        }, defaultLevel);
         setProfile(newProfile);
         onClose();
         navigate('/select-level');
@@ -66,7 +81,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLe
       } else if (err.code === 'auth/weak-password') {
         setError('Password must be at least 6 characters.');
       } else {
-        setError('Authentication failed. Please try again.');
+        setError(err.message || 'Authentication failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -97,126 +112,138 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLe
     }
   };
 
-  if (!isOpen) return null;
-
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }} 
-          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" 
-          onClick={onClose} 
-        />
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 20 }} 
-          animate={{ opacity: 1, scale: 1, y: 0 }} 
-          exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-          className="relative w-full max-w-md bg-card border border-border rounded-3xl shadow-2xl p-8"
-        >
-          <button onClick={onClose} className="absolute right-6 top-6 text-muted hover:text-ink transition-colors">
-            <X size={20} />
-          </button>
-          
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-ink mb-2">
-              {isLogin ? 'Welcome back' : 'Create an account'}
-            </h2>
-            <p className="text-sm text-muted">
-              {isLogin ? 'Sign in to access your dashboard' : 'Join thousands of scholars today'}
-            </p>
-          </div>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
+              onClick={onClose} 
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.95, y: 20 }} 
+              className="relative transform overflow-y-auto rounded-3xl bg-card border border-border text-left shadow-2xl transition-all w-full max-w-md max-h-[90vh] my-8"
+            >
+              <div className="p-6 sm:p-8">
+                <button onClick={onClose} className="absolute right-6 top-6 text-muted hover:text-ink transition-colors z-10">
+                  <X size={20} />
+                </button>
+                
+                <div className="text-center mb-8 mt-2">
+                  <h2 className="text-2xl font-bold text-ink mb-2">
+                    {isLogin ? 'Welcome back' : 'Create an account'}
+                  </h2>
+                  <p className="text-sm text-muted">
+                    {isLogin ? 'Sign in to access your dashboard' : 'Join thousands of scholars today'}
+                  </p>
+                </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 text-sm list-none">
-                {error}
-            </div>
-          )}
+                {error && (
+                  <div className="mb-6 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 text-sm list-none">
+                      {error}
+                  </div>
+                )}
 
-          <form onSubmit={handleEmailAuth} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Full Name</label>
-                <div className="relative">
-                  <UserIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                  <input 
-                    type="text" 
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    required
-                    className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
-                    placeholder="John Doe"
-                  />
+                <form onSubmit={handleEmailAuth} className="space-y-4">
+                  {!isLogin && (
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Full Name</label>
+                      <div className="relative">
+                        <UserIcon size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                        <input 
+                          type="text" 
+                          value={name}
+                          onChange={e => setName(e.target.value)}
+                          required
+                          autoComplete="name"
+                          className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink placeholder-slate-400 focus:outline-none focus:border-accent transition-colors"
+                          placeholder="John Doe"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Email</label>
+                    <div className="relative">
+                      <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                      <input 
+                        type="email" 
+                        name="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                        className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink placeholder-slate-400 focus:outline-none focus:border-accent transition-colors"
+                        placeholder="name@example.com"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Password</label>
+                    <div className="relative">
+                      <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                      <input 
+                        type="password" 
+                        name="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        autoComplete={isLogin ? "current-password" : "new-password"}
+                        className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink placeholder-slate-400 focus:outline-none focus:border-accent transition-colors"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full py-4 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-800 dark:hover:bg-sky-500 transition-colors mt-6 flex justify-center items-center gap-2"
+                  >
+                    {loading && <Loader2 size={16} className="animate-spin" />}
+                    {isLogin ? 'Sign In' : 'Create Account'}
+                  </button>
+                </form>
+
+                <div className="mt-8 text-center text-sm text-muted flex items-center justify-center gap-2">
+                  <span>{isLogin ? "Don't have an account?" : "Already have an account?"}</span>
+                  <button 
+                    onClick={() => { setIsLogin(!isLogin); setError(''); }}
+                    className="text-accent font-bold hover:underline"
+                    type="button"
+                  >
+                    {isLogin ? 'Sign up' : 'Sign in'}
+                  </button>
+                </div>
+                
+                <div className="mt-8 pt-8 border-t border-border">
+                   <button
+                      type="button"
+                      onClick={handleGoogleAuth}
+                      disabled={loading}
+                      className="w-full py-4 bg-paper text-ink border border-border text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex justify-center items-center gap-3"
+                    >
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                      Continue with Google
+                   </button>
                 </div>
               </div>
-            )}
-            
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Email</label>
-              <div className="relative">
-                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
-                  placeholder="name@example.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted mb-2 block">Password</label>
-              <div className="relative">
-                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                <input 
-                  type="password" 
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full bg-paper border border-border rounded-xl pl-12 pr-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
-                  placeholder="••••••••"
-                />
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full py-4 bg-slate-900 dark:bg-sky-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 transition-colors mt-6 flex justify-center items-center gap-2"
-            >
-              {loading && <Loader2 size={16} className="animate-spin" />}
-              {isLogin ? 'Sign In' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="mt-8 text-center text-sm text-muted flex items-center justify-center gap-2">
-            <span>{isLogin ? "Don't have an account?" : "Already have an account?"}</span>
-            <button 
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-accent font-bold hover:underline"
-              type="button"
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
+            </motion.div>
           </div>
-          
-          <div className="mt-8 pt-8 border-t border-border">
-             <button
-                type="button"
-                onClick={handleGoogleAuth}
-                disabled={loading}
-                className="w-full py-4 bg-paper text-ink border border-border text-[11px] font-bold uppercase tracking-widest rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex justify-center items-center gap-3"
-              >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-                Continue with Google
-             </button>
-          </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 };
