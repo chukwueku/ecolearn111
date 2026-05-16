@@ -105,7 +105,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLe
       } else if (err.code === 'auth/unauthorized-domain') {
         setError('Sign-in failed: Unauthorized domain. Please add this domain (e.g. your vercel.app domain) to your Firebase Authentication Settings -> Authorized domains.');
       } else {
-        setError('Google sign-in failed. Please try again.');
+        console.error("Google Auth Error:", err);
+        setError(err.message || 'Google sign-in failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -129,10 +130,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLe
               initial={{ opacity: 0, scale: 0.95, y: 20 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
               exit={{ opacity: 0, scale: 0.95, y: 20 }} 
-              className="relative transform overflow-hidden rounded-[2.5rem] bg-card border-none ring-1 ring-ink/5 dark:ring-white/10 text-left shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all w-full max-w-md max-h-[90vh] my-8"
+              className="relative transform overflow-hidden flex flex-col rounded-[2.5rem] bg-card border-none ring-1 ring-ink/5 dark:ring-white/10 text-left shadow-[0_20px_50px_rgba(0,0,0,0.1)] transition-all w-full max-w-md max-h-[90vh] my-8"
             >
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-noise mix-blend-overlay opacity-50" />
-              <div className="p-8 sm:p-10 relative z-10">
+              <div className="p-8 sm:p-10 relative z-10 overflow-y-auto flex-1 custom-scrollbar">
                 <button onClick={onClose} className="absolute right-6 top-6 text-muted hover:text-ink hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors z-10 w-10 h-10 flex items-center justify-center">
                   <X size={20} />
                 </button>
