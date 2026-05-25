@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, serverTimestamp, Timestamp, orderBy, limit, getDocFromServer, addDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, onSnapshot, serverTimestamp, Timestamp, orderBy, limit, getDocFromServer, addDoc, runTransaction } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
@@ -291,3 +291,125 @@ export const getLeaderboard = async (limitCount: number = 10): Promise<UserProfi
     return [];
   }
 };
+
+// --- Arena Matchmaking ---
+
+export const enterMatchmaking = async (user: { uid: string, displayName: string }, topicId: string, questions: Question[]) => {
+  try {
+    const queueRef = collection(db, 'arena_queue');
+    const q = query(queueRef, where('topicId', '==', topicId));
+    let matchCreated = null;
+
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(q);
+      const potentialOpponents = snap.docs.filter(d => d.data().uid !== user.uid);
+      
+      if (potentialOpponents.length > 0) {
+        // Found opponent
+        const opponent = potentialOpponents[0];
+        const oppData = opponent.data();
+        transaction.delete(opponent.ref);
+
+        const matchRef = doc(collection(db, 'arena_matches'));
+        matchCreated = matchRef.id;
+        
+        transaction.set(matchRef, {
+          matchId: matchRef.id,
+          topicId,
+          questions,
+          players: [
+            { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true },
+            { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true }
+          ],
+          status: 'playing',
+          createdAt: serverTimestamp()
+        });
+      } else {
+        // No opponent found, add self to queue
+        const myQueueRef = doc(collection(db, 'arena_queue'), user.uid);
+        transaction.set(myQueueRef, {
+          uid: user.uid,
+          displayName: user.displayName,
+          topicId,
+          enteredAt: serverTimestamp()
+        });
+      }
+    });
+
+    return matchCreated; // returns matchId if immediately found, null if placed in queue
+
+  } catch(e) {
+    console.error("Error in matchmaking:", e);
+    return null;
+  }
+};
+
+export const leaveMatchmaking = async (uid: string) => {
+  try {
+    await deleteDoc(doc(db, 'arena_queue', uid));
+  } catch(e) { console.error(e); }
+};
+
+export const submitMatchAnswer = async (matchId: string, uid: string, correct: boolean, questionIndex: number) => {
+  try {
+    const matchRef = doc(db, 'arena_matches', matchId);
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(matchRef);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const players = data.players || [];
+      const pIndex = players.findIndex((p: any) => p.id === uid);
+      if (pIndex !== -1) {
+        if (correct) players[pIndex].score += 10;
+        players[pIndex].currentQuestion = questionIndex + 1;
+        
+        // check win
+        let status = data.status;
+        if (players.every((p: any) => p.currentQuestion >= (data.questions?.length || 0))) {
+          status = 'finished';
+        }
+        
+        transaction.update(matchRef, { players, status });
+      }
+    });
+  } catch(e) { console.error(e); }
+};
+
+export const sendMatchMessage = async (matchId: string, senderId: string, senderName: string, message: string) => {
+  try {
+    await addDoc(collection(db, `arena_matches/${matchId}/messages`), {
+       senderId, senderName, message, timestamp: serverTimestamp()
+    });
+  } catch(e) { console.error(e); }
+};
+
+export const requestMatchRematch = async (matchId: string, challengerName: string, challengerId: string) => {
+  try {
+    await updateDoc(doc(db, 'arena_matches', matchId), {
+       rematchOffered: { challengerName, challengerId }
+    });
+  } catch(e) { console.error(e); }
+};
+
+export const acceptMatchRematch = async (matchId: string, questions: Question[]) => {
+  try {
+    const matchRef = doc(db, 'arena_matches', matchId);
+    await runTransaction(db, async (transaction) => {
+       const snap = await transaction.get(matchRef);
+       if (!snap.exists()) return;
+       const data = snap.data();
+       const players = data.players.map((p: any) => ({ ...p, score: 0, currentQuestion: 0 }));
+       transaction.update(matchRef, {
+         players,
+         questions,
+         status: 'playing',
+         rematchOffered: null
+       });
+    });
+  } catch(e) { console.error(e); }
+};
+
+// Also listen to online users for lobby representation: Just simple presence.
+// We'll read from arena_queue for those "searching", and we can't easily track idle without cloud functions.
+// We'll skip complex presence for now to ensure stability on Vercel.
+
