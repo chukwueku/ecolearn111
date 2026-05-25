@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { logout, updateUserLevel } from '../firebase';
+import { logout, updateUserLevel, updateUserProfile, db } from '../firebase';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useDarkMode } from '../DarkModeContext';
 
 export const Profile = () => {
@@ -9,6 +10,18 @@ export const Profile = () => {
     const navigate = useNavigate();
     const { isDarkMode, toggleDarkMode } = useDarkMode();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState('');
+    const [editPhotoURL, setEditPhotoURL] = useState('');
+    const [updateLoading, setUpdateLoading] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (profile) {
+            setEditName(profile.displayName || '');
+            setEditPhotoURL(profile.photoURL || '');
+        }
+    }, [profile]);
     
     // Fallback counts or real data calculation
     const progress = profile?.progress || {};
@@ -32,6 +45,181 @@ export const Profile = () => {
         navigate('/');
     };
 
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user || !profile) return;
+        if (!editName.trim()) return;
+
+        setUpdateLoading(true);
+        try {
+            const updates: Partial<{ displayName: string; photoURL: string }> = { displayName: editName };
+            if (editPhotoURL) updates.photoURL = editPhotoURL;
+            
+            await updateUserProfile(user.uid, updates);
+            setProfile({ ...profile, ...updates });
+            setIsEditing(false);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setUpdateLoading(false);
+        }
+    };
+
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 1024 * 1024) { // 1MB limit for base64
+                alert('Image is too large. Please select an image under 1MB.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditPhotoURL(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleResetProgress = async () => {
+        if (!user || !profile) return;
+        if (window.confirm('Are you sure you want to reset all your progress? This cannot be undone.')) {
+            setUpdateLoading(true);
+            try {
+                await updateUserProfile(user.uid, { progress: {}, scores: {}, points: 0 });
+                setProfile({ ...profile, progress: {}, scores: {}, points: 0 });
+                alert('Progress reset successfully.');
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setUpdateLoading(false);
+            }
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!user || !profile) return;
+        if (window.confirm('DANGER: This will permanently delete your EcoMastery account and all your data. Are you absolutely sure?')) {
+            setUpdateLoading(true);
+            try {
+                // Delete from firestore
+                await deleteDoc(doc(db, 'users', user.uid));
+                
+                // Then logout (Actual Auth deletion would require re-authentication usually, so we just clear data and logout for this prototype)
+                await logout();
+                navigate('/');
+                alert('Your account has been deleted.');
+            } catch (e) {
+                console.error(e);
+                alert('Error deleting account. You might need to re-login to perform this action.');
+            } finally {
+                setUpdateLoading(false);
+            }
+        }
+    };
+
+    if (isEditing) {
+        return (
+            <div className="bg-background text-on-background min-h-screen pb-24 font-['Hanken_Grotesk']">
+                <header className="w-full sticky top-0 z-40 bg-surface dark:bg-surface-container-low shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex justify-between items-center px-grid-margin py-md">
+                    <button onClick={() => setIsEditing(false)} className="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface">
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
+                    <h1 className="font-headline-md text-primary font-bold">Edit Profile</h1>
+                    <div className="w-10"></div>
+                </header>
+
+                <main className="px-grid-margin mt-lg max-w-xl mx-auto py-8">
+                    <form onSubmit={handleUpdateProfile} className="space-y-6">
+                        <div className="flex flex-col items-center mb-8">
+                            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                <img 
+                                    className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover mb-4 group-hover:opacity-75 transition-opacity" 
+                                    src={editPhotoURL || user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuAfzyP_Cs1fhh76Mfc5oxxTt3jrhfEKTIVkLomLlMJBJ4TIAaYQPS6np0hqP8wrxcB1qINH4CNUHkMvoROAvbjvt6gfpx74WXh4bmyRkM37ZZ48f34cpZlJcCmjoVMdrqAfpUllVSB-bgB3UJeXEb67VNsF6PJqauhJ58sMxVa2vBCQpjWA3mCPWbm4Q9itUJ3PR_gzEYGkHOgtbfnFaK8KO136EOFmU0vJxE3Qywds1Bf8Wq-oYz073mppqPg5Lwzx6kYfvj7vt3M"} 
+                                    alt="Avatar" 
+                                />
+                                <div className="absolute inset-x-0 bottom-4 flex justify-center">
+                                    <div className="bg-primary/80 text-on-primary p-1.5 rounded-full shadow-lg group-hover:scale-110 transition-transform">
+                                        <span className="material-symbols-outlined text-sm">photo_camera</span>
+                                    </div>
+                                </div>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    onChange={onFileChange} 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                />
+                            </div>
+                            <p className="font-label-sm text-outline mt-2 text-center">Click avatar to upload from gallery</p>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="font-label-md text-on-surface-variant ml-1 font-bold">Display Name</label>
+                                <input 
+                                    type="text" 
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-2xl px-6 py-4 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-on-surface font-medium"
+                                    placeholder="Enter your name"
+                                    required
+                                />
+                            </div>
+
+                            <div className="space-y-1.5 opacity-60">
+                                <label className="font-label-md text-on-surface-variant ml-1 font-bold">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    value={user?.email || ''} 
+                                    disabled
+                                    className="w-full bg-surface-container-low border border-outline-variant/10 rounded-2xl px-6 py-4 text-on-surface font-medium cursor-not-allowed"
+                                />
+                                <p className="text-[10px] text-outline font-medium ml-1">Email cannot be changed directly</p>
+                            </div>
+                        </div>
+
+                        <button 
+                            type="submit"
+                            disabled={updateLoading}
+                            className="w-full bg-primary text-on-primary font-headline-md font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-8"
+                        >
+                            {updateLoading ? (
+                                <span className="animate-spin material-symbols-outlined">progress_activity</span>
+                            ) : (
+                                <span className="material-symbols-outlined">check</span>
+                            )}
+                            Save Changes
+                        </button>
+
+                        <div className="pt-10 space-y-4">
+                            <h4 className="font-label-md text-error uppercase tracking-widest pl-1 font-bold text-[10px]">Danger Zone</h4>
+                            
+                            <button 
+                                type="button"
+                                onClick={handleResetProgress}
+                                disabled={updateLoading}
+                                className="w-full border border-outline-variant/30 text-error font-label-md font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error/5 transition-all"
+                            >
+                                <span className="material-symbols-outlined text-lg">restart_alt</span>
+                                Reset All Progress
+                            </button>
+
+                            <button 
+                                type="button"
+                                onClick={handleDeleteAccount}
+                                disabled={updateLoading}
+                                className="w-full border border-error/30 text-error font-label-md font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error/5 transition-all"
+                            >
+                                <span className="material-symbols-outlined text-lg">delete_forever</span>
+                                Delete Account
+                            </button>
+                        </div>
+                    </form>
+                </main>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-background text-on-background min-h-screen pb-24 font-['Hanken_Grotesk']">
             {/* TopAppBar */}
@@ -50,7 +238,7 @@ export const Profile = () => {
                     <div className="relative mb-4">
                         <img 
                             className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover" 
-                            src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuAfzyP_Cs1fhh76Mfc5oxxTt3jrhfEKTIVkLomLlMJBJ4TIAaYQPS6np0hqP8wrxcB1qINH4CNUHkMvoROAvbjvt6gfpx74WXh4bmyRkM37ZZ48f34cpZlJcCmjoVMdrqAfpUllVSB-bgB3UJeXEb67VNsF6PJqauhJ58sMxVa2vBCQpjWA3mCPWbm4Q9itUJ3PR_gzEYGkHOgtbfnFaK8KO136EOFmU0vJxE3Qywds1Bf8Wq-oYz073mppqPg5Lwzx6kYfvj7vt3M"} 
+                            src={profile?.photoURL || user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuAfzyP_Cs1fhh76Mfc5oxxTt3jrhfEKTIVkLomLlMJBJ4TIAaYQPS6np0hqP8wrxcB1qINH4CNUHkMvoROAvbjvt6gfpx74WXh4bmyRkM37ZZ48f34cpZlJcCmjoVMdrqAfpUllVSB-bgB3UJeXEb67VNsF6PJqauhJ58sMxVa2vBCQpjWA3mCPWbm4Q9itUJ3PR_gzEYGkHOgtbfnFaK8KO136EOFmU0vJxE3Qywds1Bf8Wq-oYz073mppqPg5Lwzx6kYfvj7vt3M"} 
                             alt="User Avatar" 
                         />
                         <div className="absolute bottom-0 right-0 bg-secondary text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-md border-2 border-white">
@@ -114,7 +302,7 @@ export const Profile = () => {
                         </div>
 
                         {/* Profile Settings */}
-                        <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => alert('Account settings coming soon!')}>
+                        <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setIsEditing(true)}>
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
                                     <span className="material-symbols-outlined">manage_accounts</span>

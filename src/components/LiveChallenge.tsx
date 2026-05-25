@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence } from '../firebase';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
@@ -28,8 +28,17 @@ export const LiveChallenge: React.FC = () => {
   const [chatInput, setChatInput] = useState('');
   const [rematchRequested, setRematchRequested] = useState(false);
   const [rematchOffered, setRematchOffered] = useState<any>(null);
+  const [waitingForOpponent, setWaitingForOpponent] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [gameMode, setGameMode] = useState<'bullet' | 'blitz' | 'rapid'>('blitz');
   const timerRef = useRef<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const MODE_CONFIGS = {
+    bullet: { time: 15, label: 'Bullet', questions: 5, icon: <Zap size={18} /> },
+    blitz: { time: 30, label: 'Blitz', questions: 15, icon: <Timer size={18} /> },
+    rapid: { time: 45, label: 'Rapid', questions: 20, icon: <Swords size={18} /> }
+  };
 
   const [searchTime, setSearchTime] = useState(0);
   const [matchFoundState, setMatchFoundState] = useState(false);
@@ -126,15 +135,35 @@ export const LiveChallenge: React.FC = () => {
                   setMatchFoundState(false);
                   setLoading(false);
                   setFinished(false);
-                  setCurrentQuestion(0);
+                  const me = myMatch.players.find((p: any) => p.id === user.uid);
+                  setCurrentQuestion(me.currentQuestion || 0);
+                  setWaitingForOpponent(myMatch.currentTurnUid !== user.uid);
                   setRematchRequested(false);
                   setRematchOffered(null);
-                  startTimer();
+                  const mode = myMatch.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
+                  startTimer(MODE_CONFIGS[mode].time);
              }, 2000);
          } else {
              // Match updated (progress sync)
              setPlayers(myMatch.players);
+             setMatchData(myMatch);
              
+             const me = myMatch.players.find((p: any) => p.id === user.uid);
+             const isMyTurn = myMatch.currentTurnUid === user.uid;
+
+             // Turn changed logic
+             if (isMyTurn && waitingForOpponent) {
+                // It just became my turn!
+                setWaitingForOpponent(false);
+                setCurrentQuestion(me.currentQuestion);
+                const mode = myMatch.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
+                setTimeLeft(MODE_CONFIGS[mode].time);
+                startTimer(MODE_CONFIGS[mode].time);
+             } else if (!isMyTurn && !waitingForOpponent) {
+                // I just moved, now waiting
+                setWaitingForOpponent(true);
+             }
+
              if (myMatch.rematchOffered && myMatch.rematchOffered.challengerId !== user.uid) {
                 setRematchOffered(myMatch.rematchOffered);
              } else if (!myMatch.rematchOffered) {
@@ -192,19 +221,19 @@ export const LiveChallenge: React.FC = () => {
     };
   }, [user]);
 
-  const startTimer = () => {
-    setTimeLeft(15);
+  const startTimer = (limit: number = 15) => {
+    setTimeLeft(limit);
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          handleAnswer(false);
-          return 15;
-        }
-        return prev - 1;
-      });
+      setTimeLeft(prev => prev <= 1 ? 0 : prev - 1);
     }, 1000);
   };
+
+  useEffect(() => {
+     if (timeLeft === 0 && !waitingForOpponent && matchData && !finished) {
+         handleAnswer(false);
+     }
+  }, [timeLeft, waitingForOpponent, matchData, finished]);
 
   const handleChallenge = async (targetUser: any) => {
     if (!user || !profile) return;
@@ -224,9 +253,10 @@ export const LiveChallenge: React.FC = () => {
     
     try {
       const questions = await getQuestions(topic.id);
-      const finalQuestions = questions.length > 0 ? questions : [
+      const finalQuestions: Question[] = questions.length > 0 ? questions : [
          { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
       ];
+      // Note: Direct challenges always use blitz for now or we can add a picker
       await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
     } catch(e) { console.error(e); }
     setLoading(false);
@@ -238,15 +268,10 @@ export const LiveChallenge: React.FC = () => {
   };
 
   const handleAnswer = (correct: boolean) => {
-    if (!matchData?.matchId || !user) return;
+    if (!matchData?.matchId || !user || waitingForOpponent) return;
     submitMatchAnswer(matchData.matchId, user.uid, correct, currentQuestion);
-    
-    if (currentQuestion < matchData.questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-      startTimer();
-    } else {
-      clearInterval(timerRef.current);
-    }
+    setWaitingForOpponent(true);
+    clearInterval(timerRef.current);
   };
 
   const sendMessage = (e: React.FormEvent) => {
@@ -271,9 +296,10 @@ export const LiveChallenge: React.FC = () => {
     
     const questions = await getQuestions(topic.id);
     
-    await acceptMatchRematch(matchData.matchId, questions.length > 0 ? questions : [
+    const finalQuestions: Question[] = questions.length > 0 ? questions : [
        { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
-    ]);
+    ];
+    await acceptMatchRematch(matchData.matchId, finalQuestions);
     setLoading(false);
   };
 
@@ -301,33 +327,29 @@ export const LiveChallenge: React.FC = () => {
 
       try {
         const questions = await getQuestions(topic.id);
-        const finalQuestions = questions.length > 0 ? questions : [
+        const finalQuestions: Question[] = questions.length > 0 ? questions : [
           { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
         ];
 
         setIsSearching(true);
-        const matchResult = await enterMatchmaking({ uid: user.uid, displayName: profile.displayName }, selectedTopicId, finalQuestions);
-        
-        if (matchResult === false || matchResult === undefined) {
-             // In case it utterly fails
-             setIsSearching(false);
-             return;
-        }
-
-        // Start search timer
         setSearchTime(0);
-        clearInterval(searchTimerRef.current);
-        searchTimerRef.current = setInterval(() => {
-          setSearchTime(prev => prev + 1);
-        }, 1000);
-      } catch (error) {
-        console.error("Error fetching questions:", error);
+        searchTimerRef.current = setInterval(() => setSearchTime(prev => prev + 1), 1000);
+
+        const matchResult = await enterMatchmaking({ uid: user.uid, displayName: profile.displayName }, selectedTopicId, finalQuestions, gameMode);
+        
+        if (matchResult === null) {
+             // Success putting in queue
+        } else if (matchResult) {
+            // Match found immediately - snapshot takes over
+        }
+      } catch (e) {
+        console.error(e);
+        setIsSearching(false);
       } finally {
         setLoading(false);
       }
     }
   };
-
   if (finished) {
     const me = players.find(p => p.id === user?.uid);
     const opponent = players.find(p => p.id !== user?.uid);
@@ -437,144 +459,226 @@ export const LiveChallenge: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen bg-paper pt-8 md:pt-16 pb-12 px-8 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12">
-          {/* Main Content */}
-          <div className="lg:col-span-8 space-y-8">
-            <div className="bg-white dark:bg-slate-900 p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-              {/* Subtle Background Glow */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-              
-              <div className="flex items-center justify-between mb-20 relative z-10">
+      <div className="min-h-screen bg-[#161512] text-[#f1f1f1] flex flex-col md:flex-row font-sans">
+        {/* Main Game Area */}
+        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 space-y-4">
+          <div className="w-full max-w-[700px] flex flex-col space-y-4">
+            
+            {/* Opponent Panel */}
+            <div className={cn(
+              "flex items-center justify-between bg-[#262421] rounded-lg p-3 shadow-lg border transition-all",
+              matchData.currentTurnUid !== user?.uid ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-white/5"
+            )}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center font-bold text-xl text-white border border-white/10">
+                  {opponent?.displayName?.[0] || 'O'}
+                </div>
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="px-3 py-1 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-[8px] font-bold uppercase tracking-[0.3em] rounded-full border border-sky-500/20">
-                      Combat Phase
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-bold">{opponent?.displayName || 'Opponent'}</p>
+                    {matchData.currentTurnUid !== user?.uid && (
+                      <span className="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-black uppercase animate-pulse">Thinking</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/40 flex items-center gap-1">
+                      <Swords size={12} />
+                      Score: {opponent?.score || 0}
                     </span>
                   </div>
-                  <p className="text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.3em] mb-2">Question {currentQuestion + 1} of {matchData.questions.length}</p>
-                  <h2 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tighter uppercase font-display italic">Active Duel</h2>
                 </div>
-                <div className="text-right">
-                  <div className={cn(
-                    "text-4xl md:text-6xl font-mono font-bold tracking-tighter transition-all duration-300",
-                    timeLeft <= 5 ? 'text-rose-500 animate-pulse scale-110' : 'text-slate-900 dark:text-white'
+              </div>
+              <div className={cn(
+                "px-6 py-3 rounded-lg font-mono text-3xl font-bold border-2 transition-all",
+                matchData.currentTurnUid !== user?.uid ? "bg-emerald-500/10 border-emerald-500 text-white" : "bg-white/5 border-white/10 text-white/40"
+              )}>
+                {matchData.currentTurnUid !== user?.uid ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
+              </div>
+            </div>
+
+            {/* Question Area (The "Board") */}
+            <div className="relative aspect-[4/3] w-full bg-[#262421] rounded-2xl border-4 border-[#3c3a37] shadow-2xl flex flex-col overflow-hidden">
+               {/* Background grid pattern like chess board */}
+               <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                    style={{ backgroundImage: 'radial-gradient(circle, #f1f1f1 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+               
+               <div className="flex-1 p-8 md:p-12 flex flex-col relative z-10">
+                  {waitingForOpponent ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
+                      <div className="relative">
+                        <Loader2 className="animate-spin text-emerald-500" size={64} />
+                        <div className="absolute inset-0 blur-xl bg-emerald-500/20 animate-pulse" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-white uppercase tracking-widest italic font-display">Opponent's Turn</h3>
+                      <p className="text-white/40 font-mono text-sm tracking-widest">WAITING FOR MOVE...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-8">
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-sky-400 mb-2 block">Your Turn • Question {currentQuestion + 1}</span>
+                        <h3 className="text-2xl md:text-3xl font-bold leading-tight">
+                          {q.question}
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {q.options.map((option: string, i: number) => (
+                          <button
+                            key={i}
+                            onClick={() => handleAnswer(i === q.correctAnswer)}
+                            className="group relative h-20 bg-[#3c3a37] hover:bg-[#484643] rounded-xl border-l-[6px] border-[#312e2b] hover:border-sky-500 transition-all text-left px-6 flex items-center gap-4 overflow-hidden"
+                          >
+                             <div className="w-8 h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-white/20 group-hover:text-sky-500/50 transition-colors">
+                               {String.fromCharCode(65 + i)}
+                             </div>
+                             <span className="text-lg font-medium tracking-tight text-white group-hover:translate-x-1 transition-transform">{option}</span>
+                             <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+               </div>
+
+               {/* Game Progress Bar */}
+               <div className="h-2 bg-black/40 flex">
+                  {matchData.questions.map((_: any, i: number) => {
+                    const myProgress = me?.currentQuestion || 0;
+                    const oppProgress = opponent?.currentQuestion || 0;
+                    return (
+                      <div 
+                        key={i}
+                        className={cn(
+                          "flex-1 h-full border-r border-black/20 transition-all flex",
+                          i < Math.min(myProgress, oppProgress) ? "bg-emerald-500" : "bg-transparent"
+                        )}
+                      >
+                         <div className={cn("flex-1 h-full", i === myProgress && matchData.currentTurnUid === user?.uid ? "bg-sky-500 animate-pulse" : "")} />
+                         <div className={cn("flex-1 h-full", i === oppProgress && matchData.currentTurnUid !== user?.uid ? "bg-emerald-500/50 animate-pulse" : "")} />
+                      </div>
+                    );
+                  })}
+               </div>
+            </div>
+
+            {/* My Panel */}
+            <div className={cn(
+              "flex items-center justify-between bg-[#262421] rounded-lg p-3 shadow-lg border-2 transition-all",
+              matchData.currentTurnUid === user?.uid ? "border-sky-500" : "border-white/5"
+            )}>
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl text-white border",
+                  matchData.currentTurnUid === user?.uid ? "bg-sky-500 border-sky-400" : "bg-white/10 border-white/10"
+                )}>
+                  {profile?.displayName?.[0] || 'U'}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-bold">You</p>
+                    {matchData.currentTurnUid === user?.uid && (
+                      <span className="text-[10px] bg-sky-500 text-white px-1.5 py-0.5 rounded font-black uppercase">Your Turn</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-emerald-400 flex items-center gap-1">
+                      <Trophy size={12} />
+                      Score: {me?.score || 0}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className={cn(
+                "px-6 py-3 rounded-lg font-mono text-3xl font-bold border-2 transition-all",
+                matchData.currentTurnUid === user?.uid 
+                  ? timeLeft <= 5 ? "bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse" : "bg-sky-500/10 border-sky-500 text-white" 
+                  : "bg-white/5 border-white/10 text-white/40"
+              )}>
+                {matchData.currentTurnUid === user?.uid ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        {/* Sidebar (Analysis/Chat) */}
+        <div className="w-full md:w-[320px] bg-[#262421] border-l border-black/20 flex flex-col">
+           {/* Header tabs */}
+           <div className="flex border-b border-black/20 p-1">
+              <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-[#f1f1f1] border-b-2 border-sky-500 transition-all">Move History</button>
+              <button onClick={() => setIsChatOpen(!isChatOpen)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">Analysis</button>
+           </div>
+
+           {/* History List */}
+           <div className="flex-1 overflow-y-auto p-4 space-y-2 font-mono scrollbar-hide">
+              {matchData.questions.map((_: any, i: number) => {
+                const isPast = i < currentQuestion;
+                const isCurrent = i === currentQuestion;
+                const wasCorrect = me?.answers?.[i];
+                const opponentCorrect = opponent?.answers?.[i];
+
+                return (
+                  <div key={i} className={cn(
+                    "flex items-center gap-4 p-2 rounded transition-colors group",
+                    isCurrent ? "bg-white/5" : ""
                   )}>
-                    {timeLeft}s
-                  </div>
-                  <p className="text-[9px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.3em] mt-2">Remaining Time</p>
-                </div>
-              </div>
-
-              <div className="space-y-16 relative z-10">
-                <h3 className="text-4xl font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight max-w-2xl">
-                  {q.question}
-                </h3>
-                <div className="grid gap-5">
-                  {q.options.map((option: string, i: number) => (
-                    <button
-                      key={i}
-                      onClick={() => handleAnswer(i === q.correctAnswer)}
-                      className="w-full p-10 text-left bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] hover:border-sky-500 hover:bg-sky-50/30 dark:hover:bg-sky-900/30 transition-all group flex items-center justify-between shadow-sm hover:shadow-xl hover:-translate-y-1"
-                    >
-                      <div className="flex items-center gap-8">
-                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center font-bold text-xl text-slate-700 dark:text-slate-500 group-hover:bg-sky-500 group-hover:text-white transition-all shadow-sm">
-                          {String.fromCharCode(65 + i)}
-                        </div>
-                        <span className="text-2xl font-medium text-slate-800 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{option}</span>
-                      </div>
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 group-hover:bg-sky-500 transition-all">
-                        <ChevronRight className="text-slate-400 dark:text-slate-600 group-hover:text-white transition-all" size={24} />
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-4 space-y-10">
-            {/* Scoreboard */}
-            <div className="bg-white dark:bg-slate-900 p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-              <h4 className="text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.4em] mb-12 relative z-10">Live Performance</h4>
-              <div className="space-y-10 relative z-10">
-                <div className="flex items-center justify-between p-8 bg-slate-900 dark:bg-sky-600 rounded-[2.5rem] text-white shadow-2xl shadow-slate-900/20 dark:shadow-sky-500/20 border border-white/5">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center font-bold text-lg text-white border border-white/10">ME</div>
-                    <div>
-                      <p className="text-base font-bold">You</p>
-                      <p className="text-[9px] text-slate-500 dark:text-sky-200 font-bold uppercase tracking-[0.2em] mt-1">Current Score</p>
+                    <span className="text-white/20 text-xs w-6">{i + 1}.</span>
+                    <div className="flex-1 grid grid-cols-2 gap-2">
+                       <div className={cn(
+                         "h-6 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
+                         isPast 
+                          ? wasCorrect ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500"
+                          : i === currentQuestion ? "bg-white/10 text-white/40" : "bg-black/20 text-white/5"
+                       )}>
+                         {isPast ? (wasCorrect ? "WIN" : "LOSS") : "..."}
+                       </div>
+                       <div className={cn(
+                         "h-6 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
+                         isPast 
+                          ? opponentCorrect ? "bg-emerald-500/10 text-emerald-500/40" : "bg-rose-500/10 text-rose-500/40"
+                          : "bg-black/20 text-white/5"
+                       )}>
+                         {isPast ? (opponentCorrect ? "WIN" : "LOSS") : "..."}
+                       </div>
                     </div>
                   </div>
-                  <span className="text-5xl font-bold font-mono tracking-tighter text-sky-400 dark:text-white">{me?.score || 0}</span>
-                </div>
-                <div className="flex items-center justify-between p-8 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white dark:bg-slate-900/50">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center font-bold text-lg text-slate-700 dark:text-slate-500 border border-slate-200 dark:border-slate-700">OP</div>
-                    <div>
-                      <p className="text-base font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{opponent?.displayName || 'Opponent'}</p>
-                      <p className="text-[9px] text-sky-500 dark:text-sky-400 font-bold uppercase tracking-[0.2em] mt-1">Opponent Score</p>
-                    </div>
-                  </div>
-                  <span className="text-5xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter">{opponent?.score || 0}</span>
-                </div>
-              </div>
-            </div>
+                );
+              })}
+           </div>
 
-            {/* Chat */}
-            <div className="bg-white dark:bg-slate-900 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-[600px] overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-              <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-100/30 dark:bg-slate-800/30 relative z-10">
-                <h4 className="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-[0.4em]">Combat Comms</h4>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]" />
-                  <span className="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-[0.2em]">Active</span>
-                </div>
+           {/* Chat Section */}
+           <div className="h-[250px] border-t border-black/20 flex flex-col bg-black/10">
+              <div className="p-3 border-b border-black/10 flex items-center justify-between">
+                <span className="text-[9px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                   Live Chat
+                </span>
               </div>
-              <div className="flex-1 overflow-y-auto p-10 space-y-8 relative z-10">
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full opacity-20 dark:opacity-20">
-                    <MessageSquare size={80} className="mb-8 text-slate-900 dark:text-white" />
-                    <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-900 dark:text-white">Quiet in the arena</p>
-                  </div>
-                ) : (
-                  messages.map((msg, i) => (
-                    <div 
-                      key={i} 
-                      className={`flex flex-col ${msg.senderId === user?.uid ? 'items-end' : 'items-start'}`}
-                    >
-                      <div className={cn(
-                        "px-6 py-4 rounded-[1.8rem] max-w-[85%] text-sm font-medium leading-relaxed shadow-sm",
-                        msg.senderId === user?.uid 
-                          ? 'bg-slate-900 dark:bg-sky-600 text-white rounded-tr-none' 
-                          : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white rounded-tl-none'
-                      )}>
-                        {msg.message}
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div ref={chatEndRef} />
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                 {messages.length === 0 ? (
+                   <p className="text-[10px] text-white/20 text-center mt-4 italic">No messages yet...</p>
+                 ) : (
+                   messages.map((m, i) => (
+                     <div key={i} className="flex gap-2 text-xs leading-relaxed">
+                        <span className="font-bold text-sky-400 shrink-0">{m.senderName}:</span>
+                        <span className="text-white/80">{m.message}</span>
+                     </div>
+                   ))
+                 )}
+                 <div ref={chatEndRef} />
               </div>
-              <form onSubmit={sendMessage} className="p-8 border-t border-slate-100 dark:border-slate-800 flex gap-4 relative z-10 bg-white dark:bg-slate-900">
-                <input 
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Send a message..."
-                  className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-2xl px-8 py-5 text-sm font-medium focus:ring-8 focus:ring-sky-500/5 outline-none border-none transition-all text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-600"
-                />
-                <button 
-                  type="submit"
-                  className="w-16 h-16 bg-slate-900 dark:bg-sky-600 text-white rounded-2xl flex items-center justify-center hover:bg-sky-600 dark:hover:bg-sky-500 transition-all shadow-2xl shadow-slate-900/20 group"
-                >
-                  <Send size={22} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </button>
+              <form onSubmit={sendMessage} className="p-3">
+                 <div className="bg-black/20 rounded border border-white/5 p-1 flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder="Type a message..."
+                      className="flex-1 bg-transparent border-none outline-none text-xs px-2 py-1 placeholder:text-white/10"
+                    />
+                    <button type="submit" className="p-1 px-3 bg-[#3c3a37] text-white/40 hover:text-white rounded text-[10px] font-black uppercase tracking-widest transition-colors">Send</button>
+                 </div>
               </form>
-            </div>
-          </div>
+           </div>
         </div>
       </div>
     );
@@ -777,10 +881,10 @@ export const LiveChallenge: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Bar: Topic Selection */}
-        <div className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-16 flex flex-col md:flex-row items-center gap-10">
-          <div className="flex-1 w-full">
-            <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Select Combat Topic</label>
+        {/* Action Bar: Topic & Mode Selection */}
+        <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-16 flex flex-col lg:flex-row items-stretch md:items-center gap-8 md:gap-10">
+          <div className="flex-1">
+            <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Combat Topic</label>
             <div className="relative">
               <select
                 value={selectedTopicId}
@@ -793,6 +897,30 @@ export const LiveChallenge: React.FC = () => {
                 ))}
               </select>
               <ChevronRight size={20} className="absolute right-8 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 dark:text-slate-600 pointer-events-none" />
+            </div>
+          </div>
+
+          <div className="w-full lg:w-[450px]">
+            <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Speed Control</label>
+            <div className="flex gap-2 p-2 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800">
+               {(Object.keys(MODE_CONFIGS) as Array<keyof typeof MODE_CONFIGS>).map((mode) => (
+                 <button
+                    key={mode}
+                    onClick={() => setGameMode(mode)}
+                    className={cn(
+                      "flex-1 py-4 px-3 rounded-xl flex items-center justify-center gap-3 transition-all",
+                      gameMode === mode 
+                        ? "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md text-sky-600 dark:text-sky-400" 
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5"
+                    )}
+                 >
+                    {MODE_CONFIGS[mode].icon}
+                    <div className="flex flex-col items-start">
+                        <span className="text-[10px] font-black uppercase tracking-tighter">{MODE_CONFIGS[mode].label}</span>
+                        <span className="text-[8px] font-bold opacity-40">{MODE_CONFIGS[mode].questions} Q / {MODE_CONFIGS[mode].time}s</span>
+                    </div>
+                 </button>
+               ))}
             </div>
           </div>
         </div>

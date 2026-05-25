@@ -17,15 +17,37 @@ async function startServer() {
       console.warn("GEMINI_API_KEY is not defined.");
       return null;
     }
-    return new GoogleGenAI({ apiKey });
+    return new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  };
+
+  const withRetry = async (fn: () => Promise<any>, maxRetries = 3, delay = 1000) => {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        const isRetryable = error?.status === 503 || error?.status === 429 || error?.code === 503 || error?.code === 429;
+        if (isRetryable && i < maxRetries - 1) {
+          console.log(`Retrying API call (attempt ${i + 1})...`);
+          await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+          continue;
+        }
+        throw error;
+      }
+    }
   };
   
   app.post("/api/generateStudyGuide", async (req, res) => {
     const { topicTitle, level, description } = req.body;
-    const genAI = getGenAI();
-    if (!genAI) return res.status(500).json({ error: "Missing API key" });
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
     
-    const model = "gemini-3-flash-preview";
     const prompt = `You are an expert Economics tutor. Generate a comprehensive study guide for a ${level} student on the topic: "${topicTitle}". 
 Description: ${description}
 
@@ -41,23 +63,24 @@ Format the output in Markdown with:
 Make it educational, engaging, and easy to understand for a ${level} level.`;
 
     try {
-      const response = await genAI.models.generateContent({
-        model,
-        contents: [{ parts: [{ text: prompt }] }],
-      });
+      const response = await withRetry(() => ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: prompt
+      }));
       res.json({ result: response.text });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to generate study guide" });
+    } catch (error: any) {
+      console.error("Gemini Error:", error);
+      const status = error?.status || 500;
+      const message = status === 503 ? "Gemini API is currently overloaded. Please try again in a moment." : "Failed to generate study guide";
+      res.status(status).json({ error: message });
     }
   });
   
   app.post("/api/generateQuestions", async (req, res) => {
     const { topicTitle, level, count } = req.body;
-    const genAI = getGenAI();
-    if (!genAI) return res.status(500).json({ error: "Missing API key" });
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
     
-    const model = "gemini-3-flash-preview";
     const prompt = `You are an expert Economics examiner. Generate ${count || 5} multiple-choice questions for a ${level} student on the topic: "${topicTitle}".
 
 Each question must have:
@@ -79,17 +102,19 @@ Return the response in JSON format as an array of objects with the following sch
 Ensure the questions are challenging but appropriate for the ${level} level.`;
 
     try {
-      const response = await genAI.models.generateContent({
-        model,
-        contents: [{ parts: [{ text: prompt }] }],
+      const response = await withRetry(() => ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
-      });
+      }));
       res.json({ questions: JSON.parse(response.text || "[]") });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to generate questions" });
+    } catch (error: any) {
+      console.error("Gemini Error:", error);
+      const status = error?.status || 500;
+      const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to generate questions";
+      res.status(status).json({ questions: [], error: message });
     }
   });
 

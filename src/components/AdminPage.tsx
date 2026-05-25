@@ -437,8 +437,11 @@ export const AdminPage: React.FC = () => {
                       <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Question Count</label>
                       <input
                         type="number"
-                        value={count}
-                        onChange={(e) => setCount(parseInt(e.target.value))}
+                        value={isNaN(count) ? '' : count}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setCount(isNaN(val) ? 0 : val);
+                        }}
                         min="1"
                         max="20"
                         className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all"

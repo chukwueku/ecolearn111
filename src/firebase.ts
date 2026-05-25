@@ -11,6 +11,7 @@ export interface UserProfile {
   uid: string;
   email: string;
   displayName: string;
+  photoURL?: string;
   level: 'secondary' | 'undergraduate';
   progress: Record<string, boolean>;
   scores?: Record<string, number>;
@@ -27,7 +28,7 @@ export interface Question {
   options: string[];
   correctAnswer: number;
   explanation: string;
-  createdAt: any;
+  createdAt?: any;
 }
 
 // Auth functions
@@ -82,6 +83,7 @@ export const createUserProfile = async (user: any, level: 'secondary' | 'undergr
     uid: user.uid || user.id,
     email: user.email || '',
     displayName: user.displayName || user.user_metadata?.full_name || '',
+    photoURL: user.photoURL || '',
     level,
     progress: {},
     role: isAdmin ? 'admin' : 'user',
@@ -140,6 +142,12 @@ export const updateProgress = async (uid: string, topicId: string, completed: bo
   } catch(e) {
     console.error(e);
   }
+};
+
+export const updateUserProfile = async (uid: string, updates: Partial<UserProfile>): Promise<void> => {
+  try {
+    await updateDoc(doc(db, 'users', uid), updates);
+  } catch(e) { console.error(e); }
 };
 
 export const updateUserPresence = async (uid: string) => {
@@ -304,7 +312,7 @@ export const getLeaderboard = async (limitCount: number = 10): Promise<UserProfi
 
 // --- Arena Matchmaking ---
 
-export const enterMatchmaking = async (user: { uid: string, displayName: string }, topicId: string, questions: Question[]) => {
+export const enterMatchmaking = async (user: { uid: string, displayName: string }, topicId: string, questions: Question[], gameMode: 'bullet' | 'blitz' | 'rapid' = 'blitz') => {
   try {
     const queueRef = collection(db, 'arena_queue');
     let matchCreated = null;
@@ -313,7 +321,7 @@ export const enterMatchmaking = async (user: { uid: string, displayName: string 
     while (attempts < 3) {
       attempts++;
       
-      const q = query(queueRef, where('topicId', '==', topicId));
+      const q = query(queueRef, where('topicId', '==', topicId), where('gameMode', '==', gameMode));
       const snap = await getDocs(q);
       const potentialOpponents = snap.docs.filter(d => d.data().uid !== user.uid);
       
@@ -334,15 +342,22 @@ export const enterMatchmaking = async (user: { uid: string, displayName: string 
             const matchRef = doc(collection(db, 'arena_matches'));
             matchCreated = matchRef.id;
             
+            // Slice questions based on mode
+            const modeCounts = { bullet: 5, blitz: 15, rapid: 20 };
+            const finalQuestions = questions.slice(0, modeCounts[gameMode] || 15);
+
             transaction.set(matchRef, {
               matchId: matchRef.id,
               topicId,
-              questions,
+              questions: finalQuestions,
+              gameMode,
               players: [
-                { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true },
-                { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true }
+                { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true, answers: {} },
+                { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true, answers: {} }
               ],
               status: 'playing',
+              currentTurnUid: oppData.uid, // The one who was waiting gets first move
+              lastTurnChangeAt: serverTimestamp(),
               createdAt: serverTimestamp()
             });
           });
@@ -361,6 +376,7 @@ export const enterMatchmaking = async (user: { uid: string, displayName: string 
           uid: user.uid,
           displayName: user.displayName,
           topicId,
+          gameMode,
           enteredAt: serverTimestamp()
         });
         return null;
@@ -388,19 +404,39 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
       const snap = await transaction.get(matchRef);
       if (!snap.exists()) return;
       const data = snap.data();
+      
+      // Check turn (Chess-like)
+      if (data.currentTurnUid !== uid) {
+        console.warn("Not your turn!");
+        return;
+      }
+
       const players = data.players || [];
       const pIndex = players.findIndex((p: any) => p.id === uid);
       if (pIndex !== -1) {
         if (correct) players[pIndex].score += 10;
+        
+        // Track answers for history
+        if (!players[pIndex].answers) players[pIndex].answers = {};
+        players[pIndex].answers[questionIndex] = correct;
+        
         players[pIndex].currentQuestion = questionIndex + 1;
         
+        const nextPlayer = players.find((p: any) => p.id !== uid);
+        const nextTurnUid = nextPlayer ? nextPlayer.id : uid;
+
         // check win
         let status = data.status;
         if (players.every((p: any) => p.currentQuestion >= (data.questions?.length || 0))) {
           status = 'finished';
         }
         
-        transaction.update(matchRef, { players, status });
+        transaction.update(matchRef, { 
+          players, 
+          status,
+          currentTurnUid: nextTurnUid,
+          lastTurnChangeAt: serverTimestamp()
+        });
       }
     });
   } catch(e) { console.error(e); }
@@ -429,11 +465,17 @@ export const acceptMatchRematch = async (matchId: string, questions: Question[])
        const snap = await transaction.get(matchRef);
        if (!snap.exists()) return;
        const data = snap.data();
-       const players = data.players.map((p: any) => ({ ...p, score: 0, currentQuestion: 0 }));
+       const players = data.players.map((p: any) => ({ ...p, score: 0, currentQuestion: 0, answers: {} }));
+       const mode = data.gameMode || 'blitz';
+       const modeCounts: any = { bullet: 5, blitz: 15, rapid: 20 };
+       const finalQuestions = questions.slice(0, modeCounts[mode] || 15);
+
        transaction.update(matchRef, {
          players,
-         questions,
+         questions: finalQuestions,
          status: 'playing',
+         currentTurnUid: data.rematchOffered.challengerId,
+         lastTurnChangeAt: serverTimestamp(),
          rematchOffered: null
        });
     });
@@ -472,17 +514,24 @@ export const respondDirectChallenge = async (challengeId: string, status: 'accep
       transaction.update(challengeRef, { status });
       
       if (status === 'accepted' && questions) {
+         const mode = data.gameMode || 'blitz';
+         const modeCounts: any = { bullet: 5, blitz: 15, rapid: 20 };
+         const finalQuestions = questions.slice(0, modeCounts[mode] || 15);
+
          // Create the match
          const matchRef = doc(collection(db, 'arena_matches'));
          transaction.set(matchRef, {
             matchId: matchRef.id,
             topicId: data.topicId,
-            questions,
+            questions: finalQuestions,
+            gameMode: data.gameMode || 'blitz',
             players: [
-              { id: data.challengerId, displayName: data.challengerName, score: 0, currentQuestion: 0, connected: true },
-              { id: data.targetId, displayName: data.targetName, score: 0, currentQuestion: 0, connected: true }
+              { id: data.challengerId, displayName: data.challengerName, score: 0, currentQuestion: 0, connected: true, answers: {} },
+              { id: data.targetId, displayName: data.targetName, score: 0, currentQuestion: 0, connected: true, answers: {} }
             ],
             status: 'playing',
+            currentTurnUid: data.challengerId, // Challenger starts
+            lastTurnChangeAt: serverTimestamp(),
             createdAt: serverTimestamp()
          });
       }
