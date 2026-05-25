@@ -142,6 +142,16 @@ export const updateProgress = async (uid: string, topicId: string, completed: bo
   }
 };
 
+export const updateUserPresence = async (uid: string) => {
+  try {
+    await updateDoc(doc(db, 'users', uid), { 
+      lastActive: Date.now() 
+    });
+  } catch(e) {
+    console.error(e);
+  }
+};
+
 export const getAllUsers = async (): Promise<UserProfile[]> => {
   try {
     const snap = await getDocs(collection(db, 'users'));
@@ -297,46 +307,67 @@ export const getLeaderboard = async (limitCount: number = 10): Promise<UserProfi
 export const enterMatchmaking = async (user: { uid: string, displayName: string }, topicId: string, questions: Question[]) => {
   try {
     const queueRef = collection(db, 'arena_queue');
-    const q = query(queueRef, where('topicId', '==', topicId));
     let matchCreated = null;
 
-    await runTransaction(db, async (transaction) => {
-      const snap = await transaction.get(q);
+    let attempts = 0;
+    while (attempts < 3) {
+      attempts++;
+      
+      const q = query(queueRef, where('topicId', '==', topicId));
+      const snap = await getDocs(q);
       const potentialOpponents = snap.docs.filter(d => d.data().uid !== user.uid);
       
       if (potentialOpponents.length > 0) {
         // Found opponent
         const opponent = potentialOpponents[0];
-        const oppData = opponent.data();
-        transaction.delete(opponent.ref);
-
-        const matchRef = doc(collection(db, 'arena_matches'));
-        matchCreated = matchRef.id;
         
-        transaction.set(matchRef, {
-          matchId: matchRef.id,
-          topicId,
-          questions,
-          players: [
-            { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true },
-            { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true }
-          ],
-          status: 'playing',
-          createdAt: serverTimestamp()
-        });
+        try {
+          await runTransaction(db, async (transaction) => {
+            const oppSnap = await transaction.get(opponent.ref);
+            if (!oppSnap.exists()) {
+              throw new Error("Opponent taken");
+            }
+            
+            const oppData = oppSnap.data() as any;
+            transaction.delete(opponent.ref);
+
+            const matchRef = doc(collection(db, 'arena_matches'));
+            matchCreated = matchRef.id;
+            
+            transaction.set(matchRef, {
+              matchId: matchRef.id,
+              topicId,
+              questions,
+              players: [
+                { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true },
+                { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true }
+              ],
+              status: 'playing',
+              createdAt: serverTimestamp()
+            });
+          });
+          
+          if (matchCreated) {
+            return matchCreated;
+          }
+        } catch(txnErr) {
+          console.warn("Transaction collision, retrying matchmaking...", txnErr);
+          continue; // Try again
+        }
       } else {
         // No opponent found, add self to queue
         const myQueueRef = doc(collection(db, 'arena_queue'), user.uid);
-        transaction.set(myQueueRef, {
+        await setDoc(myQueueRef, {
           uid: user.uid,
           displayName: user.displayName,
           topicId,
           enteredAt: serverTimestamp()
         });
+        return null;
       }
-    });
-
-    return matchCreated; // returns matchId if immediately found, null if placed in queue
+    }
+    
+    return null;
 
   } catch(e) {
     console.error("Error in matchmaking:", e);
@@ -407,6 +438,58 @@ export const acceptMatchRematch = async (matchId: string, questions: Question[])
        });
     });
   } catch(e) { console.error(e); }
+};
+
+export const sendDirectChallenge = async (challengerId: string, challengerName: string, targetId: string, targetName: string, topicId: string) => {
+  try {
+    const challengeRef = doc(collection(db, 'direct_challenges'));
+    await setDoc(challengeRef, {
+      id: challengeRef.id,
+      challengerId,
+      challengerName,
+      targetId,
+      targetName,
+      topicId,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+    return challengeRef.id;
+  } catch(e) {
+    console.error(e);
+    return null;
+  }
+};
+
+export const respondDirectChallenge = async (challengeId: string, status: 'accepted' | 'declined', questions?: Question[]) => {
+  try {
+    const challengeRef = doc(db, 'direct_challenges', challengeId);
+    
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(challengeRef);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      
+      transaction.update(challengeRef, { status });
+      
+      if (status === 'accepted' && questions) {
+         // Create the match
+         const matchRef = doc(collection(db, 'arena_matches'));
+         transaction.set(matchRef, {
+            matchId: matchRef.id,
+            topicId: data.topicId,
+            questions,
+            players: [
+              { id: data.challengerId, displayName: data.challengerName, score: 0, currentQuestion: 0, connected: true },
+              { id: data.targetId, displayName: data.targetName, score: 0, currentQuestion: 0, connected: true }
+            ],
+            status: 'playing',
+            createdAt: serverTimestamp()
+         });
+      }
+    });
+  } catch(e) {
+    console.error(e);
+  }
 };
 
 // Also listen to online users for lobby representation: Just simple presence.

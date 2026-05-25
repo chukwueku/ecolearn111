@@ -106,6 +106,21 @@ export const DailyPuzzle = () => {
     const [isSessionComplete, setIsSessionComplete] = useState(false);
     const [performance, setPerformance] = useState<Record<string, { total: number, correct: number }>>({});
 
+    const [botScore, setBotScore] = useState(0);
+
+    useEffect(() => {
+        if (!isSessionComplete && !isAnswered) {
+            const timer = setTimeout(() => {
+                // The bot answers. 70% chance to get it right.
+                const gotCorrect = Math.random() > 0.3;
+                if (gotCorrect) {
+                     setBotScore(prev => prev + 10);
+                }
+            }, 3000 + Math.random() * 6000); // Between 3 and 9 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [currentPuzzleIdx, isSessionComplete, isAnswered]);
+
     const puzzle = PUZZLE_POOL[currentPuzzleIdx];
 
     const handleOptionSelect = (idx: number) => {
@@ -172,17 +187,25 @@ export const DailyPuzzle = () => {
                             <Trophy size={40} />
                         </div>
                         
-                        <h2 className="text-3xl font-bold font-headline-md text-primary mb-2">Great Work, Scholar!</h2>
-                        <p className="text-on-surface-variant mb-10 text-lg">You've completed your daily puzzle session.</p>
+                        <h2 className="text-3xl font-bold font-headline-md text-primary mb-2">
+                            {score > botScore ? 'Great Work, Scholar!' : score === botScore ? 'It\'s a Tie!' : 'Auto-Bot Won!'}
+                        </h2>
+                        <p className="text-on-surface-variant mb-10 text-lg">
+                            {score > botScore ? 'You outsmarted the Auto-Bot.' : score === botScore ? 'You matched the Auto-Bot\'s efficiency.' : 'The Auto-Bot calculated faster this time.'}
+                        </p>
 
-                        <div className="grid grid-cols-2 gap-4 mb-10">
-                            <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/30 flex flex-col items-center">
-                                <span className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-2"><CheckCircle size={16} className="text-emerald-500" /> Accuracy</span>
-                                <span className="text-4xl font-black text-on-surface">{Math.round((totalCorrect / 5) * 100)}%</span>
+                        <div className="grid grid-cols-3 gap-4 mb-10">
+                            <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
+                                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-1"><CheckCircle size={14} className="text-emerald-500" /> Accuracy</span>
+                                <span className="text-3xl font-black text-on-surface">{Math.round((totalCorrect / 5) * 100)}%</span>
                             </div>
-                            <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/30 flex flex-col items-center">
-                                <span className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-2"><Zap size={16} className="text-secondary" /> XP Earned</span>
-                                <span className="text-4xl font-black text-secondary">{score}</span>
+                            <div className="bg-secondary-container/20 p-4 rounded-2xl border border-secondary/30 flex flex-col items-center justify-center">
+                                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-1"><Zap size={14} className="text-secondary" /> You</span>
+                                <span className="text-3xl font-black text-secondary">{score}</span>
+                            </div>
+                            <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">Bot</span>
+                                <span className="text-3xl font-black text-slate-500">{botScore}</span>
                             </div>
                         </div>
 
@@ -237,9 +260,19 @@ export const DailyPuzzle = () => {
                         <Activity size={10} className="text-secondary" /> Level {puzzle.level} • Case #{puzzle.id}
                     </p>
                 </div>
-                <div className="flex items-center gap-2 bg-secondary-container/50 px-3 py-1.5 rounded-full border border-secondary/20">
-                    <Zap size={14} className="text-secondary" />
-                    <span className="text-sm font-bold font-label-md text-secondary-on-container">{score} XP</span>
+                
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest leading-none">Auto-Bot</span>
+                        <div className="flex items-center gap-1 text-slate-500">
+                            <span className="font-mono text-sm font-black">{botScore} XP</span>
+                        </div>
+                    </div>
+                    <div className="h-6 w-px bg-outline-variant/50 hidden md:block" />
+                    <div className="flex items-center gap-2 bg-secondary-container/50 px-3 py-1.5 rounded-full border border-secondary/20">
+                        <Zap size={14} className="text-secondary" />
+                        <span className="text-sm font-bold font-label-md text-secondary-on-container">{score} XP</span>
+                    </div>
                 </div>
             </header>
 

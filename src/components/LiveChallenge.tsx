@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch } from '../firebase';
-import { onSnapshot, collection, query, doc, orderBy, where } from 'firebase/firestore';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence } from '../firebase';
+import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight } from 'lucide-react';
@@ -15,7 +15,8 @@ function cn(...inputs: ClassValue[]) {
 export const LiveChallenge: React.FC = () => {
   const { user, profile } = useAuth();
   const [lobbyUsers, setLobbyUsers] = useState<any[]>([]);
-  const [incomingChallenge, setIncomingChallenge] = useState<any>(null); // Disabled for now
+  const [allUsersData, setAllUsersData] = useState<any[]>([]);
+  const [incomingChallenge, setIncomingChallenge] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [finished, setFinished] = useState(false);
@@ -41,16 +42,61 @@ export const LiveChallenge: React.FC = () => {
     }
   }, [messages]);
 
-  // Listen to queue to show searching users
+  // Load all users & maintain presence
+  useEffect(() => {
+    if (user) {
+      updateUserPresence(user.uid);
+      const interval = setInterval(() => updateUserPresence(user.uid), 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'users'), (snap) => {
+       setAllUsersData(snap.docs.map(d => d.data()));
+    });
+    return () => unsub();
+  }, []);
+
+  // Listen to queue to show searching users and merge with all users
   useEffect(() => {
     const q = query(collection(db, 'arena_queue'));
     const unsubQueue = onSnapshot(q, (snap) => {
       const usersInQueue = snap.docs.map(doc => ({ ...doc.data(), status: 'searching' }));
-      setLobbyUsers(usersInQueue);
+      
+      const fiveMinsAgo = Date.now() - 5 * 60 * 1000;
+      const onlineUsers = allUsersData.filter(u => u.lastActive >= fiveMinsAgo || u.uid === user?.uid);
+
+      const merged = onlineUsers.map((u: any) => {
+         const inQueue = usersInQueue.find((qu: any) => qu.uid === u.uid);
+         if (inQueue) return inQueue;
+         return { ...u, status: 'idle' };
+      });
+      // also include queue users who might not be in allUsersData (rare)
+      usersInQueue.forEach((qu: any) => {
+         if (!merged.find(m => m.uid === qu.uid)) merged.push(qu);
+      });
+      
+      setLobbyUsers(merged.length > 0 ? merged : onlineUsers.map((u: any) => ({ ...u, status: 'idle' })));
     });
 
     return () => unsubQueue();
-  }, []);
+  }, [allUsersData, user]);
+
+  // Listen to incoming direct challenges
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, 'direct_challenges'), where('targetId', '==', user.uid), where('status', '==', 'pending'));
+    const unsub = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        const challenge = snap.docs[0];
+        setIncomingChallenge({ id: challenge.id, ...challenge.data() });
+      } else {
+        setIncomingChallenge(null);
+      }
+    });
+    return () => unsub();
+  }, [user]);
 
   // Listen to active matches to find if user has a match
   useEffect(() => {
@@ -160,8 +206,35 @@ export const LiveChallenge: React.FC = () => {
     }, 1000);
   };
 
-  const handleChallenge = async (targetUserId: string) => {
-    alert("Please join the Matchmaking Queue instead!");
+  const handleChallenge = async (targetUser: any) => {
+    if (!user || !profile) return;
+    if (!selectedTopicId) {
+      alert("Please select a topic first!");
+      return;
+    }
+    await sendDirectChallenge(user.uid, profile.displayName, targetUser.uid, targetUser.displayName || 'User', selectedTopicId);
+    alert(`Challenge sent to ${targetUser.displayName}! Waiting for response...`);
+  };
+
+  const handleAcceptChallenge = async () => {
+    if (!incomingChallenge || !profile) return;
+    setLoading(true);
+    const topics = profile.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+    const topic = topics.find(t => t.id === incomingChallenge.topicId) || topics[0];
+    
+    try {
+      const questions = await getQuestions(topic.id);
+      const finalQuestions = questions.length > 0 ? questions : [
+         { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
+      ];
+      await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
+    } catch(e) { console.error(e); }
+    setLoading(false);
+  };
+
+  const handleDeclineChallenge = async () => {
+    if (!incomingChallenge) return;
+    await respondDirectChallenge(incomingChallenge.id, 'declined');
   };
 
   const handleAnswer = (correct: boolean) => {
@@ -233,7 +306,13 @@ export const LiveChallenge: React.FC = () => {
         ];
 
         setIsSearching(true);
-        enterMatchmaking({ uid: user.uid, displayName: profile.displayName }, selectedTopicId, finalQuestions);
+        const matchResult = await enterMatchmaking({ uid: user.uid, displayName: profile.displayName }, selectedTopicId, finalQuestions);
+        
+        if (matchResult === false || matchResult === undefined) {
+             // In case it utterly fails
+             setIsSearching(false);
+             return;
+        }
 
         // Start search timer
         setSearchTime(0);
@@ -631,6 +710,35 @@ export const LiveChallenge: React.FC = () => {
               </div>
             </motion.div>
           )}
+
+          {/* Incoming Challenge Modal */}
+          {incomingChallenge && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-8"
+            >
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-2xl max-w-sm w-full text-center relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="w-20 h-20 bg-sky-100 dark:bg-sky-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Swords className="text-sky-500" size={40} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 uppercase font-display tracking-tight">Challenge</h3>
+                <p className="text-slate-500 text-sm mb-8 font-medium">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{incomingChallenge.challengerName}</span> has challenged you to a duel!
+                </p>
+                <div className="flex gap-4">
+                  <button onClick={handleDeclineChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Decline</button>
+                  <button onClick={handleAcceptChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-sky-500 text-white shadow-[0_4px_0_theme(colors.sky.700)] active:translate-y-1 active:shadow-none transition-all">Accept</button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Header Section */}
@@ -661,7 +769,10 @@ export const LiveChallenge: React.FC = () => {
             </button>
             <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 px-6 py-4 rounded-xl shadow-sm flex items-center gap-5 backdrop-blur-md">
               <Users size={20} className="text-slate-400 dark:text-slate-600" />
-              <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">{lobbyUsers.length} in Queue</span>
+              <div className="flex flex-col">
+                 <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">{lobbyUsers.filter(u => u.status === 'searching').length} in Queue</span>
+                 <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{lobbyUsers.length} Online</span>
+              </div>
             </div>
           </div>
         </div>
@@ -714,14 +825,21 @@ export const LiveChallenge: React.FC = () => {
                 </div>
               </div>
               <div className="mb-10 relative z-10">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-1 tracking-tight uppercase group-hover:text-indigo-600 transition-colors">{u.displayName}</h3>
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase group-hover:text-indigo-600 transition-colors">{u.displayName}</h3>
+                  <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-500/20">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[9px] font-black tracking-widest uppercase text-emerald-600 dark:text-emerald-400">Online</span>
+                  </div>
+                </div>
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{u.level || 'Economics'} Scholar</p>
               </div>
               <button
-                disabled={true}
-                className="w-full btn-premium justify-center opacity-50"
+                onClick={() => handleChallenge(u)}
+                disabled={u.status !== 'idle'}
+                className={cn("w-full btn-premium justify-center", u.status !== 'idle' && "opacity-50")}
               >
-                In Queue
+                {u.status === 'idle' ? 'Challenge' : u.status === 'searching' ? 'Wait in Queue' : 'In Duel'}
               </button>
             </motion.div>
           ))}
