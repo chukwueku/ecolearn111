@@ -67,10 +67,10 @@ The modern interpretation of regression is, however, quite different. Broadly sp
 }
 \`\`\`
 
-**6. Money Holding vs. Inflation Rate ($\pi$):** Predicting the proportion $k$ of income held in money based on inflation expectations.
+**6. Money Holding vs. Inflation Rate ($\\$):** Predicting the proportion $k$ of income held in money based on inflation expectations.
 
 $$
-k = \\frac{Money}{Income}
+k = \\\frac{Money}{Income}
 $$
 
 
@@ -84,7 +84,7 @@ In regression analysis, we are concerned with *statistical*, not *functional* or
 - **Deterministic relationships** deal with relationships of the type exhibited by Newton's law of gravity:
 
 $$
-F = k \\frac{m_1 m_2}{r^2}
+F = k \\\frac{m_1 m_2}{r^2}
 $$
 
 where $F = force$, $m_1, m_2 = masses$, $r = distance$, and $k = constant$. These are not the focus of econometrics unless explicit measurement errors render them statistical.
@@ -187,20 +187,20 @@ In this chapter, we approach the subject in a more formal manner. We introduce t
 #### 2.1 A Hypothetical Example
 Regression analysis is largely concerned with estimating and/or predicting the (population) mean value of the dependent variable on the basis of the known or fixed values of the explanatory variable(s).
 
-Consider a hypothetical population of 60 families divided into 10 income groups (from \\$80 to \\$260). We examine the weekly consumption expenditure corresponding to these given income levels. There is considerable variation in weekly consumption expenditure in each income group.
+Consider a hypothetical population of 60 families divided into 10 income groups (from \\\$80 to \\\$260). We examine the weekly consumption expenditure corresponding to these given income levels. There is considerable variation in weekly consumption expenditure in each income group.
 
-If we ask the question, "What is the *expected value* of weekly consumption expenditure of a family whose monthly income is, say, \\$140?", we look at the exact conditional mean for that bracket. The knowledge of the income level enables us to better predict the mean value of consumption expenditure than if we did not have that knowledge. This probability is the essence of regression analysis.
+If we ask the question, "What is the *expected value* of weekly consumption expenditure of a family whose monthly income is, say, \\\$140?", we look at the exact conditional mean for that bracket. The knowledge of the income level enables us to better predict the mean value of consumption expenditure than if we did not have that knowledge. This probability is the essence of regression analysis.
 
 If we join these conditional mean values against the various $X$ values, we obtain the **population regression line (PRL)**, or more generally, the **population regression curve**. 
 - The adjective "population" comes from the fact that we are dealing with the entire population of 60 families. 
 - Geometrically, then, a population regression curve is simply the locus of the conditional means of the dependent variable for the fixed values of the explanatory variable(s).
 
-**TABLE 2.1** WEEKLY FAMILY INCOME $X$, \$
+**TABLE 2.1** WEEKLY FAMILY INCOME $X$, \\$
 <div className="overflow-x-auto my-6 markdown-table">
 
-| $Y \downarrow$ \\ $X \\rightarrow$ | 80 | 100 | 120 | 140 | 160 | 180 | 200 | 220 | 240 | 260 |
+| $Y \\$ \\ $X \\\rightarrow$ | 80 | 100 | 120 | 140 | 160 | 180 | 200 | 220 | 240 | 260 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Weekly family consumption expenditure $Y$, \$** | 55 | 65 | 79 | 80 | 102 | 110 | 120 | 135 | 137 | 150 |
+| **Weekly family consumption expenditure $Y$, \\$** | 55 | 65 | 79 | 80 | 102 | 110 | 120 | 135 | 137 | 150 |
 | | 60 | 70 | 84 | 93 | 107 | 115 | 136 | 137 | 145 | 152 |
 | | 65 | 74 | 90 | 95 | 110 | 120 | 140 | 140 | 155 | 175 |
 | | 70 | 80 | 94 | 103 | 116 | 130 | 144 | 152 | 165 | 178 |
@@ -242,7 +242,7 @@ If we join these conditional mean values against the various $X$ values, we obta
 From the preceding discussion, it is clear that each conditional mean $E(Y|X_i)$ is a function of $X_i$, where $X_i$ is a given value of $X$. Symbolically,
 
 $$
-E(Y|X_i) = f(X_i) \\quad \\text{(2.2.1)}
+E(Y|X_i) = f(X_i) \\quad \\\text{(2.2.1)}
 $$
 
 where $f(X_i)$ denotes some function of the explanatory variable $X$. 
@@ -252,16 +252,16 @@ The expected value of the distribution of $Y$ given $X_i$ is functionally relate
 For example, assuming the PRF is a *linear* function of $X_i$, we write:
 
 $$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i \\quad \\text{(2.2.2)}
+E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i \\quad \\\text{(2.2.2)}
 $$
 
-where $\\beta_1$ and $\\beta_2$ are unknown but fixed parameters known as the **regression coefficients** ($\\beta_1$ is the **intercept** and $\\beta_2$ is the **slope coefficient**). 
+where $\\\beta_1$ and $\\\beta_2$ are unknown but fixed parameters known as the **regression coefficients** ($\\\beta_1$ is the **intercept** and $\\\beta_2$ is the **slope coefficient**). 
 
 #### 2.3 The Meaning of the Term *Linear*
 Since this text is concerned primarily with linear models like (2.2.2), it is essential to know what the term *linear* really means. It can be interpreted in two different ways.
 
 **Linearity in the Variables**
-The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) = \\beta_1 + \\beta_2 X_i$ represents a straight line. Conversely, a model is *not* linear in variables if $X$ appears with a power or index other than 1.
+The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i$ represents a straight line. Conversely, a model is *not* linear in variables if $X$ appears with a power or index other than 1.
 
 \`\`\`chart
 {
@@ -292,65 +292,65 @@ The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) 
 For example, the following are not linear in variables:
 
 $$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
+E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i^2
 $$
 
 
 $$
-E(Y|X_i) = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right)
+E(Y|X_i) = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right)
 $$
 
 
 **Linearity in the Parameters**
-The expected value of $Y$ is a linear function of the *parameters* (the $\\beta$'s); it may or may not be linear in the variable $X$. 
-- A model is linear in the parameter if the $\\beta$'s appear with a power or index of 1 only and are not multiplied/divided by other parameters.
+The expected value of $Y$ is a linear function of the *parameters* (the $\\\beta$'s); it may or may not be linear in the variable $X$. 
+- A model is linear in the parameter if the $\\\beta$'s appear with a power or index of 1 only and are not multiplied/divided by other parameters.
 - Example of *linear in parameter* (but non-linear in variables): 
 
 $$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
+E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i^2
 $$
 
 Even though $X$ is squared, the parameters are linear.
 - Example of *nonlinear in parameter*: 
 
 $$
-E(Y|X_i) = \\beta_1 + \\beta_2^2 X_i
+E(Y|X_i) = \\\beta_1 + \\\beta_2^2 X_i
 $$
 
 
-**Crucial Note**: *Therefore, from now on the term "linear" regression will always mean a regression that is linear in the parameters; the $\\beta$'s are raised to the first power only. It may or may not be linear in the explanatory variables, the $X$'s.*
+**Crucial Note**: *Therefore, from now on the term "linear" regression will always mean a regression that is linear in the parameters; the $\\\beta$'s are raised to the first power only. It may or may not be linear in the explanatory variables, the $X$'s.*
 
 For example, all of these are **Linear Regression Models** (even though they are nonlinear in variables):
 
 $$
-Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i \\quad \\text{(Reciprocal)}
+Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i \\quad \\\text{(Reciprocal)}
 $$
 
 
 $$
-Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Semilogarithmic)}
+Y_i = \\\beta_1 + \\\beta_2 \\\ln X_i + u_i \\quad \\\text{(Semilogarithmic)}
 $$
 
 
 $$
-\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(Inverse semilogarithmic)}
+\\\ln Y_i = \\\beta_1 + \\\beta_2 X_i + u_i \\quad \\\text{(Inverse semilogarithmic)}
 $$
 
 
 $$
-\\ln Y_i = \\ln \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Logarithmic or double logarithmic)}
+\\\ln Y_i = \\\ln \\\beta_1 + \\\beta_2 \\\ln X_i + u_i \\quad \\\text{(Logarithmic or double logarithmic)}
 $$
 
 
 However, the following models are **NOT** linear regression models:
 
 $$
-Y_i = e^{\\beta_1 + \\beta_2 X_i + u_i}
+Y_i = e^{\\\beta_1 + \\\beta_2 X_i + u_i}
 $$
 
 
 $$
-Y_i = \\frac{1}{1 + e^{\\beta_1 + \\beta_2 X_i + u_i}}
+Y_i = \\\frac{1}{1 + e^{\\\beta_1 + \\\beta_2 X_i + u_i}}
 $$
 
 
@@ -378,7 +378,7 @@ $$
 or
 
 $$
-Y_i = E(Y|X_i) + u_i \\quad \\text{(2.4.1)}
+Y_i = E(Y|X_i) + u_i \\quad \\\text{(2.4.1)}
 $$
 
 Here $u_i$ is an unobservable random variable taking positive or negative values. Technically, $u_i$ is known as the **stochastic disturbance** or **stochastic error term**.
@@ -390,19 +390,19 @@ The expenditure of an individual family can be expressed as the sum of two compo
 If we assume $E(Y|X_i)$ is linear in $X_i$, we can write:
 
 $$
-Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(2.4.2)}
+Y_i = \\\beta_1 + \\\beta_2 X_i + u_i \\quad \\\text{(2.4.2)}
 $$
 
 Eq (2.4.2) posits that consumption is linearly related to income *plus* a disturbance term. Now, if we take the expected value of both sides:
 
 $$
-E(Y_i | X_i) = E[E(Y|X_i)] + E(u_i | X_i) = E(Y|X_i) + E(u_i | X_i) \\quad \\text{(2.4.4)}
+E(Y_i | X_i) = E[E(Y|X_i)] + E(u_i | X_i) = E(Y|X_i) + E(u_i | X_i) \\quad \\\text{(2.4.4)}
 $$
 
 Since $E(Y_i | X_i)$ is the same thing as $E(Y | X_i)$, this implies that:
 
 $$
-E(u_i | X_i) = 0 \\quad \\text{(2.4.5)}
+E(u_i | X_i) = 0 \\quad \\\text{(2.4.5)}
 $$
 
 Therefore, the assumption that the regression line passes through the conditional means of $Y$ implies that the conditional mean values of $u_i$ are explicitly zero.
@@ -473,15 +473,15 @@ As an illustration, pretend that the population of Table 2.1 was not known to us
 Analogously to the PRF, we develop the concept of the **sample regression function (SRF)** to represent the sample regression line:
 
 $$
-\\hat{Y}_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i \\quad \\text{(2.6.1)}
+\\hat{Y}_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i \\quad \\\text{(2.6.1)}
 $$
 
-where $\\hat{Y}$ is read as "Y-hat" or "Y-cap" and represents the estimator of $E(Y|X_i)$, $\\hat{\\beta}_1$ = estimator of $\\beta_1$, and $\\hat{\\beta}_2$ = estimator of $\\beta_2$. Note that an **estimator**, also known as a (sample) **statistic**, is simply a rule or formula or method that tells how to estimate the population parameter from the information provided by the sample at hand. A particular numerical value obtained by the estimator in an application is known as an **estimate**.
+where $\\hat{Y}$ is read as "Y-hat" or "Y-cap" and represents the estimator of $E(Y|X_i)$, $\\hat{\\\beta}_1$ = estimator of $\\\beta_1$, and $\\hat{\\\beta}_2$ = estimator of $\\\beta_2$. Note that an **estimator**, also known as a (sample) **statistic**, is simply a rule or formula or method that tells how to estimate the population parameter from the information provided by the sample at hand. A particular numerical value obtained by the estimator in an application is known as an **estimate**.
 
 Now just as we expressed the PRF in two equivalent forms (deterministic and stochastic), we can express the SRF (2.6.1) in its stochastic form as follows:
 
 $$
-Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i \\quad \\text{(2.6.2)}
+Y_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i + \\hat{u}_i \\quad \\\text{(2.6.2)}
 $$
 
 where, in addition to the symbols already defined, $\\hat{u}_i$ denotes the (sample) **residual** term. Conceptually $\\hat{u}_i$ is analogous to $u_i$ and can be regarded as an *estimate* of $u_i$.
@@ -489,25 +489,25 @@ where, in addition to the symbols already defined, $\\hat{u}_i$ denotes the (sam
 To sum up, our primary objective in regression analysis is to estimate the PRF
 
 $$
-Y_i = \\beta_1 + \\beta_2 X_i + u_i
+Y_i = \\\beta_1 + \\\beta_2 X_i + u_i
 $$
 
 on the basis of the SRF
 
 $$
-Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i
+Y_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i + \\hat{u}_i
 $$
 
 Because more often than not our analysis is based upon a single sample from some population, the SRF is at best an approximate one. This approximation is shown diagrammatically in Figure 2.5. For observation $X = X_i$, we have one (sample) observation $Y = Y_i$. In terms of the SRF, the observed $Y_i$ can be expressed as:
 
 $$
-Y_i = \\hat{Y}_i + \\hat{u}_i \\quad \\text{(2.6.3)}
+Y_i = \\hat{Y}_i + \\hat{u}_i \\quad \\\text{(2.6.3)}
 $$
 
 and in terms of the PRF, it can be expressed as:
 
 $$
-Y_i = E(Y|X_i) + u_i \\quad \\text{(2.6.4)}
+Y_i = E(Y|X_i) + u_i \\quad \\\text{(2.6.4)}
 $$
 
 
@@ -539,7 +539,7 @@ We conclude this chapter with an example using data on the level of education (m
 **TABLE 2.6** MEAN HOURLY WAGE BY EDUCATION
 <div className="overflow-x-auto my-6 markdown-table">
 
-| Years of schooling | Mean wage, \$ | Number of people |
+| Years of schooling | Mean wage, \\$ | Number of people |
 | :--- | :--- | :--- |
 | 6 | 4.4567 | 3 |
 | 7 | 5.7700 | 5 |
@@ -610,29 +610,29 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 
 | Model | Descriptive title |
 | :--- | :--- |
-| **a.** $Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i$ | Reciprocal |
-| **b.** $Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i$ | Semilogarithmic |
-| **c.** $\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i$ | Inverse semilogarithmic |
-| **d.** $\\ln Y_i = \\ln \\beta_1 + \\beta_2 \\ln X_i + u_i$ | Logarithmic or double logarithmic |
-| **e.** $\\ln Y_i = \\beta_1 - \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i$ | Logarithmic reciprocal |
+| **a.** $Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i$ | Reciprocal |
+| **b.** $Y_i = \\\beta_1 + \\\beta_2 \\\ln X_i + u_i$ | Semilogarithmic |
+| **c.** $\\\ln Y_i = \\\beta_1 + \\\beta_2 X_i + u_i$ | Inverse semilogarithmic |
+| **d.** $\\\ln Y_i = \\\ln \\\beta_1 + \\\beta_2 \\\ln X_i + u_i$ | Logarithmic or double logarithmic |
+| **e.** $\\\ln Y_i = \\\beta_1 - \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i$ | Logarithmic reciprocal |
 
 </div>
 
-*Note:* $\\ln$ = natural log (i.e., log to the base $e$); $u_i$ is the stochastic disturbance term. We will study these models in Chapter 6.
+*Note:* $\\\ln$ = natural log (i.e., log to the base $e$); $u_i$ is the stochastic disturbance term. We will study these models in Chapter 6.
 
 **2.7.** Are the following models linear regression models? Why or why not?
-**a.** $ Y_i = e^{\\beta_1 + \\beta_2 X_i + u_i} $
-**b.** $ Y_i = \\frac{1}{1 + e^{\\beta_1 + \\beta_2 X_i + u_i}} $
-**c.** $ \\ln Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i $
-**d.** $ Y_i = \\beta_1 + (0.75 - \\beta_1) e^{-\\beta_2 (X_i - 2)} + u_i $
-**e.** $ Y_i = \\beta_1 + \\beta_2^3 X_i + u_i $
+**a.** $ Y_i = e^{\\\beta_1 + \\\beta_2 X_i + u_i} $
+**b.** $ Y_i = \\\frac{1}{1 + e^{\\\beta_1 + \\\beta_2 X_i + u_i}} $
+**c.** $ \\\ln Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i $
+**d.** $ Y_i = \\\beta_1 + (0.75 - \\\beta_1) e^{-\\\beta_2 (X_i - 2)} + u_i $
+**e.** $ Y_i = \\\beta_1 + \\\beta_2^3 X_i + u_i $
 
-**2.8.** What is meant by an *intrinsically linear* regression model? If $\\beta_2$ in exercise 2.7d were $0.8$, would it be a linear or nonlinear regression model?
+**2.8.** What is meant by an *intrinsically linear* regression model? If $\\\beta_2$ in exercise 2.7d were $0.8$, would it be a linear or nonlinear regression model?
 
 ***2.9.** Consider the following nonstochastic models (i.e., models without the stochastic error term). Are they linear regression models? If not, is it possible, by suitable algebraic manipulations, to convert them into linear models?
-**a.** $ Y_i = \\frac{1}{\\beta_1 + \\beta_2 X_i} $
-**b.** $ Y_i = \\frac{X_i}{\\beta_1 + \\beta_2 X_i} $
-**c.** $ Y_i = \\frac{1}{1 + \\exp(-\\beta_1 - \\beta_2 X_i)} $
+**a.** $ Y_i = \\\frac{1}{\\\beta_1 + \\\beta_2 X_i} $
+**b.** $ Y_i = \\\frac{X_i}{\\\beta_1 + \\\beta_2 X_i} $
+**c.** $ Y_i = \\\frac{1}{1 + \\exp(-\\\beta_1 - \\\beta_2 X_i)} $
 
 **2.10.** You are given the scattergram in Figure 2.7 along with the regression line. What general conclusion do you draw from this diagram? Is the regression line sketched in the diagram a population regression line or the sample regression line?
 
@@ -747,50 +747,50 @@ The method of ordinary least squares is attributed to Carl Friedrich Gauss. Unde
 Recall the Sample Regression Function (SRF):
 
 $$
-Y_i = \\\hat{\\\beta}_1 + \\\hat{\\\beta}_2 X_i + \\\hat{u}_i
+Y_i = \\\hat{\\\\beta}_1 + \\\hat{\\\\beta}_2 X_i + \\\hat{u}_i
 $$
 
 We can write the residual as:
 
 $$
-\\\mathbf{u}_i = Y_i - \\\hat{Y}_i = Y_i - \\\hat{\\\beta}_1 - \\\mathbf{\\\beta}_2 X_i
+\\\mathbf{u}_i = Y_i - \\\hat{Y}_i = Y_i - \\\hat{\\\\beta}_1 - \\\mathbf{\\\\beta}_2 X_i
 $$
 
-The OLS principle states that we should choose the sample estimators $\\\mathbf{\\\beta}_1$ and $\\\mathbf{\\\beta}_2$ in such a way that the **residual sum of squares (RSS)** is as small as possible:
+The OLS principle states that we should choose the sample estimators $\\\mathbf{\\\\beta}_1$ and $\\\mathbf{\\\\beta}_2$ in such a way that the **residual sum of squares (RSS)** is as small as possible:
 
 $$
-\\\begin{equation}\\\mathbf{ui^2} = \\\sum (Y_i - \\\mathbf{\\\beta}_1 - \\\mathbf{\\\beta}_2 X_i)^2
+\\\begin{equation}\\\mathbf{ui^2} = \\\\sum (Y_i - \\\mathbf{\\\\beta}_1 - \\\mathbf{\\\\beta}_2 X_i)^2
 \\\end{equation}
 $$
 
-By taking the partial derivatives of the RSS with respect to $\\\mathbf{\\\beta}_1$ and $\\\mathbf{\\\beta}_2$ and setting them to zero, we obtain the **normal equations*:
+By taking the partial derivatives of the RSS with respect to $\\\mathbf{\\\\beta}_1$ and $\\\mathbf{\\\\beta}_2$ and setting them to zero, we obtain the **normal equations*:
 
 $$
-\\\begin{equation}\\\mathbf|\\\sum Y_i = n\\\mathbf{\\\beta}_1 + \\\mathbf{\\\beta}_2 \\\sum X_i\\\end{equation}
+\\\begin{equation}\\\mathbf|\\\\sum Y_i = n\\\mathbf{\\\\beta}_1 + \\\mathbf{\\\\beta}_2 \\\\sum X_i\\\end{equation}
 $$
 
 $$
-\\\begin{equation}\\\sum Y_i X_i = \\\mathbf{\\\beta}_1 \\\sum X_i + \\\hat{\\\beta}_2 \\\sum X_i^2\\\end{equation}
+\\\begin{equation}\\\\sum Y_i X_i = \\\mathbf{\\\\beta}_1 \\\\sum X_i + \\\hat{\\\\beta}_2 \\\\sum X_i^2\\\end{equation}
 $$
 
 Solving these equations simultaneously yields the OLS estimators:
 
 $$
-\\\begin{equation}\\\hat{\\\beta}_2 = \\\frac{n\\\sum X_i Y_i - (\\\sum X_i)(\\\sum Y_i)}{n\\\sum X_i^2 - (\\\sum X_i)^2} - \\\frac{\\\sum x_i y_i}{\\\sum x_i^2}\\\end{equation}
+\\\begin{equation}\\\hat{\\\\beta}_2 = \\\\frac{n\\\\sum X_i Y_i - (\\\\sum X_i)(\\\\sum Y_i)}{n\\\\sum X_i^2 - (\\\\sum X_i)^2} - \\\\frac{\\\\sum x_i y_i}{\\\\sum x_i^2}\\\end{equation}
 $$
 
 $$
-\\\begin{equation}\\\hat{\\\beta}_1 = \\\bar{Y} - \\\hat{\\\beta}_2 \\\bar{X}\\\end{equation}
+\\\begin{equation}\\\hat{\\\\beta}_1 = \\\bar{Y} - \\\hat{\\\\beta}_2 \\\bar{X}\\\end{equation}
 $$
 
 $(Note: lower case letters $x_i$ and $y_i$ denote deviations from their sample means: $x_i = X_i - \\\bar{X}$ and $y_i = Y_i - \\\bar{Y}$.)*
 
 #### 3.2 The Classical Linear Regression Model (CLRM)
 The theoretical justification for OLS rests on the CLRM.
-1. **Linear in Parameters**: The regression model is linear in the parameters $\\\beta$.
+1. **Linear in Parameters**: The regression model is linear in the parameters $\\\\beta$.
 2. **Fixed $X$ values**: Values taken by the regressor $X$ are considered fixed in repeated sampling.
 3. **Zero Mean of Disturbance**: $E(u_i | X_i) = 0$.
-4. **Homoscedasticity**: Equal variance of $u_i$. $var(u_i | X_i) = \\\sigma^2$.
+4. **Homoscedasticity**: Equal variance of $u_i$. $var(u_i | X_i) = \\\\sigma^2$.
 5. **No Autocorrelation**: Given $X$, there is no autocorrelation between the disturbances. $cov(u_i, u_j | X_i, X_j) = 0$ for $i \\\neq j$.
 6. **Zero Covariance between $X_i$ and $u_i$**: $cov(X_i, u_i) = 0$.
 7. **Number of Observations**: The number of observations $n$ must be greater than the number of parameters to be estimated.
@@ -799,15 +799,15 @@ The theoretical justification for OLS rests on the CLRM.
 The standard errors are necessary for hypothesis testing and interval estimation:
 
 $$
-var(\\\hat{\\\beta}_2) = \\\frac{\\\sigma^2}{\\\sum x_i^2} \\\quad , \\\quad se(\\\hat{\\\beta}_2) = \\\frac{\\\sigma}{\\\sqrt{\\\sum x_i^2}}
+var(\\\hat{\\\\beta}_2) = \\\\frac{\\\\sigma^2}{\\\\sum x_i^2} \\\quad , \\\quad se(\\\hat{\\\\beta}_2) = \\\\frac{\\\\sigma}{\\\\sqrt{\\\\sum x_i^2}}
 $$
 
 $$
-var(\\\hat{\\\beta}_1) = \\\frac{\\\sum X_i^2}{n \\\sum x_i^2} \\\sigma^2 \\\quad , \\\quad se(\\\hat{\\\beta}_1) = \\\sqrt{\\\frac{\\\sum X_i^2}{n \\\sum x_i^2}} \\\sigma
+var(\\\hat{\\\\beta}_1) = \\\\frac{\\\\sum X_i^2}{n \\\\sum x_i^2} \\\\sigma^2 \\\quad , \\\quad se(\\\hat{\\\\beta}_1) = \\\\sqrt{\\\\frac{\\\\sum X_i^2}{n \\\\sum x_i^2}} \\\\sigma
 $$
 
-To estimate the true variance of the disturbance term $\\\sigma^2$, we use the estimator $\\\hat{\\\sigma}^2$:
-\\\begin{equation}\\\hat{\\\sigma}^2 = \\\frac{\\\sum \\\hat{u}_i^2}{n - 2}\\\end{equation}
+To estimate the true variance of the disturbance term $\\\\sigma^2$, we use the estimator $\\\hat{\\\\sigma}^2$:
+\\\begin{equation}\\\hat{\\\\sigma}^2 = \\\\frac{\\\\sum \\\hat{u}_i^2}{n - 2}\\\end{equation}
 
 #### 3.4 Properties of Least-Squares Estimators: The Gauss-Markov Theorem
 > **Gauss-Markov Theorem**: Given the assumptions of the CLRM, the least-squares estimators, in the class of unbiased linear estimators, have minimum variance, that is, they are BLUE.
@@ -825,18 +825,18 @@ TSS = ESS + RSS
 $$
 
 $$
-\\\sum (Y_i - \\\bar{Y})^2 = \\\sum (\\\hat{Y}_i - \\\bar{Y})^2 + \\\sum \\\hat{u}_i^2
+\\\\sum (Y_i - \\\bar{Y})^2 = \\\\sum (\\\hat{Y}_i - \\\bar{Y})^2 + \\\\sum \\\hat{u}_i^2
 $$
 
 Then, defining $R^2$ as the ratio of the explained variation to the total variation:
 
 $$
-R^2 = \\\frac{ESS}{TSS} = 1 - \\\frac{RSS}{TSS} = 1 - \\\frac{\\\sum \\\hat{u}_i^2}{\\\sum y_i^2}
+R^2 = \\\\frac{ESS}{TSS} = 1 - \\\\frac{RSS}{TSS} = 1 - \\\\frac{\\\\sum \\\hat{u}_i^2}{\\\\sum y_i^2}
 $$
 
 The sample correlation coefficient $r$ is:
 $$
-r = \\\pm \\\sqrt{R^2} = \\\frac{\\\sum x_i y_i}{\\\sqrt{(\\\sum x_i^2)(\\\sum y_i^2)}}
+r = \\\pm \\\\sqrt{R^2} = \\\\frac{\\\\sum x_i y_i}{\\\\sqrt{(\\\\sum x_i^2)(\\\\sum y_i^2)}}
 $$
 
 #### 3.6 A Numerical Example
@@ -861,10 +861,10 @@ To illustrate the computations of OLS, we utilize a hypothetical dataset represe
 From the table, $\\\bar{Y} = 111$ and $\\\bar{X} = 170$.
 Using the normal equations:
 $$
-\\\hat{\\\beta}_2 = \\\frac{\\\sum x_i y_i}{\\\sum x_i^2} = \\\frac{16800}{33000} = 0.5091
+\\\hat{\\\\beta}_2 = \\\\frac{\\\\sum x_i y_i}{\\\\sum x_i^2} = \\\\frac{16800}{33000} = 0.5091
 $$
 $$
-\\\hat{\\\beta}_1 = \\\bar{Y} - \\\hat{\\\beta}_2 \\\bar{X} = 111 - 0.5091(170) = 24.453
+\\\hat{\\\\beta}_1 = \\\bar{Y} - \\\hat{\\\\beta}_2 \\\bar{X} = 111 - 0.5091(170) = 24.453
 $$
 
 So the Sample Regression Function is:
@@ -874,15 +874,15 @@ $$
 
 We calculate variances:
 $$
-\\\hat{\\\sigma}^2 = \\\frac{\\\sum \\\hat{u}_i^2}{n - 2 = 42.159
+\\\hat{\\\\sigma}^2 = \\\\frac{\\\\sum \\\hat{u}_i^2}{n - 2 = 42.159
 $$
 $$
-se(\\\hat{\\\beta}_2) = 0.0357 \\\quad , \\\quad se(\\\mathbf{\\\beta}_1) = 6.4138
+se(\\\hat{\\\\beta}_2) = 0.0357 \\\quad , \\\quad se(\\\mathbf{\\\\beta}_1) = 6.4138
 $$
 
 $$R^2$ is calculated as:
 $$
-R^2 = \\\frac{\\\hat{\\\beta}_2^2 \\\sum x_i^2}{\\\sum y_i^2} = \\\frac{0.5091^2 \\\times 33000}{8890} = 0.9621
+R^2 = \\\\frac{\\\hat{\\\\beta}_2^2 \\\\sum x_i^2}{\\\\sum y_i^2} = \\\\frac{0.5091^2 \\\\times 33000}{8890} = 0.9621
 $$
 This means approx 96.21% of the variation in weekly consumption expenditure is explained by weekly income.
 
@@ -936,7 +936,7 @@ In cases where theoretical assumptions might break down, Experiments bty Simulat
 5.1 Statistical Prerequisites
 5.2 Interval Estimation: Some Basic Ideas
 5.3 Confidence Intervals for Regression Coefficients
-5.4 Confidence Interval for $\\sigma^2$
+5.4 Confidence Interval for $\\\sigma^2$
 5.5 Hypothesis Testing: General Comments
 5.6 Hypothesis Testing: The Confidence-Interval Approach
 5.7 Hypothesis Testing: The Test-of-Significance Approach
@@ -1260,7 +1260,7 @@ Sustenance, Self-Esteem, Freedom from Servitude.
 ## CHAPTER 2: CLASSIC THEORIES
 
 ### 2.1 Harrod-Domar Growth Model
-$$g = \\frac{s}{v}$$
+$$g = \\\frac{s}{v}$$
 ### 2.2 Lewis Two-Sector Model
 Transfer of labor from agriculture to industry.
 
@@ -1301,26 +1301,874 @@ $$Y = A K^\\alpha L^{1-\\alpha}$$
   "ug-financial": `
 # COMPREHENSIVE FINANCIAL ECONOMICS STUDY GUIDE
 
-## CHAPTER 1: ASSET PRICING AND RETURN
+*Based on Financial Economics, Second Edition by Zvi Bodie, Robert C. Merton, and David L. Cleeton*
 
-### 1.1 Net Present Value (NPV)
-$$NPV = \\sum_{t=0}^n \\frac{CF_t}{(1+r)^t}$$
+## PART I: FINANCE AND THE FINANCIAL SYSTEM
 
-### 1.2 Expected Return and Risk
-$$E(R) = \\sum p_i R_i$$
-$$\\sigma^2 = \\sum p_i (R_i - E(R))^2$$
+### Chapter 1: Financial Economics
+
+**1.1 Defining Finance**
+Finance is the study of how people allocate scarce resources over time. The two core features that distinguish financial decisions from other resource allocation decisions are:
+1. **Time**: The costs and benefits of financial decisions are spread out over time.
+2. **Uncertainty**: The costs and benefits are usually not known with certainty in advance.
+
+By systematically allocating resources over time, participants in the economy can optimize their consumption, investment, and wealth generation across various temporal states and risk environments.
+
+**1.2 Why Study Finance?**
+- **To manage your personal resources**: You will face decisions such as whether to rent or buy a home, how much to save for retirement, and how to allocate your savings among alternative investments (e.g., stocks, bonds, mutual funds).
+- **To deal with the world of business**: Whether you work in marketing, production, human resources, or information systems, an understanding of financial concepts is essential for comprehending the broader goals of your organization and the rationale behind strategic capital allocations.
+- **To pursue career opportunities**: Finance offers diverse paths including investment banking, wealth management, corporate treasury, quantitative risk analysis, and underwriting.
+- **To make informed public choices**: Many public policy issues, such as social security reform and government debt management, involve fundamental financial principles.
+
+**1.3 Financial Decisions of Households**
+Households face four basic types of financial decisions:
+1. **Consumption and Saving Decisions**: How much of their current wealth should they spend on consumption and how much of their current income should they save for the future?
+2. **Investment Decisions**: How should they invest the money they have saved? (e.g., risk-free assets vs. risky asset portfolios).
+3. **Financing Decisions**: When and how should households use other people's money? (e.g., student loans, mortgages, credit card debt).
+4. **Risk-Management Decisions**: How and on what terms should households seek to reduce financial uncertainties? (e.g., purchasing life, health, or property insurance).
+
+**1.4 Financial Decisions of Firms**
+Firms are legal entities that produce goods or sell services, acting as the primary source of real production in the economy. They face three primary financial decisions:
+- **Capital Budgeting**: Selecting which investment projects to undertake. The basic unit of analysis is the corporate project, and firms utilize methods such as Net Present Value (NPV) to evaluate expected cash flows.
+- **Capital Structure**: Determining how to finance those investments. This involves selecting the optimal mix of debt (borrowed funds) and equity (owner capital).
+- **Working Capital Management**: Managing the day-to-day short-term assets and liabilities (liquidity management, receivables, and inventory) to ensure smooth operations.
+
+**1.5 The Goal of Management**
+In a market economy, the primary goal of corporate management is to **maximize shareholder wealth**, which is represented by the market price of the firm's common stock. 
+- *Why Shareholder Wealth?* Because shareholders are the residual claimants to the firm's cash flows—they get paid last, after employees, suppliers, and tax authorities. Maximizing the value of this residual claim ensures that the firm maximizes the value of its overall output.
+- *The Separation of Ownership and Control*: In large corporations, ownership is widely dispersed among millions of shareholders, while management is run by professionals. This separation can create **Agency Conflicts** where managers may act in their own self-interest rather than in the interest of the shareholders, requiring incentive structures (e.g., stock options, performance-based compensation) and monitoring mechanisms to align interests.
+
+**1.6 Market Discipline and Governance**
+Managers are kept in line through various external governance forces:
+- **The Market for Corporate Control**: If a firm's management performs poorly, its stock price falls, making it a target for hostile takeovers by outsiders who will replace the board and management.
+- **The Labor Market for Managers**: Managerial reputation and future earnings are linked to the performance of the firm they manage.
 
 ---
 
-## CHAPTER 2: PORTFOLIO THEORY AND CAPM
+### Chapter 2: Financial Markets and Institutions
 
-### 2.1 The Capital Asset Pricing Model
-$$E(R_i) = R_f + \\beta_i (E(R_m) - R_f)$$
+**2.1 What Is the Financial System?**
+The financial system is the collection of markets, institutions, laws, regulations, and techniques through which bonds, stocks, and other securities are traded, financial services are produced and delivered, and interest rates and security prices are determined. 
+
+At its core, the system facilitates the flow of funds from **surplus units** (economic entities that earn more than they spend, typically households) to **deficit units** (entities that spend more than they earn, typically businesses and governments). This flow occurs either through financial markets (direct finance) or financial intermediaries (indirect finance).
+
+**2.2 Direct vs. Indirect Finance**
+- **Direct Finance**: Deficit units borrow funds directly from financial markets by selling securities (such as bonds or equity shares) to surplus units.
+- **Indirect Finance**: Financial intermediaries (such as commercial banks) channel funds by borrowing from surplus units (e.g., via deposits) and lending them to deficit units (e.g., via commercial loans). This transformation of assets reduces transaction costs, manages risk, and bridges liquidity mismatches.
+
+**2.3 The Functional Perspective**
+Financial institutions and markets change over time and across countries, but the basic functions they perform remain remarkably stable. The financial system performs six core functions:
+1. **Transferring Economic Resources**: Provides ways to transfer economic resources through time (e.g., saving for retirement), across borders (e.g., foreign exchange), and among industries. This allocates capital to its most productive uses.
+2. **Managing Risk**: Provides ways of managing and distributing risks. Insurance contracts, derivative markets (options, forwards, futures), and portfolio diversification allow individuals and firms to transfer risks to those more willing or able to bear them.
+3. **Clearing and Settling Payments**: Provides payment services to facilitate transaction settlement, domestic and international trade of goods, services, and financial assets (e.g., credit cards, wire transfers, clearing houses).
+4. **Pooling Resources**: Provides a mechanism for the pooling of funds from many individual investors so as to undertake large-scale, indivisible investments. Intermediaries like mutual funds allow individual savers to participate in diversified portfolios with small amounts of capital.
+5. **Providing Price Information**: Provides price signals (interest rates, stock prices, exchange rates) to coordinate decentralized decision-making across different sectors of the economy. These prices serve as vital signals for capital allocation.
+6. **Handling Incentive Problems**: Provides methods to address information asymmetry and incentive issues, specifically:
+   - **Moral Hazard**: The risk that a borrower engages in activities that make it less likely they will repay a loan once the loan has been granted.
+   - **Adverse Selection**: The problem created by asymmetric information *before* a transaction occurs—tendency of high-risk individuals to be more eager borrowers.
+   - **Principal-Agent Relationship**: Conflicts of interest arising when managers (agents) do not act in the absolute best interests of the shareholders (principals).
+
+**2.4 Financial Intermediaries and Market Institutions**
+Financial intermediaries are categorized by how they acquire and distribute funds:
+- **Depository Institutions**: Commercial banks, savings banks, and credit unions. They accept deposits and make commercial/consumer loans.
+- **Contractual Savings Institutions**: Insurance companies (life, property & casualty) and pension funds. They receive regular premiums or contributions and invest in long-term securities.
+- **Investment Intermediaries**: Mutual funds, money market mutual funds, and finance companies. They pool resources from investors to buy portfolios of stocks, bonds, or short-term debt.
+- **Market Specialists**: Broker-dealers, investment banks, and exchanges. They facilitate the direct trading of securities.
+
+**2.5 Classification of Financial Markets**
+Financial markets can be segmented along several dimensions:
+- **Debt vs. Equity Markets**: Debt instruments (bonds, notes) represent borrower-lender arrangements with fixed payments; equity instruments (common stock) represent ownership claims with residual payouts.
+- **Money vs. Capital Markets**: Money markets deal in short-term debt instruments (maturity $< 1$ year, e.g., T-bills, commercial paper) requiring high liquidity and very low risk. Capital markets trade long-term debt and equity issues (maturity $\ge 1$ year, e.g., corporate bonds, treasury bonds, stocks).
+- **Primary vs. Secondary Markets**: In primary markets, newly issued securities are sold to initial buyers (e.g., IPOs). Secondary markets facilitate the trading of pre-existing securities between investors, providing vital liquidity and establishing market prices.
+
+**2.6 Financial Market Rates**
+An interest rate is a promised rate of return, representing the price of borrowing or the reward for lending funds over a specified time horizon.
+- **Nominal Interest Rate ($i$)**: The interest rate expressed in ordinary monetary terms, unadjusted for changes in purchasing power.
+- **Real Interest Rate ($r$)**: The rate of return measured in terms of constant purchasing power (real goods and services).
+
+Accounting for the rate of inflation ($\pi$), the exact relationship (the Fisher Multiplicative Equation) is:
+$$ 1 + r = \\frac{1 + i}{1 + \\pi} $$
+
+Often, for low inflation rates, this is approximated by the linear **Fisher Equation**:
+$$ r \\approx i - \\pi $$
+
+- **The Term Structure of Interest Rates**: The relationship between interest rates (yields) and the time to maturity for debt instruments of equivalent credit risk, graphically represented by the **Yield Curve**.
+- **Credit Risk Spreads**: The difference in yield between a risky bond (e.g., high-yield corporate debt) and a default-free government bond of the same maturity. This spread reflects the premium required by investors to bear default risk.
+
+---
+
+### Chapter 3: Managing Financial Health and Performance
+
+**3.4 The Balance Sheet and Income Statement**
+The firm's financial health is summarized in the balance sheet and the income statement.
+$$ \\text{Assets} = \\text{Liabilities} + \\text{Shareholders' Equity} $$
+
+**3.6 Analysis Using Financial Ratios**
+<div class="overflow-x-auto my-6 markdown-table text-sm">
+
+| Ratio Category | Name of Ratio | Formula |
+| :--- | :--- | :--- |
+| **Profitability** | Return on sales (ROS) | $EBIT / \\text{Sales}$ |
+| | Return on assets (ROA) | $EBIT / \\text{Average Total Assets}$ |
+| | Return on equity (ROE) | $\\text{Net Income} / \\text{Stockholders' Equity}$ |
+| **Asset Turnover** | Receivables turnover | $\\text{Sales} / \\text{Average Receivables}$ |
+| | Inventory turnover | $\\text{Cost of Goods Sold} / \\text{Average Inventory}$ |
+| | Asset turnover | $\\text{Sales} / \\text{Average Total Assets}$ |
+| **Financial Leverage**| Debt ratio | $\\text{Total Debt} / \\text{Total Assets}$ |
+| | Times interest earned | $EBIT / \\text{Interest Expense}$ |
+| **Liquidity** | Current ratio | $\\text{Current Assets} / \\text{Current Liabilities}$ |
+| | Quick ratio | $(\\text{Cash} + \\text{Receivables}) / \\text{Current Liabilities}$ |
+
+</div>
+
+**ROE Decomposition:**
+$$ ROE = \\frac{\\text{Net Income}}{\\text{Sales}} \\times \\frac{\\text{Sales}}{\\text{Assets}} \\times \\frac{\\text{Assets}}{\\text{Equity}} $$
+
+$$ ROE = (1 - \\text{Tax Rate}) \\times \\left[ ROA + \\left(\\frac{\\text{Debt}}{\\text{Equity}}\\right) \\times (ROA - \\text{Interest Rate}) \\right] $$
+
+**3.9 Growth and the Need for External Financing**
+$$ \\text{Sustainable Growth Rate} = \\text{Earnings Retention Rate} \\times ROE $$
+
+---
+
+## PART II: TIME AND RESOURCE ALLOCATION
+
+### Chapter 4: Allocating Resources Over Time
+
+As we saw in chapter 1, financial decisions involve costs and benefits that are spread over time. Financial decision makers in households and firms all have to evaluate whether investing money today is justified by the expected benefits in the future. They must, therefore, compare the values of sums of money at different dates. To do so requires a thorough understanding of the time value of money concepts and discounted cash flow techniques presented in this chapter.
+
+The time value of money (TVM) refers to the fact that money (a dollar, a euro, or a yen) in hand today is worth more than the expectation of the same amount to be received in the future. There are at least three reasons why this is true. The first is that you can invest it, earn interest, and end up with more in the future. The second is that the purchasing power of money can change over time because of inflation. The third is that the receipt of money expected in the future is, in general, uncertain.
+
+In this chapter we study how to take account of the first of these: interest. We leave the study of how to deal with inflation and uncertainty to later chapters.
+
+**4.1 Compounding**
+
+We begin our study of the time value of money and discounted cash flow analysis with the concept of compounding—the process of going from today's value, or present value (PV), to future value (FV). Future value is the amount of money an investment will grow to at some date in the future by earning interest at some compound rate. For example, suppose you put $1,000 (the PV) into an account earning an interest rate of 10% per year. The amount you will have in five years, assuming you take nothing out of the account before then, is called the future value of $1,000 at an interest rate of 10% per year for five years.
+
+Let us define our terms more precisely:
+$PV =$ present value or beginning amount in your account. Here, it is $1,000.
+$i =$ interest rate, usually expressed in percent per year. Here, it is 10% (or 0.10 as a decimal).
+$n =$ number of years the account will earn interest.
+$FV =$ future value at the end of $n$ years.
+
+Now let's calculate the future value in this example one step at a time. First, how much will you have after the first year? You will have your original $1,000 plus interest of $100 (10% of $1,000 or $0.1 \\times $1,000). Your future value at the end of year 1 will, therefore, be $1,100:
+
+$$ FV = \\$1,000 \\times 1.10 = \\$1,100 $$
+
+If you redeposit this entire sum of $1,100 for another year, how much will you have at the end of year 2? During year 2 you will earn 10% interest on the entire $1,100. The interest earned is, thus, $0.10 \\times \\$1,100$ or $110. You will, therefore, have $1,210 at the end of year 2.
+
+To gain a good understanding of the nature of compound interest, we can break this future value of $1,210 into its three components. First, there is the original principal of $1,000. Next, there is the interest on this principal—$100 in the first year and another $100 in the second year. The interest on the original principal is called **simple interest** ($200 in our example). Finally, there is $10 of interest earned in the second year on the $100 of interest earned in the first year. Interest earned on interest already paid is called **compound interest**. The total interest earned ($210) is the sum of the simple interest ($200) plus the compound interest ($10).
+
+Practically speaking, you do not care how much of your total interest of $210 is simple interest and how much is compound interest. All you really care about is how much you will have in your account in the future, that is, the future value. The most direct way to calculate the future value at the end of year 2 is to recognize that it is the original principal multiplied by 1.1 (here we drop the zero from 1.10 to shorten our equations) and then multiplied by 1.1 again:
+
+$$ FV = \\$1,000 \\times 1.1 \\times 1.1 = \\$1,000 \\times 1.1^2 = \\$1,210 $$
+
+After three years you will have:
+
+$$ FV = \\$1,000 \\times 1.1 \\times 1.1 \\times 1.1 = \\$1,000 \\times 1.1^3 = \\$1,331 $$
+
+By this chain of reasoning, we can find future value after five years by repeated multiplication:
+
+$$ \\$1,000 \\times 1.1 \\times 1.1 \\times 1.1 \\times 1.1 \\times 1.1 = \\$1,100 \\times 1.1^5 = \\$1,610.51 $$
+
+Thus, we have our answer to the original question. The future value of $1,000 at an interest rate of 10% per year for five years is $1,610.51. The total interest earned over the five years is $610.51, of which $500 is simple interest and $110.51 is compound interest.
+
+<div class="overflow-x-auto my-6 markdown-table text-sm">
+
+| Year | Beginning Amount | Interest Earned | Ending Amount |
+| :---: | :---: | :---: | :---: |
+| 1 | $1,000.00 | $100.00 | $1,100.00 |
+| 2 | $1,100.00 | $110.00 | $1,210.00 |
+| 3 | $1,210.00 | $121.00 | $1,331.00 |
+| 4 | $1,331.00 | $133.10 | $1,464.10 |
+| 5 | $1,464.10 | $146.41 | $1,610.51 |
+| | **Total Interest Earned** | **$610.51** | |
+
+</div>
+
+More generally, if $i$ is the interest rate and $n$ is the number of years, the future value of the $1,000 is given by the formula:
+
+$$ FV = \\$1,000(1 + i)^n $$
+
+In general, for any present value invested, the **future value factor** is given by:
+
+$$ FV = (1 + i)^n $$
+
+<div class="overflow-x-auto my-6 markdown-table text-sm">
+
+| Number of Periods, n | 2% | 4% | 6% | 8% | 10% | 12% |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | 1.0200 | 1.0400 | 1.0600 | 1.0800 | 1.1000 | 1.1200 |
+| 2 | 1.0404 | 1.0816 | 1.1236 | 1.1664 | 1.2100 | 1.2544 |
+| 3 | 1.0612 | 1.1249 | 1.1910 | 1.2597 | 1.3310 | 1.4049 |
+| 4 | 1.0824 | 1.1699 | 1.2625 | 1.3605 | 1.4641 | 1.5735 |
+| 5 | 1.1041 | 1.2167 | 1.3382 | 1.4693 | 1.6105 | 1.7623 |
+| 10 | 1.2190 | 1.4802 | 1.7908 | 2.1589 | 2.5937 | 3.1058 |
+| 15 | 1.3459 | 1.8009 | 2.3966 | 3.1722 | 4.1772 | 5.4736 |
+| 20 | 1.4859 | 2.1911 | 3.2071 | 4.6610 | 6.7275 | 9.6463 |
+
+</div>
 
 \`\`\`chart
 {
   "type": "line",
-  "title": "Figure 2.1: The Security Market Line (SML)",
+  "title": "Figure 4.2: Future Value of $1 at Interest Rates from 2% to 12%",
+  "xAxis": "Years",
+  "yAxis": "Future Value",
+  "data": [
+    {"Years": 1, "2%": 1.02, "4%": 1.04, "6%": 1.06, "8%": 1.08, "10%": 1.10, "12%": 1.12},
+    {"Years": 5, "2%": 1.10, "4%": 1.22, "6%": 1.34, "8%": 1.47, "10%": 1.61, "12%": 1.76},
+    {"Years": 10, "2%": 1.22, "4%": 1.48, "6%": 1.79, "8%": 2.16, "10%": 2.59, "12%": 3.11},
+    {"Years": 15, "2%": 1.35, "4%": 1.80, "6%": 2.40, "8%": 3.17, "10%": 4.18, "12%": 5.47},
+    {"Years": 20, "2%": 1.49, "4%": 2.19, "6%": 3.21, "8%": 4.66, "10%": 6.73, "12%": 9.65}
+  ],
+  "series": [
+    {"key": "2%", "name": "2%", "color": "#9ca3af"},
+    {"key": "4%", "name": "4%", "color": "#60a5fa"},
+    {"key": "6%", "name": "6%", "color": "#3b82f6"},
+    {"key": "8%", "name": "8%", "color": "#2563eb"},
+    {"key": "10%", "name": "10%", "color": "#1d4ed8"},
+    {"key": "12%", "name": "12%", "color": "#1e3a8a"}
+  ]
+}
+\`\`\`
+
+**Rule of 72**
+There is a handy rule of thumb that can help you estimate future values when you do not have your calculator or a table available. It is called the **Rule of 72**. This rule says that the number of years it takes for a sum of money to double in value (the "doubling time") is approximately equal to the number 72 divided by the interest rate expressed in percent per year:
+
+$$ \\text{Doubling Time} = \\frac{72}{\\text{Interest Rate}} $$
+
+So at an interest rate of 10% per year, it should take approximately 7.2 years to double your money.
+
+**4.2 The Frequency of Compounding**
+Interest rates on loans and saving accounts are usually stated in the form of an **annual percentage rate (APR)** (e.g., 6% per year) with a certain frequency of compounding (e.g., monthly). Because the frequency of compounding can differ, it is important to have a way of making interest rates comparable. This is done by computing an **effective annual rate (EFF)**, defined as the equivalent interest rate, *if compounding were only once per year*.
+
+The general formula for the effective annual rate is:
+$$ EFF(APR, m) = \\left(1 + \\frac{APR}{m}\\right)^m - 1 $$
+where $APR$ is the annual percentage rate, and $m$ the number of compounding periods per year.
+
+For continuous compounding, the effective rate approaches $e^{APR} - 1$ where $e$ is the constant $2.71828$. The continuous future value formula is $FV_{con} = PV \\cdot e^{APR \\cdot n}$.
+
+**4.3 Present Value and Discounting**
+When we compute future values, we are asking questions like "How much will we have in 10 years if we invest $1,000 today at an interest rate of 8% per year?"
+But suppose we want to know how much to invest today in order to reach some target amount at a date in the future. For example, if we need to have $15,000 for a child's college education eight years from now, how much do we have to invest now? To find the answer to this kind of question, we need to calculate the *present value* of a given future amount.
+
+Calculating present values is the reverse of calculating future values. That is, it tells us the amount you would have to invest today to have a certain amount in the future.
+
+The general formula for the present value of $1 to be received $n$ periods from now at a discount rate of $i$ (per period) is:
+
+$$ PV = \\frac{1}{(1 + i)^n} $$
+
+This is called the **present value of $1** at an interest rate of $i$ for $n$ periods.
+
+<div class="overflow-x-auto my-6 markdown-table text-sm">
+
+| Number of Periods, n | 2% | 4% | 6% | 8% | 10% | 12% |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | 0.9804 | 0.9615 | 0.9434 | 0.9259 | 0.9091 | 0.8929 |
+| 2 | 0.9612 | 0.9246 | 0.8900 | 0.8573 | 0.8264 | 0.7972 |
+| 3 | 0.9423 | 0.8890 | 0.8396 | 0.7938 | 0.7513 | 0.7118 |
+| 4 | 0.9238 | 0.8548 | 0.7921 | 0.7350 | 0.6830 | 0.6355 |
+| 5 | 0.9057 | 0.8219 | 0.7473 | 0.6806 | 0.6209 | 0.5674 |
+| 10 | 0.8203 | 0.6756 | 0.5584 | 0.4632 | 0.3855 | 0.3220 |
+| 15 | 0.7430 | 0.5553 | 0.4173 | 0.3152 | 0.2394 | 0.1827 |
+| 20 | 0.6730 | 0.4564 | 0.3118 | 0.2145 | 0.1486 | 0.1037 |
+
+</div>
+
+Consistent with our previous notation for time value of money computations, we can calculate the present value of a future amount using the **present value factor** defined as:
+
+$$ PV_{FV}(FV, i, n) = \\frac{FV}{(1 + i)^n} $$
+
+**4.6 Annuities**
+Often the future cash flows in a savings plan, an investment project, or a loan repayment schedule are the same each year. We call such a level stream of cash flows or payments an **annuity**. If the cash flows start immediately, as in a savings plan or a lease, it is called an **immediate annuity**. If the cash flows start at the end of the current period rather than immediately, it is called an **ordinary annuity**.
+
+Future Value of Annuity:
+$$ FV = PMT \\times \\frac{(1 + i)^n - 1}{i} $$
+
+Present Value of Annuity:
+$$ PV = PMT \\times \\frac{1 - (1 + i)^{-n}}{i} $$
+
+**4.7 Perpetual Annuities**
+An important, special type of annuity is a perpetual annuity or **perpetuity**. A perpetuity is a stream of cash flows that lasts forever. The classic example is the "consol" bonds issued by the British government in the nineteenth century, which pay interest each year on the stated face value of the bonds but have no maturity date.
+
+$$ PV \\text{ of a Level Perpetuity} = \\frac{C}{i} $$
+
+For a **growth perpetuity** where cash flows grow at a constant rate $g$:
+
+$$ PV = \\frac{C_1}{i - g} $$
+
+Growth Perpetuity (Constant Growth):
+$$ PV = \\\frac{C_1}{i - g} $$
+
+\`\`\`simulator
+{
+  "mode": "future_value",
+  "title": "Interactive Time Value of Money (Future Value) Simulator"
+}
+\`\`\`
+
+---
+
+### Chapter 5: Household Saving and Investment Decisions
+
+**5.1 A Life-Cycle Model of Saving**
+The primary framework for analyzing household saving decisions is the **Life-Cycle Hypothesis**. The fundamental assumption is that individuals plan their consumption and savings behavior over their entire life cycle to maximize lifetime utility. Rather than consuming based purely on current income (which fluctuates dramatically over one's life), individuals seek to **even out or smooth** their consumption over their working years and retirement.
+
+To achieve this, the present value of lifetime consumption spending and bequests must equal the present value of initial financial wealth and future labor earnings. The latter is referred to as **Human Capital** ($HC$).
+
+**The Intertemporal Budget Constraint**:
+$$ \\sum_{t=1}^T \\frac{C_t}{(1+i)^t} + \\frac{B_T}{(1+i)^T} = W_0 + \\sum_{t=1}^R \\frac{Y_t}{(1+i)^t} $$
+
+Where:
+- $C_t$ is planned consumption in year $t$.
+- $B_T$ is the bequest left to heirs at the end of life expectancy ($T$).
+- $W_0$ is initial physical and financial wealth.
+- $Y_t$ is labor income/earnings in year $t$.
+- $R$ is the retirement age (years of active labor).
+- $T$ is the overall life expectancy.
+- $i$ is the constant market interest rate.
+
+**5.2 Human Capital and Consumption Smoothing**
+- **Human Capital ($HC$)**: Calculated as the present value of expected future labor earnings up to retirement:
+  $$ HC_0 = \\sum_{t=1}^R \\frac{Y_t}{(1+i)^t} $$
+  For most individuals early in their working lives, human capital is their single largest asset, dwarfing their financial and physical assets.
+- **Consumption Smoothing**: Because utility curves are typically concave ($U''(C) < 0$), individuals derive greater utility from a stable level of consumption than from highly volatile boom-and-bust periods. Thus, they smooth consumption by borrowing early in life (when income is low but human capital is high), saving during peak earning years, and dissaving (spending down accumulated assets) during retirement.
+
+**5.3 The Consumption-Smoothing Formula (No Bequests)**
+Assuming an individual expects to live for $T$ years, work for $R$ years, has zero initial financial wealth ($W_0 = 0$), expects to leave no bequest ($B_T = 0$), earns a constant annual income $Y$ during working years, and faces a zero interest rate ($i = 0$), the constant level of annual consumption $C$ is solved by:
+$$ T \\times C = R \\times Y \\implies C = \\left(\\frac{R}{T}\\right) Y $$
+
+During working years ($t \\le R$), the individual accumulates savings at a constant annual rate:
+$$ S = Y - C = Y - \\left(\\frac{R}{T}\\right) Y = \\left(1 - \\frac{R}{T}\\right) Y $$
+
+*Implication*: If an individual expects a longer retirement period (larger $T - R$), they must reduce their consumption $C$ and increase their annual saving rate during their working years.
+
+**5.4 Social Security and Household Saving**
+Social security is a government-mandated pension program. It functions as a forced savings mechanism:
+- **Substitute Effect**: If households view social security benefits as a perfect substitute for private pension savings, they will reduce their active private saving dollar-for-dollar. 
+- **Retirement Effect**: Social security may encourage earlier retirement (reducing $R$). This creates a need for higher savings to support the longer retirement period, which could partially offset the reduction in private saving.
+
+**5.5 Asset Allocation Over the Life Cycle**
+A household's total wealth is the sum of its financial/physical wealth and its human capital:
+$$ \\text{Total Wealth} = \\text{Financial Wealth} + \\text{Human Capital} $$
+
+- **Human Capital as a Safe Asset**: For most steady professions, future salary payments are highly secure and behave similarly to inflation-indexed, risk-free bonds. 
+- **Young Households**: Early in the life cycle, a household's portfolio is massively weighted toward human capital (safe bond-like asset). To achieve a balanced overall wealth exposure, they should plant their financial wealth heavily in risky, high-return assets (such as equity/stocks).
+- **As Retirement Approaches**: As the individual works ($t \\to R$), their human capital is harvested and converted into financial savings. To maintain a stable risk profile for their total wealth, the asset allocation of their financial portfolio must gradually shift toward safer assets (bonds and money-market instruments).
+
+---
+
+### Chapter 6: The Analysis of Investment Projects
+
+**6.1 The Capital Budgeting Process**
+Firms must continuously identify and evaluate physical capital investments, research and development capabilities, and strategic expansions. This process of allocating funds for long-term investments is known as **capital budgeting**. The primary goal of capital budgeting is to maximize the firm's value, which aligns with the objective of maximizing shareholder wealth. 
+
+Unlike daily operational decisions, capital budgeting decisions involve massive cash outlays that are highly irreversible and shape the firm's strategic direction for years or even decades. The process typically evolves through several formal phases:
+1. **Identification of Opportunities**: Sourcing potential projects from strategic business units, research labs, or external market trends.
+2. **Analysis and Information Gathering**: Estimating expected incremental cost structures, market size, and terminal asset values.
+3. **Selection**: Applying financial decision rules (such as NPV, IRR, and PI) to choose the optimal set of projects under risk.
+4. **Execution and Implementation**: Deploying physical capital, training personnel, and launching operations.
+5. **Post-Audit and Review**: Composing systematic retroactive evaluations of actual vs. projected cash flows to refine future forecasts.
+
+**6.2 Identifying Relevant Cash Flows**
+The first step in evaluating a project is establishing its incremental cash flows—the differences in the firm's total cash flows if the project is accepted versus if it is rejected. Setting this up is called the **Stand-Alone Principle**, which allows us to view the project as a "mini-firm" with its own financial statement.
+
+To measure cash flows accurately, we must strictly adhere to the following principles:
+- **Cash Flows vs. Accounting Profits**: Financial decisions are driven by the physical movement of cash, not non-cash accounting entries. For instance, **depreciation** is a non-cash expense. While it must be added back to accounting net income, it affects actual cash flows because it is tax-deductible, creating a vital **Depreciation Tax Shield**:
+  $$ \\text{Depreciation Tax Shield} = \\text{Depreciation} \\times T_c $$
+  where $T_c$ is the corporate tax rate.
+- **Sunk Costs**: Costs that have already been incurred or are legally committed regardless of whether the project proceeds (e.g., historical R&D spend, past feasibility studies) are totally irrelevant and **MUST** be ignored.
+- **Opportunity Costs**: If a project uses an existing asset that the firm could otherwise sell, lease, or use elsewhere (e.g., building a factory on land currently owned by the firm), the market value of that asset represents an opportunity cost and **MUST** be treated as a cash outflow.
+- **Side Effects and Cannibalization**: Projects do not exist in isolation. 
+  - **Erosion/Cannibalization**: If a new product line reduces sales of the firm's existing products, the lost cash flows must be subtracted from the project's projected inflows.
+  - **Synergies**: If a project increases sales of existing lines (e.g., launching a game console increases controller sales), the extra cash flows must be credited to the project.
+- **Net Working Capital (NWC)**: Projects usually require an upfront investment in working capital (such as initial inventory and minimum cash balances) and generate accounts receivable/payable. The change in NWC at period $t$, calculated as $\\Delta NWC_t = NWC_t - NWC_{t-1}$, represents a physical cash movement:
+  - An increase in NWC represents a **cash outflow** (buying inventory).
+  - A decrease in NWC represents a **cash inflow** (collecting receivables).
+  - At the terminal end of the project's life, the accumulated Net Working Capital is typically fully recovered, resulting in a positive cash inflow.
+
+**Formulating Free Cash Flows (FCF)**:
+The total incremental cash flow in any period $t$ can be formalized as:
+$$ FCF_t = OCF_t - \\Delta NWC_t - CapEx_t $$
+Where Operating Cash Flow ($OCF$) is derived as:
+$$ OCF_t = (Sales_t - Costs_t - Depreciation_t) \\times (1 - T_c) + Depreciation_t $$
+Which simplifies to:
+$$ OCF_t = (Sales_t - Costs_t) \\times (1 - T_c) + (Depreciation_t \\times T_c) $$
+And terminal capital expenditures ($CapEx_t$) include salvage value net of tax:
+$$ \\text{Net Salvage Value} = \\text{Salvage Value} - [(\\text{Salvage Value} - \\text{Book Value}) \\times T_c] $$
+
+**6.3 The Net Present Value Investment Rule**
+Net Present Value (NPV) calculation represents the absolute standard for project analysis. It discounts all expected future cash flows at the firm's required rate of return (cost of capital adjusted for risk) and subtracts the initial investment.
+
+$$ NPV(k) = \\sum_{t=0}^n \\frac{CF_t}{(1 + k)^t} $$
+Where:
+- $CF_t$ is the net cash flow at time $t$
+- $k$ is the firm's cost of capital (or the required rate of return for the project's risk level)
+- $n$ is the project's life span
+
+**Decision Rule**:
+- **Independent Projects**: Accept the project if and only if $NPV > 0$. A positive NPV indicates that taking the project will generate wealth for shareholders over and above the cost of capital.
+- **Mutually Exclusive Projects**: If you must choose between multiple candidate projects, select the one with the highest positive NPV.
+- **NPV Profile**: Plotting NPV on the y-axis against various discount rates on the x-axis illustrates the project's sensitivity to financing costs. The point where the curve crosses the x-axis (where $NPV = 0$) is the project's Internal Rate of Return (IRR).
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 6.1: NPV Profile of Project A vs. Project B",
+  "xAxis": "rate",
+  "yAxis": "npv",
+  "data": [
+    {"rate": "0%", "npv_a": 120, "npv_b": 180},
+    {"rate": "5%", "npv_a": 78, "npv_b": 102},
+    {"rate": "10%", "npv_a": 42, "npv_b": 42},
+    {"rate": "12.5%", "npv_a": 27, "npv_b": 20},
+    {"rate": "15%", "npv_a": 13, "npv_b": 0},
+    {"rate": "17.5%", "npv_a": 1, "npv_b": -18},
+    {"rate": "20%", "npv_a": -10, "npv_b": -33}
+  ],
+  "series": [
+    {"key": "npv_a", "name": "Project A (Short-lived, low discount-sensitivity)", "color": "#3b82f6"},
+    {"key": "npv_b", "name": "Project B (Long-term, high discount-sensitivity)", "color": "#ef4444"}
+  ]
+}
+\`\`\`
+
+*NPV Crossover Rate*: In the chart above, both projects have an identical NPV of $42 at a 10% discount rate. If the cost of capital is less than 10%, Project B is superior due to its larger long-term cash flows. If the cost of capital is greater than 10%, Project A is selected because its near-term cash flows protect it from discount-rate penalization.
+
+**6.4 Alternative Decision Rules**
+While NPV is the direct mathematical measure of wealth creation, firms frequently utilize other metrics, though with caution:
+
+1. **Internal Rate of Return (IRR)**: The unique rate that discounts the future cash flows to equal the initial outlay, forcing $NPV = 0$:
+   $$ 0 = \\sum_{t=0}^n \\frac{CF_t}{(1 + IRR)^t} $$
+   - **Decision Rule**: Accept the project if $IRR > k$ (the cost of capital).
+   - **Severe Pitfalls of IRR**:
+     - **Multiple IRRs**: If the project cash flows are non-conventional (signs of cash flows change more than once, e.g., a project requires clean-up costs at the end, creating a negative terminal FCF), there will be multiple mathematical roots to the equation, and multiple IRRs exist.
+     - **Mutually Exclusive Outlays (The Scale Problem)**: IRR is a relative index. A small project with an IRR of 50% ($10 investment returning $15) creates far less absolute wealth than a large project with an IRR of 20% ($1,000,000 investment returning $1,200,000). Always defer to NPV to resolve scale conflicts.
+     - **Reinvestment Rate Assumption**: IRR implicitly assumes all intermediary cash flows are reinvested at the IRR itself, which is often unrealistically high. NPV assumes cash flows are reinvested at the realistic market cost of capital ($k$).
+
+2. **Modified Internal Rate of Return (MIRR)**:
+   Designed to address IRR's reinvestment assumption by compounding all cash inflows to the terminal date at the cost of capital, and discounting all outflows to the present. The MIRR is then the single rate that equates the two:
+   $$ PV(\\text{Outflows}) = \\frac{Terminal Value(\\text{Inflows})}{(1+MIRR)^n} $$
+
+3. **Profitability Index (PI)**:
+   A relative index of value created per dollar of capital invested:
+   $$ PI = \\frac{\\text{PV of Future Cash Flows}}{\\text{Initial Capital Investment}} = \\frac{NPV + CF_0}{CF_0} $$
+   - **Decision Rule**: Accept if $PI > 1$.
+   - **Utility**: PI is highly valuable when the firm faces **Capital Rationing** (a hard constraint on total cash available for capital expenditure). Under rationing, the firm cannot accept all positive-NPV projects; sorting projects by their PI allows managers to pack the maximum aggregate NPV into their limited budget.
+
+4. **Payback Period**: The exact number of years it takes for cumulative project cash inflows to equal the initial outflow.
+   - **Severe Disadvantages**: It ignores the time value of money (treating near-term cash and far-future cash identically) and completely ignores cash flows and profits that occur *after* the payback cutoff date.
+   - **Discounted Payback Period**: Improves upon standard payback by first discounting all cash flows at the cost of capital before calculating the recovery horizon, but still ignores terminal cash flows.
+
+**6.5 Capital Rationing**
+Capital rationing occurs when a firm has positive-NPV project opportunities but cannot fund them all:
+- **Soft Rationing**: Self-imposed spending limits chosen by senior executives to control expansion velocity and allocate discipline.
+- **Hard Rationing**: External constraints imposed by capital markets, indicating the firm cannot secure additional debt or equity financing under any circumstances due to credit limits or market distress.
+- When capital is rationed in a single period, the optimal set of projects is determined by formulating a linear programming model or rank-ordering candidates strictly by the **Profitability Index (PI)** until the budget is exhausted.
+
+\`\`\`simulator
+{
+  "mode": "capital_budgeting",
+  "title": "Interactive Capital Budgeting Simulator (NPV vs. IRR)"
+}
+\`\`\`
+
+---
+
+## PART III: VALUATION MODELS
+
+### Chapter 7: Principles of Market Valuation
+
+**7.1 The Relation between an Asset's Value and Its Price**
+The fundamental value of an asset is the price well-informed, rational investors are willing to pay for it in a free and competitive market. Financial valuation bridges the gap between anticipated future benefits (cash flows), the precise timing of those benefits, and the associated risks. 
+
+While individual investors assign subjective values to an asset based on private information or risk tolerances, the market price represents the consensus aggregate valuation of marginal buyers and sellers. An asset is:
+- **Undervalued** if its fundamental value exceeds its market price ($Value > Price$). Investors should buy.
+- **Overvalued** if its market price exceeds its fundamental value ($Price > Value$). Investors should sell or short.
+
+**7.2 Value Maximization vs. Price Maximization**
+In accordance with modern corporate finance theory, the singular objective of managers should be to maximize the true fundamental value of the firm's equity, which represents the discounted cash flows of the business over the long run. 
+
+Stock market prices can occasionally deviate from fundamental value due to noise trading, information lag, or speculative bubbles. Attempting to manipulate short-term stock prices (e.g., through cosmetic accounting adjustments or deferring productive capital projects to beat quarterly earnings targets) destroys long-term intrinsic value and represents a failure of corporate governance. True value is eventual; stock prices inevitably converge to fundamental values over reasonable horizons.
+
+**7.3 The Law of One Price and Arbitrage**
+The bedrock of financial valuation is the **Law of One Price**: In a competitive and frictionless market, two assets that generate identical cash flows in every state of the world (equivalent payoffs) must have the exact same market price. 
+
+This law is enforced by **arbitrage**, which is defined as the purchase and immediate sale of equivalent security portfolios to earn a riskless profit from price discrepancies:
+- If Asset X and Asset Y have identical cash flows but Price(X) < Price(Y), arbitrageurs will instantly execute a transaction to **buy X and short-sell Y**.
+- This trading volume increases the demand (and price) for X and increases the supply (and depresses the price) of Y, rapidly forcing their prices into absolute parity.
+- An arbitrage transaction requires:
+  1. No risk (the net payoffs are perfectly matched and cancel out).
+  2. No net initial investment (the proceeds from shorting Y fully fund the purchase of X).
+  3. Positive expected profits.
+
+In highly liquid, modern financial markets, pure arbitrage opportunities are extremely rare and disappear in milliseconds as algorithmic platforms continuously police price discrepancies.
+
+**7.4 Valuation by Using Comparables**
+Because of the Law of One Price, we can value an asset by analyzing the market prices of similar, comparable assets. This technique is widely used in real estate and corporate private equity. In public equity markets, this is called **Multiples Valuation**:
+
+Instead of making highly speculative, infinite-horizon cash projections, an analyst identifies a peer group of publicly traded companies with similar risk profiles, capital structures, and growth rates. They calculate relative valuation ratios:
+- **Price-to-Earnings (P/E) Ratio**: Price per share divided by Earnings Per Share. Measures how much the market is willing to pay for each dollar of earnings:
+  $$ \\text{Value} = \\text{EPS}_{\\text{target}} \\times \\text{P/E}_{\\text{comparable peer average}} $$
+- **Enterprise Value-to-EBITDA (EV/EBITDA)**: Measures total business value (debt plus equity minus cash) relative to operating cash flows, making it capital-structure neutral.
+- **Price-to-Sales (P/S)**: Useful for valuing fast-growing companies or startups with negative net income.
+
+*The Valuation adjustments*: While comparables provide a fast, market-grounded sanity check, they assume the peer firms are correctly priced. Adjustments must always be made for differences in growth rates, historical risk, and size.
+
+**7.5 Interest Rates and the Law of One Price**
+Interest rates are the prices of money over different times, dynamically linking current prices with future expected values. Under the Law of One Price, risk-free interest rates on equivalent time horizons must match perfectly across all financial instruments.
+
+One of the most powerful applications of this principle is **Covered Interest Parity (CIP)**. If you can invest in risk-free bonds in two different currencies (e.g., USD and EUR) and eliminate currency risk using a forward contract, the yields must satisfy:
+$$ 1 + i_{\\text{USD}} = (1 + i_{\\text{EUR}}) \\times \\frac{F}{S} $$
+Where:
+- $i_{\\text{USD}}$ and $i_{\\text{EUR}}$ are the nominal risk-free interest rates.
+- $S$ is the current spot exchange rate (USD per EUR).
+- $F$ is the forward exchange rate for contract settlement on the bond's maturity date.
+
+If this relation does not hold, an arbitrageur can borrow in the cheap country, convert, invest in the high-yield country, and buy a forward contract to lock in the conversion back, earning a completely riskless profit without any currency exposure.
+
+**7.6 The Efficient Markets Theory**
+The speed at which competitive markets incorporate information is described by the **Efficient Markets Hypothesis (EMH)**, pioneered by Eugene Fama. The EMH states that an asset's current market price fully and instantaneously reflects all available information about its fundamentals.
+
+The theory assumes three levels of informational efficiency, depending on what constitutes "available information":
+- **Weak-Form Efficiency**: Current prices incorporate all historical trading statistics (past prices, volumes, and short-interest data).
+  - *Implication*: Technical analysis (charting patterns) cannot consistently yield abnormal, risk-adjusted returns because past trends provide zero predictive power for future price movements. Prices follow a **random walk**.
+- **Semi-Strong Form Efficiency**: Current prices incorporate all past trading data plus all publicly available fundamental information (such as balance sheets, earnings reports, patent filings, and macroeconomic indexes).
+  - *Implication*: Fundamental analysis (studying financial ratios or cash flows) cannot consistently beat the market, as any newly published report is immediately digested by professional algorithmic systems, adjusting the price in seconds.
+- **Strong-Form Efficiency**: Current prices incorporate all information, whether public or private (including confidential insider information).
+  - *Implication*: Even corporate insiders cannot earn abnormal returns because any internal development is already factored into the price. In practice, strong-form efficiency does not fully hold due to illegal insider trading profits, indicating the presence of private communication friction.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 7.2: Asset Price Adjustment to Positive Earnings Surprises under EMH",
+  "xAxis": "day",
+  "yAxis": "price",
+  "data": [
+    {"day": "-3", "price": 50, "efficient": 50, "slow_delayed": 50, "overreaction": 50},
+    {"day": "-2", "price": 50, "efficient": 50, "slow_delayed": 50, "overreaction": 50},
+    {"day": "-1", "price": 50, "efficient": 50, "slow_delayed": 50, "overreaction": 50},
+    {"day": "0", "price": 62, "efficient": 62, "slow_delayed": 54, "overreaction": 68},
+    {"day": "1", "price": 62, "efficient": 62, "slow_delayed": 57, "overreaction": 65},
+    {"day": "2", "price": 62, "efficient": 62, "slow_delayed": 59, "overreaction": 63},
+    {"day": "3", "price": 62, "efficient": 62, "slow_delayed": 61, "overreaction": 62},
+    {"day": "4", "price": 62, "efficient": 62, "slow_delayed": 62, "overreaction": 62},
+    {"day": "5", "price": 62, "efficient": 62, "slow_delayed": 62, "overreaction": 62}
+  ],
+  "series": [
+    {"key": "efficient", "name": "Semi-Strong Efficient (Instant adjustment)", "color": "#10b981"},
+    {"key": "slow_delayed", "name": "Underreaction (Slow/Delayed adjustment)", "color": "#f59e0b"},
+    {"key": "overreaction", "name": "Overreaction & Correction", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+The diagram above models price adjustment on Day 0 when excellent, unprojected earnings news is announced:
+- Under **efficient markets**, the price instantly jumps from $50 to $62 and remains stable, allowing no one who buys *after* the announcement on Day 0 to beat the market.
+- In **underreacting markets**, the price rises slowly over several days, creating an exploitation channel for fundamental traders.
+- In **overreacting markets**, the price spikes too high due to irrational exuberance and subsequently corrects downward to its true fundamental value.
+
+---
+
+### Chapter 8: Valuation of Known Cash Flows: Bonds
+
+Chapter 7 shows that the essence of the valuation process is to estimate an asset's market value using information about the prices of comparable assets, making adjustments for differences. A *valuation model* is a quantitative method used to infer an asset's value from market information about the prices of other assets and market interest rates.
+
+**8.2 The Basic Building Blocks: Pure Discount Bonds**
+In valuing contracts promising a stream of known cash flows, the place to start is a listing of the market prices of **pure discount bonds** (also called *zero-coupon bonds*). These are bonds that promise a single payment of cash at some date in the future, called the maturity date.
+
+Pure discount bonds are the basic building blocks for valuing all contracts promising streams of known cash flows. This is because we can always decompose any contract—no matter how complicated its pattern of certain future cash flows—into its component cash flows, value each one separately, and then add them up.
+
+The promised cash payment on a pure discount bond is called its **face value** or *par value*. The interest earned by investors on pure discount bonds is the difference between the price paid for the bond and the face value received at the maturity date. Thus, for a pure discount bond maturing in one year and a purchase price of $950, the interest earned is the $50 difference between the $1,000 face value and the $950 purchase price.
+
+The **yield** (interest rate) on a pure discount bond is the annualized rate of return to investors who buy it and hold it until it matures. For a pure discount bond with a one-year maturity such as the one in our example, we get:
+
+$$ \\text{Yield on 1-Year Pure Discount Bond} = \\frac{\\text{Face Value} - \\text{Price}}{\\text{Price}} = \\frac{\\$1,000 - \\$950}{\\$950} = 0.0526 \\text{ or } 5.26\% $$
+
+If, however, the bond has a maturity different from one year, we would use the present value formula to find its annualized yield. Thus, suppose we observe a two-year pure discount bond with a face value of $1,000 and a price of $880. We would compute the annualized yield on this bond as the discount rate that makes its face value equal to its price:
+
+$$ 880 = \\frac{1000}{(1+YTM)^2} \\implies YTM \\approx 6.60\% $$
+
+**8.3 Coupon Bonds, Current Yield, and Yield to Maturity**
+A **coupon bond** obligates the issuer to make periodic payments of interest—called *coupon payments*—to the bondholder for the life of the bond, and then to pay the face value of the bond when the bond matures (i.e., when the last payment comes due). The periodic payments of interest are called *coupons* because at one time most bonds had coupons attached to them that investors would tear off and present to the bond issuer for payment.
+
+The **coupon rate** of the bond is the interest rate applied to the face value to compute the coupon payment. Thus, a bond with a face value of $1,000 that makes annual coupon payments at a coupon rate of 10% obligates the issuer to pay $0.10 \\times \\$1,000 = \\$100$ every year. If the bond's maturity is six years, then at the end of six years, the issuer pays the last coupon of $100 and the face value of $1,000.
+
+The relation between prices and yields on coupon bonds is more complicated than for pure discount bonds. As we will see, when the prices of coupon bonds are different from their face value, the meaning of the term *yield* is itself ambiguous.
+
+Coupon bonds with a market price equal to their face value are called **par bonds**.  
+*Bond Pricing Principle 1: Par Bonds*
+If a bond's price equals its face value, then its yield equals its coupon rate.
+
+Often the price of a coupon bond and its face value are not the same. What is its yield? There are two different yields that we can compute. The first is called the **current yield**, the annual coupon divided by the bond's price:
+
+$$ \\text{Current Yield} = \\frac{\\text{Coupon}}{\\text{Price}} $$
+
+To take account of the fact that a bond's face value and its price may differ, we compute a different yield called the **yield to maturity**. The yield to maturity makes the present value of the bond's stream of promised cash payments equal to its price. 
+
+The yield to maturity on a multiperiod coupon bond can be computed by solving this equation:
+$$ \\text{Price} = \\sum_{t=1}^n \\frac{PMT}{(1 + YTM)^t} + \\frac{FV}{(1 + YTM)^n} $$
+
+where $n$ is the number of annual payment periods until the bond's maturity, $YTM$ is the annual yield to maturity, $PMT$ is the coupon payment, and $FV$ is the face value.
+
+*Bond Pricing Principle 2: Premium Bonds*
+If a coupon bond has a price higher than its face value, its yield to maturity is less than its current yield, which is in turn less than its coupon rate.  
+$$ \\text{Yield to Maturity} < \\text{Current Yield} < \\text{Coupon Rate} $$
+
+*Bond Pricing Principle 3: Discount Bonds*
+If a coupon bond has a price lower than its face value, its yield to maturity is greater than its current yield, which is in turn greater than its coupon rate.  
+$$ \\text{Yield to Maturity} > \\text{Current Yield} > \\text{Coupon Rate} $$
+
+\`\`\`simulator
+{
+  "mode": "bond_valuation",
+  "title": "Interactive Coupon Bond Valuation Simulator"
+}
+\`\`\`
+
+---
+
+### Chapter 9: Valuation of Common Stocks
+
+**9.1 The Nature of Common Stocks**
+Common stock represents an equity ownership claim on a corporation. Unlike debt holders who are creditors with fixed financial claims, common stock shareholders have:
+- **Residual Claim**: Shareholders are entitled to the firm's earnings and assets only *after* all creditors, bondholders, and preferred stockholders have been fully satisfied.
+- **Limited Liability**: Shareholders cannot lose more than their initial investment in the stock; their personal assets are protected from the firm's creditors in the event of bankruptcy.
+- **Voting Rights**: Shareholders elect the board of directors and vote on major corporate actions (e.g., mergers, stock splits).
+
+**9.2 The Discounted Dividend Model (DDM)**
+The fundamental value of a share of stock is the present value of all future dividends expected to be paid on it, discounted at the investor's required rate of return ($k$). Given an infinite holding period:
+
+$$ P_0 = \\sum_{t=1}^{\\infty} \\frac{D_t}{(1 + k)^t} $$
+
+**The Constant-Growth-Rate DDM (Gordon Growth Model)**:
+If we assume that dividends will grow at a constant rate $g$ indefinitely, and the required rate of return is greater than the growth rate ($k > g$), the infinite series simplifies to:
+
+$$ P_0 = \\frac{D_1}{k - g} = \\frac{D_0 (1 + g)}{k - g} $$
+
+*Limitation*: If the assumed growth rate $g$ is equal to or greater than the required rate of return $k$ ($g \\ge k$), the model fails as the stock price would theoretically approach infinity, indicating that the constant-growth assumption is invalid for that asset.
+
+**9.3 Earnings and Growth Opportunities**
+Rather than paying out all earnings as dividends, firms often reinvest (plow back) a portion to fund growth. Let:
+- $EPS_t$ be the Earnings Per Share at time $t$.
+- $b$ be the **Earnings Retention Rate** (or plowing-back ratio), where the dividend payout ratio is $1 - b = D_1 / EPS_1$.
+- $ROE$ be the Return on Equity on new investments made by the firm.
+
+The dividend and earnings growth rate ($g$) is determined by:
+$$ g = b \\times ROE $$
+
+**Net Present Value of Growth Opportunities (PVGO)**:
+We can decompose the stock price into two components: the value of the firm's existing assets if it distributed 100% of its earnings as dividends (zero-growth cash cow), plus the net present value of all future growth opportunities:
+
+$$ P_0 = \\frac{EPS_1}{k} + PVGO $$
+Where:
+- $\\frac{EPS_1}{k}$ is the value of the company with a zero-growth policy ($b = 0$).
+- $PVGO$ is the Net Present Value of Growth Opportunities.
+
+*Critical Relation*: Reinvestment adds value to the firm ($PVGO > 0$) if and only if the Return on Equity exceeds the required rate of return ($ROE > k$). If $ROE < k$, retaining earnings and plowing them back into projects creates a negative NPV and actually *reduces* shareholder wealth compared to a 100% payout strategy.
+
+**9.4 Multi-Stage Growth Models**
+For many firms, especially young technology companies, high growth is unsustainable in the long run. Valuing these firms requires a multi-stage model, where the firm is assumed to grow at a temporary high rate $g_1$ for $T$ years, and then settle into a long-term stable growth rate $g_2$ indefinitely:
+
+$$ P_0 = \\sum_{t=1}^T \\frac{D_0 (1+g_1)^t}{(1+k)^t} + \\frac{P_T}{(1+k)^T} $$
+Where the terminal price $P_T$ at year $T$ is calculated using the stable-stage constant growth model:
+$$ P_T = \\frac{D_{T+1}}{k - g_2} = \\frac{D_0 (1+g_1)^T (1+g_2)}{k - g_2} $$
+
+**9.5 Valuation by Using Multiples**
+When future dividends are highly uncertain, professionals often value stocks using valuation multiples derived from comparable publicly traded peer firms:
+- **Price-to-Earnings (P/E) Ratio**: Reflects the price paid per dollar of current or forecasted earnings. High-growth firms with high PVGO command higher P/E ratios:
+  $$ \\frac{P_0}{EPS_1} = \\frac{1 - b}{k - g} = \\frac{1}{k} \\left(1 + \\frac{PVGO}{EPS_1/k}\\right) $$
+- **Enterprise Value to EBITDA**: Used to value the entire operating business regardless of the capital structure.
+- **Price-to-Book (P/B) Ratio**: Compares market value of equity to accounting book value.
+
+---
+
+## PART IV: RISK MANAGEMENT AND PORTFOLIO THEORY
+
+### Chapter 10: Principles of Risk Management
+
+**10.1 Why Manage Risk?**
+Risk is the possibility of suffering harm or loss, or more generally, the variability of future outcomes. Risk management is the systematic process of identifying, assessing, and responding to risk exposures.
+- **For Individuals**: Risk management is driven by **risk aversion**—concave utility of wealth ($U''(W) < 0$). Under risk aversion, the utility of expected wealth is strictly greater than the expected utility of wealth: $U(E[W]) > E[U(W)]$. Individuals willingly pay a premium (e.g., insurance) to eliminate uncertainty.
+- **For Corporations**: Even though shareholders can diversify portfolio risk, corporate risk management adds value by:
+  1. Reducing the expected costs of financial distress and bankruptcy.
+  2. Tax optimization (under a progressive corporate tax structure, smoothing earnings decreases expected tax liability).
+  3. Ensuring internal funds are available for profitable investment projects (resolving the underinvestment problem).
+
+**10.2 The Risk Management Process**
+Risk management follows four sequential steps:
+1. **Identify Risks**: Cataloging all potential exposures (e.g., price risk, credit risk, operational risk, currency risk).
+2. **Evaluate Impact**: Estimating the probability distribution and financial impact of each risk event.
+3. **Select Technique**: Deciding whether to retain the risk (self-insure), avoid it entirely, or transfer it using financial markets.
+4. **Implement and Monitor**: Executing chosen responses and dynamically auditing performance as market structures evolve.
+
+**10.3 The Three Dimensions of Risk Transfer**
+Risk can be transferred in financial markets in three primary ways:
+1. **Hedging**: Taking action to reduce risk exposure, which simultaneously eliminates both the downside risk of a loss and the upside potential for a gain. Hedging creates a symmetrical, certain outcome.
+2. **Insuring**: Paying a fee (a premium) to eliminate the downside risk of losses while fully retaining the upside potential for gains. Insuring creates an asymmetrical payoff profile.
+3. **Diversifying**: Spreading a fixed amount of resources across multiple, non-perfectly correlated assets. Uncorrelated risks tend to offset one other, smoothing portfolio returns without requiring an upfront premium or sacrificing expected return.
+
+**10.4 Quantifying Risk and Return**
+To quantify risk, we define future states of the world and assign probabilities ($P_i$) and corresponding asset returns ($r_i$).
+- **Expected Rate of Return ($E[r]$)**:
+  $$ E(r) = \\sum_{i=1}^n P_i r_i $$
+- **Variance ($\\sigma^2$) and Standard Deviation ($\\sigma$)**: Measures the dispersion of returns around the expected value:
+  $$ \\sigma^2 = \\sum_{i=1}^n P_i [r_i - E(r)]^2 $$
+  $$ \\sigma = \\sqrt{\\sigma^2} $$
+- **Risk Premium**: The expected return of a risky asset over and above the return on a risk-free asset ($r_f$), required to compensate risk-averse investors:
+  $$ \\text{Risk Premium} = E(r) - r_f $$
+
+**Value at Risk (VaR)**:
+A key corporate risk metric representing the maximum potential loss over a targeted time horizon with a given level of statistical confidence (e.g., "The firm's 1-day portfolio VaR is $2.5 million at the 99% confidence level").
+
+---
+
+### Chapter 11: Hedging, Insuring, and Diversifying
+
+**11.1 Using Forward and Futures Contracts to Hedge Risk**
+Hedging locks in current market conditions to eliminate future price volatility.
+- **Forward Contract**: A bespoke, bilateral agreement in the over-the-counter (OTC) market to buy or sell an asset at a specified future date for a predetermined forward price. *Limitation*: Subject to counterparty default (credit) risk.
+- **Futures Contract**: A standardized agreement traded on organized exchanges. To eliminate counterparty risk, clearing houses require daily **marking-to-market** (realizing gains and losses daily) and margin collateral.
+
+**Hedge Ratio**: The ratio of the size of the hedging position to the size of the exposure being hedged, designed to minimize net portfolio variance.
+
+**11.2 Hedging with Interest Rate Swaps**
+An interest rate swap is an agreement between two parties to exchange interest rate cash flows (typically fixed-rate payments for floating-rate payments) based on a specified principal amount. This allows financial institutions to manage and match the duration of assets and liabilities.
+
+**11.3 Insuring with Options**
+Options provide an asymmetric insurance profile:
+- **Put option**: Gives the owner the right (but not the obligation) to sell an asset at a specified strike price ($E$) on or before maturity. A put owner pays a premium ($P$) to establish a floor price:
+  $$ \\text{Put Payoff} = \\max(0, E - S_T) $$
+  $$ \\text{Put Profit} = \\max(0, E - S_T) - P $$
+- **Call option**: Gives the owner the right to buy an asset at a strike price ($E$), establishing a ceiling price for purchase.
+
+**Credit Default Swaps (CDS)**:
+A financial contract acting as credit insurance where the CDS buyer pays periodic fees to the seller in exchange for a payout if a referenced corporate or sovereign bond defaults.
+
+**11.4 The Mathematics of Diversification**
+Spreading assets across independent risk sources dramatically reduces volatility:
+- **Uncorrelated Risks (i.i.d.)**:
+  Consider a portfolio of $N$ assets, each with the same variance $\\sigma^2$ and zero correlation between any two assets. If we invest an equal weight $w_i = 1/N$ in each asset, the portfolio variance is:
+  $$ \\sigma_p^2 = \\sum_{i=1}^N \\left(\\frac{1}{N}\\right)^2 \\sigma^2 = \\frac{1}{N^2} (N \\sigma^2) = \\frac{\\sigma^2}{N} $$
+  As $N \\to \\infty$, the portfolio variance $\\sigma_p^2 \\to 0$. Uncorrelated, idiosyncratic (firm-specific) risk is completely eliminated.
+
+- **Correlated Risks**:
+  If the average covariance between any two assets is $Cov > 0$, equal-weight portfolio variance becomes:
+  $$ \\sigma_p^2 = \\frac{1}{N} \\bar{\\sigma}^2 + \\left(1 - \\frac{1}{N}\\right) Cov $$
+  As $N \\to \\infty$, the portfolio variance converges to:
+  $$ \\lim_{N \\to \\infty} \\sigma_p^2 = Cov $$
+  This remaining risk is **systematic (market-wide) risk**. It cannot be diversified away because all assets are exposed to common macroeconomic shocks (e.g., changes in GDP, inflation, or interest rates).
+
+---
+
+### Chapter 12: Portfolio Opportunities and Choice
+
+**12.1 The Asset Allocation Decision**
+The most critical investment decision is asset allocation—how to divide portfolio funds among broad asset classes, primarily risky assets (such as equity portfolios) and risk-free assets (such as short-term Treasury bills).
+
+**12.2 Capital Allocation between Risky and Risk-Free Assets**
+Let an investor put a fraction $w$ of their portfolio in a risky asset portfolio ($s$) and a fraction $(1-w)$ in a default-free risk-free asset ($r_f$).
+- **Expected Portfolio Return ($E[r_p]$)**:
+  $$ E(r_p) = w E(r_s) + (1-w) r_f = r_f + w [E(r_s) - r_f] $$
+- **Portfolio Standard Deviation ($\\sigma_p$)**:
+  Since the risk-free asset has zero variance and zero covariance with risky assets:
+  $$ \\sigma_p = w \\sigma_s \\implies w = \\frac{\\sigma_p}{\\sigma_s} $$
+
+Substituting $w$ back into the expected return equation yields the **Capital Allocation Line (CAL)**:
+$$ E(r_p) = r_f + \\left( \\frac{E(r_s) - r_f}{\\sigma_s} \\right) \\sigma_p $$
+
+The slope of the CAL is the **Sharpe Ratio** (Reward-to-Risk Ratio), measuring excess expected return per unit of standard deviation:
+$$ \\text{Slope of CAL (Sharpe Ratio)} = \\frac{E(r_s) - r_f}{\\sigma_s} $$
+
+**12.3 Optimal Portfolio with Two Risky Assets**
+When building a combination of two risky assets with weights $w_1$ and $w_2 = 1 - w_1$:
+- **Expected Return**: $E(r_p) = w_1 E(r_1) + w_2 E(r_2)$
+- **Portfolio Variance ($\\sigma_p^2$)**:
+  $$ \\sigma_p^2 = w_1^2 \\sigma_1^2 + w_2^2 \\sigma_2^2 + 2w_1 w_2 \\rho_{1,2} \\sigma_1 \\sigma_2 $$
+  Where $\\rho_{1,2}$ is the correlation coefficient between the returns of the two assets (bounded by $-1 \\le \\rho_{1,2} \\le 1$).
+
+**Impact of Correlation on Diversification**:
+- **Perfect Positive Correlation ($\\rho_{1,2} = 1$)**: Portfolio standard deviation is a direct weighted average: $\\sigma_p = w_1 \\sigma_1 + w_2 \\sigma_2$. No risk reduction occurs; the portfolio opportunity set is a straight line.
+- **Imperfect Correlation ($\\rho_{1,2} < 1$)**: Portfolio standard deviation is strictly less than the weighted average, creating a curved opportunity set bowing to the left. The lower the correlation, the greater the bowing effect (risk reduction).
+- **Perfect Negative Correlation ($\\rho_{1,2} = -1$)**: Risk can be reduced to exactly zero ($\\sigma_p = 0$) with optimal weights:
+  $$ w_1 = \\frac{\\sigma_2}{\\sigma_1 + \\sigma_2} $$
+
+**12.4 The Efficient Frontier of Risky Assets**
+With many risky assets, plotting all possible portfolios in the $(E[r], \\sigma)$ plane creates a feasibility region. The upper boundary of this region starting from the Global Minimum Variance Portfolio is the **Efficient Frontier**. Every portfolio on this frontier offers the highest possible expected return for a given level of risk.
+
+**12.5 Optimal Portfolio Selection and Tobin's Separation Theorem**
+By introducing the risk-free asset, investors can draw CALs from $r_f$ to different portfolios on the efficient frontier. To maximize utility, they seek the CAL with the steepest slope. This unique tangent line touches the efficient frontier at the **Tangency Portfolio** ($P^*$), which is the optimal risky portfolio.
+
+According to **Tobin's Separation Theorem**, the portfolio selection problem is separated into two entirely independent phases:
+1. **The Investment Phase**: Finding the Tangency Portfolio $P^*$ by solving a purely mathematical optimization problem involving only security expected returns, variances, and covariances. This is **identical for all investors**, regardless of their individual risk preferences.
+2. **The Financing Phase**: Deciding how much to invest in the risk-free asset vs. the optimal risky portfolio $P^*$. This is determined by the individual's risk aversion: highly risk-averse investors hold mostly T-bills, while aggressive investors leverage their portfolio by borrowing at $r_f$ to invest more than 100% of their equity in $P^*$.
+
+---
+
+## PART V: ASSET PRICING
+
+### Chapter 13: Capital Market Equilibrium
+
+The capital asset pricing model (CAPM) is a theory about equilibrium prices in the markets for risky assets. It builds on the theory of portfolio selection developed in chapter 12 and derives the quantitative relations that must exist among expected rates of return on risky assets on the assumption that asset prices adjust to equate supply and demand.
+
+The CAPM is important for two reasons. First, it provides a theoretical justification for the widespread practice of passive investing known as *indexing*. Indexing means holding a diversified portfolio in which securities are held in the same relative proportions as in a broad market index such as the Standard & Poor's 500 or the Morgan Stanley index of international stocks. Today many billions of dollars invested worldwide by pension funds, mutual funds, and other institutions are managed passively by indexing, and indexing provides a simple feasible benchmark against which the performance of active investment strategies are measured.
+
+Second, the CAPM provides a way of estimating expected rates of return for use in a variety of financial applications. For example, chapter 9 shows that risk-adjusted expected rates of return are needed as inputs to discounted-cash-flow valuation models for stocks. Chapter 16 shows how corporate managers use these models in making capital-budgeting decisions. The CAPM is also used to establish "fair" rates of return on invested capital in regulated firms or in firms that do business on a cost-plus basis.
+
+**13.1 The Capital Asset Pricing Model in Brief**
+The **capital asset pricing model** is an equilibrium theory that is based on the theory of portfolio selection presented in chapter 12. The CAPM was developed in the early 1960s. It was derived by posing the question: What would risk premiums on securities be in equilibrium if people had the same set of forecasts of expected returns and risks and all chose their portfolios optimally according to the principles of efficient diversification?
+
+The fundamental idea behind the CAPM is that in equilibrium the market rewards people for bearing risk. Because people generally exhibit risk-averse behavior, the risk premium for the aggregate of all risky assets must be positive to induce people to willingly hold all of the risky assets that exist in the economy.
+
+But the market does not reward people for holding inefficient portfolios—that is, for exposing themselves to risks that could be eliminated by optimal diversification behavior. The risk premium on any individual security is, therefore, not related to the security's "stand-alone" risk, but rather to its contribution to the risk of an efficiently diversified portfolio.
+
+Chapter 12 showed that every efficient portfolio can be constructed by mixing just two particular assets: the riskless asset and the optimal combination of risky assets (i.e., the tangency portfolio). To derive the CAPM, we need two assumptions:
+1. *Assumption 1*: Investors agree in their forecasts of expected rates of return, standard deviations, and correlations of the risky securities, and they, therefore, optimally hold risky assets in the same relative proportions.
+2. *Assumption 2*: Investors generally behave optimally. In equilibrium, the prices of securities adjust so that when investors are holding their optimal portfolios, the aggregate demand for each security is equal to its supply.
+
+From these two assumptions, because every investor's relative holdings of risky assets is the same, the only way the asset market can clear is if those optimal relative proportions are the proportions in which they are valued in the marketplace. A portfolio that holds all assets in proportion to their observed market values is called the **market portfolio**.
+
+**The Capital Market Line**
+This basic idea of the CAPM can also be explained with the help of the risk-reward trade-off line facing each investor. Because the tangency portfolio or optimal combination of risky assets has the same relative holdings of risky assets as the market portfolio, the market portfolio is located somewhere on the risk-return trade-off line. In the CAPM, the trade-off line is called the **capital market line (CML)**. 
+
+The CAPM says that in equilibrium, the CML represents the best risk-reward combinations available to all investors. Although everyone will strive to achieve points that are above the CML, the forces of competition will move asset prices so that everyone expects to achieve points that are on the line.
+
+The CML's formula is:
+$$ E(r) = r_f + \\frac{E(r_M) - r_f}{\\sigma_M} \\sigma $$
+
+The slope of the CML is, thus, the risk premium on the market portfolio divided by its standard deviation:
+
+$$ \\text{Slope of CML} = \\frac{E(r_M) - r_f}{\\sigma_M} $$
+
+**13.2 Determinants of the Risk Premium on the Market Portfolio**
+According to the CAPM, the size of the risk premium of the market portfolio is determined by the aggregate risk aversion of investors and the volatility of the market return. To be induced to accept the risk of the market portfolio, investors must be offered an expected rate of return that exceeds the risk-free rate. 
+
+In the CAPM, the equilibrium risk premium on the market portfolio is equal to the variance of the market portfolio times a weighted average of the degree of risk aversion of the holders of wealth (A):
+
+$$ E(r_M) - r_f = A \\sigma_M^2 $$
+
+There are two critical components:
+1. The average degree of risk aversion ($A$).
+2. The standard deviation or variance of the market portfolio ($\\sigma_M^2$).
+
+**13.3 Beta and Risk Premiums on Individual Securities**
+By definition, equilibrium asset prices and expected returns are such that knowledgeable investors willingly hold the assets they have in their optimal portfolios. The risk of a security is measured by the size of its equilibrium expected return. However, standard deviation of return *does not* measure the risk of securities in the CAPM. Instead, the general measure of a security's risk is its **beta** (the Greek letter $\\beta$). Technically, beta describes the marginal contribution of that security's return to the standard deviation of the market portfolio's return. The formula for the beta of security $j$ is given by:
+
+$$ \\beta_j = \\frac{\\sigma_{jM}}{\\sigma_M^2} $$
+
+where $\\sigma_{jM}$ denotes the covariance between the return on security $j$ and the return on the market portfolio.
+
+According to the CAPM, in equilibrium, the risk premium on any asset is equal to its beta times the risk premium on the market portfolio. The equation expressing this relation is:
+
+$$ E(r_j) - r_f = \\beta_j [E(r_M) - r_f] $$
+
+This is called the **security market line (SML)** relation.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 13.2: The Security Market Line (SML)",
   "xAxis": "beta",
   "yAxis": "return",
   "data": [
@@ -1331,10 +2179,239 @@ $$E(R_i) = R_f + \\beta_i (E(R_m) - R_f)$$
     {"beta": 2.0, "return": 17}
   ],
   "series": [
-    {"key": "return", "name": "Required Return", "color": "#ef4444"}
+    {"key": "return", "name": "Expected Return E(r)", "color": "#ef4444"}
   ]
 }
 \`\`\`
+
+The CAPM can be used to decompose the total risk ($\\sigma_j^2$) of an individual security's return into diversifiable and undiversifiable components. For any risky security, its undiversifiable risk is given by $\\beta_j^2 \\cdot \\sigma_M^2$, whereas the diversifiable risk can be found as the residual by subtracting the undiversifiable risk from the total risk: $\\sigma_j^2 - (\\beta_j^2 \\cdot \\sigma_M^2)$. 
+
+For a security with a beta of $+1$ (like the market portfolio itself), its undiversifiable risk is equal to that of the market portfolio. Security returns with high betas (greater than 1) are called "aggressive" and securities with low betas (less than 1) are called "defensive." The market portfolio has a beta of 1, and securities with a beta of $1$ are said to have "average risk."
+
+\`\`\`simulator
+{
+  "mode": "capm",
+  "title": "Interactive Capital Asset Pricing Model (CAPM) Simulator"
+}
+\`\`\`
+
+---
+
+### Chapter 14: Forward and Futures Markets
+
+**14.1 Forward Contracts: Structure and Payoffs**
+A **Forward Contract** is a customized, bilateral agreement made in the over-the-counter (OTC) market to buy or sell an underlying asset at a specified future date for a predetermined price (the forward price, $F$) agreed upon today. 
+- **Long Forward (Buyer)**: Commits to purchasing the asset. Their payoff at expiration ($T$) is proportional to the difference between the spot price ($S_T$) and the forward price ($F$):
+  $$ \\text{Payoff}_{\\text{buyer}} = S_T - F $$
+- **Short Forward (Seller)**: Commits to selling the asset. Their payoff at expiration is:
+  $$ \\text{Payoff}_{\\text{seller}} = F - S_T $$
+
+*Risk*: Forward contracts are subject to severe **counterparty default risk**, as no collateral is dynamically held, and all settlement occurs entirely at the terminal date $T$.
+
+**14.2 Futures Contracts: Exchange Standardization and Safety**
+A **Futures Contract** is a highly standardized version of a forward contract that trades on organized exchanges (e.g., Chicago Mercantile Exchange). Exchanges eliminate counterparty credit risk through three mechanisms:
+1. **Standardization**: Fixed contract sizes, delivery dates, and quality specifications to maximize liquidity.
+2. **The Clearinghouse**: Acts as an intermediary, becoming the seller to every buyer and the buyer to every seller.
+3. **Daily Marking-to-Market and Margin Accounts**:
+   - **Initial Margin**: The upfront cash/collateral required to open a contract.
+   - **Maintenance Margin**: The minimum balance required to keep the position open.
+   - **Margin Call**: If losses reduce the margin account below the maintenance margin, the holder receives a margin call to immediately replenish the account back to the *initial margin* level.
+
+**14.3 Forward-Spot Price Parity (Cost of Carry Model)**
+By the Law of One Price (no-arbitrage pricing), we establish the exact relationship between the current spot price ($S_0$) and the forward price ($F_0$) over a horizon $T$ with a risk-free rate of interest ($r$).
+
+- **Basic Parity (No Storage Costs or Dividends)**:
+  Under discrete compounding:
+  $$ F_0 = S_0 (1 + r)^T $$
+  Under continuous compounding:
+  $$ F_0 = S_0 e^{rT} $$
+
+- **Arbitrage Proof (Discrete Compounding)**:
+  - If $F_0 > S_0(1+r)^T$, an arbitrageur executes a **Cash-and-Carry Arbitrage**: borrow $S_0$ at rate $r$ to buy the asset in the spot market today, and simultaneously sell (short) a forward contract at $F_0$. At time $T$, deliver the asset to settle the forward for $F_0$, and pay back the loan ($S_0(1+r)^T$). Net riskless profit is:
+    $$ \text{Profit} = F_0 - S_0(1+r)^T > 0 $$
+  - If $F_0 < S_0(1+r)^T$, they execute a **Reverse Cash-and-Carry Arbitrage**: short-sell the asset today for $S_0$, invest the proceeds at rate $r$, and long a forward contract at $F_0$. At $T$, buy back the asset for $F_0$ using the forward to close the short position. Net riskless profit:
+    $$ \text{Profit} = S_0(1+r)^T - F_0 > 0 $$
+
+**14.4 Parity with Holding Income and Costs**
+If holding the underlying asset entails costs or benefits, the cost of carry model must adjust:
+
+1. **Storage Costs**: If storing an asset (like gold or oil) requires paying a cost with a present value of $U$ (or a continuous proportional storage rate $s$ share of the spot price):
+   $$ F_0 = (S_0 + U)(1 + r)^T $$
+   Or under continuous compounding:
+   $$ F_0 = S_0 e^{(r + s)T} $$
+
+2. **Holding Income (Dividends/Interest)**: If the underlying asset yields a known cash dividend/income with present value $I$ (or a continuous dividend yield $d$):
+   $$ F_0 = (S_0 - I)(1 + r)^T $$
+   Or under continuous compounding:
+   $$ F_0 = S_0 e^{(r - d)T} $$
+
+3. **Combined Parity Equation**:
+   Combining continuous risk-free rate $r$, continuous storage cost $s$, and continuous dividend yield $d$:
+   $$ F_0 = S_0 e^{(r + s - d)T} $$
+
+---
+
+### Chapter 15: Markets for Options and Contingent Claims
+
+**15.1 Basic Characteristics of Options**
+An option is a contract that gives its holder the right, but not the obligation, to buy or sell an asset at a specified price (exercise or strike price, $E$) on or before a specified expiration date ($T$).
+- **Call Option**: The right to buy the underlying asset.
+- **Put Option**: The right to sell the underlying asset.
+- **European Options**: Can be exercised only on the expiration date.
+- **American Options**: Can be exercised at any time up to and including the expiration date.
+
+**15.2 Option Payoffs and Profits**
+Let $S_T$ be the spot price of the underlying asset at expiration $T$, and $C$ and $P$ be the upfront purchase premiums for the call and put options:
+
+1. **Long Call**:
+   $$ \\text{Payoff} = \\max(0, S_T - E) $$
+   $$ \\text{Profit} = \\max(0, S_T - E) - C $$
+2. **Short Call**:
+   $$ \\text{Payoff} = -\\max(0, S_T - E) = \\min(0, E - S_T) $$
+   $$ \\text{Profit} = C - \\max(0, S_T - E) $$
+3. **Long Put**:
+   $$ \\text{Payoff} = \\max(0, E - S_T) $$
+   $$ \\text{Profit} = \\max(0, E - S_T) - P $$
+4. **Short Put**:
+   $$ \\text{Payoff} = -\\max(0, E - S_T) = \\min(0, S_T - E) $$
+   $$ \\text{Profit} = P - \\max(0, E - S_T) $$
+
+**15.3 The Put-Call Parity Relation**
+Put-Call Parity is a foundational no-arbitrage relationship between the prices of European call and put options on the same underlying stock, with the same strike price $E$ and expiration date $T$:
+$$ S_0 + P_0 = C_0 + \\frac{E}{(1 + r)^T} $$
+
+*Replication Proof*:
+Consider two portfolios constructed today:
+- **Portfolio A (Protective Put)**: One share of stock ($S_0$) plus one European put option ($P_0$).
+- **Portfolio B (Fiduciary Call)**: One European call option ($C_0$) plus a zero-coupon bond that pays $E$ at expiration ($E / (1+r)^T$).
+
+At expiration date $T$, both portfolios have the exact same payoff:
+- If $S_T \\le E$: Put is exercised. Portfolio A is worth $E$. Call expires worthless, Bond pays $E$. Portfolio B is worth $E$.
+- If $S_T > E$: Put expires worthless. Portfolio A is worth $S_T$. Call is exercised. Portfolio B is worth $(S_T - E) + E = S_T$.
+
+Since the payoffs of Portfolio A and B are identical ($\\max(S_T, E)$) in all future states, by the Law of One Price, their current costs must be identical. Thus, the parity relation must hold.
+
+**15.4 The Binomial Option Pricing Model (One-Period)**
+The Binomial Model offers a simple framework for option pricing by assuming the stock price can move to only two possible values over a single period: up to $u S_0$ (with $u > 1 + r$) or down to $d S_0$ (with $0 < d \\le 1 + r$).
+
+Given the call option payoffs $C_u = \\max(0, u S_0 - E)$ and $C_d = \\max(0, d S_0 - E)$, we can replicate the option payoff exactly by holding $\\Delta$ shares of stock and borrowing $B$ at the risk-free rate:
+$$ \\Delta = \\frac{C_u - C_d}{(u - d)S_0} $$
+$$ B = \\frac{d C_u - u C_d}{(u - d)(1 + r)} $$
+
+The option price is then the cost of the replicating portfolio:
+$$ C_0 = \\Delta S_0 + B = \\frac{p C_u + (1-p) C_d}{1 + r} $$
+
+Where $p$ is the **Risk-Neutral Probability** of an upward stock price movement:
+$$ p = \\frac{(1 + r) - d}{u - d} $$
+
+**15.5 The Black-Scholes Formula**
+By dividing the investment period into infinitely small increments, the binomial model converges to the continuous-time **Black-Scholes-Merton formula** for a European call option on a non-dividend-paying stock:
+$$ C_0 = S_0 N(d_1) - E e^{-rT} N(d_2) $$
+
+Where:
+$$ d_1 = \\frac{\\ln(S_0 / E) + \\left(r + \\frac{\\sigma^2}{2}\\right)T}{\\sigma \\sqrt{T}} $$
+$$ d_2 = d_1 - \\sigma \\sqrt{T} $$
+
+And:
+- $S_0$ is the current stock price.
+- $E$ is the exercise/strike price.
+- $r$ is the continuous risk-free interest rate.
+- $T$ is the time to expiration (in years).
+- $\\sigma$ is the annualized volatility of the stock's return.
+- $N(\\cdot)$ is the cumulative standard normal distribution function (giving the probability that a standard normal variable is less than or equal to the argument).
+
+---
+
+## PART VI: CORPORATE FINANCE
+
+### Chapter 16: Financial Structure of the Firm
+
+**16.1 What Is Capital Structure?**
+Capital structure represents the mix of long-term debt, preferred stock, and common stock equity used by a firm to finance its overall operations and capital expenditures. The core question of financial structure is whether a firm can increase its total value ($V = D + E$) by changing its leverage ratio.
+
+**16.2 Modigliani-Miller Proposition I: Irrelevance in a Frictionless Market**
+In 1958, Franco Modigliani and Merton Miller proved that in an idealized market with no frictions (no taxes, no bankruptcy/transaction costs, symmetric information, and equal borrowing rates for individuals and firms), the value of a firm is entirely independent of its capital structure:
+$$ V_L = V_U $$
+Where $V_L$ is the value of the levered firm (debt + equity) and $V_U$ is the value of the unlevered firm (pure equity).
+
+*The Arbitrage/Replication Argument*: 
+If $V_L > V_U$, investors can sell overpriced levered shares and buy underpriced unlevered shares, borrowing on their own personal accounts (**homemade leverage**) to replicate the same leverage risk. The selling pressure on $V_L$ and buying pressure on $V_U$ will immediately restore the equality $V_L = V_U$.
+
+**16.3 Modigliani-Miller Proposition II: Cost of Levered Equity**
+Under the frictionless assumptions of Proposition I, as a firm takes on more relatively cheap debt, its risk increases. This increased risk is borne entirely by the equity holders. Consequently, the cost of equity ($r_e$) rises linearly with the debt-to-equity ratio ($D/E$):
+$$ r_e = r_0 + \\frac{D}{E} (r_0 - r_d) $$
+
+Where:
+- $r_e$ is the cost of levered equity.
+- $r_0$ is the cost of equity for an unlevered, pure-equity firm (determined entirely by the riskiness of the firm’s operating assets).
+- $r_d$ is the cost of debt (interest rate).
+- $D/E$ is the debt-to-equity ratio.
+
+*Implication*: As leverage increases, the advantage of using lower-cost debt is exactly offset by the rising cost of equity. Thus, the Weighted Average Cost of Capital (WACC) remains constant and equal to $r_0$ at all debt levels.
+
+**16.4 Taxes, Subsidies, and the Debt Tax Shield**
+In the real world, corporate interest payments are tax-deductible expenses, whereas dividend payments to equity holders are paid from after-tax income. This differential treatment creates a government subsidy for debt financing known as the **Debt Tax Shield**:
+
+- **M&M Proposition I with Taxes**:
+  $$ V_L = V_U + T_c D $$
+  Where $T_c$ is the corporate tax rate and $D$ is the book value of the firm's debt. The value of the firm increases with leverage because the present value of the tax shield ($T_c D$) accrues directly to the firm's legal owners.
+  
+- **M&M Proposition II with Taxes**:
+  The cost of levered equity under corporate taxes rises less rapidly than without taxes:
+  $$ r_e = r_0 + \\frac{D}{E}(r_0 - r_d)(1 - T_c) $$
+
+**16.5 The Static Trade-Off Theory**
+Because M&M Proposition I with taxes implies that firms should borrow 100% debt, we must introduce offsetting costs to explain real-world capital structures. The **Trade-Off Theory** states that a firm balances the tax advantages of debt against the expected costs of financial distress:
+$$ V_L = V_U + T_c D - PV(\\text{Expected Financial Distress Costs}) $$
+
+Expected financial distress costs consist of:
+- **Direct Costs**: Legal and administrative expenses associated with bankruptcy or restructuring.
+- **Indirect Costs**: Loss of sales due to customer fear, loss of key employees, and agency costs representing conflicts between bondholders and equity holders as bankruptcy approaches (e.g., the underinvestment or risk-shifting incentives).
+
+An optimal capital structure is achieved at the point where the marginal benefit of an additional dollar of debt tax shield is exactly equal to the marginal cost of the increased expectation of financial distress.
+
+**16.6 The Pecking Order Theory**
+Due to **Asymmetric Information** (managers know more about the firm's true value than outside investors), issuing new equity is viewed by the market as a negative signal (suggesting the stock is overvalued). This leads to the **Pecking Order Hypothesis**:
+1. Firms prefer internal finance (retained earnings) first.
+2. If external finance is required, they issue debt first.
+3. They issue new equity only as a last resort.
+
+**16.7 The Weighted Average Cost of Capital (WACC)**
+Under taxes, the discount rate used to value the firm's operating cash flows is WACC, which incorporates the tax-shield effect of debt:
+$$ WACC = r_e \\left(\\frac{E}{V}\\right) + r_d (1 - T_c)\\left(\\frac{D}{V}\\right) $$
+Where $V = D + E$ is the total market value of the firm's capital.
+
+---
+
+### Chapter 17: Real Options
+
+**17.1 What Are Real Options?**
+In traditional capital budgeting, projects are evaluated using discounted cash flow analysis (such as NPV), which assumes a passive, "now-or-never" management strategy. In reality, managers have the flexibility to adjust their decisions in response to new information as a project's future unfolds. These options to adapt, scale, or terminate a project are called **Real Options**, because the underlying assets are real/physical assets (such as machinery, research projects, land, patents) rather than financial securities.
+
+**17.2 Core Classification of Real Options**
+1. **The Option to Defer (Delay)**: The option to postpone an investment decision to collect more market data. It is analogous to an **American Call Option** on the project's present value.
+2. **The Option to Abandon**: The option to shut down a project and liquidate its assets (or salvage equipment) if market conditions degrade. It is analogous to an **American Put Option** where the strike price is the salvage/liquidation value.
+3. **The Option to Expand**: The option to scale up the project by making an additional investment if early results are highly positive. It is analogous to a **Call Option**.
+4. **The Option to Contract**: The option to scale down operations (reducing capital outlay) if demand is lower than expected. It is analogous to a **Put Option**.
+5. **The Option to Switch**: The option to change inputs (e.g., fuel-switching in a power generator) or outputs (e.g., matching chemical plant production to changing market prices) depending on relative commodity pricing.
+
+**17.3 Mapping Real Option Parameters to Black-Scholes Formula**
+Real options can be valued quantitatively by mapping the physical characteristics of the corporate investment project to the standard inputs of the Black-Scholes-Merton option pricing formula:
+
+| Financial Option Parameter | Real Option Analog |
+| :--- | :--- |
+| **Stock Price ($S_0$)** | Present Value of the project's expected operating cash flows ($PV_{\\text{flows}}$). |
+| **Strike Price ($E$)** | Required investment capital outlay or acquisition cost ($I$). |
+| **Time to Expiration ($T$)** | Length of time the investment opportunity remains viable (e.g., lease duration or patent expiration). |
+| **Volatility ($\\sigma$)** | Riskiness or volatility of the project's future cash flows ($\\sigma_{\\text{project}}$). |
+| **Risk-Free Rate ($r$)** | Continuously compounded risk-free rate of interest over the option window ($r$). |
+
+**17.4 Strategic Implications: When NPV is Not Enough**
+The true value of an investment project is the sum of its static NPV (assuming standard operations) plus the value of its embedded managerial options:
+$$ \\text{Expanded NPV} = \\text{Static NPV} + \\text{Real Option Premium} $$
+
+- *Implication 1*: A project with a negative static NPV may actually be highly valuable ($E\\_NPV > 0$) if it contains an exceptionally valuable option to expand, delay, or switch.
+- *Implication 2*: Volatility is the enemy of static NPV, but it is the friend of options. Higher project cash flow volatility ($\\sigma$) increases the likelihood of highly profitable outcomes while the downside exposure is protected by the option to abandon or defer. Thus, higher volatility *increases* the Real Option Premium, making highly risky, flexible projects more valuable than rigid, low-risk alternatives.
 `,
 
   "ug-international": `
@@ -1403,65 +2480,462 @@ Governments use tariffs (taxes) and quotas (limits) to protect domestic industri
 
 ### 5.1 Purchasing Power Parity (PPP)
 The exchange rate between two currencies should equal the ratio of the two countries' price levels.
-$$E = \\frac{P_1}{P_2}$$
+$$E = \\\frac{P_1}{P_2}$$
 `,
-
   "ug-macro": `
-# COMPREHENSIVE MACROECONOMICS STUDY GUIDE
+# Macroeconomics: Eleventh Edition - Chapter by Chapter Summary
 
-## CHAPTER 1: AGGREGATE DEMAND AND SUPPLY
-
-### 1.1 Aggregate Demand (AD)
-The total demand for goods and services in an economy.
-$$AD = C + I + G + (X - M)$$
-
-### 1.2 Aggregate Supply (AS)
-- **Short-Run AS (SRAS)**: Slopes upward due to sticky wages/prices.
-- **Long-Run AS (LRAS)**: Vertical at full-employment output.
+This document provides a chapter-by-chapter summary of the textbook *Macroeconomics*, Eleventh Edition, by Dornbusch, Fischer, and Startz. It includes key concepts, mathematical equations, referenced tables, and graphs.
 
 ---
 
-## CHAPTER 2: THE MULTIPLIER EFFECT
+## Chapter 1: Introduction
+**Concepts summarized:**
+Macroeconomics is encapsulated in three models operating over different time frames:
+1. **Very Long Run (Growth Theory):** Focuses on the growth of productive capacity (potential output) driven by capital accumulation and technology.
+2. **Long Run:** Productive capacity is given. Output is determined by Aggregate Supply (AS) and prices are determined by both AS and Aggregate Demand (AD). The AS curve is vertical. 
+3. **Short Run:** Prices are relatively fixed (flat AS curve). Output is determined by changes in AD.
+4. **Medium Run:** Transition between short and long run is described by the **Phillips curve**, which models the speed of price adjustment.
 
-### 2.1 The Investment Multiplier
-$$k = \\frac{1}{1 - MPC}$$
-Where $MPC$ is the Marginal Propensity to Consume.
+**Key Equations:**
+- Output gap = actual output − potential output
+
+**Key Graphs & Tables:**
+- **Fig 1-1:** Per Capita GNP, 1890–2009.
+- **Fig 1-2, 1-3, 1-4, 1-5:** AS-AD diagrams representing the Long Run (vertical AS), Very Long Run (shifting vertical AS), Short Run (horizontal AS), and Medium Run (upward sloping AS).
+- **Fig 1-6:** Phillips curve showing changes in inflation vs. unemployment.
+- **Fig 1-7:** The Business Cycle (peaks, troughs, recession, recovery, trend).
+- **Table 1-1:** Per Capita Real GDP Growth Rates (e.g., China 7.4%, US 2.0%).
 
 ---
 
-## CHAPTER 3: FISCAL AND MONETARY POLICY
+## Chapter 2: National Income Accounting
+**Concepts summarized:**
+Addresses the accounting framework for the macroeconomy, distinguishing between the production of output (factor payments) and demand for output (consumption, investment, government, net exports). Differentiates between GDP, GNP, and NDP, and explains price indexes (CPI, GDP deflator) and employment statistics. 
 
-### 3.1 Fiscal Policy
-Government spending and taxation to influence AD.
+**Key Equations:**
+- **Production function:** Pies = f(friends, kitchens) or generically $Y = f(N, K)$
+- **Factor payments:** $Y = (w \\times N) + (r \\times K) + profit$
+- **Fundamental Identity:** $Y = C + I + G + NX$
+- **Disposable Income:** $YD = Y + TR - TA$
+- **Allocation of YD:** $YD = C + S$
+- **Savings-Investment Identity:** $S - I = (G + TR - TA) + NX$  (Private saving minus investment equals budget deficit plus net exports/trade surplus)
+- **Inflation rate ($\\$):** $\\ = (P_t - P_{t-1}) / P_{t-1}$
 
-### 3.2 Monetary Policy
-Central bank actions to manage money supply and interest rates.
+**Key Graphs & Tables:**
+- **Fig 2-1:** Composition of US GDP (C=70%, I=16.9%, G=18.9%, NX=-2.8%).
+- **Table 2-1:** GDP and Components of Demand.
+- **Table 2-2:** The Budget Deficit, Trade, Saving, and Investment.
 
 ---
 
-## CHAPTER 4: INFLATION AND UNEMPLOYMENT
+## Chapter 3: Growth and Accumulation
+**Concepts summarized:**
+Focuses on Neoclassical Growth Theory (Solow Model). Growth is driven by capital accumulation, labor force growth, and technological progress. In the steady-state equilibrium, per capita income and capital are constant. The saving rate determines the steady-state level of income but NOT the long-run growth rate.
 
-### 4.1 The Phillips Curve
-Inverse relationship between inflation and unemployment in the short run.
+**Key Equations:**
+- **Production function:** $Y = AF(K, N)$
+- **Growth accounting equation:** $\\ Y/Y = [(1-\\) \\times \\ N/N] + (\\ \\times \\ K/K) + \\ A/A$ (where $\\$ is capital's share).
+- **Per capita output growth:** $\\ y/y = \\ \\times \\ k/k + \\ A/A$
+- **Cobb-Douglas form:** $Y = AK^\\ N^{1-\\}$
+- **Capital accumulation:** $\\ k = sy - (n+d)k$
+- **Steady State ($\\ k = 0$):** $sy^* = (n+d)k^*$
+
+**Key Graphs & Tables:**
+- **Fig 3-1:** GDP per capita for four countries.
+- **Fig 3-4:** Steady-state Output and Investment (intersection of $sy$ and $(n+d)k$ curves).
+- **Fig 3-5/3-6:** Adjustment to new steady states from saving rate increases.
+- **Table 3-1:** Postwar Annual Growth Rates (US vs Japan).
+
+---
+
+## Chapter 4: Growth and Policy
+**Concepts summarized:**
+Introduces Endogenous Growth Theory, which assumes a constant marginal product of capital, implying that the long-run growth rate CAN be affected by the saving rate. Emphasizes the role of human capital and social infrastructure. Discusses absolute vs. conditional convergence.
+
+**Key Equations:**
+- **Endogenous production function:** $Y = aK$
+- **Capital accumulation:** $\\ K = sY = saK$
+- **Growth rate (Endogenous):** $\\ Y/Y = s \\times a$
+
+**Key Graphs & Tables:**
+- **Fig 4-1:** Solow vs. Endogenous growth models.
+- **Fig 4-2:** The Poverty Trap (combining neoclassical and endogenous elements).
+- **Table 1 (Box 4-3):** Annual Growth Rates: China and India (1978-2004).
+
+---
+
+## Chapter 5: Aggregate Supply and Demand
+**Concepts summarized:**
+Brings together the AD and AS curves to determine equilibrium output and price level. Explores the Keynesian extreme (flat AS, where output changes do not affect prices) and the Classical extreme (vertical AS, where AD shifts only change prices, not output).
+
+**Key Equations:**
+- **Dynamic Aggregate Supply:** $P_{t+1} = P_t [1 + \\(Y - Y^*)]$
+- **Quantity Theory of Money (AD proxy):** $M \\times V = P \\times Y$
+
+**Key Graphs & Tables:**
+- **Fig 5-1 to 5-3:** Basic AD-AS shifts.
+- **Fig 5-4, 5-9, 5-10:** Keynesian vs. Classical AS curves and their response to AD expansions.
+- **Fig 5-11:** Supply-Side Economics (tax cuts shifting AS slightly and AD vastly).
+
+---
+
+## Chapter 6: Aggregate Supply: Wages, Prices, and Unemployment
+
+**6.1 Deriving the Aggregate Supply Curve: The Theoretical Bridge**
+The Aggregate Supply (AS) curve describes the relationship between the price level and the level of real output supplied by firms. In the short run, the AS curve is relatively flat, whereas in the long run, it is perfectly vertical at potential output ($Y^*$). The transition between these timeframes and the upward slope of the medium-run AS curve is explained by the labor market, specifically linking wages, unemployment, and prices.
+
+The derivation of the modern expectations-augmented AS curve follows a structured four-step economic bridge:
+1. **The Link between Output and Unemployment (Okun's Law)**:
+   Arthur Okun identified a strong empirical regularity. In the short-to-medium run, changes in real GDP are tightly coupled with changes in the unemployment rate. Because labor is a primary input, output can only exceed potential if firms hire more workers than usual, pushing unemployment below its natural rate ($u^*$). This is formalized as:
+   $$ \\frac{Y - Y^*}{Y^*} = -\\beta(u - u^*) $$
+   where $\\beta$ (typically around 2.0 in the US) represents Okun's coefficient: for every 1% that unemployment is below the natural rate, real GDP rises by approximately 2% above its potential.
+
+2. **The Link between Unemployment and Wage Inflation (The Phillips Curve)**:
+   A tight labor market (where $u < u^*$) increases the bargaining power of workers and labor unions. To attract and retain scarce labor, firms must bid up nominal wages. Thus, low unemployment accelerates nominal wage growth ($g_w$). In an expectations-augmented framework, workers care about their real purchasing power, so wages are set based on projected price inflation ($\\pi^e$):
+   $$ g_w = \\frac{W_{t+1} - W_t}{W_t} = \\pi^e - \\alpha(u - u^*) $$
+   where $\\alpha$ measures the sensitivity of wages to labor market tightness.
+
+3. **The Link between Wages and Prices (Mark-up Pricing)**:
+   Firms set prices ($P$) by applying a markup percentage ($z$) over their unit labor costs. Unit labor cost is the nominal wage ($W$) divided by average labor productivity ($a = Y/N$):
+   $$ P = \\frac{(1+z)W}{a} $$
+   Taking percentage changes, price inflation ($\\pi$) is directly driven by wage inflation ($g_w$), modified by changes in productivity:
+   $$ \\pi = g_w - \\frac{\\Delta a}{a} $$
+   Assuming labor productivity is stable in the medium run, price inflation directly mirrors wage inflation: $\\pi = g_w$.
+
+4. **Synthesizing the Aggregate Supply Curve**:
+   Combining the expectations-augmented Phillips Curve with Okun's Law yields the **Dynamic Aggregate Supply Curve**:
+   $$ \\pi = \\pi^e + \\gamma(Y - Y^*) $$
+   where $\\gamma = \\frac{\\alpha}{\\beta Y^*}$. This shows that inflation exceeds expected inflation when real output exceeds potential output (an inflationary gap).
 
 \`\`\`chart
 {
   "type": "line",
-  "title": "Figure 4.1: The Phillips Curve",
-  "xAxis": "unemployment",
-  "yAxis": "inflation",
+  "title": "Figure 6.1: Deriving the Upward Sloping Aggregate Supply Curve",
+  "xAxis": "output",
+  "yAxis": "price",
   "data": [
-    {"unemployment": 2, "inflation": 10},
-    {"unemployment": 4, "inflation": 6},
-    {"unemployment": 6, "inflation": 4},
-    {"unemployment": 8, "inflation": 3},
-    {"unemployment": 10, "inflation": 2.5}
+    {"output": 80, "as_short_run": 100, "as_medium_run": 80},
+    {"output": 90, "as_short_run": 100, "as_medium_run": 90},
+    {"output": 100, "as_short_run": 100, "as_medium_run": 100, "as_long_run": 150},
+    {"output": 110, "as_short_run": 100, "as_medium_run": 110},
+    {"output": 120, "as_short_run": 100, "as_medium_run": 120}
   ],
   "series": [
-    {"key": "inflation", "name": "Short-Run Phillips Curve", "color": "#10b981"}
+    {"key": "as_short_run", "name": "Short-Run AS (Fixed Prices)", "color": "#94a3b8"},
+    {"key": "as_medium_run", "name": "Medium-Run AS (Upward Sloping)", "color": "#10b981"},
+    {"key": "as_long_run", "name": "Long-Run AS (Potential GDP Y*=100)", "color": "#0f172a"}
   ]
 }
 \`\`\`
+
+**6.2 Why Nominal Wages Are Sticky**
+If wages adjusted instantly and frictionlessly, the labor market would always clear, and the AS curve would be vertical even in the short term. However, in reality, nominal wages are sticky (slow to adjust). Key modern macroeconomic theories explain this friction:
+
+- **Coordination Problems (Mankiw / Cooper)**: Firms and unions would willingly adjust prices and wages downward in response to a drop in demand *if* they were certain every other competitor would do so simultaneously. In the absence of a central coordinating agency, no single firm wants to cut wages first (which would alienate workers and lower morale), leading to sticky wages.
+- **Efficiency Wage Theory**: The productivity (morale, effort, and turnover rate) of workers is a direct mathematical function of the real wage paid relative to the market average. According to the **Solow Condition**, firms maximize profits by retaining a real wage above the market-clearing level:
+  $$ \\text{Effort} = e(W) \\quad \\text{where } e'(W) > 0 $$
+  Cutting wages during a recession would reduce worker effort and trigger high-skilled employee departures, increasing net costs.
+- **Insider-Outsider Models**: Firm employees are split into two categories:
+  - **Insiders**: Already employed, high-tenured workers who control union representation.
+  - **Outsiders**: Unemployed individuals willing to work for lower wages.
+  Insiders use their collective bargaining power and high replacement/turnover costs to prevent firms from undercutting them with cheaper outsider labor, keeping wages high even amidst extreme unemployment.
+
+**6.3 Supply-Side Shocks**
+A supply shock is an economic disturbance that directly shifts the AS curve.
+- **Adverse Shocks**: A spike in raw oil prices or raw material costs raises the markup ($z$) or reduces labor productivity ($a$). This shifts the AS curve upward (to the left), as shown in 1973 and 1979. This creates **stagflation**—the simultaneous occurrence of rising inflation and falling real GDP.
+
+---
+
+## Chapter 7: The Anatomy of Inflation and Unemployment
+
+**7.1 The Social and Economic Costs of Unemployment**
+Unemployment represents a severe macroeconomic inefficiency. Economists categorize its costs into two major areas:
+- **Lost Aggregate Output**: Evaluated directly via **Okun's Law**. When workers are idle, the economy is operating inside its Production Possibility Frontier. This represents a permanent, unrecoverable loss of economic output.
+- **Distributional and Social Impact**: The burden of unemployment is not distributed evenly. It falls disproportionately on younger, less-skilled, and minority workers. Prolonged unemployment degrades human capital (the hysteresis effect), damages personal health, and increases social spending.
+
+**7.2 Frictional vs. Structural Unemployment**
+The **natural rate of unemployment** ($u^*$) is the rate at which the labor market is in equilibrium, meaning there is no excess demand or supply. It consists of:
+- **Frictional Unemployment**: The inevitable temporary unemployment resulting from workers changing jobs, searching for better career fits, or graduating. It is a sign of a healthy, dynamic labor market.
+- **Structural Unemployment**: A mismatch between the skill sets demanded by employers and those possessed by job seekers, or a geographic mismatch. Structural factors are exacerbated by institutional rigidities like legal minimum wages or overly generous welfare programs that reduce job-search incentives.
+
+The aggregate rate is a weighted average of sector rates:
+$$ u^* = w_1 u_1^* + w_2 u_2^* + \\dots + w_n u_n^* $$
+
+**7.3 The Costs of Inflation**
+Inflation is a general rise in the price level, reducing the purchasing power of nominal currency. Costs vary significantly depending on whether inflation is expected or unexpected:
+
+- **Anticipated (Expected) Inflation**:
+  - **Shoe-leather Costs**: Higher inflation means holding cash incurs an option cost. People spend more time and effort running to banks to deposit cash into interest-bearing assets.
+  - **Menu Costs**: Firms must continuously spend physical resources updating catalogues, pricing labels, and digital databases.
+- **Unanticipated (Unexpected) Inflation**:
+  - **Arbitrary Wealth Redistribution**: Unanticipated inflation serves as a silent mechanism transferring wealth from **creditors to debtors**. Debtors pay back loans in depreciated, low-value currency. Conversely, unexpected deflation hurts debtors.
+  - **Tax Distortion**: Since tax brackets are often index-lagged, or capital gains taxes are computed on nominal returns rather than real returns, inflation artificially inflates tax liabilities (bracket creep), discouraging private investment.
+
+**7.4 The Choice of Disinflation: The Sacrifice Ratio**
+To reduce inflation, the central bank must tighten monetary policy, which shifts the Aggregate Demand (AD) curve left and temporarily increases unemployment. The willingness of a nation to endure this is measured by the **Sacrifice Ratio**:
+$$ \\text{Sacrifice Ratio} = \\frac{\\text{Cumulative % Loss of Real GDP}}{\\text{Percentage Point Reduction in Inflation}} $$
+For instance, a sacrifice ratio of 2.0 implies that to reduce inflation from 6% to 2% (a 4 percentage point drop), the economy must sacrifice a cumulative 8% of annual GDP (e.g., a 4% output gap for two consecutive years).
+
+\`\`\`chart
+{
+  "type": "area",
+  "title": "Figure 7.3: The Sacrifice Ratio - Output Loss vs. Disinflation Path",
+  "xAxis": "year",
+  "yAxis": "percentage",
+  "data": [
+    {"year": "Year 0", "trend_gdp": 100, "actual_gdp": 100},
+    {"year": "Year 1", "trend_gdp": 102, "actual_gdp": 98},
+    {"year": "Year 2", "trend_gdp": 104, "actual_gdp": 99},
+    {"year": "Year 3", "trend_gdp": 106, "actual_gdp": 103},
+    {"year": "Year 4", "trend_gdp": 108, "actual_gdp": 108}
+  ],
+  "series": [
+    {"key": "trend_gdp", "name": "Potential Trend GDP", "color": "#0ea5e9"},
+    {"key": "actual_gdp", "name": "Actual Real GDP", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+The shaded gap between the blue potential line and the red actual line represents the cumulative output lost to achieve a 6.0 percentage point reduction in inflation.
+
+- **Volcker Disinflation (Cold Turkey)**: In the early 1980s, Fed Chairman Paul Volcker implemented a sharp, swift disinflation policy. Critics warned of massive output losses, but supporters argued that a credible, aggressive disinflation policy lowers expected inflation ($\\pi^e$) rapidly, shifting short-run Phillips curves down and reducing the ultimate sacrifice ratio.
+- **Gradualism**: Alternatively, a slow, predictable reduction in AD limits the severity of the output gap in any single year but takes much longer to align public expectations.
+
+---
+
+## Chapter 8: Policy Preview
+**Concepts summarized:**
+Gives a practical overview of how central banks set policy. Explains the target (inflation, output) and instrument (interest rate) approach. Outlines the Taylor Rule as a standard monetary policy rule guiding central bank interest rate decisions.
+
+**Key Equations:**
+- **Taylor Rule:** $i_t = r^* + \\pi_t + 0.5(\\pi_t - \\pi^*) + 0.5[100 \\times (Y_t - Y^*)/Y^*]$
+- **Aggregate Demand (with interest rate):** $Y = C(i) + I(i) + G + NX = AD(i)$
+
+**Key Graphs:**
+- **Fig 8-1:** Increased interest rates shift AD to the left.
+
+---
+
+## Chapter 9: Income and Spending
+**Concepts summarized:**
+Develops the basic Keynesian cross model where prices are fixed. Output is driven by planned spending. Models consumption as a function of income and derives the spending multiplier. Extends the model to include the government sector and proportional taxes as automatic stabilizers.
+
+**Key Equations:**
+- **Consumption:** $C = \\bar{C} + cY$ (where $c$ is the Marginal Propensity to Consume, MPC).
+- **Saving:** $S = Y - C = -\\bar{C} + (1-c)Y$
+- **Equilibrium condition:** $Y = AD = \\bar{A} + cY \\quad Y_0 = \\frac{1}{1-c}\\bar{A}$
+- **Multiplier (no taxes):** $\\alpha = \\frac{1}{1-c}$
+- **Equilibrium with government & taxes:** $Y_0 = \\frac{1}{1-c(1-t)}(\\bar{C} + c\\bar{TR} + \\bar{I} + \\bar{G} + \\bar{NX})$
+- **Multiplier with taxes:** $\\alpha_G = \\frac{1}{1-c(1-t)}$
+- **Budget Surplus:** $BS = tY - \\bar{G} - \\bar{TR}$
+
+**Key Graphs & Tables:**
+- **Fig 9-1/9-2/9-3:** The Keynesian Cross and derivation of the Multiplier.
+- **Fig 9-6:** The Budget Surplus as a function of income.
+- **Table 9-1:** The Multiplier in stages.
+
+---
+
+## Chapter 10: Money, Interest, and Income
+**Concepts summarized:**
+Derives the IS-LM model. The IS curve represents equilibrium in the goods market. The LM curve represents equilibrium in the money market. Their intersection determines short-run equilibrium output and interest rates at a fixed price level.
+
+**Key Equations:**
+- **Investment demand:** $I = \\bar{I} - bi$
+- **IS Curve:** $Y = \\alpha_G(\\bar{A} - bi)$ or $i = \\frac{\\bar{A}}{b} - \\frac{Y}{\\alpha_G b}$
+- **Real Money Demand:** $L = kY - hi$
+- **LM Curve:** $i = \\frac{1}{h}(kY - \\frac{\\bar{M}}{\\bar{P}})$
+- **IS-LM Algebraic Solution for Y:** $Y = \\frac{h\\alpha_G}{h+kb\\alpha_G}\\bar{A} + \\frac{b\\alpha_G}{h+kb\\alpha_G} \\frac{\\bar{M}}{\\bar{P}}$
+
+**Key Graphs & Tables:**
+- **Fig 10-5:** Derivation of the IS curve.
+- **Fig 10-9:** Derivation of the LM curve.
+- **Fig 10-11:** Goods and Money Market Equilibrium (IS-LM).
+- **Fig 10-13:** Derivation of the AD curve from IS-LM shifts.
+
+---
+
+## Chapter 11: Monetary and Fiscal Policy
+**Concepts summarized:**
+Analyzes fiscal and monetary policy effectiveness using the IS-LM model. Discusses crowding out (where fiscal expansion raises interest rates, reducing private investment). Explores polar cases: the Liquidity Trap (horizontal LM) where monetary policy is useless, and the Classical Case (vertical LM) where fiscal policy causes full crowding out.
+
+**Key Concepts / Equations:**
+- **Monetary Transmission Mechanism:** Money supply changes $\\rightarrow$ Portfolio adjustments $\\rightarrow$ Interest rates change $\\rightarrow$ Investment changes $\\rightarrow$ Output changes.
+- **Classical LM:** $\\bar{M} = k(\\bar{P} \\times Y)$ (derived when $h=0$).
+
+**Key Graphs & Tables:**
+- **Fig 11-3:** Monetary expansion (LM shifts right).
+- **Fig 11-6:** Fiscal expansion (IS shifts right, partial crowding out).
+- **Fig 11-7:** Full crowding out in the classical case.
+- **Table 11-1:** The Transmission Mechanism.
+- **Table 11-2:** Policy effects on income and interest rates.
+
+---
+
+## Chapter 12: International Linkages
+**Concepts summarized:**
+Extends IS-LM to the Open Economy (Mundell-Fleming model). Introduces Capital Mobility and the Balance of Payments (BP). Explains policy effectiveness under fixed vs. flexible exchange rates. Introduces Purchasing Power Parity (PPP) and real exchange rates.
+
+**Key Equations:**
+- **Balance of Payments:** $BP = NX(Y, Y_f, R) + CF(i - i_f)$
+- **Real Exchange Rate:** $R = e P_f / P$
+- **Open Economy IS:** $Y = DS(Y, i) + NX(Y, Y_f, R)$
+- **Uncovered Interest Parity:** $(e_{t+1} - e_t)/e_t = i - i^*$
+
+**Key Theoretical Results (Mundell-Fleming):**
+- **Fixed Rates + Perfect Capital Mobility:** Monetary policy is ineffective. Fiscal policy is highly effective.
+- **Flexible Rates + Perfect Capital Mobility:** Fiscal policy is ineffective (causes appreciation & severe crowding out of net exports). Monetary policy is highly effective (causes depreciation & boosts net exports).
+
+**Key Graphs & Tables:**
+- **Fig 12-4:** Internal and External Balance under Fixed Rates.
+- **Fig 12-5/12-6/12-7:** Adjustments under Flexible Rates.
+- **Table 12-6:** Effects of Monetary/Fiscal policy under Perfect Capital Mobility.
+
+---
+
+## Chapter 13: Consumption and Saving
+**Concepts summarized:**
+Moves beyond the simple Keynesian consumption function to Life-Cycle/Permanent-Income Hypotheses (LC-PIH). Consumption is smoothed over a lifetime. Explores reasons why LC-PIH doesn't perfectly hold: liquidity constraints and myopia. Introduces the Barro-Ricardo Equivalence Proposition.
+
+**Key Equations:**
+- **Simple Keynesian:** $C = \\bar{C} + cYD$
+- **Life-Cycle:** $C = \\frac{WL}{NL} \\times YL$ (Working Life / Normal Life $\\times$ Labor Income)
+- **Permanent Income:** $C = c YP$
+- **Random Walk Model (Rational Expectations):** $C_{t+1} = C_t + \\epsilon$
+
+**Key Graphs & Tables:**
+- **Fig 13-4:** Lifetime Income, Consumption, Saving, and Wealth.
+- **Table 13-1/13-2:** Sectoral savings rates.
+
+---
+
+## Chapter 14: Investment Spending
+**Concepts summarized:**
+Investment is highly volatile and drives the business cycle. Covers Business Fixed Investment (via the rental cost of capital and marginal product), Residential Investment (linked to mortgage rates), and Inventory Investment (the accelerator model). Also discusses Tobin's $q$ theory.
+
+**Key Equations:**
+- **Rental cost of capital (rc):** $rc = r + d = i - \\pi^e + d$ (interest rate - expected inflation + depreciation).
+- **Flexible Accelerator Model:** $K_0 = K_{-1} + \\lambda(K^* - K_{-1})$ and $I = \\lambda(K^* - K_{-1})$
+- **Present Value (Discounted Cash Flow):** $PV = \\frac{FV}{1+i}$
+
+**Key Graphs & Tables:**
+- **Fig 14-2/14-3:** Marginal Product of Capital and desired Capital stock.
+- **Fig 14-4/14-5:** Adjustment of Capital stock over time.
+
+---
+
+## Chapter 15: The Demand for Money
+**Concepts summarized:**
+Defines money (M1, M2) and its functions. Analyzes the transactions, precautionary, and speculative motives for holding money. Uses the Baumol-Tobin model to show that money demand is sensitive to interest rates and transaction costs, exhibiting economies of scale.
+
+**Key Equations:**
+- **Baumol-Tobin Transaction Demand:** $\\frac{M}{P} = \\sqrt{\\frac{tc \\times Y}{2i}}$
+- **Linear Money Demand:** $L = kY - hi$
+- **Income Velocity of Money:** $V = \\frac{P \\times Y}{M}$
+- **Classical Quantity Theory (Inflation):** $\\ = m - y + v$
+
+**Key Graphs & Tables:**
+- **Fig 15-1:** Velocity of money and T-bill rates.
+- **Table 15-1/15-2:** Income and Interest Rate Elasticities of Money Demand.
+
+---
+
+## Chapter 16: The Fed, Money, and Credit
+**Concepts summarized:**
+Explains how the Federal Reserve determines the money supply through the monetary base and the money multiplier. Tools of the Fed include Open Market Operations (predominant), the discount rate, and reserve requirements. Discusses the trade-off of targeting interest rates vs. targeting the money supply (Poole's analysis).
+
+**Key Equations:**
+- **Monetary Base (High-powered money):** $H = CU + reserves$
+- **Money Stock:** $M = CU + D$
+- **Money Multiplier:** $mm = \\frac{1+cu}{re+cu}$
+- **Total Money Supply:** $M = mm \\times H$
+
+**Key Graphs & Tables:**
+- **Fig 16-2:** Relation between High-Powered Money and the Money Stock.
+- **Fig 16-4:** Pegging the interest rate vs fixing the money supply.
+- **Fig 16-5:** Poole's analysis of targets in the presence of IS or LM shocks.
+- **Tables 16-1 to 16-3:** Fed Balance Sheet representations.
+
+---
+
+## Chapter 17: Policy
+**Concepts summarized:**
+Examines the practical difficulties of active stabilization policy. Discusses inside lags (recognition, decision, action) and outside lags (the time it takes for the economy to respond). Covers the debate of rules vs. discretion, dynamic inconsistency, and alternative targets like Real GDP vs Nominal GDP vs Inflation targeting.
+
+**Key Equations:**
+- **Constant-growth-rate activist rule:** $\\frac{\\Delta M}{M} = 4.0 + 2(u - 5.5)$
+- **Policymaker Loss Function (Dynamic Inconsistency):** $L = a(u - u^*) + \\pi^2$
+
+**Key Graphs & Tables:**
+- **Fig 17-1:** Lags and destabilizing policy.
+- **Fig 17-3:** The Phillips curve and dynamic inconsistency (temptation to cheat on inflation targets).
+
+---
+
+## Chapter 18: Financial Markets and Asset Prices
+**Concepts summarized:**
+Explains the forward-looking nature of financial markets and the concept of arbitrage. Covers the yield curve (term structure of interest rates), the random walk of stock prices, and how exchange rate expectations adjust international returns.
+
+**Key Equations:**
+- **Expectations theory of term structure:** $_3i_{2020} = \\frac{_1i_{2020} + _1i^e_{2021} + _1i^e_{2022}}{3} + PR$
+- **Random walk of stock prices:** $P_{t+1} = a + P_t + \\epsilon$
+- **Uncovered Interest Parity:** $\\frac{e_{t+1} - e_t}{e_t} = i - i^*$
+
+**Key Graphs:**
+- **Fig 18-1, 18-3:** Yield Curves and historically tracking long vs short rates.
+- **Fig 18-4, 18-5:** Random walk plots for stock markets.
+
+---
+
+## Chapter 19: Big Events: The Economics of Depression, Hyperinflation, and Deficits
+**Concepts summarized:**
+Examines extreme macroeconomic events. Summarizes the causes of the Great Depression, hyperinflations (driven by monetization of large deficits/inflation tax), and the ongoing debate surrounding government deficits and social security.
+
+**Key Equations:**
+- **Budget Financing Identity:** $Budget\ Deficit = Sales\ of\ Bonds + Increase\ in\ Money\ Base$
+- **Inflation-Adjusted Deficit:** $Total\ Deficit - (Inflation\ Rate \\times National\ Debt)$
+- **Inflation Tax Revenue:** $Inflation\ Rate \\times Real\ Money\ Base$
+- **Debt-Income Ratio:** $Debt / PY$
+
+**Key Graphs & Tables:**
+- **Fig 19-3 / Fig 19-4:** Monetary Accommodation and The Inflation Tax (Seigniorage curve).
+- **Table 19-6:** High-Inflation / Hyperinflation Experiences.
+
+---
+
+## Chapter 20: International Adjustment and Interdependence
+**Concepts summarized:**
+Expands on Chapter 12 to look at long-term adjustment mechanisms. Demonstrates how under fixed rates, prices adjust to restore competitiveness (classical adjustment). Covers the J-Curve effect (volume effects of depreciation lag price effects), the monetary approach to the balance of payments, and exchange rate overshooting under flexible rates.
+
+**Key Equations:**
+- **Spending on domestic goods:** $DS + NX = (C + I + G) + (X - Q)$
+- **Monetary Approach (Balance sheet):** $\\Delta NFA = \\Delta H - \\Delta DC$
+
+**Key Graphs & Tables:**
+- **Fig 20-3:** Competitiveness and Adjustment.
+- **Fig 20-7:** Exchange Rate Overshooting.
+- **Table 20-2:** Short and Long Run effects of Monetary Expansions.
+
+---
+
+## Chapter 21: Advanced Topics
+**Concepts summarized:**
+Explores the modern frontier of macroeconomics: Rational Expectations, Real Business Cycle (RBC) Theory, and New Keynesian economics. RBC argues shocks are permanent technology shifts with purely market-clearing reactions. New Keynesians justify price stickiness using small "menu costs" and imperfect competition.
+
+**Key Equations:**
+- **Rational Expectations Prediction:** $p = p^e + \\(y - y^*)$
+- **Rational Forecast:** $p^e = m^e + v - y^{*e}$
+- **Random Walk of GDP:** $y_t = y_{t-1} + \\$ (Difference stationary)
+- **New Keynesian Pricing (Markup):** $P_i = \\left(\\frac{\\}{\\ - 1}\\right) \\frac{W}{a}$
+
+**Key Graphs:**
+- **Fig 21-4/21-5:** Actual and Projected GDP (Trend vs Difference Stationary).
+- **Fig 21-6:** Mankiw's Menu Cost Breakthrough (profit loss curves under perfect vs imperfect competition).
+
+---
+*End of Summary*
+
 `,
   "ug-statistical": `
 # COMPREHENSIVE STATISTICAL ECONOMICS STUDY GUIDE
@@ -1485,7 +2959,7 @@ The most important distribution in statistics, characterized by its bell-shaped 
 
 ### 2.2 Standard Normal Distribution (Z)
 A normal distribution with a mean of 0 and a standard deviation of 1.
-$$Z = \frac{X - \mu}{\sigma}$$
+$$Z = \\frac{X - \\}{\\sigma}$$
 
 \`\`\`chart
 {
@@ -1526,7 +3000,7 @@ States that for a large enough sample size, the sampling distribution of the mea
 ## CHAPTER 4: REGRESSION ANALYSIS
 
 ### 4.1 Simple Linear Regression
-$Y = \beta_0 + \beta_1 X + \epsilon$
+$Y = \\beta_0 + \\beta_1 X + \\$
 
 ### 4.2 Correlation Coefficient ($r$)
 Measures the strength and direction of the linear relationship between two variables. Range: [-1, 1].

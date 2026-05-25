@@ -403,7 +403,7 @@ export const LiveChallenge: React.FC = () => {
     const q = matchData.questions[currentQuestion];
 
     return (
-      <div className="min-h-screen bg-paper pt-32 pb-12 px-8 transition-colors duration-300">
+      <div className="min-h-screen bg-paper pt-8 md:pt-16 pb-12 px-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-8">
@@ -547,7 +547,7 @@ export const LiveChallenge: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-paper pt-32 pb-20 px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-paper pt-8 md:pt-16 pb-24 px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Searching Overlay */}
         <AnimatePresence>
@@ -679,39 +679,36 @@ export const LiveChallenge: React.FC = () => {
         </AnimatePresence>
 
         {/* Header Section */}
-        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-slate-200 dark:border-slate-800 pb-16 relative">
-          <div className="relative z-10">
+        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 border-b-4 border-slate-200 dark:border-slate-800 pb-16 relative">
+          <div className="relative z-10 w-full md:w-auto">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2 h-2 bg-sky-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(14,165,233,0.5)]" />
-              <span className="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-[0.4em]">Live Arena</span>
+              <span className="text-[12px] font-black text-sky-700 dark:text-sky-400 uppercase tracking-widest">Live Arena</span>
             </div>
-            <h1 className="text-4xl md:text-6xl md:text-8xl font-bold text-slate-900 dark:text-white tracking-tighter mb-6 uppercase font-display italic">Duel Arena</h1>
-            <p className="text-slate-700 dark:text-slate-500 text-sm max-w-md font-medium leading-relaxed">
-              Challenge peers in real-time economic combat. <br />
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tight mb-6 uppercase block font-display shadow-sm break-words md:break-normal w-full">Duel Arena</h1>
+            <p className="text-slate-700 dark:text-slate-500 text-base font-bold leading-relaxed w-full md:max-w-md">
+              Challenge peers in real-time economic combat. <br className="hidden md:block" />
               <span className="text-slate-900 dark:text-slate-300">Climb the global leaderboard and claim your status.</span>
             </p>
           </div>
-          <div className="flex items-center gap-6 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10 w-full md:w-auto mt-6 md:mt-0">
             <button
               onClick={toggleSearching}
               className={cn(
-                "px-12 py-6 rounded-[2rem] font-bold text-[10px] uppercase tracking-[0.3em] transition-all shadow-2xl flex items-center gap-4 group",
+                "px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none flex items-center gap-4 group",
                 lobbyUsers.find(u => u.socketId === socket?.id)?.status === 'searching'
-                  ? "bg-sky-600 text-white hover:bg-sky-700 shadow-sky-500/30"
-                  : "bg-slate-900 dark:bg-sky-600 text-white hover:bg-slate-800 dark:hover:bg-sky-500 shadow-slate-900/20 dark:shadow-sky-500/20"
+                  ? "bg-rose-500 text-white hover:bg-rose-600 border-b-4 border-rose-700"
+                  : "bg-blue-500 text-white hover:bg-blue-600 border-b-4 border-blue-700"
               )}
             >
-              <Zap size={18} className={cn("transition-transform group-hover:scale-125", lobbyUsers.find(u => u.socketId === socket?.id)?.status === 'searching' && "animate-pulse")} />
+              <Zap size={20} className={cn("transition-transform group-hover:scale-110", lobbyUsers.find(u => u.socketId === socket?.id)?.status === 'searching' && "animate-pulse")} />
               {lobbyUsers.find(u => u.socketId === socket?.id)?.status === 'searching' ? "In Matchmaking" : "Enter Arena Queue"}
             </button>
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-8 py-6 rounded-[2rem] shadow-sm flex items-center gap-5 backdrop-blur-md">
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 px-6 py-4 rounded-xl shadow-sm flex items-center gap-5 backdrop-blur-md">
               <Users size={20} className="text-slate-400 dark:text-slate-600" />
-              <span className="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-[0.2em]">{lobbyUsers.length} Online</span>
+              <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">{lobbyUsers.length} Online</span>
             </div>
           </div>
-          
-          {/* Decorative Background Element */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         </div>
 
         {/* Action Bar: Topic Selection */}
@@ -784,56 +781,43 @@ export const LiveChallenge: React.FC = () => {
         </AnimatePresence>
 
         {/* Lobby Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {lobbyUsers.filter(u => u.id !== user?.uid).map((u, i) => (
             <motion.div
               key={u.socketId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="bg-white dark:bg-slate-900 p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-2xl hover:border-sky-500/30 transition-all group relative overflow-hidden"
+              className="card-gamified p-8 relative overflow-hidden group border-[3px] border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 shadow-[0_8px_0_theme(colors.indigo.200)] translate-y-[-4px]"
             >
-              {/* Subtle Background Glow on Hover */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/0 group-hover:bg-sky-500/5 rounded-full blur-3xl transition-all pointer-events-none" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/0 group-hover:bg-indigo-500/10 rounded-full blur-3xl transition-all pointer-events-none" />
               
-              <div className="flex items-center justify-between mb-12 relative z-10">
-                <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-[2rem] flex items-center justify-center font-bold text-3xl text-slate-900 dark:text-white group-hover:bg-slate-900 dark:group-hover:bg-sky-600 group-hover:text-white transition-all shadow-sm border border-transparent group-hover:border-white/10">
+              <div className="flex items-center justify-between mb-8 relative z-10">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl border-b-4 border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-3xl text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white group-hover:border-indigo-600 transition-all shadow-sm">
                   {u.displayName[0]}
                 </div>
                 <div className={cn(
-                  "flex items-center gap-3 px-5 py-2.5 rounded-full border transition-all",
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-all font-black text-[10px] uppercase tracking-widest",
                   u.status === 'searching' 
-                    ? "bg-sky-50 dark:bg-sky-900/20 border-sky-100 dark:border-sky-800" 
+                    ? "bg-amber-100 border-amber-300 text-amber-700" 
                     : u.status === 'playing' 
-                      ? "bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700" 
-                      : "bg-slate-50 dark:bg-slate-800 border-slate-100 dark:border-slate-700"
+                      ? "bg-slate-100 border-slate-300 text-slate-500" 
+                      : "bg-emerald-100 border-emerald-300 text-emerald-700"
                 )}>
-                  <div className={cn(
-                    "w-2 h-2 rounded-full",
-                    u.status === 'searching' ? "bg-sky-500 animate-pulse shadow-[0_0_8px_rgba(14,165,233,0.5)]" : u.status === 'playing' ? "bg-slate-400" : "bg-slate-200 dark:bg-slate-700"
-                  )} />
-                  <span className={cn(
-                    "text-[10px] font-bold uppercase tracking-widest",
-                    u.status === 'searching' ? "text-sky-600 dark:text-sky-400" : u.status === 'playing' ? "text-slate-500 dark:text-slate-400" : "text-slate-400 dark:text-slate-500"
-                  )}>
-                    {u.status === 'searching' ? "Searching" : u.status === 'playing' ? "In Match" : "Idle"}
-                  </span>
+                  {u.status === 'searching' ? "Queue" : u.status === 'playing' ? "In Duel" : "Idle"}
                 </div>
               </div>
-              <div className="mb-16 relative z-10">
-                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tighter uppercase font-display italic group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{u.displayName}</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-[1px] bg-slate-200 dark:bg-slate-800" />
-                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">{u.level} Scholar</p>
-                </div>
+              <div className="mb-10 relative z-10">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-1 tracking-tight uppercase group-hover:text-indigo-600 transition-colors">{u.displayName}</h3>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{u.level} Scholar</p>
               </div>
               <button
                 onClick={() => handleChallenge(u.socketId)}
                 disabled={loading || u.status === 'playing'}
-                className="w-full py-6 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-[10px] uppercase tracking-[0.3em] rounded-[2rem] hover:bg-slate-900 dark:hover:bg-sky-600 hover:text-white transition-all disabled:opacity-30 flex items-center justify-center gap-4 group/btn relative z-10 overflow-hidden"
+                className="w-full btn-premium justify-center"
               >
-                {loading ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} className="group-hover/btn:scale-125 transition-transform" />}
-                {u.status === 'playing' ? "Occupied" : "Issue Challenge"}
+                {loading ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} className="group-hover/btn:scale-110 transition-transform" />}
+                {u.status === 'playing' ? "In Combat" : "Challenge"}
               </button>
             </motion.div>
           ))}

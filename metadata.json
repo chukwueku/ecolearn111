@@ -2,5 +2,7 @@
   "name": "EcoLearn111",
   "description": "A comprehensive Economics study guide and challenge platform for secondary and undergraduate students.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

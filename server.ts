@@ -3,10 +3,96 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import { GoogleGenAI } from "@google/genai";
 
 async function startServer() {
   const app = express();
+  app.use(express.json());
+  
   const httpServer = createServer(app);
+  
+  const getGenAI = () => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn("GEMINI_API_KEY is not defined.");
+      return null;
+    }
+    return new GoogleGenAI({ apiKey });
+  };
+  
+  app.post("/api/generateStudyGuide", async (req, res) => {
+    const { topicTitle, level, description } = req.body;
+    const genAI = getGenAI();
+    if (!genAI) return res.status(500).json({ error: "Missing API key" });
+    
+    const model = "gemini-3-flash-preview";
+    const prompt = `You are an expert Economics tutor. Generate a comprehensive study guide for a ${level} student on the topic: "${topicTitle}". 
+Description: ${description}
+
+Format the output in Markdown with:
+- Clear headings
+- Key definitions
+- Detailed explanations
+- Examples where applicable
+- Professional Markdown tables for data (ensure proper rows and columns)
+- Mathematical expressions formatted in LaTeX using $ for inline and $$ for block math. Ensure all LaTeX commands (like \\frac, \\Delta, \\epsilon) are correctly formatted with a single backslash as per standard LaTeX.
+- A summary section
+
+Make it educational, engaging, and easy to understand for a ${level} level.`;
+
+    try {
+      const response = await genAI.models.generateContent({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+      });
+      res.json({ result: response.text });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to generate study guide" });
+    }
+  });
+  
+  app.post("/api/generateQuestions", async (req, res) => {
+    const { topicTitle, level, count } = req.body;
+    const genAI = getGenAI();
+    if (!genAI) return res.status(500).json({ error: "Missing API key" });
+    
+    const model = "gemini-3-flash-preview";
+    const prompt = `You are an expert Economics examiner. Generate ${count || 5} multiple-choice questions for a ${level} student on the topic: "${topicTitle}".
+
+Each question must have:
+- A clear question text
+- Exactly 4 options
+- The index of the correct answer (0-3)
+- A brief explanation for the correct answer
+
+Return the response in JSON format as an array of objects with the following schema:
+[
+  {
+    "question": "string",
+    "options": ["string", "string", "string", "string"],
+    "correctAnswer": number,
+    "explanation": "string"
+  }
+]
+
+Ensure the questions are challenging but appropriate for the ${level} level.`;
+
+    try {
+      const response = await genAI.models.generateContent({
+        model,
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+      res.json({ questions: JSON.parse(response.text || "[]") });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to generate questions" });
+    }
+  });
+
   const io = new Server(httpServer, {
     cors: {
       origin: "*",

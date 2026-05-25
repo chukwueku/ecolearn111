@@ -469,6 +469,20 @@ Market equilibrium is a situation in which the quantities of the product which b
 \`\`\`
 Equilibrium is reached at $10 where demand and supply both equal 20kg.
 
+#### Market Equilibrium Simulator
+\`\`\`simulator
+{
+  "mode": "equilibrium",
+  "title": "Interactive Market Equilibrium Simulator",
+  "initialValues": {
+    "a": 50,
+    "b": 2,
+    "c": 10,
+    "d": 2
+  }
+}
+\`\`\`
+
 ## Concept of Revenue
 Revenue refers to all the money income accruing to a firm from the sale of goods and services, assets or investments.
 
