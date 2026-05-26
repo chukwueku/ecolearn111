@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question } from '../firebase';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
@@ -30,6 +30,8 @@ export const LiveChallenge: React.FC = () => {
   const [rematchOffered, setRematchOffered] = useState<any>(null);
   const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [showAnswerFeedback, setShowAnswerFeedback] = useState<'correct' | 'incorrect' | null>(null);
+  const [mobileTab, setMobileTab] = useState<'board' | 'analysis'>('board');
   const [gameMode, setGameMode] = useState<'bullet' | 'blitz' | 'rapid'>('blitz');
   const timerRef = useRef<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,11 @@ export const LiveChallenge: React.FC = () => {
   const [matchFoundState, setMatchFoundState] = useState(false);
   const searchTimerRef = useRef<any>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+
+  useEffect(() => {
+    getLeaderboard(5).then(setLeaderboard);
+  }, []);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -112,9 +119,11 @@ export const LiveChallenge: React.FC = () => {
     if (!user) return;
     
     const matchesRef = collection(db, 'arena_matches');
-    const unsubMatches = onSnapshot(matchesRef, (snap) => {
+    const qMatches = query(matchesRef, where('playerUids', 'array-contains', user.uid));
+
+    const unsubMatches = onSnapshot(qMatches, (snap) => {
       const allMatches = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
-      const myMatch = allMatches.find(m => m.players?.some((p: any) => p.id === user.uid) && m.status !== 'finished');
+      const myMatch = allMatches.find(m => m.status !== 'finished');
 
       if (myMatch) {
          if (!matchData || matchData.matchId !== myMatch.matchId) {
@@ -141,30 +150,26 @@ export const LiveChallenge: React.FC = () => {
                   setRematchRequested(false);
                   setRematchOffered(null);
                   const mode = myMatch.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
-                  startTimer(MODE_CONFIGS[mode].time);
              }, 2000);
          } else {
-             // Match updated (progress sync)
-             setPlayers(myMatch.players);
-             setMatchData(myMatch);
-             
-             const me = myMatch.players.find((p: any) => p.id === user.uid);
-             const isMyTurn = myMatch.currentTurnUid === user.uid;
+      const isMyTurn = myMatch.currentTurnUid === user.uid;
 
-             // Turn changed logic
-             if (isMyTurn && waitingForOpponent) {
-                // It just became my turn!
-                setWaitingForOpponent(false);
-                setCurrentQuestion(me.currentQuestion);
-                const mode = myMatch.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
-                setTimeLeft(MODE_CONFIGS[mode].time);
-                startTimer(MODE_CONFIGS[mode].time);
-             } else if (!isMyTurn && !waitingForOpponent) {
-                // I just moved, now waiting
-                setWaitingForOpponent(true);
-             }
+              setPlayers(myMatch.players);
+              setMatchData(myMatch);
 
-             if (myMatch.rematchOffered && myMatch.rematchOffered.challengerId !== user.uid) {
+              const me = myMatch.players.find((p: any) => p.id === user.uid);
+
+              // Turn changed logic
+              if (isMyTurn && waitingForOpponent) {
+                 // It just became my turn!
+                 setWaitingForOpponent(false);
+                 setCurrentQuestion(me.currentQuestion);
+              } else if (!isMyTurn && !waitingForOpponent) {
+                 // I just moved, now waiting
+                 setWaitingForOpponent(true);
+              }
+
+              if (myMatch.rematchOffered && myMatch.rematchOffered.challengerId !== user.uid) {
                 setRematchOffered(myMatch.rematchOffered);
              } else if (!myMatch.rematchOffered) {
                 setRematchOffered(null);
@@ -181,20 +186,28 @@ export const LiveChallenge: React.FC = () => {
               const me = myFinishedMatch.players.find((p: any) => p.id === user.uid);
               const opponent = myFinishedMatch.players.find((p: any) => p.id !== user.uid);
               
-              if (me && opponent && me.score > opponent.score && !me.pointsAwarded) {
-                  updatePoints(user.uid, 50); // Win bonus
-                  saveDuelResult({
-                    winnerUid: user.uid,
-                    winnerName: profile!.displayName,
-                    loserUid: opponent.id,
-                    loserName: opponent.displayName,
-                    topicId: selectedTopicId || 'General',
-                    pointsAwarded: 50
-                  });
-              } else if (me && opponent && me.score === opponent.score && !me.pointsAwarded) {
-                updatePoints(user.uid, 20); // Draw
-              } else {
-                updatePoints(user.uid, 10); // Participation
+              if (me && opponent && !me.pointsAwarded) {
+                  const matchRef = doc(db, 'arena_matches', myFinishedMatch.id);
+                  const updatedPlayers = myFinishedMatch.players.map((p: any) => 
+                    p.id === user.uid ? { ...p, pointsAwarded: true } : p
+                  );
+                  updateDoc(matchRef, { players: updatedPlayers });
+
+                  if (me.score > opponent.score) {
+                    updatePoints(user.uid, 50); // Win bonus
+                    saveDuelResult({
+                      winnerUid: user.uid,
+                      winnerName: profile!.displayName,
+                      loserUid: opponent.id,
+                      loserName: opponent.displayName,
+                      topicId: selectedTopicId || 'General',
+                      pointsAwarded: 50
+                    });
+                  } else if (me.score === opponent.score) {
+                    updatePoints(user.uid, 20); // Draw
+                  } else {
+                    updatePoints(user.uid, 10); // Participation
+                  }
               }
           }
       }
@@ -221,19 +234,44 @@ export const LiveChallenge: React.FC = () => {
     };
   }, [user]);
 
-  const startTimer = (limit: number = 15) => {
-    setTimeLeft(limit);
-    clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft(prev => prev <= 1 ? 0 : prev - 1);
-    }, 1000);
-  };
+  const pendingSubmitRef = useRef(false);
 
   useEffect(() => {
-     if (timeLeft === 0 && !waitingForOpponent && matchData && !finished) {
-         handleAnswer(false);
-     }
-  }, [timeLeft, waitingForOpponent, matchData, finished]);
+    if (!matchData || finished) return;
+    
+    // Reset our pending submit flag every time match status/turn changes
+    pendingSubmitRef.current = false;
+    
+    const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
+    const totalTime = MODE_CONFIGS[mode].time;
+    
+    setTimeLeft(totalTime);
+
+    const timerInterval = setInterval(() => {
+        setTimeLeft((prev) => {
+            const remaining = Math.max(0, prev - 1);
+            
+            if (remaining === 0 && !pendingSubmitRef.current) {
+                pendingSubmitRef.current = true;
+                const isMyTurn = matchData.currentTurnUid === user?.uid;
+                
+                if (isMyTurn && !waitingForOpponent) {
+                    handleAnswer(false);
+                } else if (!isMyTurn) {
+                    // force advance
+                    const currentTurnPlayer = matchData.players.find((p: any) => p.id === matchData.currentTurnUid);
+                    if (currentTurnPlayer) {
+                        submitMatchAnswer(matchData.matchId, currentTurnPlayer.id, false, currentTurnPlayer.currentQuestion);
+                    }
+                }
+            }
+            
+            return remaining;
+        });
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, [matchData?.matchId, matchData?.currentTurnUid, matchData?.lastTurnChangeAt, finished, waitingForOpponent, user]);
 
   const handleChallenge = async (targetUser: any) => {
     if (!user || !profile) return;
@@ -268,10 +306,16 @@ export const LiveChallenge: React.FC = () => {
   };
 
   const handleAnswer = (correct: boolean) => {
-    if (!matchData?.matchId || !user || waitingForOpponent) return;
-    submitMatchAnswer(matchData.matchId, user.uid, correct, currentQuestion);
-    setWaitingForOpponent(true);
-    clearInterval(timerRef.current);
+    if (!matchData?.matchId || !user || waitingForOpponent || showAnswerFeedback) return;
+    
+    setShowAnswerFeedback(correct ? 'correct' : 'incorrect');
+    
+    // Minimal delay to see feedback
+    setTimeout(() => {
+      submitMatchAnswer(matchData.matchId, user.uid, correct, currentQuestion);
+      setWaitingForOpponent(true);
+      setShowAnswerFeedback(null);
+    }, 1200);
   };
 
   const sendMessage = (e: React.FormEvent) => {
@@ -357,7 +401,7 @@ export const LiveChallenge: React.FC = () => {
     const draw = me.score === opponent.score;
 
     return (
-      <div className="min-h-screen flex items-center justify-center px-6 bg-paper transition-colors duration-300 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center px-6 bg-paper transition-colors duration-300 relative overflow-y-auto py-12">
         {/* Victory/Defeat Background Glow */}
         <div className={cn(
           "absolute inset-0 pointer-events-none blur-[120px] opacity-20 transition-all duration-1000",
@@ -459,37 +503,40 @@ export const LiveChallenge: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen bg-[#161512] text-[#f1f1f1] flex flex-col md:flex-row font-sans">
+      <div className="min-h-screen bg-[#161512] pb-24 md:pb-0 text-[#f1f1f1] flex flex-col md:flex-row font-sans md:overflow-auto">
         {/* Main Game Area */}
-        <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8 space-y-4">
-          <div className="w-full max-w-[700px] flex flex-col space-y-4">
+        <div className={cn(
+          "flex-1 flex flex-col items-center justify-center p-4 md:p-8 space-y-4 transition-all duration-300 overflow-y-auto md:overflow-visible",
+          mobileTab !== 'board' && "hidden md:flex"
+        )}>
+          <div className="w-full max-w-[700px] flex flex-col space-y-3 md:space-y-4">
             
             {/* Opponent Panel */}
             <div className={cn(
-              "flex items-center justify-between bg-[#262421] rounded-lg p-3 shadow-lg border transition-all",
+              "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border transition-all",
               matchData.currentTurnUid !== user?.uid ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-white/5"
             )}>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center font-bold text-xl text-white border border-white/10">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border border-white/10 shrink-0">
                   {opponent?.displayName?.[0] || 'O'}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-lg font-bold">{opponent?.displayName || 'Opponent'}</p>
+                    <p className="text-sm md:text-lg font-bold truncate">{opponent?.displayName || 'Opponent'}</p>
                     {matchData.currentTurnUid !== user?.uid && (
-                      <span className="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded font-black uppercase animate-pulse">Thinking</span>
+                      <span className="text-[8px] md:text-[10px] bg-emerald-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-white/40 flex items-center gap-1">
-                      <Swords size={12} />
+                    <span className="text-[10px] md:text-xs text-white/40 flex items-center gap-1">
+                      <Swords size={10} />
                       Score: {opponent?.score || 0}
                     </span>
                   </div>
                 </div>
               </div>
               <div className={cn(
-                "px-6 py-3 rounded-lg font-mono text-3xl font-bold border-2 transition-all",
+                "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
                 matchData.currentTurnUid !== user?.uid ? "bg-emerald-500/10 border-emerald-500 text-white" : "bg-white/5 border-white/10 text-white/40"
               )}>
                 {matchData.currentTurnUid !== user?.uid ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
@@ -497,50 +544,98 @@ export const LiveChallenge: React.FC = () => {
             </div>
 
             {/* Question Area (The "Board") */}
-            <div className="relative aspect-[4/3] w-full bg-[#262421] rounded-2xl border-4 border-[#3c3a37] shadow-2xl flex flex-col overflow-hidden">
+            <div className="relative aspect-square md:aspect-[4/3] w-full bg-[#262421] rounded-xl md:rounded-2xl border-2 md:border-4 border-[#3c3a37] shadow-2xl flex flex-col overflow-hidden">
                {/* Background grid pattern like chess board */}
                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                     style={{ backgroundImage: 'radial-gradient(circle, #f1f1f1 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                
-               <div className="flex-1 p-8 md:p-12 flex flex-col relative z-10">
-                  {waitingForOpponent ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-                      <div className="relative">
-                        <Loader2 className="animate-spin text-emerald-500" size={64} />
-                        <div className="absolute inset-0 blur-xl bg-emerald-500/20 animate-pulse" />
-                      </div>
-                      <h3 className="text-2xl font-bold text-white uppercase tracking-widest italic font-display">Opponent's Turn</h3>
-                      <p className="text-white/40 font-mono text-sm tracking-widest">WAITING FOR MOVE...</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="mb-8">
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-sky-400 mb-2 block">Your Turn • Question {currentQuestion + 1}</span>
-                        <h3 className="text-2xl md:text-3xl font-bold leading-tight">
-                          {q.question}
-                        </h3>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {q.options.map((option: string, i: number) => (
-                          <button
-                            key={i}
-                            onClick={() => handleAnswer(i === q.correctAnswer)}
-                            className="group relative h-20 bg-[#3c3a37] hover:bg-[#484643] rounded-xl border-l-[6px] border-[#312e2b] hover:border-sky-500 transition-all text-left px-6 flex items-center gap-4 overflow-hidden"
-                          >
-                             <div className="w-8 h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-white/20 group-hover:text-sky-500/50 transition-colors">
-                               {String.fromCharCode(65 + i)}
-                             </div>
-                             <span className="text-lg font-medium tracking-tight text-white group-hover:translate-x-1 transition-transform">{option}</span>
-                             <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
+               <div className="flex-1 p-6 md:p-12 flex flex-col relative z-10 overflow-y-auto scrollbar-hide">
+                  <AnimatePresence mode="wait">
+                    {showAnswerFeedback ? (
+                      <motion.div 
+                        key="feedback"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.2 }}
+                        className="h-full flex flex-col items-center justify-center text-center space-y-6"
+                      >
+                         <div className={cn(
+                           "w-24 h-24 rounded-full flex items-center justify-center border-4 animate-in zoom-in duration-300",
+                           showAnswerFeedback === 'correct' ? "bg-emerald-500/20 border-emerald-500 text-emerald-500" : "bg-rose-500/20 border-rose-500 text-rose-500"
+                         )}>
+                           {showAnswerFeedback === 'correct' ? <CheckCircle2 size={48} /> : <XCircle size={48} />}
+                         </div>
+                         <h3 className={cn(
+                           "text-4xl font-black uppercase tracking-tighter italic",
+                           showAnswerFeedback === 'correct' ? "text-emerald-500" : "text-rose-500"
+                         )}>
+                           {showAnswerFeedback === 'correct' ? "Brilliant!" : "Blunder!"}
+                         </h3>
+                         <p className="text-white/40 font-mono text-sm">SWITCHING TURNS...</p>
+                      </motion.div>
+                    ) : waitingForOpponent ? (
+                      <motion.div 
+                        key="waiting"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="h-full flex flex-col items-center justify-center text-center space-y-6"
+                      >
+                        <div className="relative">
+                          <Loader2 className="animate-spin text-emerald-500" size={48} />
+                          <div className="absolute inset-0 blur-xl bg-emerald-500/20 animate-pulse" />
+                        </div>
+                        <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-widest italic font-display">Opponent's Turn</h3>
+                        <p className="text-white/40 font-mono text-[10px] md:text-sm tracking-widest">AWAITING COUNTER-MOVE...</p>
+                        
+                        <div className="bg-black/20 p-4 rounded-xl border border-white/5 w-full max-w-xs">
+                           <div className="flex justify-between text-[10px] font-bold text-white/20 uppercase mb-2">
+                              <span>Position</span>
+                              <span>Q{currentQuestion + 1} / {matchData.questions.length}</span>
+                           </div>
+                           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${(currentQuestion / matchData.questions.length) * 100}%` }}
+                                className="h-full bg-emerald-500"
+                              />
+                           </div>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="question"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex-1 flex flex-col"
+                      >
+                        <div className="mb-6 md:mb-8">
+                          <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-sky-400 mb-2 block">Your Turn • Q{currentQuestion + 1}</span>
+                          <h3 className="text-xl md:text-3xl font-bold leading-tight">
+                            {q.question}
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-auto">
+                          {q.options.map((option: string, i: number) => (
+                            <button
+                              key={i}
+                              onClick={() => handleAnswer(i === q.correctAnswer)}
+                              className="group relative h-16 md:h-20 bg-[#3c3a37] hover:bg-[#484643] rounded-xl border-l-[4px] md:border-l-[6px] border-[#312e2b] hover:border-sky-500 transition-all text-left px-4 md:px-6 flex items-center gap-3 md:gap-4 overflow-hidden"
+                            >
+                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-sm md:text-lg text-white/20 group-hover:text-sky-500/50 transition-colors shrink-0">
+                                 {String.fromCharCode(65 + i)}
+                               </div>
+                               <span className="text-sm md:text-lg font-medium tracking-tight text-white group-hover:translate-x-1 transition-transform line-clamp-2">{option}</span>
+                               <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                </div>
 
                {/* Game Progress Bar */}
-               <div className="h-2 bg-black/40 flex">
+               <div className="h-1.5 md:h-2 bg-black/40 flex">
                   {matchData.questions.map((_: any, i: number) => {
                     const myProgress = me?.currentQuestion || 0;
                     const oppProgress = opponent?.currentQuestion || 0;
@@ -562,33 +657,33 @@ export const LiveChallenge: React.FC = () => {
 
             {/* My Panel */}
             <div className={cn(
-              "flex items-center justify-between bg-[#262421] rounded-lg p-3 shadow-lg border-2 transition-all",
+              "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border-2 transition-all",
               matchData.currentTurnUid === user?.uid ? "border-sky-500" : "border-white/5"
             )}>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 md:gap-4">
                 <div className={cn(
-                  "w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl text-white border",
+                  "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border shrink-0",
                   matchData.currentTurnUid === user?.uid ? "bg-sky-500 border-sky-400" : "bg-white/10 border-white/10"
                 )}>
                   {profile?.displayName?.[0] || 'U'}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-lg font-bold">You</p>
+                    <p className="text-sm md:text-lg font-bold truncate">You</p>
                     {matchData.currentTurnUid === user?.uid && (
-                      <span className="text-[10px] bg-sky-500 text-white px-1.5 py-0.5 rounded font-black uppercase">Your Turn</span>
+                      <span className="text-[8px] md:text-[10px] bg-sky-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-emerald-400 flex items-center gap-1">
-                      <Trophy size={12} />
+                    <span className="text-[10px] md:text-xs text-emerald-400 flex items-center gap-1">
+                      <Trophy size={10} />
                       Score: {me?.score || 0}
                     </span>
                   </div>
                 </div>
               </div>
               <div className={cn(
-                "px-6 py-3 rounded-lg font-mono text-3xl font-bold border-2 transition-all",
+                "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
                 matchData.currentTurnUid === user?.uid 
                   ? timeLeft <= 5 ? "bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse" : "bg-sky-500/10 border-sky-500 text-white" 
                   : "bg-white/5 border-white/10 text-white/40"
@@ -601,7 +696,10 @@ export const LiveChallenge: React.FC = () => {
         </div>
 
         {/* Sidebar (Analysis/Chat) */}
-        <div className="w-full md:w-[320px] bg-[#262421] border-l border-black/20 flex flex-col">
+        <div className={cn(
+          "flex-1 md:flex-none w-full md:w-[320px] bg-[#262421] border-l border-black/20 flex flex-col transition-all duration-300",
+          mobileTab !== 'analysis' && "hidden md:flex"
+        )}>
            {/* Header tabs */}
            <div className="flex border-b border-black/20 p-1">
               <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-[#f1f1f1] border-b-2 border-sky-500 transition-all">Move History</button>
@@ -611,33 +709,36 @@ export const LiveChallenge: React.FC = () => {
            {/* History List */}
            <div className="flex-1 overflow-y-auto p-4 space-y-2 font-mono scrollbar-hide">
               {matchData.questions.map((_: any, i: number) => {
-                const isPast = i < currentQuestion;
-                const isCurrent = i === currentQuestion;
-                const wasCorrect = me?.answers?.[i];
-                const opponentCorrect = opponent?.answers?.[i];
+                const myAnswer = me?.answers?.[i];
+                const opponentAnswer = opponent?.answers?.[i];
+                const myAsked = i <= (me?.currentQuestion || 0);
+                const oppAsked = i <= (opponent?.currentQuestion || 0);
+
+                const myRes = myAnswer !== undefined ? (myAnswer ? "WIN" : "LOSS") : "...";
+                const oppRes = opponentAnswer !== undefined ? (opponentAnswer ? "WIN" : "LOSS") : "...";
 
                 return (
                   <div key={i} className={cn(
                     "flex items-center gap-4 p-2 rounded transition-colors group",
-                    isCurrent ? "bg-white/5" : ""
+                    (i === me?.currentQuestion || i === opponent?.currentQuestion) ? "bg-white/5 border-l-2 border-sky-500/50" : ""
                   )}>
-                    <span className="text-white/20 text-xs w-6">{i + 1}.</span>
+                    <span className="text-white/20 text-[10px] w-6">{i + 1}.</span>
                     <div className="flex-1 grid grid-cols-2 gap-2">
                        <div className={cn(
-                         "h-6 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
-                         isPast 
-                          ? wasCorrect ? "bg-emerald-500/20 text-emerald-500" : "bg-rose-500/20 text-rose-500"
-                          : i === currentQuestion ? "bg-white/10 text-white/40" : "bg-black/20 text-white/5"
+                         "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
+                         myAnswer !== undefined
+                          ? myAnswer ? "bg-emerald-500/20 text-emerald-500 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]" : "bg-rose-500/20 text-rose-500"
+                          : "bg-black/40 text-white/5"
                        )}>
-                         {isPast ? (wasCorrect ? "WIN" : "LOSS") : "..."}
+                         {myRes}
                        </div>
                        <div className={cn(
-                         "h-6 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
-                         isPast 
-                          ? opponentCorrect ? "bg-emerald-500/10 text-emerald-500/40" : "bg-rose-500/10 text-rose-500/40"
-                          : "bg-black/20 text-white/5"
+                         "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all opacity-60",
+                         opponentAnswer !== undefined
+                          ? opponentAnswer ? "bg-emerald-500/10 text-emerald-500/60" : "bg-rose-500/10 text-rose-500/60"
+                          : "bg-black/40 text-white/5"
                        )}>
-                         {isPast ? (opponentCorrect ? "WIN" : "LOSS") : "..."}
+                         {oppRes}
                        </div>
                     </div>
                   </div>
@@ -646,7 +747,7 @@ export const LiveChallenge: React.FC = () => {
            </div>
 
            {/* Chat Section */}
-           <div className="h-[250px] border-t border-black/20 flex flex-col bg-black/10">
+           <div className="h-[250px] md:h-[250px] border-t border-black/20 flex flex-col bg-black/10">
               <div className="p-3 border-b border-black/10 flex items-center justify-between">
                 <span className="text-[9px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -679,6 +780,37 @@ export const LiveChallenge: React.FC = () => {
                  </div>
               </form>
            </div>
+        </div>
+
+        {/* Mobile Bottom Nav */}
+        <div className="md:hidden flex h-16 bg-[#161512] border-t border-white/5 pb-2 shrink-0">
+           <button 
+             onClick={() => setMobileTab('board')}
+             className={cn(
+               "flex-1 flex flex-col items-center justify-center gap-1 transition-all",
+               mobileTab === 'board' ? "text-sky-400" : "text-white/40"
+             )}
+           >
+             <Swords size={20} className={cn("transition-transform", mobileTab === 'board' && "scale-110")} />
+             <span className="text-[10px] font-black uppercase tracking-tighter">Arena</span>
+             {mobileTab === 'board' && <div className="w-1 h-1 bg-sky-400 rounded-full mt-1" />}
+           </button>
+           <button 
+             onClick={() => setMobileTab('analysis')}
+             className={cn(
+               "flex-1 flex flex-col items-center justify-center gap-1 transition-all",
+               mobileTab === 'analysis' ? "text-sky-400" : "text-white/40"
+             )}
+           >
+             <div className="relative">
+                <MessageSquare size={20} className={cn("transition-transform", mobileTab === 'analysis' && "scale-110")} />
+                {messages.length > 0 && mobileTab !== 'analysis' && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full border border-[#161512]" />
+                )}
+             </div>
+             <span className="text-[10px] font-black uppercase tracking-tighter">Logs</span>
+             {mobileTab === 'analysis' && <div className="w-1 h-1 bg-sky-400 rounded-full mt-1" />}
+           </button>
         </div>
       </div>
     );
@@ -926,8 +1058,9 @@ export const LiveChallenge: React.FC = () => {
         </div>
 
         {/* Lobby Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {lobbyUsers.filter(u => u.uid !== user?.uid).map((u, i) => (
+        <div className="grid lg:grid-cols-4 gap-8">
+          <div className="lg:col-span-3 grid md:grid-cols-2 gap-8">
+            {lobbyUsers.filter(u => u.uid !== user?.uid).map((u, i) => (
             <motion.div
               key={u.uid}
               initial={{ opacity: 0, y: 20 }}
@@ -972,15 +1105,57 @@ export const LiveChallenge: React.FC = () => {
             </motion.div>
           ))}
           
-          {lobbyUsers.length <= 1 && (
-            <div className="col-span-full py-24 text-center rounded-[4rem] border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30">
-              <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                <Users className="text-slate-200 dark:text-slate-700" size={40} />
+            {lobbyUsers.length <= 1 && (
+              <div className="col-span-full py-24 text-center rounded-[4rem] border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30">
+                <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <Users className="text-slate-200 dark:text-slate-700" size={40} />
+                </div>
+                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
+                <p className="text-slate-500 font-medium">Be the first to enter the matchmaking queue.</p>
               </div>
-              <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
-              <p className="text-slate-500 font-medium">Be the first to enter the matchmaking queue.</p>
+            )}
+          </div>
+
+          {/* Sidebar: Leaderboard & Stats */}
+          <div className="space-y-8">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2">
+                <Trophy size={14} className="text-amber-500" />
+                Top Gladiators
+              </h3>
+              <div className="space-y-4">
+                {leaderboard.map((u, i) => (
+                  <div key={i} className="flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <span className="w-5 text-[8px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors uppercase">#{i+1}</span>
+                      <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center font-bold text-slate-900 dark:text-white group-hover:bg-sky-500 group-hover:text-white transition-all">
+                        {u.displayName?.[0]}
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate flex-1 group-hover:text-slate-900 transition-colors">{u.displayName || 'Unknown'}</span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400">{u.points || 0}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
+
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-8 rounded-[3rem] text-white shadow-xl relative overflow-hidden group">
+               <Zap className="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform" />
+               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 relative z-10 text-indigo-100">Live Status</h3>
+               <p className="text-2xl font-bold tracking-tight mb-8 relative z-10">Arena Heat Map</p>
+               <div className="space-y-4 relative z-10">
+                  <div className="flex items-center justify-between text-[10px] uppercase font-bold text-indigo-200">
+                    <span>Active Duels</span>
+                    <span>{Math.floor(lobbyUsers.length / 2)}</span>
+                  </div>
+                  <div className="w-full h-1 bg-indigo-400/30 rounded-full" />
+                  <div className="flex items-center justify-between text-[10px] uppercase font-bold text-indigo-200">
+                    <span>Searching</span>
+                    <span>{lobbyUsers.filter(u => u.status === 'searching').length}</span>
+                  </div>
+               </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

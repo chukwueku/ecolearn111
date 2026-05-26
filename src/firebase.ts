@@ -351,6 +351,7 @@ export const enterMatchmaking = async (user: { uid: string, displayName: string 
               topicId,
               questions: finalQuestions,
               gameMode,
+              playerUids: [user.uid, oppData.uid],
               players: [
                 { id: user.uid, displayName: user.displayName, score: 0, currentQuestion: 0, connected: true, answers: {} },
                 { id: oppData.uid, displayName: oppData.displayName, score: 0, currentQuestion: 0, connected: true, answers: {} }
@@ -414,7 +415,10 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
       const players = data.players || [];
       const pIndex = players.findIndex((p: any) => p.id === uid);
       if (pIndex !== -1) {
-        if (correct) players[pIndex].score += 10;
+         // Only process if they are answering their expected current question
+        if (players[pIndex].currentQuestion !== questionIndex) return;
+
+        if (correct) players[pIndex].score += 100;
         
         // Track answers for history
         if (!players[pIndex].answers) players[pIndex].answers = {};
@@ -423,12 +427,17 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
         players[pIndex].currentQuestion = questionIndex + 1;
         
         const nextPlayer = players.find((p: any) => p.id !== uid);
-        const nextTurnUid = nextPlayer ? nextPlayer.id : uid;
+        let nextTurnUid = nextPlayer ? nextPlayer.id : uid;
 
         // check win
         let status = data.status;
-        if (players.every((p: any) => p.currentQuestion >= (data.questions?.length || 0))) {
+        const totalQuestions = data.questions?.length || 0;
+        
+        if (players.every((p: any) => p.currentQuestion >= totalQuestions)) {
           status = 'finished';
+        } else if (nextPlayer && nextPlayer.currentQuestion >= totalQuestions) {
+          // If the opponent is done, turn returns to us until we're done
+          nextTurnUid = uid;
         }
         
         transaction.update(matchRef, { 
@@ -525,6 +534,7 @@ export const respondDirectChallenge = async (challengeId: string, status: 'accep
             topicId: data.topicId,
             questions: finalQuestions,
             gameMode: data.gameMode || 'blitz',
+            playerUids: [data.challengerId, data.targetId],
             players: [
               { id: data.challengerId, displayName: data.challengerName, score: 0, currentQuestion: 0, connected: true, answers: {} },
               { id: data.targetId, displayName: data.targetName, score: 0, currentQuestion: 0, connected: true, answers: {} }
