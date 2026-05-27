@@ -33,6 +33,15 @@ export const LiveChallenge: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showAnswerFeedback, setShowAnswerFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [mobileTab, setMobileTab] = useState<'board' | 'analysis'>('board');
+  const [toastOptions, setToastOptions] = useState<{message: string, type: 'error' | 'success'} | null>(null);
+  const [challengedUserIds, setChallengedUserIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (toastOptions) {
+      const timer = setTimeout(() => setToastOptions(null), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastOptions]);
   const [gameMode, setGameMode] = useState<'bullet' | 'blitz' | 'rapid'>('blitz');
   const [lobbySearchQuery, setLobbySearchQuery] = useState('');
   const timerRef = useRef<any>(null);
@@ -112,14 +121,20 @@ export const LiveChallenge: React.FC = () => {
   // Listen to incoming direct challenges
   useEffect(() => {
     if (!user) return;
-    const q = query(collection(db, 'direct_challenges'), where('targetId', '==', user.uid), where('status', '==', 'pending'));
+    const q = query(collection(db, 'direct_challenges'), where('targetId', '==', user.uid));
     const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
-        const challenge = snap.docs[0];
-        setIncomingChallenge({ id: challenge.id, ...challenge.data() });
+        const pendingChallenge = snap.docs.find(d => d.data().status === 'pending');
+        if (pendingChallenge) {
+          setIncomingChallenge({ id: pendingChallenge.id, ...pendingChallenge.data() });
+        } else {
+          setIncomingChallenge(null);
+        }
       } else {
         setIncomingChallenge(null);
       }
+    }, (err) => {
+      console.error("Direct challenges error:", err);
     });
     return () => unsub();
   }, [user]);
@@ -284,11 +299,25 @@ export const LiveChallenge: React.FC = () => {
   const handleChallenge = async (targetUser: any) => {
     if (!user || !profile) return;
     if (!selectedTopicId) {
-      alert("Please select a topic first!");
+      setToastOptions({ message: "Please select a topic first!", type: 'error' });
       return;
     }
-    await sendDirectChallenge(user.uid, profile.displayName, targetUser.uid, targetUser.displayName || 'User', selectedTopicId, gameMode);
-    alert(`Challenge sent to ${targetUser.displayName} (${MODE_CONFIGS[gameMode].label})! Waiting for response...`);
+    
+    // Optimistically update UI
+    setChallengedUserIds(prev => new Set(prev).add(targetUser.uid));
+    expectingMatchRef.current = true;
+    
+    const id = await sendDirectChallenge(user.uid, profile.displayName, targetUser.uid, targetUser.displayName || 'User', selectedTopicId, gameMode);
+    if (!id) {
+       setToastOptions({ message: "Failed to send challenge.", type: 'error' });
+       setChallengedUserIds(prev => {
+          const next = new Set(prev);
+          next.delete(targetUser.uid);
+          return next;
+       });
+    } else {
+       setToastOptions({ message: `Challenge sent to ${targetUser.displayName}! Waiting for response...`, type: 'success' });
+    }
   };
 
   const handleAcceptChallenge = async () => {
@@ -319,10 +348,16 @@ export const LiveChallenge: React.FC = () => {
     setShowAnswerFeedback(correct ? 'correct' : 'incorrect');
     
     // Minimal delay to see feedback
-    setTimeout(() => {
-      submitMatchAnswer(currentMatchIdRef.current!, user.uid, correct, currentQuestion);
-      setWaitingForOpponent(true);
-      setShowAnswerFeedback(null);
+    setTimeout(async () => {
+      try {
+        await submitMatchAnswer(currentMatchIdRef.current!, user.uid, correct, currentQuestion);
+        setWaitingForOpponent(true);
+      } catch (error) {
+        console.error(error);
+        setToastOptions({ message: "Network error submitting answer", type: 'error' });
+      } finally {
+        setShowAnswerFeedback(null);
+      }
     }, 1200);
   };
 
@@ -557,6 +592,12 @@ export const LiveChallenge: React.FC = () => {
 
     return (
       <div className="min-h-screen bg-[#161512] pb-24 md:pb-0 text-[#f1f1f1] flex flex-col md:flex-row font-sans md:overflow-auto">
+        {toastOptions && (
+          <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-[11px] uppercase tracking-widest shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300" 
+               style={{ backgroundColor: toastOptions.type === 'error' ? '#ef4444' : '#10b981', color: '#fff' }}>
+            {toastOptions.message}
+          </div>
+        )}
         {firestoreError && (
           <div className="fixed top-0 left-0 right-0 z-[100] bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest py-1 text-center animate-pulse">
             Firestore Connection error - App may be out of sync
@@ -589,7 +630,7 @@ export const LiveChallenge: React.FC = () => {
             {/* Opponent Panel */}
             <div className={cn(
               "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border transition-all",
-              matchData.currentTurnUid !== user?.uid ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-white/5"
+              (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-white/5"
             )}>
               <div className="flex items-center gap-3 md:gap-4">
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border border-white/10 shrink-0">
@@ -598,7 +639,7 @@ export const LiveChallenge: React.FC = () => {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm md:text-lg font-bold truncate">{opponent?.displayName || 'Opponent'}</p>
-                    {matchData.currentTurnUid !== user?.uid && (
+                    {(matchData.currentTurnUid !== user?.uid || waitingForOpponent) && (
                       <span className="text-[8px] md:text-[10px] bg-emerald-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
                     )}
                   </div>
@@ -612,9 +653,9 @@ export const LiveChallenge: React.FC = () => {
               </div>
               <div className={cn(
                 "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
-                matchData.currentTurnUid !== user?.uid ? "bg-emerald-500/10 border-emerald-500 text-white" : "bg-white/5 border-white/10 text-white/40"
+                (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "bg-emerald-500/10 border-emerald-500 text-white" : "bg-white/5 border-white/10 text-white/40"
               )}>
-                {matchData.currentTurnUid !== user?.uid ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
+                {(matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
               </div>
             </div>
 
@@ -722,8 +763,8 @@ export const LiveChallenge: React.FC = () => {
                           i < Math.min(myProgress, oppProgress) ? "bg-emerald-500" : "bg-transparent"
                         )}
                       >
-                         <div className={cn("flex-1 h-full", i === myProgress && matchData.currentTurnUid === user?.uid ? "bg-sky-500 animate-pulse" : "")} />
-                         <div className={cn("flex-1 h-full", i === oppProgress && matchData.currentTurnUid !== user?.uid ? "bg-emerald-500/50 animate-pulse" : "")} />
+                         <div className={cn("flex-1 h-full", i === myProgress && matchData.currentTurnUid === user?.uid && !waitingForOpponent ? "bg-sky-500 animate-pulse" : "")} />
+                         <div className={cn("flex-1 h-full", i === oppProgress && (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "bg-emerald-500/50 animate-pulse" : "")} />
                       </div>
                     );
                   })}
@@ -733,19 +774,19 @@ export const LiveChallenge: React.FC = () => {
             {/* My Panel */}
             <div className={cn(
               "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border-2 transition-all",
-              matchData.currentTurnUid === user?.uid ? "border-sky-500" : "border-white/5"
+              (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "border-sky-500" : "border-white/5"
             )}>
               <div className="flex items-center gap-3 md:gap-4">
                 <div className={cn(
                   "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border shrink-0",
-                  matchData.currentTurnUid === user?.uid ? "bg-sky-500 border-sky-400" : "bg-white/10 border-white/10"
+                  (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "bg-sky-500 border-sky-400" : "bg-white/10 border-white/10"
                 )}>
                   {profile?.displayName?.[0] || 'U'}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm md:text-lg font-bold truncate">You</p>
-                    {matchData.currentTurnUid === user?.uid && (
+                    {matchData.currentTurnUid === user?.uid && !waitingForOpponent && (
                       <span className="text-[8px] md:text-[10px] bg-sky-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
                     )}
                   </div>
@@ -765,11 +806,11 @@ export const LiveChallenge: React.FC = () => {
               </div>
               <div className={cn(
                 "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
-                matchData.currentTurnUid === user?.uid 
+                matchData.currentTurnUid === user?.uid && !waitingForOpponent
                   ? timeLeft <= 5 ? "bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse" : "bg-sky-500/10 border-sky-500 text-white" 
                   : "bg-white/5 border-white/10 text-white/40"
               )}>
-                {matchData.currentTurnUid === user?.uid ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
+                {matchData.currentTurnUid === user?.uid && !waitingForOpponent ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
               </div>
             </div>
             
@@ -1246,10 +1287,12 @@ export const LiveChallenge: React.FC = () => {
               </div>
               <button
                 onClick={() => handleChallenge(u)}
-                disabled={u.status !== 'idle'}
-                className={cn("w-full btn-premium justify-center", u.status !== 'idle' && "opacity-50")}
+                disabled={u.status !== 'idle' || challengedUserIds.has(u.uid)}
+                className={cn("w-full btn-premium justify-center", (u.status !== 'idle' || challengedUserIds.has(u.uid)) && "opacity-50")}
               >
-                {u.status === 'idle' ? 'Challenge' : u.status === 'searching' ? 'Wait in Queue' : 'In Duel'}
+                {challengedUserIds.has(u.uid) ? 'Pending...' : 
+                 u.status === 'idle' ? 'Challenge' : 
+                 u.status === 'searching' ? 'Wait in Queue' : 'In Duel'}
               </button>
             </motion.div>
           ))}
