@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight } from 'lucide-react';
+import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -18,6 +18,7 @@ export const LiveChallenge: React.FC = () => {
   const [allUsersData, setAllUsersData] = useState<any[]>([]);
   const [incomingChallenge, setIncomingChallenge] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
+  const currentMatchIdRef = useRef<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [finished, setFinished] = useState(false);
   const [players, setPlayers] = useState<any[]>([]);
@@ -33,6 +34,7 @@ export const LiveChallenge: React.FC = () => {
   const [showAnswerFeedback, setShowAnswerFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [mobileTab, setMobileTab] = useState<'board' | 'analysis'>('board');
   const [gameMode, setGameMode] = useState<'bullet' | 'blitz' | 'rapid'>('blitz');
+  const [lobbySearchQuery, setLobbySearchQuery] = useState('');
   const timerRef = useRef<any>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,11 @@ export const LiveChallenge: React.FC = () => {
 
   const [searchTime, setSearchTime] = useState(0);
   const [matchFoundState, setMatchFoundState] = useState(false);
+  const [pendingMatch, setPendingMatch] = useState<any>(null);
+  const [duelStarted, setDuelStarted] = useState(false);
+  const [firestoreError, setFirestoreError] = useState(false);
+  const [activeMatchBanner, setActiveMatchBanner] = useState<any>(null);
+  const expectingMatchRef = useRef(false);
   const searchTimerRef = useRef<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
@@ -67,6 +74,8 @@ export const LiveChallenge: React.FC = () => {
     }
   }, [user]);
 
+  const [usersInQueue, setUsersInQueue] = useState<any[]>([]);
+
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'users'), (snap) => {
        setAllUsersData(snap.docs.map(d => d.data()));
@@ -78,8 +87,12 @@ export const LiveChallenge: React.FC = () => {
   useEffect(() => {
     const q = query(collection(db, 'arena_queue'));
     const unsubQueue = onSnapshot(q, (snap) => {
-      const usersInQueue = snap.docs.map(doc => ({ ...doc.data(), status: 'searching' }));
-      
+      setUsersInQueue(snap.docs.map(doc => ({ ...doc.data(), status: 'searching' })));
+    });
+    return () => unsubQueue();
+  }, []);
+
+  useEffect(() => {
       const fiveMinsAgo = Date.now() - 5 * 60 * 1000;
       const onlineUsers = allUsersData.filter(u => u.lastActive >= fiveMinsAgo || u.uid === user?.uid);
 
@@ -94,10 +107,7 @@ export const LiveChallenge: React.FC = () => {
       });
       
       setLobbyUsers(merged.length > 0 ? merged : onlineUsers.map((u: any) => ({ ...u, status: 'idle' })));
-    });
-
-    return () => unsubQueue();
-  }, [allUsersData, user]);
+  }, [allUsersData, usersInQueue, user?.uid]);
 
   // Listen to incoming direct challenges
   useEffect(() => {
@@ -121,66 +131,58 @@ export const LiveChallenge: React.FC = () => {
     const matchesRef = collection(db, 'arena_matches');
     const qMatches = query(matchesRef, where('playerUids', 'array-contains', user.uid));
 
-    const unsubMatches = onSnapshot(qMatches, (snap) => {
+        const unsubMatches = onSnapshot(qMatches, (snap) => {
+      setFirestoreError(false);
       const allMatches = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
       const myMatch = allMatches.find(m => m.status !== 'finished');
 
       if (myMatch) {
-         if (!matchData || matchData.matchId !== myMatch.matchId) {
-             // New match found!
-             clearInterval(searchTimerRef.current);
-             setSearchTime(0);
-             setIsSearching(false);
-             setMatchFoundState(true);
+         const isMyTurn = myMatch.currentTurnUid === user.uid;
+         const me = myMatch.players.find((p: any) => p.id === user.uid);
+         
+         if (currentMatchIdRef.current !== myMatch.matchId) {
              const opponent = myMatch.players.find((p: any) => p.id !== user.uid);
+             if (isSearching || expectingMatchRef.current) {
+                 // New match found from queue or accepted challenge
+                 currentMatchIdRef.current = myMatch.matchId;
+                 clearInterval(searchTimerRef.current);
+                 setSearchTime(0);
+                 setIsSearching(false);
+                 setPlayers([me, opponent]);
+                 setPendingMatch(myMatch);
+                 setMatchFoundState(true);
+                 setDuelStarted(false);
+                 expectingMatchRef.current = false;
+             } else {
+                 // Component mounted and we found an old active match
+                 setActiveMatchBanner(myMatch);
+             }
+             setLoading(false);
+         } else if (duelStarted) {
+             setPlayers(myMatch.players);
+             setMatchData(myMatch);
              
-             setPlayers([
-               myMatch.players.find((p: any) => p.id === user.uid),
-               opponent
-             ]);
-             
-             setTimeout(() => {
-                  setMatchData(myMatch);
-                  setMatchFoundState(false);
-                  setLoading(false);
-                  setFinished(false);
-                  const me = myMatch.players.find((p: any) => p.id === user.uid);
-                  setCurrentQuestion(me.currentQuestion || 0);
-                  setWaitingForOpponent(myMatch.currentTurnUid !== user.uid);
-                  setRematchRequested(false);
-                  setRematchOffered(null);
-                  const mode = myMatch.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
-             }, 2000);
-         } else {
-      const isMyTurn = myMatch.currentTurnUid === user.uid;
+             // Directly sync question and turn state from DB
+             if (me) {
+               setCurrentQuestion(me.currentQuestion);
+             }
+             setWaitingForOpponent(!isMyTurn);
 
-              setPlayers(myMatch.players);
-              setMatchData(myMatch);
-
-              const me = myMatch.players.find((p: any) => p.id === user.uid);
-
-              // Turn changed logic
-              if (isMyTurn && waitingForOpponent) {
-                 // It just became my turn!
-                 setWaitingForOpponent(false);
-                 setCurrentQuestion(me.currentQuestion);
-              } else if (!isMyTurn && !waitingForOpponent) {
-                 // I just moved, now waiting
-                 setWaitingForOpponent(true);
-              }
-
-              if (myMatch.rematchOffered && myMatch.rematchOffered.challengerId !== user.uid) {
+             if (myMatch.rematchOffered && myMatch.rematchOffered.challengerId !== user.uid) {
                 setRematchOffered(myMatch.rematchOffered);
              } else if (!myMatch.rematchOffered) {
                 setRematchOffered(null);
              }
          }
       } else {
+          if (activeMatchBanner) setActiveMatchBanner(null);
           // Check if myMatch just finished
-          const myFinishedMatch = allMatches.find(m => m.players?.some((p: any) => p.id === user.uid) && m.status === 'finished' && m.matchId === matchData?.matchId);
+          const myFinishedMatch = allMatches.find(m => m.players?.some((p: any) => p.id === user.uid) && m.status === 'finished' && m.matchId === currentMatchIdRef.current);
           if (myFinishedMatch) {
+              setMatchData(myFinishedMatch);
               setPlayers(myFinishedMatch.players);
               setFinished(true);
+              setDuelStarted(false);
               clearInterval(timerRef.current);
               
               const me = myFinishedMatch.players.find((p: any) => p.id === user.uid);
@@ -211,10 +213,27 @@ export const LiveChallenge: React.FC = () => {
               }
           }
       }
+    }, (err) => {
+      console.error("Matches snapshot error:", err);
+      setFirestoreError(true);
     });
 
     return () => unsubMatches();
-  }, [user, matchData]);
+  }, [user, profile, selectedTopicId]);
+
+  const enterDuel = () => {
+    if (!pendingMatch) return;
+    setMatchData(pendingMatch);
+    setDuelStarted(true);
+    setMatchFoundState(false);
+    setPendingMatch(null);
+    setFinished(false);
+    const me = pendingMatch.players.find((p: any) => p.id === user?.uid);
+    setCurrentQuestion(me.currentQuestion || 0);
+    setWaitingForOpponent(pendingMatch.currentTurnUid !== user?.uid);
+    setRematchRequested(false);
+    setRematchOffered(null);
+  };
 
   // Listen to messages
   useEffect(() => {
@@ -239,39 +258,28 @@ export const LiveChallenge: React.FC = () => {
   useEffect(() => {
     if (!matchData || finished) return;
     
-    // Reset our pending submit flag every time match status/turn changes
-    pendingSubmitRef.current = false;
-    
+    const isMyTurn = matchData.currentTurnUid === user?.uid;
     const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
     const totalTime = MODE_CONFIGS[mode].time;
-    
+
+    // Reset local timer whenever turn changes or component updates with new match data
     setTimeLeft(totalTime);
 
     const timerInterval = setInterval(() => {
         setTimeLeft((prev) => {
-            const remaining = Math.max(0, prev - 1);
+            const next = Math.max(0, prev - 1);
             
-            if (remaining === 0 && !pendingSubmitRef.current) {
-                pendingSubmitRef.current = true;
-                const isMyTurn = matchData.currentTurnUid === user?.uid;
-                
-                if (isMyTurn && !waitingForOpponent) {
-                    handleAnswer(false);
-                } else if (!isMyTurn) {
-                    // force advance
-                    const currentTurnPlayer = matchData.players.find((p: any) => p.id === matchData.currentTurnUid);
-                    if (currentTurnPlayer) {
-                        submitMatchAnswer(matchData.matchId, currentTurnPlayer.id, false, currentTurnPlayer.currentQuestion);
-                    }
-                }
+            // Only the player whose turn it is should handle the timeout
+            if (next === 0 && isMyTurn && !waitingForOpponent && !showAnswerFeedback) {
+                handleAnswer(false);
             }
             
-            return remaining;
+            return next;
         });
     }, 1000);
 
     return () => clearInterval(timerInterval);
-  }, [matchData?.matchId, matchData?.currentTurnUid, matchData?.lastTurnChangeAt, finished, waitingForOpponent, user]);
+  }, [matchData?.matchId, matchData?.currentTurnUid, finished, waitingForOpponent, showAnswerFeedback, user]);
 
   const handleChallenge = async (targetUser: any) => {
     if (!user || !profile) return;
@@ -279,13 +287,14 @@ export const LiveChallenge: React.FC = () => {
       alert("Please select a topic first!");
       return;
     }
-    await sendDirectChallenge(user.uid, profile.displayName, targetUser.uid, targetUser.displayName || 'User', selectedTopicId);
-    alert(`Challenge sent to ${targetUser.displayName}! Waiting for response...`);
+    await sendDirectChallenge(user.uid, profile.displayName, targetUser.uid, targetUser.displayName || 'User', selectedTopicId, gameMode);
+    alert(`Challenge sent to ${targetUser.displayName} (${MODE_CONFIGS[gameMode].label})! Waiting for response...`);
   };
 
   const handleAcceptChallenge = async () => {
     if (!incomingChallenge || !profile) return;
     setLoading(true);
+    expectingMatchRef.current = true;
     const topics = profile.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
     const topic = topics.find(t => t.id === incomingChallenge.topicId) || topics[0];
     
@@ -294,7 +303,6 @@ export const LiveChallenge: React.FC = () => {
       const finalQuestions: Question[] = questions.length > 0 ? questions : [
          { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
       ];
-      // Note: Direct challenges always use blitz for now or we can add a picker
       await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
     } catch(e) { console.error(e); }
     setLoading(false);
@@ -306,13 +314,13 @@ export const LiveChallenge: React.FC = () => {
   };
 
   const handleAnswer = (correct: boolean) => {
-    if (!matchData?.matchId || !user || waitingForOpponent || showAnswerFeedback) return;
+    if (!currentMatchIdRef.current || !user || waitingForOpponent || showAnswerFeedback) return;
     
     setShowAnswerFeedback(correct ? 'correct' : 'incorrect');
     
     // Minimal delay to see feedback
     setTimeout(() => {
-      submitMatchAnswer(matchData.matchId, user.uid, correct, currentQuestion);
+      submitMatchAnswer(currentMatchIdRef.current!, user.uid, correct, currentQuestion);
       setWaitingForOpponent(true);
       setShowAnswerFeedback(null);
     }, 1200);
@@ -332,9 +340,47 @@ export const LiveChallenge: React.FC = () => {
     requestMatchRematch(matchData.matchId, profile?.displayName || 'User', user.uid);
   };
 
+  const cancelMatchFound = async () => {
+    if (!pendingMatch || !user) return;
+    forfeitMatch(pendingMatch.matchId, user.uid);
+    setMatchFoundState(false);
+    setPendingMatch(null);
+    setDuelStarted(false);
+    currentMatchIdRef.current = null;
+  };
+
+  const resumeBannerMatch = () => {
+    if (!activeMatchBanner) return;
+    const myMatch = activeMatchBanner;
+    currentMatchIdRef.current = myMatch.matchId;
+    
+    const me = myMatch.players.find((p: any) => p.id === user?.uid);
+    const opponent = myMatch.players.find((p: any) => p.id !== user?.uid);
+    setPlayers([me, opponent]);
+    setMatchData(myMatch);
+    setDuelStarted(true);
+    if (me) setCurrentQuestion(me.currentQuestion);
+    setWaitingForOpponent(myMatch.currentTurnUid !== user?.uid);
+    setActiveMatchBanner(null);
+  };
+
+  const forfeitBannerMatch = () => {
+    if (!activeMatchBanner || !user) return;
+    forfeitMatch(activeMatchBanner.matchId, user.uid);
+    setActiveMatchBanner(null);
+  };
+
+  const handleQuit = async () => {
+    if (!currentMatchIdRef.current || !user) return;
+    if (confirm("Are you sure you want to resign this match?")) {
+      await forfeitMatch(currentMatchIdRef.current, user.uid);
+    }
+  };
+
   const acceptRematch = async () => {
     if (!matchData?.matchId || !profile) return;
     setLoading(true);
+    setDuelStarted(true);
     const topics = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
     const topic = topics.find(t => t.id === matchData.topicId) || topics[0];
     
@@ -438,6 +484,11 @@ export const LiveChallenge: React.FC = () => {
                 <p className="text-[10px] text-slate-700 dark:text-slate-500 font-bold uppercase tracking-[0.4em]">Arena Results</p>
                 <div className="w-8 h-[1px] bg-slate-400 dark:bg-slate-800" />
               </div>
+              {matchData?.forfeitedBy && (
+                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 animate-pulse">
+                   {matchData.forfeitedBy === user?.uid ? "Match Resigned" : "Opponent Forfeited"}
+                </p>
+              )}
           </div>
 
           <div className="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800 rounded-[3rem] overflow-hidden border border-slate-200 dark:border-slate-800 mb-16 shadow-inner">
@@ -482,6 +533,8 @@ export const LiveChallenge: React.FC = () => {
               onClick={() => {
                 setMatchData(null);
                 setFinished(false);
+                setDuelStarted(false);
+                currentMatchIdRef.current = null;
               }}
               className="w-full py-6 text-slate-700 dark:text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition-all text-[10px] uppercase tracking-[0.4em] group"
             >
@@ -504,13 +557,35 @@ export const LiveChallenge: React.FC = () => {
 
     return (
       <div className="min-h-screen bg-[#161512] pb-24 md:pb-0 text-[#f1f1f1] flex flex-col md:flex-row font-sans md:overflow-auto">
+        {firestoreError && (
+          <div className="fixed top-0 left-0 right-0 z-[100] bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest py-1 text-center animate-pulse">
+            Firestore Connection error - App may be out of sync
+          </div>
+        )}
         {/* Main Game Area */}
         <div className={cn(
           "flex-1 flex flex-col items-center justify-center p-4 md:p-8 space-y-4 transition-all duration-300 overflow-y-auto md:overflow-visible",
           mobileTab !== 'board' && "hidden md:flex"
         )}>
-          <div className="w-full max-w-[700px] flex flex-col space-y-3 md:space-y-4">
+          <div className="w-full max-w-[700px] flex flex-col space-y-3 md:space-y-4 relative">
             
+            {/* Top Bar: Mode Indicator + Quick Quits */}
+            <div className="flex items-center justify-between mb-2">
+               <div className="w-16"></div> {/* Spacer for alignment */}
+               <div className="bg-[#262421] border border-white/5 px-4 py-1.5 rounded-full flex items-center gap-3 shadow-xl">
+                  {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.icon}
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hidden md:inline">
+                     {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
+                  </span>
+                  <div className="w-1 h-1 rounded-full bg-sky-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/80">Q{currentQuestion + 1}/{matchData.questions.length}</span>
+               </div>
+               <button onClick={handleQuit} className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 hover:text-rose-400 font-black tracking-widest uppercase text-[9px] rounded-full transition-all border border-rose-500/20 group">
+                  <XCircle size={12} className="group-hover:rotate-90 transition-transform" />
+                  <span className="hidden md:inline">Resign</span>
+               </button>
+            </div>
+
             {/* Opponent Panel */}
             <div className={cn(
               "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border transition-all",
@@ -674,11 +749,17 @@ export const LiveChallenge: React.FC = () => {
                       <span className="text-[8px] md:text-[10px] bg-sky-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <span className="text-[10px] md:text-xs text-emerald-400 flex items-center gap-1">
                       <Trophy size={10} />
                       Score: {me?.score || 0}
                     </span>
+                    <button 
+                      onClick={handleQuit}
+                      className="text-[8px] md:text-[10px] text-rose-500/50 hover:text-rose-500 transition-colors uppercase font-black tracking-widest flex items-center gap-1 border border-rose-500/20 px-1.5 py-0.5 rounded"
+                    >
+                      Resign
+                    </button>
                   </div>
                 </div>
               </div>
@@ -704,6 +785,10 @@ export const LiveChallenge: React.FC = () => {
            <div className="flex border-b border-black/20 p-1">
               <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-[#f1f1f1] border-b-2 border-sky-500 transition-all">Move History</button>
               <button onClick={() => setIsChatOpen(!isChatOpen)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">Analysis</button>
+              <button onClick={handleQuit} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-all border-l border-white/5 flex items-center gap-2">
+                <XCircle size={12} />
+                Resign
+              </button>
            </div>
 
            {/* History List */}
@@ -853,16 +938,33 @@ export const LiveChallenge: React.FC = () => {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="flex flex-col items-center">
                       <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tighter uppercase font-display italic">Match Found!</h2>
-                      <div className="flex items-center justify-center gap-3">
+                      <div className="flex items-center justify-center gap-3 mb-8">
                         <div className="w-12 h-[1px] bg-sky-500/30" />
-                        <p className="text-sky-400 font-bold uppercase tracking-[0.5em] text-[10px]">Initializing Duel Arena</p>
+                        <p className="text-sky-400 font-bold uppercase tracking-[0.5em] text-[10px]">
+                          {pendingMatch?.gameMode ? (`Ready for ${MODE_CONFIGS[pendingMatch.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Duel'}`) : 'Initializing Duel Arena'}
+                        </p>
                         <div className="w-12 h-[1px] bg-sky-500/30" />
+                      </div>
+
+                      <div className="flex flex-col items-center gap-4">
+                        <button 
+                          onClick={enterDuel}
+                          className="btn-premium px-12 py-5 text-sm uppercase tracking-[0.4em] shadow-[0_0_50px_rgba(14,165,233,0.3)] animate-bounce"
+                        >
+                          Start Duel
+                        </button>
+                        <button 
+                          onClick={cancelMatchFound}
+                          className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white/60 transition-all"
+                        >
+                          Cancel & Return to Lobby
+                        </button>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 md:gap-16 pt-8">
+                    <div className="flex items-center justify-center gap-6 md:gap-16">
                       <div className="text-center group">
                         <div className="w-28 h-28 bg-white/5 rounded-[2.5rem] flex items-center justify-center text-white mb-6 font-bold text-4xl border border-white/10 shadow-2xl backdrop-blur-md group-hover:border-sky-500/50 transition-colors">
                           {profile?.displayName?.[0]}
@@ -948,7 +1050,7 @@ export const LiveChallenge: React.FC = () => {
           )}
 
           {/* Incoming Challenge Modal */}
-          {incomingChallenge && (
+          {incomingChallenge && !matchData && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -965,8 +1067,18 @@ export const LiveChallenge: React.FC = () => {
                   <Swords className="text-sky-500" size={40} />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 uppercase font-display tracking-tight">Challenge</h3>
+                
+                <div className="flex items-center justify-center gap-2 mb-4">
+                   <div className="px-3 py-1 bg-sky-500/10 rounded-full border border-sky-500/20 flex items-center gap-2">
+                      {MODE_CONFIGS[incomingChallenge.gameMode as keyof typeof MODE_CONFIGS]?.icon}
+                      <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">
+                         {MODE_CONFIGS[incomingChallenge.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
+                      </span>
+                   </div>
+                </div>
+
                 <p className="text-slate-500 text-sm mb-8 font-medium">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{incomingChallenge.challengerName}</span> has challenged you to a duel!
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{incomingChallenge.challengerName}</span> has challenged you!
                 </p>
                 <div className="flex gap-4">
                   <button onClick={handleDeclineChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Decline</button>
@@ -976,6 +1088,22 @@ export const LiveChallenge: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {activeMatchBanner && (
+          <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+             <div className="flex items-center gap-3">
+                <Timer className="text-amber-500" size={24} />
+                <div>
+                  <h3 className="font-bold text-amber-500 text-sm uppercase tracking-wider">Match In Progress!</h3>
+                  <p className="text-amber-500/70 text-xs">You have an unfinished duel. Resume or forfeit to start a new one.</p>
+                </div>
+             </div>
+             <div className="flex items-center gap-3 w-full md:w-auto">
+                <button onClick={forfeitBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-amber-500/10 text-amber-500 text-[10px] font-bold hover:bg-amber-500/20 transition-all uppercase tracking-widest border border-amber-500/20">Forfeit</button>
+                <button onClick={resumeBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-amber-500 text-slate-900 text-[10px] font-black hover:bg-amber-400 transition-all uppercase tracking-widest shadow-[0_4px_0_theme(colors.amber.600)] active:translate-y-1 active:shadow-none">Resume</button>
+             </div>
+          </div>
+        )}
 
         {/* Header Section */}
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 border-b-4 border-slate-200 dark:border-slate-800 pb-16 relative">
@@ -1058,9 +1186,30 @@ export const LiveChallenge: React.FC = () => {
         </div>
 
         {/* Lobby Grid */}
+        <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative flex-1 max-w-md w-full">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              id="lobby-search-input"
+              type="text"
+              value={lobbySearchQuery}
+              onChange={(e) => setLobbySearchQuery(e.target.value)}
+              placeholder="Search opponent by name..."
+              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-14 pr-6 py-4 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-8 focus:ring-sky-500/5 transition-all shadow-sm"
+            />
+          </div>
+          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+             <span>{lobbyUsers.filter(u => u.uid !== user?.uid && u.displayName?.toLowerCase().includes(lobbySearchQuery.toLowerCase())).length} Results</span>
+             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+             <span>Lobby Filter</span>
+          </div>
+        </div>
+
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3 grid md:grid-cols-2 gap-8">
-            {lobbyUsers.filter(u => u.uid !== user?.uid).map((u, i) => (
+            {lobbyUsers
+              .filter(u => u.uid !== user?.uid && u.displayName?.toLowerCase().includes(lobbySearchQuery.toLowerCase()))
+              .map((u, i) => (
             <motion.div
               key={u.uid}
               initial={{ opacity: 0, y: 20 }}

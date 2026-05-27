@@ -451,6 +451,35 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
   } catch(e) { console.error(e); }
 };
 
+export const forfeitMatch = async (matchId: string, quitterUid: string) => {
+  try {
+    const matchRef = doc(db, 'arena_matches', matchId);
+    await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(matchRef);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      if (data.status === 'finished') return;
+
+      const players = data.players || [];
+      const winner = players.find((p: any) => p.id !== quitterUid);
+      const quitter = players.find((p: any) => p.id === quitterUid);
+
+      if (quitter && winner) {
+        // Penalty for quitter, small reward for winner
+        quitter.score = 0;
+        winner.score = Math.max(winner.score, 500); // Ensure winner has a decent score or keeps their high score
+      }
+
+      transaction.update(matchRef, { 
+        status: 'finished',
+        forfeitedBy: quitterUid,
+        players,
+        lastTurnChangeAt: serverTimestamp()
+      });
+    });
+  } catch(e) { console.error(e); }
+};
+
 export const sendMatchMessage = async (matchId: string, senderId: string, senderName: string, message: string) => {
   try {
     await addDoc(collection(db, `arena_matches/${matchId}/messages`), {
@@ -491,7 +520,7 @@ export const acceptMatchRematch = async (matchId: string, questions: Question[])
   } catch(e) { console.error(e); }
 };
 
-export const sendDirectChallenge = async (challengerId: string, challengerName: string, targetId: string, targetName: string, topicId: string) => {
+export const sendDirectChallenge = async (challengerId: string, challengerName: string, targetId: string, targetName: string, topicId: string, gameMode: string = 'blitz') => {
   try {
     const challengeRef = doc(collection(db, 'direct_challenges'));
     await setDoc(challengeRef, {
@@ -501,6 +530,7 @@ export const sendDirectChallenge = async (challengerId: string, challengerName: 
       targetId,
       targetName,
       topicId,
+      gameMode,
       status: 'pending',
       createdAt: serverTimestamp()
     });

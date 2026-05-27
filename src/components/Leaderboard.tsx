@@ -8,11 +8,18 @@ export const Leaderboard: React.FC = () => {
   const [leaders, setLeaders] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [activeLeague, setActiveLeague] = useState<'keynes' | 'eco_titan'>('keynes');
+
   useEffect(() => {
     const fetchLeaders = async () => {
       try {
-        const data = await getLeaderboard(20);
+        const data = await getLeaderboard(50);
         setLeaders(data);
+        
+        // Auto-select league based on highest populated or default to eco_titan if keynes is empty
+        if (data.filter(l => (l.points || 0) >= 1000).length === 0) {
+           setActiveLeague('eco_titan');
+        }
       } catch (error) {
         console.error("Failed to fetch leaderboard:", error);
         setLeaders([]);
@@ -24,6 +31,7 @@ export const Leaderboard: React.FC = () => {
   }, []);
 
   if (loading) {
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper transition-colors duration-500">
         <Loader2 className="animate-spin text-ink" size={40} />
@@ -31,10 +39,15 @@ export const Leaderboard: React.FC = () => {
     );
   }
 
+  const keynesLeaders = leaders.filter(l => (l.points || 0) >= 1000);
+  const ecoTitanLeaders = leaders.filter(l => (l.points || 0) < 1000);
+  
+  const displayLeaders = activeLeague === 'keynes' ? keynesLeaders : ecoTitanLeaders;
+
   return (
     <div className="min-h-screen pt-8 md:pt-16 pb-20 px-8 max-w-7xl mx-auto transition-colors duration-500 bg-paper font-sans">
       {/* Header */}
-      <div className="mb-20 border-b-4 border-border pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12">
+      <div className="mb-12 border-b-4 border-border pb-12 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12">
         <div className="w-full md:w-auto">
           <motion.p 
             initial={{ opacity: 0, y: -10 }}
@@ -49,7 +62,7 @@ export const Leaderboard: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-5xl sm:text-7xl md:text-8xl font-black text-ink font-display tracking-tight uppercase drop-shadow-sm break-words w-full"
           >
-            Top <br className="hidden md:block" /> <span className="text-blue-600">Scholars</span>
+            Leagues
           </motion.h1>
         </div>
         <motion.div 
@@ -58,7 +71,7 @@ export const Leaderboard: React.FC = () => {
           transition={{ delay: 0.2 }}
           className="text-left md:text-right w-full md:w-auto mt-6 md:mt-0"
         >
-          <p className="text-base font-bold text-slate-500 mb-6 w-full md:max-w-xs md:ml-auto">The elite circle of Economics masters. Rankings updated in real-time.</p>
+          <p className="text-base font-bold text-slate-500 mb-6 w-full md:max-w-xs md:ml-auto">Compete in Eco Titan, then climb to the legendary Keynes league at 1,000 XP.</p>
           <div className="flex items-center gap-4 justify-start md:justify-end">
             <span className="px-4 py-1.5 bg-blue-500 text-white text-[11px] font-black uppercase tracking-widest rounded-full border-b-4 border-blue-700">
               Live Data
@@ -67,12 +80,42 @@ export const Leaderboard: React.FC = () => {
         </motion.div>
       </div>
 
+      {/* League Toggle */}
+      <div className="flex justify-center mb-16">
+        <div className="bg-slate-100 p-2 rounded-2xl flex gap-2 w-full max-w-md border-b-4 border-slate-200">
+          <button 
+            onClick={() => setActiveLeague('eco_titan')}
+            className={cn(
+              "flex-1 py-3 px-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all",
+              activeLeague === 'eco_titan' 
+                ? "bg-emerald-500 text-white shadow-[0_4px_0_theme(colors.emerald.600)]" 
+                : "text-slate-400 hover:text-slate-600 hover:bg-slate-200"
+            )}
+          >
+            Eco Titan
+            <div className="text-[9px] opacity-80 normal-case mt-1 tracking-normal font-bold">(&lt; 1,000 XP)</div>
+          </button>
+          <button 
+            onClick={() => setActiveLeague('keynes')}
+            className={cn(
+              "flex-1 py-3 px-4 rounded-xl text-sm font-black uppercase tracking-widest transition-all",
+              activeLeague === 'keynes' 
+                ? "bg-amber-500 text-white shadow-[0_4px_0_theme(colors.amber.600)]" 
+                : "text-slate-400 hover:text-slate-600 hover:bg-slate-200"
+            )}
+          >
+            Keynes
+            <div className="text-[9px] opacity-80 normal-case mt-1 tracking-normal font-bold">(1,000+ XP)</div>
+          </button>
+        </div>
+      </div>
+
       {/* Podium Section */}
-      {leaders.length > 0 && (
+      {displayLeaders.length > 0 ? (
         <div className="grid grid-cols-3 gap-6 md:gap-12 mb-32 items-end max-w-5xl mx-auto px-4">
           {/* Rank 2 (Silver) */}
           <div className="flex flex-col items-center w-full">
-            {leaders[1] && (
+            {displayLeaders[1] && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -80,12 +123,12 @@ export const Leaderboard: React.FC = () => {
                 className="flex flex-col items-center w-full"
               >
                 <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-200 border-4 border-slate-300 rounded-[2rem] flex items-center justify-center text-slate-700 font-bold text-3xl mb-4 shadow-[0_8px_0_theme(colors.slate.300)] translate-y-[-8px]">
-                  {leaders[1].displayName[0]}
+                  {displayLeaders[1].displayName[0]}
                 </div>
                 <div className="w-full h-40 md:h-48 bg-slate-100 border-4 border-slate-200 rounded-[2rem] flex flex-col items-center justify-center p-4 text-center">
                   <span className="text-4xl md:text-5xl font-black text-slate-400 mb-2">2</span>
-                  <span className="text-sm font-bold uppercase tracking-widest text-slate-700 truncate w-full mb-1">{leaders[1].displayName}</span>
-                  <span className="text-xs font-black text-slate-500">{leaders[1].points} XP</span>
+                  <span className="text-sm font-bold uppercase tracking-widest text-slate-700 truncate w-full mb-1">{displayLeaders[1].displayName}</span>
+                  <span className="text-xs font-black text-slate-500">{displayLeaders[1].points} XP</span>
                 </div>
               </motion.div>
             )}
@@ -93,7 +136,7 @@ export const Leaderboard: React.FC = () => {
 
           {/* Rank 1 (Gold) */}
           <div className="flex flex-col items-center z-10 w-full">
-            {leaders[0] && (
+            {displayLeaders[0] && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -105,13 +148,13 @@ export const Leaderboard: React.FC = () => {
                     <Trophy className="text-amber-400 w-12 h-12 drop-shadow-md" fill="currentColor" />
                   </div>
                   <div className="w-24 h-24 md:w-32 md:h-32 bg-amber-400 border-4 border-amber-500 rounded-[2.5rem] flex items-center justify-center text-white font-bold text-5xl mb-4 shadow-[0_12px_0_theme(colors.amber.500)] translate-y-[-12px]">
-                    {leaders[0].displayName[0]}
+                    {displayLeaders[0].displayName[0]}
                   </div>
                 </div>
                 <div className="w-full h-56 md:h-72 bg-amber-100 border-4 border-amber-200 rounded-[2.5rem] flex flex-col items-center justify-center p-4 text-center">
                   <span className="text-6xl md:text-8xl font-black text-amber-500 mb-4">1</span>
-                  <span className="text-base font-bold uppercase tracking-widest text-amber-900 truncate w-full mb-2">{leaders[0].displayName}</span>
-                  <span className="text-sm font-black text-amber-600">{leaders[0].points} XP</span>
+                  <span className="text-base font-bold uppercase tracking-widest text-amber-900 truncate w-full mb-2">{displayLeaders[0].displayName}</span>
+                  <span className="text-sm font-black text-amber-600">{displayLeaders[0].points} XP</span>
                 </div>
               </motion.div>
             )}
@@ -119,7 +162,7 @@ export const Leaderboard: React.FC = () => {
 
           {/* Rank 3 (Bronze) */}
           <div className="flex flex-col items-center w-full">
-            {leaders[2] && (
+            {displayLeaders[2] && (
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -127,22 +170,27 @@ export const Leaderboard: React.FC = () => {
                 className="flex flex-col items-center w-full"
               >
                 <div className="w-20 h-20 md:w-24 md:h-24 bg-orange-200 border-4 border-orange-300 rounded-[2rem] flex items-center justify-center text-orange-800 font-bold text-3xl mb-4 shadow-[0_8px_0_theme(colors.orange.300)] translate-y-[-8px]">
-                  {leaders[2].displayName[0]}
+                  {displayLeaders[2].displayName[0]}
                 </div>
                 <div className="w-full h-32 md:h-40 bg-orange-50 border-4 border-orange-100 rounded-[2rem] flex flex-col items-center justify-center p-4 text-center">
                   <span className="text-3xl md:text-4xl font-black text-orange-400 mb-2">3</span>
-                  <span className="text-sm font-bold uppercase tracking-widest text-orange-900 truncate w-full mb-1">{leaders[2].displayName}</span>
-                  <span className="text-xs font-black text-orange-500">{leaders[2].points} XP</span>
+                  <span className="text-sm font-bold uppercase tracking-widest text-orange-900 truncate w-full mb-1">{displayLeaders[2].displayName}</span>
+                  <span className="text-xs font-black text-orange-500">{displayLeaders[2].points} XP</span>
                 </div>
               </motion.div>
             )}
           </div>
         </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+          <Trophy className="text-slate-300 w-16 h-16" />
+          <p className="text-slate-500 font-bold max-w-sm">No scholars have reached this league yet. Keep playing to climb the ranks!</p>
+        </div>
       )}
 
       {/* Leaderboard Grid */}
       <div className="space-y-4 max-w-5xl mx-auto">
-        {leaders.slice(3).map((user, index) => (
+        {displayLeaders.slice(3).map((user, index) => (
           <motion.div
             key={user.uid}
             initial={{ opacity: 0 }}
