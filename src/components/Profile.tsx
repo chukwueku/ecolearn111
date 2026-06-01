@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { logout, updateUserLevel, updateUserProfile, db } from '../firebase';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { logout, updateUserLevel, updateUserProfile, deleteUserAccount } from '../firebase';
 import { useDarkMode } from '../DarkModeContext';
 
 export const Profile = () => {
@@ -34,8 +33,12 @@ export const Profile = () => {
         
         // Let's assume a native confirm is okay for this prototype
         if (window.confirm(`Switch to ${newLevel} level roadmap? Your progress in the current level will be saved.`)) {
-            await updateUserLevel(user.uid, newLevel);
-            setProfile({ ...profile, level: newLevel });
+            try {
+                await updateUserLevel(user.uid, newLevel);
+                setProfile({ ...profile, level: newLevel });
+            } catch (e) {
+                console.error(e);
+            }
         }
     };
 
@@ -102,7 +105,7 @@ export const Profile = () => {
             setUpdateLoading(true);
             try {
                 // Delete from firestore
-                await deleteDoc(doc(db, 'users', user.uid));
+                await deleteUserAccount(user.uid);
                 
                 // Then logout (Actual Auth deletion would require re-authentication usually, so we just clear data and logout for this prototype)
                 await logout();

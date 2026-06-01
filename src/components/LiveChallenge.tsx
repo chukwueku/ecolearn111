@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, timeoutMatchTurn, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
@@ -76,30 +76,42 @@ export const LiveChallenge: React.FC = () => {
 
   // Load all users & maintain presence
   useEffect(() => {
-    if (user) {
-      updateUserPresence(user.uid);
-      const interval = setInterval(() => updateUserPresence(user.uid), 60000);
-      return () => clearInterval(interval);
-    }
+    if (!user) return;
+    updateUserPresence(user.uid);
+    const interval = setInterval(() => updateUserPresence(user.uid), 60000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const [usersInQueue, setUsersInQueue] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!user) {
+      setAllUsersData([]);
+      return;
+    }
     const unsub = onSnapshot(collection(db, 'users'), (snap) => {
        setAllUsersData(snap.docs.map(d => d.data()));
+    }, (err) => {
+      console.error("Users snapshot error:", err);
+      // If we get permission error, we still want to show something
     });
     return () => unsub();
-  }, []);
+  }, [user]);
 
   // Listen to queue to show searching users and merge with all users
   useEffect(() => {
+    if (!user) {
+      setUsersInQueue([]);
+      return;
+    }
     const q = query(collection(db, 'arena_queue'));
     const unsubQueue = onSnapshot(q, (snap) => {
       setUsersInQueue(snap.docs.map(doc => ({ ...doc.data(), status: 'searching' })));
+    }, (err) => {
+      console.error("Queue snapshot error:", err);
     });
     return () => unsubQueue();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
       const fiveMinsAgo = Date.now() - 5 * 60 * 1000;
@@ -164,9 +176,18 @@ export const LiveChallenge: React.FC = () => {
                  setSearchTime(0);
                  setIsSearching(false);
                  setPlayers([me, opponent]);
-                 setPendingMatch(myMatch);
-                 setMatchFoundState(true);
-                 setDuelStarted(false);
+                 
+                 // Auto-start the duel
+                 setMatchData(myMatch);
+                 setCurrentQuestion(me.currentQuestion || 0);
+                 setWaitingForOpponent(myMatch.currentTurnUid !== user.uid);
+                 setDuelStarted(true);
+                 setMatchFoundState(false);
+                 setPendingMatch(null);
+                 setFinished(false);
+                 setRematchRequested(false);
+                 setRematchOffered(null);
+                 
                  expectingMatchRef.current = false;
              } else {
                  // Component mounted and we found an old active match
@@ -272,21 +293,30 @@ export const LiveChallenge: React.FC = () => {
 
   useEffect(() => {
     if (!matchData || finished) return;
-    
-    const isMyTurn = matchData.currentTurnUid === user?.uid;
     const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
     const totalTime = MODE_CONFIGS[mode].time;
-
-    // Reset local timer whenever turn changes or component updates with new match data
     setTimeLeft(totalTime);
+  }, [matchData?.matchId, matchData?.currentTurnUid, finished]);
+
+  useEffect(() => {
+    if (!matchData || finished) return;
+    
+    const isMyTurn = matchData.currentTurnUid === user?.uid;
 
     const timerInterval = setInterval(() => {
         setTimeLeft((prev) => {
             const next = Math.max(0, prev - 1);
             
-            // Only the player whose turn it is should handle the timeout
-            if (next === 0 && isMyTurn && !waitingForOpponent && !showAnswerFeedback) {
-                handleAnswer(false);
+            if (next === 0 && prev !== 0 && !showAnswerFeedback && user) {
+                if (isMyTurn && !waitingForOpponent) {
+                    handleAnswer(false);
+                } else if (!isMyTurn) {
+                    // Try to forcefully timeout the opponent if they disconnected
+                    const opp = matchData?.players?.find((p: any) => p.id !== user.uid);
+                    if (opp && matchData.matchId) {
+                       timeoutMatchTurn(matchData.matchId, opp.id, opp.currentQuestion || 0);
+                    }
+                }
             }
             
             return next;
@@ -369,10 +399,10 @@ export const LiveChallenge: React.FC = () => {
     setChatInput('');
   };
 
-  const handleRematch = () => {
+  const handleRematch = async () => {
     if (!matchData?.matchId || !user) return;
     setRematchRequested(true);
-    requestMatchRematch(matchData.matchId, profile?.displayName || 'User', user.uid);
+    await requestMatchRematch(matchData.matchId, profile?.displayName || 'User', user.uid);
   };
 
   const cancelMatchFound = async () => {
@@ -460,7 +490,7 @@ export const LiveChallenge: React.FC = () => {
         setSearchTime(0);
         searchTimerRef.current = setInterval(() => setSearchTime(prev => prev + 1), 1000);
 
-        const matchResult = await enterMatchmaking({ uid: user.uid, displayName: profile.displayName }, selectedTopicId, finalQuestions, gameMode);
+        const matchResult = await enterMatchmaking({ uid: user.uid, displayName: profile.displayName, points: profile.points || 0 }, selectedTopicId, finalQuestions, gameMode);
         
         if (matchResult === null) {
              // Success putting in queue
@@ -584,10 +614,15 @@ export const LiveChallenge: React.FC = () => {
   if (matchData) {
     const me = players.find(p => p.id === user?.uid);
     const opponent = players.find(p => p.id !== user?.uid);
-    const q = matchData.questions[currentQuestion];
+    const displayQuestionIndex = waitingForOpponent ? (opponent?.currentQuestion || 0) : currentQuestion;
+    const q = matchData.questions[displayQuestionIndex];
 
     if (!q) {
-        return null; // Safety against index out of bounds while syncing
+        return (
+          <div className="min-h-screen bg-paper flex items-center justify-center">
+            <Loader2 className="animate-spin text-emerald-500 w-12 h-12" />
+          </div>
+        );
     }
 
     return (
@@ -619,7 +654,7 @@ export const LiveChallenge: React.FC = () => {
                      {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
                   </span>
                   <div className="w-1 h-1 rounded-full bg-sky-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/80">Q{currentQuestion + 1}/{matchData.questions.length}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/80">Q{displayQuestionIndex + 1}/{matchData.questions.length}</span>
                </div>
                <button onClick={handleQuit} className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 hover:text-rose-400 font-black tracking-widest uppercase text-[9px] rounded-full transition-all border border-rose-500/20 group">
                   <XCircle size={12} className="group-hover:rotate-90 transition-transform" />
@@ -689,43 +724,20 @@ export const LiveChallenge: React.FC = () => {
                          </h3>
                          <p className="text-white/40 font-mono text-sm">SWITCHING TURNS...</p>
                       </motion.div>
-                    ) : waitingForOpponent ? (
-                      <motion.div 
-                        key="waiting"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="h-full flex flex-col items-center justify-center text-center space-y-6"
-                      >
-                        <div className="relative">
-                          <Loader2 className="animate-spin text-emerald-500" size={48} />
-                          <div className="absolute inset-0 blur-xl bg-emerald-500/20 animate-pulse" />
-                        </div>
-                        <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-widest italic font-display">Opponent's Turn</h3>
-                        <p className="text-white/40 font-mono text-[10px] md:text-sm tracking-widest">AWAITING COUNTER-MOVE...</p>
-                        
-                        <div className="bg-black/20 p-4 rounded-xl border border-white/5 w-full max-w-xs">
-                           <div className="flex justify-between text-[10px] font-bold text-white/20 uppercase mb-2">
-                              <span>Position</span>
-                              <span>Q{currentQuestion + 1} / {matchData.questions.length}</span>
-                           </div>
-                           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                              <motion.div 
-                                initial={{ width: 0 }}
-                                animate={{ width: `${(currentQuestion / matchData.questions.length) * 100}%` }}
-                                className="h-full bg-emerald-500"
-                              />
-                           </div>
-                        </div>
-                      </motion.div>
                     ) : (
                       <motion.div
-                        key="question"
-                        initial={{ opacity: 0, x: -20 }}
+                        key={waitingForOpponent ? "opponentQuestion" : "myQuestion"}
+                        initial={{ opacity: 0, x: waitingForOpponent ? 20 : -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="flex-1 flex flex-col"
                       >
                         <div className="mb-6 md:mb-8">
-                          <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-sky-400 mb-2 block">Your Turn • Q{currentQuestion + 1}</span>
+                          <span className={cn(
+                            "text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] mb-2 block",
+                            waitingForOpponent ? "text-emerald-500 animate-pulse" : "text-sky-400"
+                          )}>
+                            {waitingForOpponent ? `Opponent's Turn • Q${displayQuestionIndex + 1}` : `Your Turn • Q${displayQuestionIndex + 1}`}
+                          </span>
                           <h3 className="text-xl md:text-3xl font-bold leading-tight">
                             {q.question}
                           </h3>
@@ -734,14 +746,23 @@ export const LiveChallenge: React.FC = () => {
                           {q.options.map((option: string, i: number) => (
                             <button
                               key={i}
+                              disabled={waitingForOpponent}
                               onClick={() => handleAnswer(i === q.correctAnswer)}
-                              className="group relative h-16 md:h-20 bg-[#3c3a37] hover:bg-[#484643] rounded-xl border-l-[4px] md:border-l-[6px] border-[#312e2b] hover:border-sky-500 transition-all text-left px-4 md:px-6 flex items-center gap-3 md:gap-4 overflow-hidden"
+                              className={cn(
+                                "group relative h-16 md:h-20 rounded-xl border-l-[4px] md:border-l-[6px] transition-all text-left px-4 md:px-6 flex items-center gap-3 md:gap-4 overflow-hidden",
+                                waitingForOpponent 
+                                  ? "bg-[#3c3a37] border-[#312e2b] opacity-60 cursor-not-allowed"
+                                  : "bg-[#3c3a37] hover:bg-[#484643] border-[#312e2b] hover:border-sky-500 cursor-pointer"
+                              )}
                             >
-                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-sm md:text-lg text-white/20 group-hover:text-sky-500/50 transition-colors shrink-0">
+                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-sm md:text-lg text-white/20 transition-colors shrink-0 group-hover:text-sky-500/50">
                                  {String.fromCharCode(65 + i)}
                                </div>
-                               <span className="text-sm md:text-lg font-medium tracking-tight text-white group-hover:translate-x-1 transition-transform line-clamp-2">{option}</span>
-                               <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                               <span className={cn(
+                                 "text-sm md:text-lg font-medium tracking-tight text-white transition-transform line-clamp-2",
+                                 !waitingForOpponent && "group-hover:translate-x-1"
+                               )}>{option}</span>
+                               {!waitingForOpponent && <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />}
                             </button>
                           ))}
                         </div>

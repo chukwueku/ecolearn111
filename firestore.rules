@@ -2,8 +2,85 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         request.auth.token.email == 'chukwuekudavid@gmail.com');
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Allow any signed-in user to read user profiles (for leaderboard/profiles)
+      allow read: if isSignedIn();
+      
+      // Allow users to create their own profile
+      allow create: if isOwner(userId);
+      
+      // Allow users to update their own profile, but restrict role updates to admins
+      allow update: if isOwner(userId) && 
+                    (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']) || isAdmin());
+      
+      // Admins can do anything
+      allow write: if isAdmin();
+    }
+    
+    // Questions Collection
+    match /questions/{questionId} {
+      // Any signed-in user can read questions
+      allow read: if isSignedIn();
+      // Only admins can write questions
+      allow write: if isAdmin();
+    }
+    
+    // Settings Collection (for announcements)
+    match /settings/{settingId} {
+      // Announcements should be public for even non-logged in users if the app needs it, 
+      // but let's stick to signed-in for now to be safe unless requested otherwise.
+      // Actually, Home.tsx might show them before login? 
+      // Let's allow public read for announcement.
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+    
+    // Duels (History)
+    match /duels/{duelId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    
+    // Arena Queue
+    match /arena_queue/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+      // Matchmaking logic might require reading others in the same topic
+      allow list: if isSignedIn();
+    }
+    
+    // Arena Matches
+    match /arena_matches/{matchId} {
+      allow read: if isSignedIn() && (request.auth.uid in resource.data.playerUids || isAdmin());
+      allow update: if isSignedIn() && (request.auth.uid in resource.data.playerUids || isAdmin());
+      allow create: if isSignedIn();
+      
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn() && (request.auth.uid in get(/databases/$(database)/documents/arena_matches/$(matchId)).data.playerUids || isAdmin());
+      }
+    }
+    
+    // Direct Challenges
+    match /direct_challenges/{challengeId} {
+      allow read: if isSignedIn() && (request.auth.uid == resource.data.challengerId || request.auth.uid == resource.data.targetId || isAdmin());
+      allow write: if isSignedIn() && (request.auth.uid == request.resource.data.challengerId || isAdmin());
+      allow update: if isSignedIn() && (request.auth.uid == resource.data.targetId || isAdmin());
     }
   }
 }

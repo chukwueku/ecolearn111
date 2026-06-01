@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, Scale, Factory, Zap, Info, Percent, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { StatsSimulator } from './StatsSimulator';
 
 type SimulatorMode = 
   | 'utility' 
@@ -11,7 +12,19 @@ type SimulatorMode =
   | 'future_value'
   | 'capital_budgeting'
   | 'bond_valuation'
-  | 'capm';
+  | 'capm'
+  | 'money_multiplier'
+  | 'taylor_rule'
+  | 'exchange_rate'
+  | 'barter_pricing'
+  | 'baumol_tobin'
+  | 'descriptive_stats'
+  | 'probability'
+  | 'statistical_inference'
+  | 'hypothesis_testing'
+  | 'simple_regression'
+  | 'multiple_regression'
+  | 'autocorrelation';
 
 interface SimulatorProps {
   mode: SimulatorMode;
@@ -79,6 +92,20 @@ const ToggleGroup = ({ label, options, activeValue, onChange }: { label: string,
 };
 
 export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, initialValues }) => {
+  const statsModes = [
+    'descriptive_stats',
+    'probability',
+    'statistical_inference',
+    'hypothesis_testing',
+    'simple_regression',
+    'multiple_regression',
+    'autocorrelation'
+  ];
+
+  if (statsModes.includes(mode)) {
+    return <StatsSimulator mode={mode as any} title={title} initialValues={initialValues} />;
+  }
+
   const [values, setValues] = useState<Record<string, number>>(() => {
     const defaults: Record<string, number> = {};
     if (mode === 'future_value') {
@@ -106,6 +133,31 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
       defaults.beta = 1.2;
       defaults.optType = 1;
       defaults.premiumOrReturn = 10; // (Rm = 10% by default)
+    } else if (mode === 'money_multiplier') {
+      defaults.mb = 1000000;
+      defaults.rr = 10;
+      defaults.c = 20;
+      defaults.e = 5;
+    } else if (mode === 'taylor_rule') {
+      defaults.r_star = 2;
+      defaults.target_inf = 2;
+      defaults.current_inf = 4;
+      defaults.output_gap = 2;
+      defaults.alpha = 0.5;
+      defaults.beta = 0.5;
+    } else if (mode === 'exchange_rate') {
+      defaults.sim_type = 1; // 1 = PPP, 2 = UIRP
+      defaults.p_d = 1200;
+      defaults.p_f = 1000;
+      defaults.i_d = 12;
+      defaults.i_f = 6;
+      defaults.e_exp = 150;
+    } else if (mode === 'barter_pricing') {
+      defaults.n_goods = 10;
+    } else if (mode === 'baumol_tobin') {
+      defaults.annual_income = 50000;
+      defaults.interest_rate = 5;
+      defaults.brokerage_cost = 10;
     }
     return { ...defaults, ...initialValues };
   });
@@ -369,6 +421,121 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
         });
         break;
       }
+      case 'money_multiplier': {
+        const mb = values.mb !== undefined ? values.mb : 1000000;
+        const rr = (values.rr !== undefined ? values.rr : 10) / 100;
+        const c = (values.c !== undefined ? values.c : 20) / 100;
+        const e = (values.e !== undefined ? values.e : 5) / 100;
+
+        const simpleMult = rr > 0 ? 1 / rr : 0;
+        const denom = rr + e + c;
+        const m1Mult = denom > 0 ? (1 + c) / denom : 0;
+        const m1Supply = m1Mult * mb;
+        const totalDeposits = denom > 0 ? mb / denom : 0;
+        const currencyDrain = c * totalDeposits;
+        const excessReserves = e * totalDeposits;
+        const requiredReserves = rr * totalDeposits;
+
+        setResult({
+          simpleMult: simpleMult.toFixed(2),
+          m1Mult: m1Mult.toFixed(4),
+          m1Supply: m1Supply.toFixed(2),
+          totalDeposits: totalDeposits.toFixed(2),
+          currencyDrain: currencyDrain.toFixed(2),
+          excessReserves: excessReserves.toFixed(2),
+          requiredReserves: requiredReserves.toFixed(2)
+        });
+        break;
+      }
+      case 'taylor_rule': {
+        const r_star = values.r_star !== undefined ? values.r_star : 2;
+        const target_inf = values.target_inf !== undefined ? values.target_inf : 2;
+        const current_inf = values.current_inf !== undefined ? values.current_inf : 4;
+        const output_gap = values.output_gap !== undefined ? values.output_gap : 2;
+        const alpha = values.alpha !== undefined ? values.alpha : 0.5;
+        const beta = values.beta !== undefined ? values.beta : 0.5;
+
+        const inf_gap = current_inf - target_inf;
+        const nominal_rate = current_inf + r_star + alpha * output_gap + beta * inf_gap;
+        const real_rate = nominal_rate - current_inf;
+
+        setResult({
+          inf_gap: inf_gap.toFixed(2) + '%',
+          nominal_rate: nominal_rate.toFixed(2) + '%',
+          real_rate: real_rate.toFixed(2) + '%'
+        });
+        break;
+      }
+      case 'exchange_rate': {
+        const sim_type = values.sim_type !== undefined ? values.sim_type : 1;
+        const p_d = values.p_d !== undefined ? values.p_d : 1200;
+        const p_f = values.p_f !== undefined ? values.p_f : 1000;
+        const i_d = values.i_d !== undefined ? values.i_d : 12;
+        const i_f = values.i_f !== undefined ? values.i_f : 6;
+        const e_exp = values.e_exp !== undefined ? values.e_exp : 150;
+
+        if (sim_type === 1) {
+          const ppp_rate = p_f > 0 ? p_d / p_f : 0;
+          setResult({
+            ppp_rate: ppp_rate.toFixed(4)
+          });
+        } else {
+          const factor = (1 + i_d / 100) / (1 + i_f / 100);
+          const uirp_rate = factor > 0 ? e_exp / factor : 0;
+          const premium = uirp_rate > 0 ? ((e_exp - uirp_rate) / uirp_rate) * 100 : 0;
+          setResult({
+            uirp_rate: uirp_rate.toFixed(4),
+            premium: premium.toFixed(2) + '%'
+          });
+        }
+        break;
+      }
+      case 'barter_pricing': {
+        const n_goods = values.n_goods !== undefined ? values.n_goods : 10;
+        const barter_prices = (n_goods * (n_goods - 1)) / 2;
+        const money_prices = n_goods - 1;
+        const saved_pct = barter_prices > 0 ? ((barter_prices - money_prices) / barter_prices) * 100 : 0;
+        setResult({
+          barter_prices: Math.round(barter_prices),
+          money_prices: Math.round(money_prices),
+          saved_pct: saved_pct.toFixed(1) + '%'
+        });
+        break;
+      }
+      case 'baumol_tobin': {
+        const Y = values.annual_income !== undefined ? values.annual_income : 50000;
+        const R = values.interest_rate !== undefined ? values.interest_rate : 5;
+        const b = values.brokerage_cost !== undefined ? values.brokerage_cost : 10;
+
+        const r_decimal = R / 100;
+        if (r_decimal > 0) {
+          const w_star = Math.sqrt((2 * b * Y) / r_decimal);
+          const m_star = w_star / 2;
+          const num_withdrawals = w_star > 0 ? Y / w_star : 0;
+          const brokerage_cost_total = b * num_withdrawals;
+          const foregone_interest_total = r_decimal * m_star;
+          const total_cost = brokerage_cost_total + foregone_interest_total;
+
+          setResult({
+            w_star: w_star.toFixed(2),
+            m_star: m_star.toFixed(2),
+            num_withdrawals: num_withdrawals.toFixed(1),
+            brokerage_cost_total: brokerage_cost_total.toFixed(2),
+            foregone_interest_total: foregone_interest_total.toFixed(2),
+            total_cost: total_cost.toFixed(2)
+          });
+        } else {
+          setResult({
+            w_star: '0.00',
+            m_star: '0.00',
+            num_withdrawals: '0.00',
+            brokerage_cost_total: '0.00',
+            foregone_interest_total: '0.00',
+            total_cost: '0.00'
+          });
+        }
+        break;
+      }
     }
   };
 
@@ -515,6 +682,79 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             </div>
           </div>
         );
+      case 'money_multiplier':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Monetary Base (MB)" value={values.mb} onChange={v => handleInputChange('mb', v)} />
+              <Input label="Req. Reserve Ratio (rr %)" value={values.rr} onChange={v => handleInputChange('rr', v)} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Currency Ratio (c %)" value={values.c} onChange={v => handleInputChange('c', v)} />
+              <Input label="Excess Reserve Ratio (e %)" value={values.e} onChange={v => handleInputChange('e', v)} />
+            </div>
+          </div>
+        );
+      case 'taylor_rule':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              <Input label="Equil. Real Rate (r* %)" value={values.r_star} onChange={v => handleInputChange('r_star', v)} />
+              <Input label="Target Inflation (π* %)" value={values.target_inf} onChange={v => handleInputChange('target_inf', v)} />
+              <Input label="Current Inflation (π %)" value={values.current_inf} onChange={v => handleInputChange('current_inf', v)} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              <Input label="Output Gap (y - y* %)" value={values.output_gap} onChange={v => handleInputChange('output_gap', v)} />
+              <Input label="Gap Weight (α)" value={values.alpha} onChange={v => handleInputChange('alpha', v)} />
+              <Input label="Inflation Weight (β)" value={values.beta} onChange={v => handleInputChange('beta', v)} />
+            </div>
+          </div>
+        );
+      case 'exchange_rate':
+        return (
+          <div className="space-y-3.5">
+            <ToggleGroup 
+              label="Exchange Rate Paradigm" 
+              options={[
+                { label: 'Purchasing Power Parity (PPP)', value: 1 },
+                { label: 'Uncovered Interest Parity (UIRP)', value: 2 }
+              ]} 
+              activeValue={values.sim_type || 1} 
+              onChange={v => handleInputChangeDirect('sim_type', v)} 
+            />
+            {values.sim_type === 1 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+                <Input label="Domestic Price Index (Pd)" value={values.p_d} onChange={v => handleInputChange('p_d', v)} />
+                <Input label="Foreign Price Index (Pf)" value={values.p_f} onChange={v => handleInputChange('p_f', v)} />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+                <Input label="Domestic Interest Rate (id %)" value={values.i_d} onChange={v => handleInputChange('i_d', v)} />
+                <Input label="Foreign Interest Rate (if %)" value={values.i_f} onChange={v => handleInputChange('i_f', v)} />
+                <Input label="Expected Future Spot (Ee)" value={values.e_exp} onChange={v => handleInputChange('e_exp', v)} />
+              </div>
+            )}
+          </div>
+        );
+      case 'barter_pricing':
+        return (
+          <div className="space-y-3.5">
+            <Input label="Number of Commodities (n)" value={values.n_goods} onChange={v => handleInputChange('n_goods', v)} />
+            <p className="text-[10px] text-muted leading-relaxed italic">
+              Try values between 3 and 100 to witness how barter pricing complexity explodes!
+            </p>
+          </div>
+        );
+      case 'baumol_tobin':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              <Input label="Standard Period Expense (Y ₦)" value={values.annual_income} onChange={v => handleInputChange('annual_income', v)} />
+              <Input label="Bonds Interest Rate (R %)" value={values.interest_rate} onChange={v => handleInputChange('interest_rate', v)} />
+              <Input label="Brokerage/Contract Fee (b0 ₦)" value={values.brokerage_cost} onChange={v => handleInputChange('brokerage_cost', v)} />
+            </div>
+          </div>
+        );
     }
   };
 
@@ -550,7 +790,23 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
           </div>
         );
       case 'inflation':
-        return <ResultCard label="Inflation Rate" value={`${result.rate}%`} icon={<TrendingUp className="text-rose-500" />} description="The percentage increase in the general price level." />;
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Inflation Rate" value={`${result.rate}%`} icon={<TrendingUp className="text-rose-500" />} description="The percentage increase in the general price level." />
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Purchasing Power Erosion:</strong> An inflation rate of <span className="text-rose-600 dark:text-rose-400 font-semibold">{result.rate}%</span> indicates that a standard basket of commodities costing ₦{values.p1} in the base period now requires ₦{values.p2}. This effectively reduces the purchasing power of each nominal currency unit.
+              </p>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Macroeconomic Policy Relevance:</strong> If nominal household income remains stagnant over this period, real consumer disposable wealth shrinks. Central banks maintain inflation targets (usually around 2%-3%) to protect currency purchasing power while avoiding deflationary liquidity traps that encourage consumer spending deferrals.
+              </p>
+            </div>
+          </div>
+        );
       case 'future_value':
         return (
           <div className="space-y-4">
@@ -634,6 +890,152 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             <div className="p-3 rounded-2xl bg-paper dark:bg-slate-800 border border-border">
               <p className="text-[10px] text-muted leading-relaxed font-mono text-center">
                 Re = Rf + Beta(Rm - Rf) = Rf + Beta(MRP)
+              </p>
+            </div>
+          </div>
+        );
+      case 'money_multiplier':
+        return (
+          <div className="space-y-4">
+            <ResultCard label="M1 Money Multiplier (m₁)" value={result.m1Mult} icon={<Percent className="text-emerald-500" />} description="Ratio of total money supply to base money assets." />
+            <ResultCard label="M1 Money Supply (M1)" value={`₦${parseFloat(result.m1Supply).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Coins className="text-sky-500" />} />
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              <ResultCard label="Required Reserves" value={`₦${parseFloat(result.requiredReserves).toLocaleString(undefined, {minimumFractionDigits: 0})}`} icon={<Scale className="text-slate-400" />} />
+              <ResultCard label="Excess Reserves" value={`₦${parseFloat(result.excessReserves).toLocaleString(undefined, {minimumFractionDigits: 0})}`} icon={<Scale className="text-slate-400" />} />
+              <ResultCard label="Cash Drainage" value={`₦${parseFloat(result.currencyDrain).toLocaleString(undefined, {minimumFractionDigits: 0})}`} icon={<Scale className="text-slate-400" />} />
+              <ResultCard label="Simple Multiplier" value={result.simpleMult} icon={<Percent className="text-slate-400" />} description="1 / rr (no leaks)" />
+            </div>
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Leakage-Adjusted Multiplier:</strong> In a realistic banking system, the actual multiplier (<span className="text-sky-600 dark:text-sky-400 font-semibold">{result.m1Mult}</span>) is substantially lower than the theoretical simple credit multiplier (<span className="text-slate-500 font-semibold">{result.simpleMult}</span>). This shrinkage is caused by systemic leakages: cash drainage into the public hands (cash ratio <span className="text-amber-600 dark:text-amber-400 font-semibold">{(values.c !== undefined ? values.c : 0.15) * 100}%</span>) and excessive reserve hoarding by commercial banks (excess ratio <span className="text-amber-600 dark:text-amber-400 font-semibold">{(values.e !== undefined ? values.e : 0.05) * 100}%</span>).
+              </p>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Credit Transmission Path:</strong> From the initial high-powered money base, fractional systems create <span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.m1Supply).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> total M1 supply. Commercial credit expansion accumulates ₦{parseFloat(result.requiredReserves).toLocaleString()} in required reserves and ₦{parseFloat(result.excessReserves).toLocaleString()} in extra safety buffers, while ₦{parseFloat(result.currencyDrain).toLocaleString()} leaks away as currency in circulation. This demonstrates the central role of public behavior and banking confidence in monetary transmission.
+              </p>
+            </div>
+          </div>
+        );
+      case 'taylor_rule':
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Suggested Nominal Rate" value={result.nominal_rate} icon={<Percent className="text-emerald-500" />} description="Target central bank policy interest rate." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="Inflation Gap" value={result.inf_gap} icon={<TrendingUp className="text-sky-500" />} />
+              <ResultCard label="Implied Real Rate" value={result.real_rate} icon={<Percent className="text-indigo-500" />} description="R - π (adjusted for inflation)" />
+            </div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-border text-center">
+              <p className="text-[10px] text-muted leading-relaxed font-mono">
+                R = π + r* + α(y - y*) + β(π - π*)
+              </p>
+            </div>
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Policy Rate Guidance (R):</strong> The rule recommends a central bank policy nominal interest rate of <span className="text-sky-600 dark:text-sky-400 font-semibold">{result.nominal_rate}%</span> to steer aggregate demand toward steady state.
+              </p>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>The Taylor Principle:</strong> The feedback coefficient ensures that when inflation rises above the target, the nominal rate is lifted by more than 1-to-1 (the feedback slope). This drives the implied real interest rate up to <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{result.real_rate}%</span>, successfully cooling the economy's output gap to contain demand-pull pressures.
+              </p>
+            </div>
+          </div>
+        );
+      case 'exchange_rate':
+        return (
+          <div className="space-y-4">
+            {values.sim_type === 1 ? (
+              <>
+                <ResultCard label="Fair Exchange Rate (E)" value={result.ppp_rate} icon={<Scale className="text-emerald-500" />} description="Exchange rate predicted by purchasing power parity (Pd / Pf)" />
+                <div className="p-3 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-800 dark:text-indigo-300 font-semibold leading-relaxed border border-indigo-100 dark:border-indigo-900/30 rounded-xl text-center text-[10px] sm:text-xs">
+                  According to PPP, if domestic price level is higher, your currency should depreciate to clear arbitrage.
+                </div>
+              </>
+            ) : (
+              <>
+                <ResultCard label="Imputed Spot Rate (Et)" value={result.uirp_rate} icon={<Scale className="text-sky-500" />} description="Current price of foreign currency balancing expected bond yields." />
+                <ResultCard label="Expected Depr. / Prem." value={result.premium} icon={<TrendingUp className="text-amber-500" />} description="Expected change in the exchange rate to equal interest parity." />
+              </>
+            )}
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              {values.sim_type === 1 ? (
+                <>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    <strong>Purchasing Power Parity (PPP):</strong> Absolute PPP suggests the nominal exchange rate is a direct reflection of relative domestic versus foreign price levels. At <span className="text-sky-600 dark:text-sky-400 font-semibold">{result.ppp_rate}</span>, commodity arbitrage is fully cleared under the Law of One Price.
+                  </p>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    <strong>Systematic Violations:</strong> In actual data, transportation costs, tariffs, and non-traded inputs systematically violate static PPP. The <em>Balassa-Samuelson Effect</em> explains why developed nations with rapid traded sector productivity growth experience higher domestic price levels and persistently appear overvalued.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    <strong>Uncovered Interest Rate Parity (UIRP):</strong> To prevent riskless speculative capital runs across borders, international assets must offer identical expected returns. A domestic nominal rate of <span className="text-sky-600 dark:text-sky-400 font-semibold">{values.i_d !== undefined ? values.i_d : 12}%</span> compared to foreign yield <span className="text-sky-600 dark:text-sky-400 font-semibold">{values.i_f !== undefined ? values.i_f : 6}%</span> forces an expected spot rate of <span className="text-sky-600 dark:text-sky-400 font-semibold">{result.uirp_rate}</span>.
+                  </p>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    <strong>Expected Depreciation Alignment:</strong> The equilibrium expected currency shift of <span className="text-amber-600 dark:text-amber-400 font-semibold">{result.premium}</span> exactly wipes out foreign yield advantages. This ensures investors are neutral between domestic or foreign currency denominated interest assets, aligning Balance of Payments capital accounts.
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      case 'barter_pricing':
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="Barter Prices Needed" value={result.barter_prices} icon={<Scale className="text-rose-500" />} description="n * (n - 1) / 2" />
+              <ResultCard label="Monetary Prices Needed" value={result.money_prices} icon={<Coins className="text-emerald-500" />} description="n - 1" />
+            </div>
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 font-semibold leading-relaxed border border-emerald-100 dark:border-emerald-900/30 rounded-xl text-center text-xs">
+              Value Exchange Optimization: Using money reduces the number of transactional price listings by {result.saved_pct}!
+            </div>
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Exploding Price Tag Complexity:</strong> In a pure barter system with <span className="text-sky-600 dark:text-sky-400 font-semibold">{values.n_goods !== undefined ? values.n_goods : 10}</span> goods, every commodity must exchange directly against every other commodity. This forces prices to grow quadratically at a rate of <code>n(n - 1) / 2</code>, resulting in <span className="text-rose-600 dark:text-rose-400 font-semibold">{result.barter_prices}</span> distinct cross-market prices.
+              </p>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Money's Optimization Paradigm:</strong> Introducing a single unit of account (money) reduces price complexity to a linear function <code>n - 1</code>, requiring only <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{result.money_prices}</span> prices. This collapses search costs and computational overhead by <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{result.saved_pct}</span>, illustrating the supreme efficiency gain of a monetized economy.
+              </p>
+            </div>
+          </div>
+        );
+      case 'baumol_tobin':
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Optimal Withdrawal (W*)" value={`₦${parseFloat(result.w_star).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Coins className="text-emerald-500" />} description="Ideal size for cash withdrawal to minimize overhead + foregone interest." />
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              <ResultCard label="Avg Cash Balance" value={`₦${parseFloat(result.m_star).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Scale className="text-slate-400" />} />
+              <ResultCard label="# of Transactions" value={result.num_withdrawals} icon={<TrendingUp className="text-slate-400" />} />
+              <ResultCard label="Brokerage Cost" value={`₦${parseFloat(result.brokerage_cost_total).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Percent className="text-slate-400" />} />
+              <ResultCard label="Interest Cost" value={`₦${parseFloat(result.foregone_interest_total).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Percent className="text-slate-400" />} />
+            </div>
+            <p className="text-[10px] text-muted text-center font-mono py-1 border border-dashed border-border rounded-xl">
+              Total Cost = {`₦${parseFloat(result.total_cost).toLocaleString(undefined, {minimumFractionDigits: 2})}`}
+            </p>
+            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
+                <Info size={14} />
+                <span>Economic Theory & Interpretation</span>
+              </div>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Optimal Lot Size (W*):</strong> Initiating cash withdrawals of <span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.w_star).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> minimizes the sum of transaction brokerage costs and foregone bond interest. This balances the classic inventory trade-off perfectly.
+              </p>
+              <p className="text-[11px] text-muted leading-relaxed">
+                <strong>Inventory Trade-Off Equilibrium:</strong> At this optimal point, your annual brokerage fee overhead (<span className="text-amber-600 dark:text-amber-400 font-semibold">₦{parseFloat(result.brokerage_cost_total).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>) is exactly equal to the foregone interest income (<span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.foregone_interest_total).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>) on your average cash holding (half of W*). This confirms the mathematical condition of the Baumol-Tobin square-root model.
               </p>
             </div>
           </div>

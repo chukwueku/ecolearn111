@@ -1,6 +1,6 @@
 {
-  "name": "EcoLearn111",
-  "description": "A comprehensive Economics study guide and challenge platform for secondary and undergraduate students.",
+  "name": "Statistics & Econometrics Ref",
+  "description": "A comprehensive reference interface for the Statistics and Econometrics study guide, browsing chapters, tables, and mathematical equations.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

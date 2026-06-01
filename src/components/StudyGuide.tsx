@@ -4,12 +4,13 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import { visit } from 'unist-util-visit';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   AreaChart, Area, BarChart, Bar, ScatterChart, Scatter, Cell,
   PieChart, Pie, ComposedChart
 } from 'recharts';
-import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles, Copy, Check } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../useAuth';
 import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
@@ -29,6 +30,62 @@ const LazyEconomicsSimulator = React.lazy(() =>
   import('./EconomicsSimulator').then(module => ({ default: module.EconomicsSimulator }))
 );
 
+const extractLatex = (node: any): string | null => {
+  if (!node) return null;
+  if (node.type === 'element' && node.tagName === 'annotation' && node.properties?.encoding === 'application/x-tex') {
+    return node.children?.[0]?.value || null;
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      const found = extractLatex(child);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+const rehypeMathMarker = () => {
+  return (tree: any) => {
+    visit(tree, 'element', (node: any, index: number, parent: any) => {
+      const classNames = node.properties?.className;
+      if (node.tagName === 'span' && Array.isArray(classNames)) {
+        if (classNames.includes('katex-display')) {
+          node.properties['data-math-block'] = true;
+        } else if (classNames.includes('katex') && !classNames.includes('katex-display')) {
+          if (parent && parent.tagName === 'span' && Array.isArray(parent.properties?.className) && parent.properties.className.includes('katex-display')) {
+            node.properties['data-math-inner'] = true;
+          } else {
+            node.properties['data-math-inline'] = true;
+          }
+        }
+      }
+    });
+  };
+};
+
+const CopyMathButton = ({ latex, isBlock }: { latex: string, isBlock?: boolean }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(isBlock ? `$$\n${latex}\n$$` : `$${latex}$`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className={cn(
+        "z-10 p-1.5 flex items-center justify-center text-slate-400 hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg opacity-0 group-hover:opacity-100 transition-all shadow-sm cursor-pointer hover:shadow",
+        isBlock ? "absolute top-2 right-2 md:top-4 md:right-4" : "absolute -top-7 left-1/2 -translate-x-1/2"
+      )}
+      title="Copy LaTeX"
+    >
+      {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+    </button>
+  );
+};
+
 export const StudyGuide = ({ topicId }: { topicId: string }) => {
   const { profile } = useAuth();
   const navigate = useNavigate();
@@ -46,7 +103,8 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
 
   useEffect(() => {
     const fetchGuide = async () => {
-      const currentRoadmap = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+      const isSecondary = topicId.startsWith('ss1-');
+      const currentRoadmap = isSecondary ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
       const currentTopic = currentRoadmap.find(t => t.id === topicId);
       if (!currentTopic) return;
       setLoading(true);
@@ -57,14 +115,14 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
       if (localContent) {
         guideContent = localContent;
       } else {
-        guideContent = await generateStudyGuide(currentTopic.title, profile?.level || 'secondary', currentTopic.description);
+        guideContent = await generateStudyGuide(currentTopic.title, isSecondary ? 'secondary' : 'undergraduate', currentTopic.description);
       }
 
       setContent(guideContent);
       setLoading(false);
     };
     fetchGuide();
-  }, [profile?.level, topicId]);
+  }, [topicId]);
 
   // Reset to first page when topicId changes
   useEffect(() => {
@@ -95,10 +153,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         headingPages.push(currentPart.join('\n'));
       }
       if (headingPages.length > 1) {
-        return headingPages;
+        items = headingPages;
       }
     }
-    return items.length > 0 ? items : [content];
+    
+    const finalPages = items.length > 0 ? items : [content];
+    return finalPages;
   }, [content]);
 
   const totalPages = pages.length;
@@ -235,8 +295,34 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
     
     if (lang === 'chart') {
       try {
-        const config = JSON.parse(String(children).replace(/\n$/, ''));
-        const { type, data, xAxis, yAxis, series, title, height = 300 } = config;
+        let parsedConfig = JSON.parse(String(children).replace(/\n$/, ''));
+        
+        // Transform Chart.js style (labels/datasets) configuration to Recharts config if needed
+        if (parsedConfig.labels && parsedConfig.datasets) {
+          const colors = ['#0ea5e9', '#10b981', '#6366f1', '#f43f5e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+          const transformedData = parsedConfig.labels.map((label: string, idx: number) => {
+            const item: any = { label };
+            parsedConfig.datasets.forEach((dataset: any, dIdx: number) => {
+              item[`value_${dIdx}`] = dataset.data[idx];
+            });
+            return item;
+          });
+          
+          const transformedSeries = parsedConfig.datasets.map((dataset: any, dIdx: number) => ({
+            key: `value_${dIdx}`,
+            name: dataset.label,
+            color: dataset.color || colors[dIdx % colors.length]
+          }));
+
+          parsedConfig = {
+            ...parsedConfig,
+            xAxis: 'label',
+            data: transformedData,
+            series: transformedSeries
+          };
+        }
+
+        const { type, data, xAxis, yAxis, series, title, height = 300 } = parsedConfig;
         const chartHeight = typeof height === 'number' && !isNaN(height) ? height : 300;
         
         return (
@@ -333,7 +419,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
           </div>
         );
       } catch (e) {
-        return <pre className={className} {...props}>{children}</pre>;
+        return <code className={className} {...props}>{children}</code>;
       }
     }
 
@@ -353,11 +439,20 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
           </div>
         );
       } catch (e) {
-        return <pre className={className} {...props}>{children}</pre>;
+        return <code className={className} {...props}>{children}</code>;
       }
     }
 
-    return <pre className={className} {...props}>{children}</pre>;
+    const isBlockCode = className && className.includes('language-');
+    if (!isBlockCode) {
+      return (
+        <code className={cn(className, "px-1.5 py-0.5 text-xs sm:text-sm font-mono bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-slate-800 dark:text-slate-200")} {...props}>
+          {children}
+        </code>
+      );
+    }
+
+    return <code className={className} {...props}>{children}</code>;
   };
 
   return (
@@ -547,13 +642,60 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                     <div className="markdown-body prose prose-base md:prose-lg prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-headings:tracking-tight prose-headings:font-bold prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-p:leading-relaxed prose-li:text-slate-600 dark:prose-li:text-slate-400">
                       <ReactMarkdown
                         remarkPlugins={[remarkMath, remarkGfm]}
-                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex, rehypeMathMarker]}
                         components={{
                           h1: ({ children }) => <HeadingRenderer level={1}>{children}</HeadingRenderer>,
                           h2: ({ children }) => <HeadingRenderer level={2}>{children}</HeadingRenderer>,
                           h3: ({ children }) => <HeadingRenderer level={3}>{children}</HeadingRenderer>,
-                          pre: ({ children }) => <>{children}</>,
+                          pre: ({ children, node, ...props }: any) => {
+                            let isInteractive = false;
+                            React.Children.forEach(children, (child: any) => {
+                              if (React.isValidElement(child)) {
+                                const childProps: any = child.props || {};
+                                const className = childProps.className || '';
+                                if (className.includes('language-chart') || className.includes('language-simulator')) {
+                                  isInteractive = true;
+                                }
+                              }
+                            });
+
+                            if (isInteractive) {
+                              return <>{children}</>;
+                            }
+
+                            return (
+                              <pre 
+                                className="my-6 p-4 sm:p-6 bg-slate-950 dark:bg-slate-900/50 border border-slate-800 dark:border-slate-800/80 rounded-xl overflow-x-auto whitespace-pre text-xs sm:text-sm font-mono text-slate-100 dark:text-slate-200 leading-normal scrollbar-thin"
+                                {...props}
+                              >
+                                {children}
+                              </pre>
+                            );
+                          },
                           code: SimulatorRenderer,
+                          span: ({ node, className, children, ...props }: any) => {
+                            const isBlock = props['data-math-block'];
+                            const isInline = props['data-math-inline'];
+                            if (isBlock || isInline) {
+                              const latex = extractLatex(node);
+                              const cleanProps = { ...props };
+                              delete cleanProps['data-math-block'];
+                              delete cleanProps['data-math-inline'];
+                              delete cleanProps['data-math-inner'];
+
+                              return (
+                                <span className={cn(className, "relative group", isBlock ? "flex justify-center w-full my-6 p-2 rounded-xl hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800" : "inline-block mx-0.5 px-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-text")} {...cleanProps}>
+                                  {children}
+                                  {latex && <CopyMathButton latex={latex} isBlock={isBlock} />}
+                                </span>
+                              );
+                            }
+                            const cleanProps = { ...props };
+                            delete cleanProps['data-math-block'];
+                            delete cleanProps['data-math-inline'];
+                            delete cleanProps['data-math-inner'];
+                            return <span className={className} {...cleanProps}>{children}</span>;
+                          },
                           table: ({ children }) => (
                             <div className="my-10 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm">
                               <table className="w-full border-collapse text-left min-w-[500px]">
@@ -570,6 +712,48 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                         {pages[currentPage] || ''}
                       </ReactMarkdown>
                     </div>
+
+                    {/* Cover Page Special Syllabus Directory Grid */}
+                    {currentPage === 0 && headingsWithPages.length > 0 && (
+                      <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800/60">
+                        <div className="flex items-center gap-2 mb-6">
+                          <BookOpen className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          <h3 className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest">
+                            Course Chapters Index
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {headingsWithPages
+                            .filter(h => h.level === 2) // only show H2 level chapters
+                            .map((heading, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleHeadingClick(heading.id, heading.pageIndex)}
+                                className="text-left p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 hover:border-sky-500 hover:bg-white dark:hover:bg-slate-950/80 transition-all group flex justify-between items-center cursor-pointer font-sans"
+                              >
+                                <div className="pr-2">
+                                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase block mb-1">
+                                    Chapter {i + 1}
+                                  </span>
+                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
+                                    {heading.text.replace(/^[C|c]hapter\s+([a-zA-Z0-9_.-]+):?\s*/i, '')}
+                                  </span>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                              </button>
+                            ))}
+                        </div>
+                        <div className="mt-8 flex justify-center">
+                          <button
+                            onClick={nextPage}
+                            className="px-8 py-3 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:shadow-lg transition-all animate-pulse flex items-center gap-2 cursor-pointer"
+                          >
+                            <span>Start Lessons</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Final module complete banner ONLY render on the absolute last page */}
                     {currentPage === totalPages - 1 && (

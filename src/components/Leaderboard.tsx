@@ -1,16 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { getLeaderboard, UserProfile } from '../firebase';
+import { useAuth } from '../useAuth';
 import { motion } from 'motion/react';
 import { Trophy, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const Leaderboard: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
   const [leaders, setLeaders] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [activeLeague, setActiveLeague] = useState<'keynes' | 'eco_titan'>('keynes');
 
   useEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      setLeaders([]);
+      setLoading(false);
+      return;
+    }
+
     const fetchLeaders = async () => {
       try {
         const data = await getLeaderboard(50);

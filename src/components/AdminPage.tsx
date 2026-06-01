@@ -20,11 +20,23 @@ import {
 } from 'recharts';
 
 import { cn } from '../lib/utils';
-
-import { DarkModeProvider, useDarkMode } from '../DarkModeContext';
+import { useAuth } from '../useAuth';
+import { useNavigate } from 'react-router-dom';
+import { useDarkMode } from '../DarkModeContext';
 
 export const AdminPage: React.FC = () => {
   const { isDarkMode } = useDarkMode();
+  const { user, profile, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  const isAdmin = profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com';
+
+  useEffect(() => {
+     if (!authLoading && !isAdmin) {
+        navigate('/');
+     }
+  }, [authLoading, isAdmin, navigate]);
+
   const [activeTab, setActiveTab] = useState<'overview' | 'questions' | 'users' | 'activity' | 'settings'>('overview');
   const [subTab, setSubTab] = useState<'generate' | 'bank' | 'create'>('generate');
   

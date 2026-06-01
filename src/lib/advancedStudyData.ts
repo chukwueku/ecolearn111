@@ -1,5 +1,4 @@
-export const ADVANCED_STUDY_GUIDE: Record<string, string> = {
-  "ug-econometrics": `
+export const ADVANCED_STUDY_GUIDE: Record<string, string> = {"ug-econometrics":`
 # COMPREHENSIVE ECONOMETRICS STUDY GUIDE
 
 *Based on Gujarati's Basic Econometrics Table of Contents*
@@ -70,7 +69,7 @@ The modern interpretation of regression is, however, quite different. Broadly sp
 **6. Money Holding vs. Inflation Rate ($\\$):** Predicting the proportion $k$ of income held in money based on inflation expectations.
 
 $$
-k = \\\frac{Money}{Income}
+k = \\frac{Money}{Income}
 $$
 
 
@@ -84,7 +83,7 @@ In regression analysis, we are concerned with *statistical*, not *functional* or
 - **Deterministic relationships** deal with relationships of the type exhibited by Newton's law of gravity:
 
 $$
-F = k \\\frac{m_1 m_2}{r^2}
+F = k \\frac{m_1 m_2}{r^2}
 $$
 
 where $F = force$, $m_1, m_2 = masses$, $r = distance$, and $k = constant$. These are not the focus of econometrics unless explicit measurement errors render them statistical.
@@ -187,9 +186,9 @@ In this chapter, we approach the subject in a more formal manner. We introduce t
 #### 2.1 A Hypothetical Example
 Regression analysis is largely concerned with estimating and/or predicting the (population) mean value of the dependent variable on the basis of the known or fixed values of the explanatory variable(s).
 
-Consider a hypothetical population of 60 families divided into 10 income groups (from \\\$80 to \\\$260). We examine the weekly consumption expenditure corresponding to these given income levels. There is considerable variation in weekly consumption expenditure in each income group.
+Consider a hypothetical population of 60 families divided into 10 income groups (from \\$80 to \\$260). We examine the weekly consumption expenditure corresponding to these given income levels. There is considerable variation in weekly consumption expenditure in each income group.
 
-If we ask the question, "What is the *expected value* of weekly consumption expenditure of a family whose monthly income is, say, \\\$140?", we look at the exact conditional mean for that bracket. The knowledge of the income level enables us to better predict the mean value of consumption expenditure than if we did not have that knowledge. This probability is the essence of regression analysis.
+If we ask the question, "What is the *expected value* of weekly consumption expenditure of a family whose monthly income is, say, \\$140?", we look at the exact conditional mean for that bracket. The knowledge of the income level enables us to better predict the mean value of consumption expenditure than if we did not have that knowledge. This probability is the essence of regression analysis.
 
 If we join these conditional mean values against the various $X$ values, we obtain the **population regression line (PRL)**, or more generally, the **population regression curve**. 
 - The adjective "population" comes from the fact that we are dealing with the entire population of 60 families. 
@@ -198,7 +197,7 @@ If we join these conditional mean values against the various $X$ values, we obta
 **TABLE 2.1** WEEKLY FAMILY INCOME $X$, \\$
 <div className="overflow-x-auto my-6 markdown-table">
 
-| $Y \\$ \\ $X \\\rightarrow$ | 80 | 100 | 120 | 140 | 160 | 180 | 200 | 220 | 240 | 260 |
+| $Y \\$ \\ $X \\rightarrow$ | 80 | 100 | 120 | 140 | 160 | 180 | 200 | 220 | 240 | 260 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Weekly family consumption expenditure $Y$, \\$** | 55 | 65 | 79 | 80 | 102 | 110 | 120 | 135 | 137 | 150 |
 | | 60 | 70 | 84 | 93 | 107 | 115 | 136 | 137 | 145 | 152 |
@@ -238,11 +237,15 @@ If we join these conditional mean values against the various $X$ values, we obta
 \`\`\`
 *(The solid line running through the centers of the distributions represents the conditional mean $E(Y|X)$).*
 
+<div className="flex justify-center my-6">
+  <img src="/images/population_regression.png" alt="Population Regression Function Diagram" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
+</div>
+
 #### 2.2 The Concept of Population Regression Function (PRF)
 From the preceding discussion, it is clear that each conditional mean $E(Y|X_i)$ is a function of $X_i$, where $X_i$ is a given value of $X$. Symbolically,
 
 $$
-E(Y|X_i) = f(X_i) \\quad \\\text{(2.2.1)}
+E(Y|X_i) = f(X_i) \\quad \\text{(2.2.1)}
 $$
 
 where $f(X_i)$ denotes some function of the explanatory variable $X$. 
@@ -252,16 +255,16 @@ The expected value of the distribution of $Y$ given $X_i$ is functionally relate
 For example, assuming the PRF is a *linear* function of $X_i$, we write:
 
 $$
-E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i \\quad \\\text{(2.2.2)}
+E(Y|X_i) = \\beta_1 + \\beta_2 X_i \\quad \\text{(2.2.2)}
 $$
 
-where $\\\beta_1$ and $\\\beta_2$ are unknown but fixed parameters known as the **regression coefficients** ($\\\beta_1$ is the **intercept** and $\\\beta_2$ is the **slope coefficient**). 
+where $\\beta_1$ and $\\beta_2$ are unknown but fixed parameters known as the **regression coefficients** ($\\beta_1$ is the **intercept** and $\\beta_2$ is the **slope coefficient**). 
 
 #### 2.3 The Meaning of the Term *Linear*
 Since this text is concerned primarily with linear models like (2.2.2), it is essential to know what the term *linear* really means. It can be interpreted in two different ways.
 
 **Linearity in the Variables**
-The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i$ represents a straight line. Conversely, a model is *not* linear in variables if $X$ appears with a power or index other than 1.
+The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) = \\beta_1 + \\beta_2 X_i$ represents a straight line. Conversely, a model is *not* linear in variables if $X$ appears with a power or index other than 1.
 
 \`\`\`chart
 {
@@ -292,65 +295,65 @@ The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) 
 For example, the following are not linear in variables:
 
 $$
-E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i^2
+E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
 $$
 
 
 $$
-E(Y|X_i) = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right)
+E(Y|X_i) = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right)
 $$
 
 
 **Linearity in the Parameters**
-The expected value of $Y$ is a linear function of the *parameters* (the $\\\beta$'s); it may or may not be linear in the variable $X$. 
-- A model is linear in the parameter if the $\\\beta$'s appear with a power or index of 1 only and are not multiplied/divided by other parameters.
+The expected value of $Y$ is a linear function of the *parameters* (the $\\beta$'s); it may or may not be linear in the variable $X$. 
+- A model is linear in the parameter if the $\\beta$'s appear with a power or index of 1 only and are not multiplied/divided by other parameters.
 - Example of *linear in parameter* (but non-linear in variables): 
 
 $$
-E(Y|X_i) = \\\beta_1 + \\\beta_2 X_i^2
+E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
 $$
 
 Even though $X$ is squared, the parameters are linear.
 - Example of *nonlinear in parameter*: 
 
 $$
-E(Y|X_i) = \\\beta_1 + \\\beta_2^2 X_i
+E(Y|X_i) = \\beta_1 + \\beta_2^2 X_i
 $$
 
 
-**Crucial Note**: *Therefore, from now on the term "linear" regression will always mean a regression that is linear in the parameters; the $\\\beta$'s are raised to the first power only. It may or may not be linear in the explanatory variables, the $X$'s.*
+**Crucial Note**: *Therefore, from now on the term "linear" regression will always mean a regression that is linear in the parameters; the $\\beta$'s are raised to the first power only. It may or may not be linear in the explanatory variables, the $X$'s.*
 
 For example, all of these are **Linear Regression Models** (even though they are nonlinear in variables):
 
 $$
-Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i \\quad \\\text{(Reciprocal)}
+Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i \\quad \\text{(Reciprocal)}
 $$
 
 
 $$
-Y_i = \\\beta_1 + \\\beta_2 \\\ln X_i + u_i \\quad \\\text{(Semilogarithmic)}
+Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Semilogarithmic)}
 $$
 
 
 $$
-\\\ln Y_i = \\\beta_1 + \\\beta_2 X_i + u_i \\quad \\\text{(Inverse semilogarithmic)}
+\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(Inverse semilogarithmic)}
 $$
 
 
 $$
-\\\ln Y_i = \\\ln \\\beta_1 + \\\beta_2 \\\ln X_i + u_i \\quad \\\text{(Logarithmic or double logarithmic)}
+\\ln Y_i = \\ln \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Logarithmic or double logarithmic)}
 $$
 
 
 However, the following models are **NOT** linear regression models:
 
 $$
-Y_i = e^{\\\beta_1 + \\\beta_2 X_i + u_i}
+Y_i = e^{\\beta_1 + \\beta_2 X_i + u_i}
 $$
 
 
 $$
-Y_i = \\\frac{1}{1 + e^{\\\beta_1 + \\\beta_2 X_i + u_i}}
+Y_i = \\frac{1}{1 + e^{\\beta_1 + \\beta_2 X_i + u_i}}
 $$
 
 
@@ -378,7 +381,7 @@ $$
 or
 
 $$
-Y_i = E(Y|X_i) + u_i \\quad \\\text{(2.4.1)}
+Y_i = E(Y|X_i) + u_i \\quad \\text{(2.4.1)}
 $$
 
 Here $u_i$ is an unobservable random variable taking positive or negative values. Technically, $u_i$ is known as the **stochastic disturbance** or **stochastic error term**.
@@ -387,22 +390,26 @@ The expenditure of an individual family can be expressed as the sum of two compo
 1. $E(Y|X_i)$, the **systematic** or **deterministic** component.
 2. $u_i$, the random, or **nonsystematic** component. It is a surrogate or proxy for all the omitted or neglected variables that may affect $Y$ but are not included in the model.
 
+<div className="flex justify-center my-6">
+  <img src="/images/regression_error_term.png" alt="Stochastic Disturbance Error Term Diagram" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
+</div>
+
 If we assume $E(Y|X_i)$ is linear in $X_i$, we can write:
 
 $$
-Y_i = \\\beta_1 + \\\beta_2 X_i + u_i \\quad \\\text{(2.4.2)}
+Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(2.4.2)}
 $$
 
 Eq (2.4.2) posits that consumption is linearly related to income *plus* a disturbance term. Now, if we take the expected value of both sides:
 
 $$
-E(Y_i | X_i) = E[E(Y|X_i)] + E(u_i | X_i) = E(Y|X_i) + E(u_i | X_i) \\quad \\\text{(2.4.4)}
+E(Y_i | X_i) = E[E(Y|X_i)] + E(u_i | X_i) = E(Y|X_i) + E(u_i | X_i) \\quad \\text{(2.4.4)}
 $$
 
 Since $E(Y_i | X_i)$ is the same thing as $E(Y | X_i)$, this implies that:
 
 $$
-E(u_i | X_i) = 0 \\quad \\\text{(2.4.5)}
+E(u_i | X_i) = 0 \\quad \\text{(2.4.5)}
 $$
 
 Therefore, the assumption that the regression line passes through the conditional means of $Y$ implies that the conditional mean values of $u_i$ are explicitly zero.
@@ -473,15 +480,15 @@ As an illustration, pretend that the population of Table 2.1 was not known to us
 Analogously to the PRF, we develop the concept of the **sample regression function (SRF)** to represent the sample regression line:
 
 $$
-\\hat{Y}_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i \\quad \\\text{(2.6.1)}
+\\hat{Y}_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i \\quad \\text{(2.6.1)}
 $$
 
-where $\\hat{Y}$ is read as "Y-hat" or "Y-cap" and represents the estimator of $E(Y|X_i)$, $\\hat{\\\beta}_1$ = estimator of $\\\beta_1$, and $\\hat{\\\beta}_2$ = estimator of $\\\beta_2$. Note that an **estimator**, also known as a (sample) **statistic**, is simply a rule or formula or method that tells how to estimate the population parameter from the information provided by the sample at hand. A particular numerical value obtained by the estimator in an application is known as an **estimate**.
+where $\\hat{Y}$ is read as "Y-hat" or "Y-cap" and represents the estimator of $E(Y|X_i)$, $\\hat{\\beta}_1$ = estimator of $\\beta_1$, and $\\hat{\\beta}_2$ = estimator of $\\beta_2$. Note that an **estimator**, also known as a (sample) **statistic**, is simply a rule or formula or method that tells how to estimate the population parameter from the information provided by the sample at hand. A particular numerical value obtained by the estimator in an application is known as an **estimate**.
 
 Now just as we expressed the PRF in two equivalent forms (deterministic and stochastic), we can express the SRF (2.6.1) in its stochastic form as follows:
 
 $$
-Y_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i + \\hat{u}_i \\quad \\\text{(2.6.2)}
+Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i \\quad \\text{(2.6.2)}
 $$
 
 where, in addition to the symbols already defined, $\\hat{u}_i$ denotes the (sample) **residual** term. Conceptually $\\hat{u}_i$ is analogous to $u_i$ and can be regarded as an *estimate* of $u_i$.
@@ -489,25 +496,25 @@ where, in addition to the symbols already defined, $\\hat{u}_i$ denotes the (sam
 To sum up, our primary objective in regression analysis is to estimate the PRF
 
 $$
-Y_i = \\\beta_1 + \\\beta_2 X_i + u_i
+Y_i = \\beta_1 + \\beta_2 X_i + u_i
 $$
 
 on the basis of the SRF
 
 $$
-Y_i = \\hat{\\\beta}_1 + \\hat{\\\beta}_2 X_i + \\hat{u}_i
+Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i
 $$
 
 Because more often than not our analysis is based upon a single sample from some population, the SRF is at best an approximate one. This approximation is shown diagrammatically in Figure 2.5. For observation $X = X_i$, we have one (sample) observation $Y = Y_i$. In terms of the SRF, the observed $Y_i$ can be expressed as:
 
 $$
-Y_i = \\hat{Y}_i + \\hat{u}_i \\quad \\\text{(2.6.3)}
+Y_i = \\hat{Y}_i + \\hat{u}_i \\quad \\text{(2.6.3)}
 $$
 
 and in terms of the PRF, it can be expressed as:
 
 $$
-Y_i = E(Y|X_i) + u_i \\quad \\\text{(2.6.4)}
+Y_i = E(Y|X_i) + u_i \\quad \\text{(2.6.4)}
 $$
 
 
@@ -529,6 +536,10 @@ $$
   ]
 }
 \`\`\`
+
+<div className="flex justify-center my-6">
+  <img src="/images/sample_regression.png" alt="Sample vs Population Regression Lines" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
+</div>
 
 Obviously, the SRF may overestimate or underestimate the true PRF because of sampling fluctuations. The critical question now is: Granted that the SRF is but an approximation of the PRF, can we devise a method that will make this approximation as "close" as possible? This will occupy much of Chapter 3.
 
@@ -610,29 +621,29 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 
 | Model | Descriptive title |
 | :--- | :--- |
-| **a.** $Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i$ | Reciprocal |
-| **b.** $Y_i = \\\beta_1 + \\\beta_2 \\\ln X_i + u_i$ | Semilogarithmic |
-| **c.** $\\\ln Y_i = \\\beta_1 + \\\beta_2 X_i + u_i$ | Inverse semilogarithmic |
-| **d.** $\\\ln Y_i = \\\ln \\\beta_1 + \\\beta_2 \\\ln X_i + u_i$ | Logarithmic or double logarithmic |
-| **e.** $\\\ln Y_i = \\\beta_1 - \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i$ | Logarithmic reciprocal |
+| **a.** $Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i$ | Reciprocal |
+| **b.** $Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i$ | Semilogarithmic |
+| **c.** $\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i$ | Inverse semilogarithmic |
+| **d.** $\\ln Y_i = \\ln \\beta_1 + \\beta_2 \\ln X_i + u_i$ | Logarithmic or double logarithmic |
+| **e.** $\\ln Y_i = \\beta_1 - \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i$ | Logarithmic reciprocal |
 
 </div>
 
-*Note:* $\\\ln$ = natural log (i.e., log to the base $e$); $u_i$ is the stochastic disturbance term. We will study these models in Chapter 6.
+*Note:* $\\ln$ = natural log (i.e., log to the base $e$); $u_i$ is the stochastic disturbance term. We will study these models in Chapter 6.
 
 **2.7.** Are the following models linear regression models? Why or why not?
-**a.** $ Y_i = e^{\\\beta_1 + \\\beta_2 X_i + u_i} $
-**b.** $ Y_i = \\\frac{1}{1 + e^{\\\beta_1 + \\\beta_2 X_i + u_i}} $
-**c.** $ \\\ln Y_i = \\\beta_1 + \\\beta_2 \\\left(\\\frac{1}{X_i}\\\right) + u_i $
-**d.** $ Y_i = \\\beta_1 + (0.75 - \\\beta_1) e^{-\\\beta_2 (X_i - 2)} + u_i $
-**e.** $ Y_i = \\\beta_1 + \\\beta_2^3 X_i + u_i $
+**a.** $ Y_i = e^{\\beta_1 + \\beta_2 X_i + u_i} $
+**b.** $ Y_i = \\frac{1}{1 + e^{\\beta_1 + \\beta_2 X_i + u_i}} $
+**c.** $ \\ln Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i $
+**d.** $ Y_i = \\beta_1 + (0.75 - \\beta_1) e^{-\\beta_2 (X_i - 2)} + u_i $
+**e.** $ Y_i = \\beta_1 + \\beta_2^3 X_i + u_i $
 
-**2.8.** What is meant by an *intrinsically linear* regression model? If $\\\beta_2$ in exercise 2.7d were $0.8$, would it be a linear or nonlinear regression model?
+**2.8.** What is meant by an *intrinsically linear* regression model? If $\\beta_2$ in exercise 2.7d were $0.8$, would it be a linear or nonlinear regression model?
 
 ***2.9.** Consider the following nonstochastic models (i.e., models without the stochastic error term). Are they linear regression models? If not, is it possible, by suitable algebraic manipulations, to convert them into linear models?
-**a.** $ Y_i = \\\frac{1}{\\\beta_1 + \\\beta_2 X_i} $
-**b.** $ Y_i = \\\frac{X_i}{\\\beta_1 + \\\beta_2 X_i} $
-**c.** $ Y_i = \\\frac{1}{1 + \\exp(-\\\beta_1 - \\\beta_2 X_i)} $
+**a.** $ Y_i = \\frac{1}{\\beta_1 + \\beta_2 X_i} $
+**b.** $ Y_i = \\frac{X_i}{\\beta_1 + \\beta_2 X_i} $
+**c.** $ Y_i = \\frac{1}{1 + \\exp(-\\beta_1 - \\beta_2 X_i)} $
 
 **2.10.** You are given the scattergram in Figure 2.7 along with the regression line. What general conclusion do you draw from this diagram? Is the regression line sketched in the diagram a population regression line or the sample regression line?
 
@@ -747,51 +758,51 @@ The method of ordinary least squares is attributed to Carl Friedrich Gauss. Unde
 Recall the Sample Regression Function (SRF):
 
 $$
-Y_i = \\\hat{\\\\beta}_1 + \\\hat{\\\\beta}_2 X_i + \\\hat{u}_i
+Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i
 $$
 
 We can write the residual as:
 
 $$
-\\\mathbf{u}_i = Y_i - \\\hat{Y}_i = Y_i - \\\hat{\\\\beta}_1 - \\\mathbf{\\\\beta}_2 X_i
+\\mathbf{u}_i = Y_i - \\hat{Y}_i = Y_i - \\hat{\\beta}_1 - \\mathbf{\\beta}_2 X_i
 $$
 
-The OLS principle states that we should choose the sample estimators $\\\mathbf{\\\\beta}_1$ and $\\\mathbf{\\\\beta}_2$ in such a way that the **residual sum of squares (RSS)** is as small as possible:
+The OLS principle states that we should choose the sample estimators $\\mathbf{\\beta}_1$ and $\\mathbf{\\beta}_2$ in such a way that the **residual sum of squares (RSS)** is as small as possible:
 
 $$
-\\\begin{equation}\\\mathbf{ui^2} = \\\\sum (Y_i - \\\mathbf{\\\\beta}_1 - \\\mathbf{\\\\beta}_2 X_i)^2
-\\\end{equation}
+\\begin{equation}\\mathbf{ui^2} = \\sum (Y_i - \\mathbf{\\beta}_1 - \\mathbf{\\beta}_2 X_i)^2
+\\end{equation}
 $$
 
-By taking the partial derivatives of the RSS with respect to $\\\mathbf{\\\\beta}_1$ and $\\\mathbf{\\\\beta}_2$ and setting them to zero, we obtain the **normal equations*:
+By taking the partial derivatives of the RSS with respect to $\\mathbf{\\beta}_1$ and $\\mathbf{\\beta}_2$ and setting them to zero, we obtain the **normal equations*:
 
 $$
-\\\begin{equation}\\\mathbf|\\\\sum Y_i = n\\\mathbf{\\\\beta}_1 + \\\mathbf{\\\\beta}_2 \\\\sum X_i\\\end{equation}
+\\begin{equation}\\mathbf|\\sum Y_i = n\\mathbf{\\beta}_1 + \\mathbf{\\beta}_2 \\sum X_i\\end{equation}
 $$
 
 $$
-\\\begin{equation}\\\\sum Y_i X_i = \\\mathbf{\\\\beta}_1 \\\\sum X_i + \\\hat{\\\\beta}_2 \\\\sum X_i^2\\\end{equation}
+\\begin{equation}\\sum Y_i X_i = \\mathbf{\\beta}_1 \\sum X_i + \\hat{\\beta}_2 \\sum X_i^2\\end{equation}
 $$
 
 Solving these equations simultaneously yields the OLS estimators:
 
 $$
-\\\begin{equation}\\\hat{\\\\beta}_2 = \\\\frac{n\\\\sum X_i Y_i - (\\\\sum X_i)(\\\\sum Y_i)}{n\\\\sum X_i^2 - (\\\\sum X_i)^2} - \\\\frac{\\\\sum x_i y_i}{\\\\sum x_i^2}\\\end{equation}
+\\begin{equation}\\hat{\\beta}_2 = \\frac{n\\sum X_i Y_i - (\\sum X_i)(\\sum Y_i)}{n\\sum X_i^2 - (\\sum X_i)^2} - \\frac{\\sum x_i y_i}{\\sum x_i^2}\\end{equation}
 $$
 
 $$
-\\\begin{equation}\\\hat{\\\\beta}_1 = \\\bar{Y} - \\\hat{\\\\beta}_2 \\\bar{X}\\\end{equation}
+\\begin{equation}\\hat{\\beta}_1 = \\bar{Y} - \\hat{\\beta}_2 \\bar{X}\\end{equation}
 $$
 
-$(Note: lower case letters $x_i$ and $y_i$ denote deviations from their sample means: $x_i = X_i - \\\bar{X}$ and $y_i = Y_i - \\\bar{Y}$.)*
+$(Note: lower case letters $x_i$ and $y_i$ denote deviations from their sample means: $x_i = X_i - \\bar{X}$ and $y_i = Y_i - \\bar{Y}$.)*
 
 #### 3.2 The Classical Linear Regression Model (CLRM)
 The theoretical justification for OLS rests on the CLRM.
-1. **Linear in Parameters**: The regression model is linear in the parameters $\\\\beta$.
+1. **Linear in Parameters**: The regression model is linear in the parameters $\\beta$.
 2. **Fixed $X$ values**: Values taken by the regressor $X$ are considered fixed in repeated sampling.
 3. **Zero Mean of Disturbance**: $E(u_i | X_i) = 0$.
-4. **Homoscedasticity**: Equal variance of $u_i$. $var(u_i | X_i) = \\\\sigma^2$.
-5. **No Autocorrelation**: Given $X$, there is no autocorrelation between the disturbances. $cov(u_i, u_j | X_i, X_j) = 0$ for $i \\\neq j$.
+4. **Homoscedasticity**: Equal variance of $u_i$. $var(u_i | X_i) = \\sigma^2$.
+5. **No Autocorrelation**: Given $X$, there is no autocorrelation between the disturbances. $cov(u_i, u_j | X_i, X_j) = 0$ for $i \\neq j$.
 6. **Zero Covariance between $X_i$ and $u_i$**: $cov(X_i, u_i) = 0$.
 7. **Number of Observations**: The number of observations $n$ must be greater than the number of parameters to be estimated.
 
@@ -799,15 +810,15 @@ The theoretical justification for OLS rests on the CLRM.
 The standard errors are necessary for hypothesis testing and interval estimation:
 
 $$
-var(\\\hat{\\\\beta}_2) = \\\\frac{\\\\sigma^2}{\\\\sum x_i^2} \\\quad , \\\quad se(\\\hat{\\\\beta}_2) = \\\\frac{\\\\sigma}{\\\\sqrt{\\\\sum x_i^2}}
+var(\\hat{\\beta}_2) = \\frac{\\sigma^2}{\\sum x_i^2} \\quad , \\quad se(\\hat{\\beta}_2) = \\frac{\\sigma}{\\sqrt{\\sum x_i^2}}
 $$
 
 $$
-var(\\\hat{\\\\beta}_1) = \\\\frac{\\\\sum X_i^2}{n \\\\sum x_i^2} \\\\sigma^2 \\\quad , \\\quad se(\\\hat{\\\\beta}_1) = \\\\sqrt{\\\\frac{\\\\sum X_i^2}{n \\\\sum x_i^2}} \\\\sigma
+var(\\hat{\\beta}_1) = \\frac{\\sum X_i^2}{n \\sum x_i^2} \\sigma^2 \\quad , \\quad se(\\hat{\\beta}_1) = \\sqrt{\\frac{\\sum X_i^2}{n \\sum x_i^2}} \\sigma
 $$
 
-To estimate the true variance of the disturbance term $\\\\sigma^2$, we use the estimator $\\\hat{\\\\sigma}^2$:
-\\\begin{equation}\\\hat{\\\\sigma}^2 = \\\\frac{\\\\sum \\\hat{u}_i^2}{n - 2}\\\end{equation}
+To estimate the true variance of the disturbance term $\\sigma^2$, we use the estimator $\\hat{\\sigma}^2$:
+\\begin{equation}\\hat{\\sigma}^2 = \\frac{\\sum \\hat{u}_i^2}{n - 2}\\end{equation}
 
 #### 3.4 Properties of Least-Squares Estimators: The Gauss-Markov Theorem
 > **Gauss-Markov Theorem**: Given the assumptions of the CLRM, the least-squares estimators, in the class of unbiased linear estimators, have minimum variance, that is, they are BLUE.
@@ -825,18 +836,18 @@ TSS = ESS + RSS
 $$
 
 $$
-\\\\sum (Y_i - \\\bar{Y})^2 = \\\\sum (\\\hat{Y}_i - \\\bar{Y})^2 + \\\\sum \\\hat{u}_i^2
+\\sum (Y_i - \\bar{Y})^2 = \\sum (\\hat{Y}_i - \\bar{Y})^2 + \\sum \\hat{u}_i^2
 $$
 
 Then, defining $R^2$ as the ratio of the explained variation to the total variation:
 
 $$
-R^2 = \\\\frac{ESS}{TSS} = 1 - \\\\frac{RSS}{TSS} = 1 - \\\\frac{\\\\sum \\\hat{u}_i^2}{\\\\sum y_i^2}
+R^2 = \\frac{ESS}{TSS} = 1 - \\frac{RSS}{TSS} = 1 - \\frac{\\sum \\hat{u}_i^2}{\\sum y_i^2}
 $$
 
 The sample correlation coefficient $r$ is:
 $$
-r = \\\pm \\\\sqrt{R^2} = \\\\frac{\\\\sum x_i y_i}{\\\\sqrt{(\\\\sum x_i^2)(\\\\sum y_i^2)}}
+r = \\pm \\sqrt{R^2} = \\frac{\\sum x_i y_i}{\\sqrt{(\\sum x_i^2)(\\sum y_i^2)}}
 $$
 
 #### 3.6 A Numerical Example
@@ -844,7 +855,7 @@ To illustrate the computations of OLS, we utilize a hypothetical dataset represe
 
 **Table 3.2: Raw Data and Computations**
 
-| $Y_i$ (Consumption) | $X_i$ (Income) | $y_i = Y_i - \\\bar{Y}$ | $x_i = X_i - \\\bar{X}$ | $x_i y_i$ | $x_i^2$ | $y_i^2$ |
+| $Y_i$ (Consumption) | $X_i$ (Income) | $y_i = Y_i - \\bar{Y}$ | $x_i = X_i - \\bar{X}$ | $x_i y_i$ | $x_i^2$ | $y_i^2$ |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 70 | 80 | -41 | -90 | 3690 | 8100 | 1681 |
 | 65 | 100 | -46 | -70 | 3220 | 4900 | 2116 |
@@ -853,36 +864,37 @@ To illustrate the computations of OLS, we utilize a hypothetical dataset represe
 | 110 | 160 | -1 | -10 | 10 | 100 | 1  |
 | 115 | 180 | 4 | 10 | 40 | 100 | 16 |
 | 120 | 200 | 9 | 30 | 270 | 900 | 81 |
-| 140 | 220 | 29 | 50 | 140 | 2500 | 841 |
+| 140 | 220 | 29 | 50 | 14
+0 | 2500 | 841 |
 | 155 | 240 | 44 | 70 | 3080 | 4900 | 1936 |
 | 150 | 260 | 39 | 90 | 3510 | 8100 | 1521 |
 | **Sum: 1110** | **Sum: 1700** | **0** | **0** | **16800** | **33000** | **8890** |
 
-From the table, $\\\bar{Y} = 111$ and $\\\bar{X} = 170$.
+From the table, $\\bar{Y} = 111$ and $\\bar{X} = 170$.
 Using the normal equations:
 $$
-\\\hat{\\\\beta}_2 = \\\\frac{\\\\sum x_i y_i}{\\\\sum x_i^2} = \\\\frac{16800}{33000} = 0.5091
+\\hat{\\beta}_2 = \\frac{\\sum x_i y_i}{\\sum x_i^2} = \\frac{16800}{33000} = 0.5091
 $$
 $$
-\\\hat{\\\\beta}_1 = \\\bar{Y} - \\\hat{\\\\beta}_2 \\\bar{X} = 111 - 0.5091(170) = 24.453
+\\hat{\\beta}_1 = \\bar{Y} - \\hat{\\beta}_2 \\bar{X} = 111 - 0.5091(170) = 24.453
 $$
 
 So the Sample Regression Function is:
 $$
-\\\mathbf{Y}_i = 24.453 + 0.5091 X_i
+\\mathbf{Y}_i = 24.453 + 0.5091 X_i
 $$
 
 We calculate variances:
 $$
-\\\hat{\\\\sigma}^2 = \\\\frac{\\\\sum \\\hat{u}_i^2}{n - 2 = 42.159
+\\hat{\\sigma}^2 = \\frac{\\sum \\hat{u}_i^2}{n - 2 = 42.159
 $$
 $$
-se(\\\hat{\\\\beta}_2) = 0.0357 \\\quad , \\\quad se(\\\mathbf{\\\\beta}_1) = 6.4138
+se(\\hat{\\beta}_2) = 0.0357 \\quad , \\quad se(\\mathbf{\\beta}_1) = 6.4138
 $$
 
 $$R^2$ is calculated as:
 $$
-R^2 = \\\\frac{\\\hat{\\\\beta}_2^2 \\\\sum x_i^2}{\\\\sum y_i^2} = \\\\frac{0.5091^2 \\\\times 33000}{8890} = 0.9621
+R^2 = \\frac{\\hat{\\beta}_2^2 \\sum x_i^2}{\\sum y_i^2} = \\frac{0.5091^2 \\times 33000}{8890} = 0.9621
 $$
 This means approx 96.21% of the variation in weekly consumption expenditure is explained by weekly income.
 
@@ -936,7 +948,7 @@ In cases where theoretical assumptions might break down, Experiments bty Simulat
 5.1 Statistical Prerequisites
 5.2 Interval Estimation: Some Basic Ideas
 5.3 Confidence Intervals for Regression Coefficients
-5.4 Confidence Interval for $\\\sigma^2$
+5.4 Confidence Interval for $\\sigma^2$
 5.5 Hypothesis Testing: General Comments
 5.6 Hypothesis Testing: The Confidence-Interval Approach
 5.7 Hypothesis Testing: The Test-of-Significance Approach
@@ -1172,133 +1184,1793 @@ In cases where theoretical assumptions might break down, Experiments bty Simulat
 22.12 Summary and Conclusions
 
 *(Note: Data, tables, formulas, and graphs will be populated here as provided.)*
-`,
-
-  "ug-monetary": `
-# COMPREHENSIVE MONETARY ECONOMICS STUDY GUIDE
-
-## CHAPTER 1: THE NATURE AND FUNCTIONS OF MONEY
-
-### 1.1 What is Money?
-Anything that is generally acceptable as a medium of exchange, a measure of value, and a store of value.
-
-### 1.2 Functions of Money
-1. **Medium of Exchange**.
-2. **Measure of Value** (Unit of Account).
-3. **Standard of Deferred Payments**.
-4. **Store of Value**.
-
-### 1.3 The Demand for Money (Liquidity Preference)
-Keynesian motives:
-1. **Transactions Motive**.
-2. **Precautionary Motive**.
-3. **Speculative Motive**.
+`,"ug-monetary":`# MONETARY ECONOMICS
 
 ---
 
-## CHAPTER 2: THE QUANTITY THEORY OF MONEY
+## CHAPTER 1: INTRODUCTION: ISSUES IN MONETARY ECONOMICS
 
-### 2.1 The Fisher Equation of Exchange
-$$MV = PY$$
-Where $M$ = Money Supply, $V$ = Velocity, $P$ = Price Level, $Y$ = Real Output.
+Monetary Economics is the study of how money, interest rates, and financial systems influence economic variables such as output, employment, and inflation. In this section, we examine the fundamental definitions of money, its evolution over time, and its critical role in the macroeconomy.
 
 ---
 
-## CHAPTER 3: CENTRAL BANKING AND MONETARY POLICY
+### 1.1.1 Definition; Functions and Evolution of Money
 
-### 3.1 The Role of the Central Bank
-Managing the currency and maintaining monetary stability.
+Money is not defined by any single property, but by the functions it performs. As Sir John Hicks (1967) famously noted, *"Money is what money does."*
 
-### 3.2 Instruments of Monetary Policy
-- **Quantitative Tools**: OMO, Bank Rate, Reserve Requirements.
-- **Qualitative Tools**: Moral Suasion, Credit Rationing.
+#### 1. Functional Definitions of Money
+Prof. Coulbourn defines money as a *"means of valuation and of payment in terms of the unit of account and exchange."* This definition includes cash, cheques, gold, and other highly-liquid instruments, so long as they can perform transaction and evaluation services.
+- **Legal Definition**: Anything backed by law to be accepted by everyone for the settlement of debt or payment is called money (legal tender).
+- **Theoretical/Traditional Definition**: Traditional currency plus demand deposits. They are 100% liquid.
 
 ---
 
-## CHAPTER 4: THE IS-LM MODEL
+### Primary Functions of Money
+The two primary functions of money are to act as a medium of exchange/payment and as a unit of account.
 
-### 4.1 The IS Curve
-Relationship between interest rates and output where $I = S$. Slopes downward.
+1. **Medium of Exchange/Payment**:
+   Traditionally, money serves as the intermediary in trades. In a modern context where transactions can be conducted with credit and debit cards, Handa (2009) refers to it as the *medium of (final) payments*. This is the primary function of money.
+   - **Overcomes Barter Frictions**: Eliminates the "double coincidence of wants".
+   - **Factor of Production**: By facilitating specialization and division of labour, money increases efficiency and output. Prof. Walters describes it as a "factor of production" enabling diversified output.
 
-### 4.2 The LM Curve
-Relationship where $L = M$. Slopes upward.
+2. **Unit of Account**:
+   Money is the standard for measuring value, just as a meter is the standard for measuring length.
+   - **Price Simplification**: Expresses the exchange value of goods and services as a price.
+   - **Barter Pricing vs. Monetary Pricing**:
+     In a barter economy with $n$ commodities, the number of relative exchange rates matches the formula:
+     $$\\frac{n(n-1)}{2}$$
+     In a monetary economy, money acts as a common denominator, reducing the number of prices to a simple:
+     $$n - 1$$
+     *Example Table (Price Reduction):*
+     | Number of Goods ($n$) | Barter Relative Prices | Monetary Prices ($n-1$) |
+     | :--- | :--- | :--- |
+     | 5 | 10 | 4 |
+     | 10 | 45 | 9 |
+     | 100 | 4,950 | 99 |
+     | 500 | 124,750 | 499 |
 
 \`\`\`chart
 {
   "type": "line",
-  "title": "Figure 4.1: The IS-LM Equilibrium",
-  "xAxis": "output",
-  "yAxis": "interest_rate",
+  "title": "Systemic Price Listings: Barter (Quadratic) vs. Monetary (Linear) Complexity",
+  "xAxis": "goods",
+  "yAxis": "prices",
   "data": [
-    {"output": 10, "IS": 10, "LM": 2},
-    {"output": 20, "IS": 8, "LM": 4},
-    {"output": 30, "IS": 6, "LM": 6},
-    {"output": 40, "IS": 4, "LM": 8},
-    {"output": 50, "IS": 2, "LM": 10}
+    {"goods": 2, "barter": 1, "monetary": 1},
+    {"goods": 5, "barter": 10, "monetary": 4},
+    {"goods": 10, "barter": 45, "monetary": 9},
+    {"goods": 20, "barter": 190, "monetary": 19},
+    {"goods": 50, "barter": 1225, "monetary": 49},
+    {"goods": 100, "barter": 4950, "monetary": 99}
   ],
   "series": [
-    {"key": "IS", "name": "IS Curve", "color": "#ef4444"},
-    {"key": "LM", "name": "LM Curve", "color": "#3b82f6"}
+    {"key": "barter", "name": "Barter Price Listings Needed", "color": "#f43f5e"},
+    {"key": "monetary", "name": "Monetary Price Listings Needed", "color": "#10b981"}
   ]
 }
 \`\`\`
-`,
 
-  "ug-development": `
-# COMPREHENSIVE DEVELOPMENT ECONOMICS STUDY GUIDE
+> **Graph Analysis — Barter vs. Monetary Pricing**:
+> The chart visualizes how a barter economy leads to a quadratic explosion in required price tags. For an economy with $n$ goods, direct barter trades require $n(n-1)/2$ relative exchange rates, leading to 4,950 price listings for just 100 goods. Introducing money as a default unit of account collapses transaction complexity to a linear relationship of $n-1$, requiring only 99 prices for 100 goods. This structural simplification enormously reduces the informational cost of search, observation, and negotiation, enabling deep market specialization and trade expansion.
 
-## CHAPTER 1: PRINCIPLES AND CONCEPTS
+To dynamically compute pricing listings complexity based on the size of the transactional commodity basket, launch the interactive calculator below:
 
-### 1.1 What is Development Economics?
-Dealing with economic aspects of the development process in low-income countries.
-
-### 1.2 Core Values of Development
-Sustenance, Self-Esteem, Freedom from Servitude.
-
----
-
-## CHAPTER 2: CLASSIC THEORIES
-
-### 2.1 Harrod-Domar Growth Model
-$$g = \\\frac{s}{v}$$
-### 2.2 Lewis Two-Sector Model
-Transfer of labor from agriculture to industry.
+\`\`\`simulator
+{
+  "mode": "barter_pricing",
+  "title": "Interactive Barter vs. Monetary Pricing Complexity Calculator"
+}
+\`\`\`
 
 ---
 
-## CHAPTER 3: CONTEMPORARY MODELS
+### Secondary and Contingent Functions of Money
 
-### 3.1 Solow Growth Model
-$$Y = A K^\\alpha L^{1-\\alpha}$$
+#### 1. Secondary Functions
+- **Store of Value**:
+  Money serves as a bridge from the present to the future. Unlike other wealth-storing assets (promissory notes, bonds, mortgages, real estate), money has no storage costs and is instantly liquid, although it does not yield interest or rent and loses purchasing power during inflation.
+- **Standard of Deferred Payments**:
+  Future or postponed payments (debts) are taken and settled in money. Under barter, taking loans in goats or perishable grains and repaying them years later was highly problematic.
+- **Transfer of Value**:
+  Allows purchasing power to be easily transferred across geographic regions or individuals.
+
+#### 2. Contingent Functions (Prof. David Kinley)
+- **Liquidity**: Money is the most liquid of all assets and aids the overall liquidity of other wealth forms.
+- **Basis of the Credit System**: Creditors lend because they expect repayment in money. Cash reserves form the basis of credit creation via the money multiplier.
+- **Equalization of Marginal Utility and Productivity**:
+  - For consumers, utility-maximizing combinations of goods are achieved when the ratio of marginal utilities equals price ratios:
+    $$MU_x = \\lambda P_x \\implies \\frac{MU_x}{P_x} = \\lambda$$
+  - For firms, factor hiring is optimized where wages ($W$) equal the marginal productivity of labour ($MPL$):
+    $$W = P \\cdot MPL \\implies \\frac{W}{P} = MPL$$
+- **Measurement and Distribution of National Income**:
+  Money allows the total income and GDP of a nation to be computed. Rewards to factors of production (wages, rent, interest, profit) are all determined and paid in money.
 
 ---
 
-## CHAPTER 4: POVERTY AND INEQUALITY
+### Evolution of Money
 
-### 4.1 The Lorenz Curve
+Money has evolved through progressive stages of dematerialization:
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Evolutionary Stages of Money: Liquidity vs. Material Intrinsic Value",
+  "xAxis": "stage",
+  "yAxis": "value",
+  "data": [
+    {"stage": "Barter System", "material_value": 100, "liquidity": 10},
+    {"stage": "Commodity Money", "material_value": 90, "liquidity": 30},
+    {"stage": "Metallic Coins", "material_value": 75, "liquidity": 60},
+    {"stage": "Paper Fiat Money", "material_value": 5, "liquidity": 90},
+    {"stage": "Electronic/Digital", "material_value": 0, "liquidity": 100}
+  ],
+  "series": [
+    {"key": "material_value", "name": "Intrinsic Value", "color": "#f43f5e"},
+    {"key": "liquidity", "name": "Transaction Liquidity", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Evolution of Money**:
+> This bar chart illustrates the historical process of dematerializing money—defined as the systematic surrender of physical intrinsic commodity value to achieve near-limitless transactional speed and absolute liquidity. While raw commodity barter and commodity systems enjoy maximum material presence, their transacting efficiency is severely limited. Modern fiat card payments and smartphone transactions feature 0% intrinsic commodity value, yet provide 100% immediate transaction liquidity. This illustrates the societal paradigm shift from valuing money for its physical component to valuing it for its collective consensus and network efficiency.
+
+1. **Barter System**: Directly exchanging merchandise for merchandise without value equivalence.
+   *Main Difficulties:*
+   - Lack of double coincidence of wants.
+   - Lack of a common measure of value.
+   - Indivisibility of certain goods (e.g., cattle).
+   - Difficulty in storing value (perishable commodities).
+   - Difficulty in making deferred/future payments.
+   - Lack of economic specialization.
+2. **Commodity Money**: Utilizing natural resources or livestock (cattle/pecunia, salt/salário, cowries, tobacco, cloth). Lost popularity due to storage perishability, high transportation costs, and lack of homogeneity.
+3. **Metallic Money (Metal & Coined)**: Uncoined gold/silver ingots required constant weighing and purity assaying. Government standardized coinage by minting coins with fixed weights and official stamps, providing face-value guarantees.
+4. **Paper Fiat Money**: In the Middle Ages, goldsmiths issued paper receipts for gold deposits. These receipts began circulating as a medium of payments, giving rise to bank notes. Inconvertible *fiat money* possesses no intrinsic value but is declared legal tender by government decree.
+5. **Near Money**: Financial assets like cheques, treasury bills, bonds, and debentures that are highly liquid and close substitutes for money, transferable with minimal cost.
+6. **Electronic and Mobile Money**: Digital cash transfers (e-money, ATM cards, smart cards, internet banking, e-zwich in Ghana). *Mobile money* is an electronic wallet service accessed via mobile networks, essential in African countries to bypass traditional banking shortages.
+7. **Digital Currency & Cryptocurrencies**: Cryptographically secured code with monetary value based on decentralized consensus (like Bitcoin, introduced in 2009).
+
+#### Summary of the Historical Evolution of Money
+| Stage of Evolution | Physical Manifestion | Intrinsic Value (%) | Transfer Speed / Portability Friction | Major Limitations / System Vulnerabilities |
+| :--- | :--- | :---: | :---: | :--- |
+| **Barter System** | Hand-to-hand real merchandise | 100% | Ultra-Low (high travel weight) | Lack of double coincidence of wants; high transaction search costs. |
+| **Commodity Money** | Gold grains, cowries, salt, cattle | 90% - 100% | Low (high bulk & volume) | Storage perishability; lack of homogeneity/divisibility. |
+| **Metallic Coins** | Minted gold/silver coins | 50% - 95% | Medium (heavy weight) | Debasement risk; extraction/mining constraints limiting elastic supply. |
+| **Paper Fiat Money** | Printed bills, treasury banknotes | 0% | High (lightweight paper) | Hyperinflation risk if over-printed; counterfeiting vulnerability. |
+| **Electronic Fiat** | Digital ledger entries, cards | 0% | Very High (immediate clearance) | Centralized network dependencies; clearing bank fees. |
+| **Cryptocurrency** | Cryptographic token (blockchain) | 0% | Global/Fast (decentralized) | High price volatility; transaction fees; regulatory crackdowns. |
+
+---
+
+### 1.1.2 The Role of Money in Macroeconomy
+
+Money acts as the "lubricant" that oils the engine of economic growth.
+- **Growth constraints**: Too little money causes a liquidity freeze and slows growth; too much money results in inflation, eroding capital formation.
+- **Static vs. Dynamic Role**:
+  - **Static Role**: Emerges from traditional functions (medium of exchange, standard of value).
+  - **Dynamic Role**: Money dynamically alters aggregate levels of spending, prices, investment, and employment.
+    - *To Consumers*: Empowers consumer sovereignty and allows saving.
+    - *To Producers*: Instills calculation of costs, revenue, and profit. Enables investment planning.
+    - *Capital Formation*: Transfers inactive savings into active capital investment.
+    - *GDP Index*: Serves as the nominal metric of national income and GDP.
+
+To understand how aggregate liquidity levels impact national output, the chart below visualizes the non-linear relationship between annual money supply expansion, real GDP output growth, and aggregate consumer inflation rates:
+
+\`\`\`chart
+{
+  "type": "combo",
+  "title": "Macroeconomic Sizing: Real GDP Growth and Inflation vs. Annual Money Growth",
+  "xAxis": "money_growth",
+  "yAxis": "rate",
+  "data": [
+    {"money_growth": "0% (Liquidity Freeze)", "GDP_Growth": -1.5, "Inflation": 0.2},
+    {"money_growth": "3% (Conservative)", "GDP_Growth": 2.0, "Inflation": 1.5},
+    {"money_growth": "6% (Optimal Balance)", "GDP_Growth": 4.8, "Inflation": 2.8},
+    {"money_growth": "10% (Expansionary)", "GDP_Growth": 3.5, "Inflation": 6.5},
+    {"money_growth": "20% (Overheated)", "GDP_Growth": 1.2, "Inflation": 18.5},
+    {"money_growth": "45% (Stagflation Spiral)", "GDP_Growth": -3.5, "Inflation": 78.0}
+  ],
+  "series": [
+    {"key": "GDP_Growth", "name": "Real GDP Growth Rate (%)", "color": "#10b981", "type": "line"},
+    {"key": "Inflation", "name": "Annual Inflation Rate (%)", "color": "#f43f5e", "type": "bar"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Money Supply Optimization**:
+> This combination diagram displays the non-linear relationship of monetary growth to the real economy. At zero money growth, a severe liquidity shortage compresses real GDP growth to a negative -1.5% as transactions buckle under cash deficits. An optimal money supply growth of approximately 5-7% maximizes real GDP growth (reaching 4.8%) with mild, stable inflation (2.8%). However, pushing monetary growth past the economy's productive capacity triggers rapid price rises without boosting output. At 45% money expansion, real GDP drops into severe contraction (-3.5%) while inflation spikes to 78%, showing how runaway money growth erodes real productivity and causes stagflation.
+
+---
+
+### 1.1.3 Changing Paradigms in Monetary Theory
+
+Monetary thought is divided into two primary competing paradigms regarding the *neutrality* of money:
+
+1. **Classical Paradigm (Neutrality of Money)**:
+   - Money is simply a "veil" or wrapper that camouflages real economic forces. It acts strictly as a medium of exchange.
+   - Adam Smith: *"Money is like a road which helps in transporting goods to market, but the road does itself not produce anything."*
+   - Real output ($Y$) and employment are determined by real structural factors (capital, technology, labor supply) under perfect competition and flexible wages/prices.
+   - Increasing the money supply affects only nominal variables (monetary wages, price levels), leaving real consumption and real output unaffected.
+2. **Keynesian Paradigm (Non-Neutrality of Money)**:
+   - Money is a store of value that bridges the uncertain present with the future, creating a direct link between monetary and real sectors.
+   - Nominal rigidities (sticky wages and prices) prevent markets from clearing instantaneously in the short run.
+   - An increase in monetary supply lowers interest rates, boosting investment spending and directly raising output and employment. Money is non-neutral in the short run (though neutral in the analytical long run).
+- **Monetarism**: A hybrid. Monetarists agree with Classical neutrality in the long run (natural rate of unemployment), but acknowledge short-run non-neutrality where monetary policy shifts can trigger temporary output fluctuations.
+- **New Keynesianism**: Assumes households have rational expectations but incorporates market failures (imperfect competition, sticky prices/wages) to justify active monetary stabilization by the central bank.
+
+#### Comparison of the Master Macroeconomic Paradigms
+| Paradigm School | Short-Run Neutrality? | Long-Run Neutrality? | Policy Transmission Channel | Wage & Price Flexibility | Recommended Policy Rule |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Classical** | **Neutral** (veil) | **Neutral** (veil) | Direct Cash Balance Effect (spending $M$ directly) | **Fully Flexible** (self-clearing markets) | No discretion; strict gold standard or rigid constant money anchor |
+| **Keynesian** | **Non-Neutral** | **Non-Neutral** (potential trap) | Indirect Interest Rate (lower rate $\\rightarrow$ higher $I$) | **Sticky Downward** (minimum wages/contracts) | Discretionary active fiscal and monetary stabilization |
+| **Monetarist** | **Non-Neutral** (imperfect info) | **Neutral** (permanent income) | Broad Portfolio Adjust (bonds, equities, real goods) | **Flexible in Medium Run** | Rigid Money Supply Growth Rule ($k$-percent rule) |
+| **New Keynesian** | **Non-Neutral** (nominal rigidity) | **Neutral** (natural rates) | Real Interest Rate channel ($r$ alters current demand) | **Sticky in Short Run** (menu costs/implicit agreements) | Taylor-Rule-based inflation targeting |
+| **Real Business Cycle** | **Neutral** (anticipation) | **Neutral** (supply-led) | No output link (real technology shocks drive cycles) | **Ultra-Flexible** (rational choice) | Passive policy; avoid distortive intervention |
+
+---
+
+## CHAPTER 2: THE DEMAND FOR MONEY
+
+Why do individuals, households, and firms wish to hold liquid money instead of interest-yielding productive assets? Various schools of thought address this query.
+
+---
+
+### 1.2.1 Classical Approach to Demand for Money: Fisher's Equation
+
+The Classical demand for money is transactional, viewing money strictly as a medium of exchange.
+
+#### Irving Fisher's Cash Transactions Equation (1911)
+$$MV + M'V' = PT$$
+Where:
+- $M$ = Quantity of currency/cash.
+- $V$ = Velocity of cash circulation.
+- $M'$ = Quantity of credit money (bank deposits).
+- $V'$ = Velocity of credit money.
+- $P$ = General price level.
+- $T$ = Real volume of transactions.
+
+This equation can be transformed into a demand-for-money theory by assuming that equilibrium requires supply to equal demand ($M_s = M_d$). Assuming a constant ratio between $M'$ and $M$, and that velocity $V$ and real transactions $T$ are fixed in the short run due to full-employment constraints, Fisher’s equation is rewritten as:
+$$P = \\frac{MV + M'V'}{T} \\implies P_t = f(M_t)$$
+
+#### Classical Positive-Inverse Relationship
+- **Panel A (Prices)**: Price level ($P$) is positively and proportionally related to money stock ($M_{supply}$). If the quantity of money is doubled, the price level doubles.
+- **Panel B (Value of Money)**: The value/purchasing power of money ($1/P$) is inversely and proportionally related to the quantity of money. If money supply is doubled, the value of money is halved.
+
+\`\`\`chart
+{
+  "type": "combo",
+  "title": "Fisher's Quantity Theory: Price Level vs. Value of Money",
+  "xAxis": "money_supply",
+  "yAxis": "rate",
+  "data": [
+    {"money_supply": 100, "price_level": 1.0, "value_of_money": 2.0},
+    {"money_supply": 200, "price_level": 1.9, "value_of_money": 1.0},
+    {"money_supply": 400, "price_level": 3.8, "value_of_money": 0.5}
+  ],
+  "series": [
+    {"key": "price_level", "name": "Price Level (P)", "color": "#ef4444", "type": "line"},
+    {"key": "value_of_money", "name": "Value of Money (1/P)", "color": "#10b981", "type": "scatter"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Irving Fisher's Monetarist Classical Duality**:
+> This composite visualization illustrates the double-proportionality doctrine of Classical monetary economics. As the nominal money stock ($M_{supply}$, horizontal axis) expands, the General Price Level ($P$, represented by the red line) rises proportionally, reflecting the classical assumption that nominal wealth chases a rigid, full-employment level of real output ($Y$). Conversely, the actual purchasing power value of a unit of currency ($1/P$, represented by the green scatter points) drops hyperbolically, cutting value precisely in half as money supply doubles. This supports the theorem of cash neutrality—where changing nominal money volumes purely inflate price tags without leaving any lasting mark on real aggregate production.
+
+#### Implied Classical Demand for Money
+Surgically separating cash transactions, the demand for transactions balances can be expressed as:
+$$M_d = \\frac{PT}{V} = \\left(\\frac{1}{V}\\right) PT$$
+The demand for nominal money represents a fixed fraction of total transactions value and is completely insensitive to interest rates.
+
+---
+
+### The Cambridge Cash Balance Equations
+
+Cambridge economists (Marshall, Pigou, Robertson) shifted focus from the *velocity of transactions* to the *store of value* choice of wealth holders.
+
+1. **Alfred Marshall's Equation**:
+   $$M = kPY$$
+   Where $Y$ is real national output/income (a proxy for transactions) and $k$ is the fraction of nominal income $PY$ that the public desires to hold as liquid cash.
+   - $k$ is the inverse of income velocity ($k = 1/V_{income}$).
+   - This formulation introduces a behavioral dimension: holding cash is a choice based on interest rates, wealth, and expectations.
+2. **Arthur Pigou's Equation**:
+   $$P = \\frac{kR}{M}$$
+   Where $P$ represents the value of money (purchasing power, $1/Price$), $R$ is real national income, and $M$ is money supply.
+   Pigou extended this to explicitly model the banking sector:
+   $$P = \\frac{kR}{M[c + h(1-c)]}$$
+   Where:
+   - $c$ = Capital/cash held directly by the public.
+   - $1-c$ = Fraction of money held as bank deposits.
+   - $h$ = Cash reserve ratio maintained by commercial banks against deposits.
+3. **Dennis Robertson's Equation**:
+   $$M = PKT \\quad \\text{or} \\quad P = \\frac{M}{KT}$$
+   This is the neatest bridge between Fisher and Marshall, where $T$ represents the real volume of transactions.
+
+#### Comparison: Classical Cash Transactions vs. Cash Balances Models
+| Theoretical Dimension | Irving Fisher's Cash Transactions (Velocity) Approach | Cambridge Cash Balances (Store of Value) Approach |
+| :--- | :--- | :--- |
+| **Core Equation** | $$MV + M'V' = PT$$ | $$M = kPY$$ |
+| **Primary Concept of Money** | Money is strictly a **medium of exchange** (only valued when in motion/spent). | Money is a **store of value** (the pool of utility held idle as wealth security). |
+| **Key Parameter** | **Velocity ($V$)**: Technical rate of cash turnover per year. | **Cash Fraction ($k$)**: Behavioral demand to hold sovereign liquid cash. |
+| **Microeconomic Foundation** | Absent: Focuses on macroeconomic-technical clearing identities. | Present: Focuses on individual choice and utility of liquidity balances. |
+| **Determinants of Parameter** | Rigid mechanical variables: payment habits, technical banking density. | Subjective variables: wealth levels, expectations, confidence, interest rates. |
+| **Scope of Transactions** | Includes all transactions $T$ (both intermediate commodity and final product trades). | Restricted to final national income $Y$ (excluding intermediate inputs to avoid double counting). |
+| **Short-Run Behavior** | Highly stable: velocity of circulation is assumed constant in short term. | Highly volatile: cash-holding desires change with market panic or confidence shocks. |
+
+---
+
+### 1.2.2 Theories of Demand of Money: Baumol and Tobin-Markowitz Model
+
+#### 1. William Baumol's Inventory Theoretics (1952)
+Baumol applied inventory optimization models (similar to firm management of manufacturing components) to transactions cash balances.
+- **The Tradeoff**: An individual receives a lump-sum income $Y$ at the start of a period and spends it evenly over time. To earn interest, they place wealth in bonds yielding interest rate $R$.
+- **Withdrawals**: They cash bonds in discrete lots of size $W$.
+- **Brokerage Cost**: For every bond-to-cash transaction, they pay a brokerage transaction fee consisting of a fixed cost $B_0$ plus a variable rate $B_1$ per dollar:
+  $$\\text{Brokerage Cost} = B_0 + B_1 W$$
+- **Optimization Problem**:
+  The total number of withdrawals over the period is $n = Y/W$.
+  Since they spend cash evenly, average cash balance is $W/2$.
+  The opportunity cost of holding cash is the foregone interest: $R \\cdot \\left(\\frac{W}{2}\\right)$.
+  Total Cost ($C$) to minimize is:
+  $$C = R \\left(\\frac{W}{2}\\right) + B_0 \\left(\\frac{Y}{W}\\right) + B_1 Y$$
+  Taking the derivative of cost with respect to withdrawal size $W$ and setting it to zero yields:
+  $$\\frac{\\partial C}{\\partial W} = \\frac{R}{2} - \\frac{B_0 Y}{W^2} = 0 \\implies W^* = \\sqrt{\\frac{2 B_0 Y}{R}}$$
+  This is the famous **Baumol-Tobin Square Root Formula**. The average transactions demand for money ($M^{tr}$) is $W^*/2$:
+  $$M^{tr} = \\frac{1}{2} W^* = \\sqrt{\\frac{B_0 Y}{2R}} = \\left(\\frac{B_0}{2}\\right)^{0.5} Y^{0.5} R^{-0.5}$$
+
+- **Key Implications**:
+  - Transactions demand is **interest-elastic** with an elasticity of $-0.5$. High interest rates economy cash holdings.
+  - There are economies of scale in cash management: income elasticity of demand is $0.5$ (meaning transactions demand grows slower than income).
+  - If we express $B_0$ in real terms ($B_0 = P \\cdot b_0$), price elasticity is exactly $1.0$ (no money illusion).
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Baumol-Tobin Cost Optimization Curve: Finding W* to Minimize Total Cost",
+  "xAxis": "withdrawal_size",
+  "yAxis": "cost",
+  "data": [
+    {"withdrawal_size": 1000, "brokerage_cost": 500, "opportunity_cost": 25, "total_cost": 525},
+    {"withdrawal_size": 2000, "brokerage_cost": 250, "opportunity_cost": 50, "total_cost": 300},
+    {"withdrawal_size": 4000, "brokerage_cost": 125, "opportunity_cost": 100, "total_cost": 225},
+    {"withdrawal_size": 6000, "brokerage_cost": 83, "opportunity_cost": 150, "total_cost": 233},
+    {"withdrawal_size": 8000, "brokerage_cost": 62, "opportunity_cost": 200, "total_cost": 262},
+    {"withdrawal_size": 10000, "brokerage_cost": 50, "opportunity_cost": 250, "total_cost": 300}
+  ],
+  "series": [
+    {"key": "brokerage_cost", "name": "Total Brokerage Fees (b0 * Y / W)", "color": "#f59e0b"},
+    {"key": "opportunity_cost", "name": "Foregone Bond Interest (R * W / 2)", "color": "#0ea5e9"},
+    {"key": "total_cost", "name": "Aggregate Transaction Cost", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Baumol's Cash Inventory Trade-Off**:
+> This plot details the classic inventory trade-off optimization under the Baumol-Tobin model. The investor is confronted with two types of cost: a fixed transaction brokerage fee (the downward-sloping amber curve, which decreases with larger withdrawal lot sizes $W$ as the number of trips drops) and the opportunity cost of foregone interest (the linear blue line, which increases with $W$ because larger withdrawals lead to a higher average cash balance $W/2$ held idle). The total cost curve (the green line) sums both. The cost-minimizing vertex ($W^* = 4000$) occurs exactly where the interest opportunity cost curve intersects the brokerage fee curve, validating the inventory model's equilibrium condition.
+
+To dynamically simulate Baumol-Tobin cash withdrawal lot sizing constraints, opportunity cost tradeoffs, and optimal transaction counts, use the simulator below:
+
+\`\`\`simulator
+{
+  "mode": "baumol_tobin",
+  "title": "Interactive Baumol-Tobin Cash Inventory Optimization Simulator"
+}
+\`\`\`
+
+The chart below shows how aggregate cash demand (average cash holding $M^*$) responds to interest rate fluctuations under the model's parameters:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Baumol-Tobin Cash Balance Sensitivity to Interest Rates (b0 = ₦10, Y = ₦50,000)",
+  "xAxis": "interest_rate",
+  "yAxis": "average_cash",
+  "data": [
+    {"interest_rate": "2%", "optimal_withdrawal": 7071, "average_cash": 3535},
+    {"interest_rate": "4%", "optimal_withdrawal": 5000, "average_cash": 2500},
+    {"interest_rate": "6%", "optimal_withdrawal": 4082, "average_cash": 2041},
+    {"interest_rate": "8%", "optimal_withdrawal": 3535, "average_cash": 1768},
+    {"interest_rate": "10%", "optimal_withdrawal": 3162, "average_cash": 1581},
+    {"interest_rate": "12%", "optimal_withdrawal": 2886, "average_cash": 1443},
+    {"interest_rate": "15%", "optimal_withdrawal": 2581, "average_cash": 1290}
+  ],
+  "series": [
+    {"key": "optimal_withdrawal", "name": "Optimal Withdrawal Size (W*)", "color": "#0ea5e9"},
+    {"key": "average_cash", "name": "Average Cash Balance held (M* = W*/2)", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Interest Rate Sensitivity**:
+> This chart models the downward-sloping relationship between the nominal interest rate and desired cash balances. At ultra-low interest rates (e.g., 2%), the opportunity cost of holding liquid cash is low, encouraging large withdrawal sizes ($W^*$) and an average cash holding ($M^* = W^*/2$) exceeding ₦3,530. However, as bond yields climb to 15%, the opportunity cost rises dramatically, compelling wealth holders to make frequent, small withdrawals. This halves their average cash balance to ₦1,290. This confirms that the transactions demand for money is highly elastic to interest rates, with a constant elasticity of $-0.5$ in the inventory model.
+
+---
+
+#### 2. James Tobin's Portfolio Selection Model: Behavior Toward Risk (1958)
+Tobin resolved a major flaw in Keynesian speculative demand: why do individuals hold a mixed portfolio of both money and bonds, rather than going "all-in" on one or the other?
+- **Assumptions**:
+  - Investor holds wealth $W$ split between interest-free safe cash ($M$) and risky bonds ($B$). So $W = M + B$.
+  - Bonds yield return $R_B = i + g$.
+  - Expected capital gain $E(g) = 0$, but actual capital gain is risky with variance $\\sigma_g^2$.
+  - Risk is measured by the portfolio's standard deviation $\\sigma_R$. Let $A$ be the fraction of wealth put in bonds ($0 \\leq A \\leq 1$).
+  - Portfolio expected return: $\\mu = A \\cdot i$.
+  - Portfolio risk: $\\sigma_R = A \\cdot \\sigma_g \\implies A = \\frac{\\sigma_R}{\\sigma_g}$.
+  - Substituting $A$ into expected return gives the **Opportunity Locus**:
+    $$\\mu = \\left(\\frac{i}{\\sigma_g}\\right) \\sigma_R$$
+- **Indifference Curves**:
+  A risk-averse investor’s utility $U = f(\\mu, \\sigma_R)$ requires compensation (higher $\\mu$) to bear more risk ($\\sigma_R$), resulting in upward-sloping, convex indifference curves.
+- **Equilibrium**:
+  The optimal allocation is achieved at the tangency point $E$ of the opportunity locus and the highest indifference curve.
+  - As interest rate $i$ rises, the slope of the opportunity locus increases (rotations upward). The substitution effect induces the investor to accept more risk and hold more bonds, reducing money holdings. This yields a smooth, downward-sloping speculative demand for money.
+
+The chart below maps Tobin's asset frontier, demonstrating the linear Opportunity Locus and the optimal tangency selection along a risk-averse investor's Indifference Curves:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Tobin's Asset Frontier: Optimizing Bond vs. Cash Allocation under Risk Aversion",
+  "xAxis": "portfolio_risk",
+  "yAxis": "expected_return",
+  "data": [
+    {"portfolio_risk": 0, "Opportunity_Locus": 0.0, "Indifference_Curve_1": 4.5, "Indifference_Curve_2": 2.5, "Optimal_Tangency_Point": null},
+    {"portfolio_risk": 10, "Opportunity_Locus": 2.0, "Indifference_Curve_1": 4.7, "Indifference_Curve_2": 2.8, "Optimal_Tangency_Point": null},
+    {"portfolio_risk": 20, "Opportunity_Locus": 4.0, "Indifference_Curve_1": 5.2, "Indifference_Curve_2": 4.0, "Optimal_Tangency_Point": 4.0},
+    {"portfolio_risk": 30, "Opportunity_Locus": 6.0, "Indifference_Curve_1": 6.2, "Indifference_Curve_2": 5.8, "Optimal_Tangency_Point": null},
+    {"portfolio_risk": 40, "Opportunity_Locus": 8.0, "Indifference_Curve_1": 8.1, "Indifference_Curve_2": 8.5, "Optimal_Tangency_Point": null},
+    {"portfolio_risk": 50, "Opportunity_Locus": 10.0, "Indifference_Curve_1": 11.2, "Indifference_Curve_2": 12.0, "Optimal_Tangency_Point": null}
+  ],
+  "series": [
+    {"key": "Opportunity_Locus", "name": "Opportunity Locus (slope = i/sigma)", "color": "#cbd5e1"},
+    {"key": "Indifference_Curve_1", "name": "Indifference Curve 1 (Lower Utility)", "color": "#f43f5e"},
+    {"key": "Indifference_Curve_2", "name": "Indifference Curve 2 (Tangency Utility)", "color": "#10b981"},
+    {"key": "Optimal_Tangency_Point", "name": "Optimal Allocation Equilibrium (E)", "color": "#0ea5e9", "type": "scatter"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Tobin's Frontier Portfolio Selection**:
+> This chart maps the optimization problem of the modern portfolio approach. The straight gray line represents the Opportunity Locus, showing the expected rate of portfolio return (\\mu, vertical axis) achievable for any amount of portfolio risk (\\sigma_R, horizontal axis) given the nominal interest rate. The red and green curves represent the upward-sloping, convex Indifference Curves of a risk-averse investor. The investor maximizes utility at point $E$ (the blue dot at risk 20, expected return 4.0%), where the opportunity line is exactly tangent to the highest attainable Indifference Curve 2. At this point, the ratio of marginal utility of return to risk matches the slope of the market opportunity locus.
+
+#### Theoretical Comparison of Microfounded Money Demand Models
+| Microfounded Model | Primary Motive Examined | Portfolio Asset Options | Interest-Rate Sensitivity (\\partial M_d / \\partial r$) | Core Modeling Insight / Main Contribution |
+| :--- | :--- | :--- | :--- | :--- |
+| **Keynes Speculative Demand** | Speculative (investment anticipation under certainty) | Binary choice: 100% Cash or 100% Bonds | Highly sensitive; yields step-wise aggregate liquidity trap. | Explains the direct link between interest rates and speculative liquid cash hoarding. |
+| **Baumol Inventory Model** | Transactions (optimal cash pool management) | Broad choice: Cash vs. interest-paying bonds | Moderately sensitive: constant interest elasticity of $-0.5$. | Treats money holding as an inventory problem; proves economies of scale in cash balances. |
+| **Tobin Portfolio Model** | Speculative (behavior toward risk) | Diversified choice: mixed cash and bonds simultaneously | Smooth, continuous negative sensitivity | Explains multi-asset diversification; shows that risk-aversion leads to a smooth downward slope. |
+
+---
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Tobin's Speculative Demand: Downward-Sloping Liquidity Preference",
+  "xAxis": "money_demand",
+  "yAxis": "interest_rate",
+  "data": [
+    {"money_demand": 10, "interest_rate": 10.0},
+    {"money_demand": 25, "interest_rate": 6.0},
+    {"money_demand": 45, "interest_rate": 3.0},
+    {"money_demand": 75, "interest_rate": 1.5},
+    {"money_demand": 120, "interest_rate": 1.0}
+  ],
+  "series": [
+    {"key": "interest_rate", "name": "Value Curve", "color": "#6366f1"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Tobin's Liquidity Preference**:
+> This curve models the classical speculative liquidity preference schedule under asset diversification. Unlike Keynes' assumption of binary portfolio choices where investors go "all-in" on cash or bonds, Tobin's model demonstrates how a risk-averse investor holds a basket containing both. At high interest rates (e.g., 10%), holding risky bonds is highly compensated, so demand for liquid cash drops. At exceptionally low yields (e.g., 1.0%), the opportunity cost of safety is negligible, making investors highly cooperative with cash holdings. This produces a smooth, continuous downward-sloping speculative cash demand.
+
+#### Comparison of Money Demand Stability: Friedman vs. Keynes
+
+To understand how the stability of these demand functions affects the transmission of monetary policy, consider the following comparative timeline showing the relative historical volatility of monetary demand index under both paradigms:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Money Demand Stability: Friedman (Stable Permanent Income) vs. Keynes (Volatile Animal Spirits)",
+  "xAxis": "period",
+  "yAxis": "index_value",
+  "data": [
+    {"period": "Period 1 (Baseline)", "Friedman_Stability": 100, "Keynes_Volatility": 100},
+    {"period": "Period 2 (Confidence Shock)", "Friedman_Stability": 101, "Keynes_Volatility": 145},
+    {"period": "Period 3 (Asset Bubbles)", "Friedman_Stability": 99, "Keynes_Volatility": 60},
+    {"period": "Period 4 (Liquidity Freeze)", "Friedman_Stability": 100, "Keynes_Volatility": 135},
+    {"period": "Period 5 (Post-Crisis Recovery)", "Friedman_Stability": 98, "Keynes_Volatility": 80},
+    {"period": "Period 6 (Steady State)", "Friedman_Stability": 100, "Keynes_Volatility": 100}
+  ],
+  "series": [
+    {"key": "Friedman_Stability", "name": "Friedman Stable Money Demand Index", "color": "#10b981"},
+    {"key": "Keynes_Volatility", "name": "Keynesian Volatile 'Animal Spirits' Speculative Index", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Money Demand Stability comparison**:
+> This comparative line graph highlights the fundamental debate between Monetarist and Keynesian schools. Friedman reasoned that the demand for real balances is highly stable because it is anchored by permanent wealth (human and non-human) rather than volatile current income. On the other hand, Keynes emphasized the speculative and precautionary motives, where volatile expectations and "animal spirits" result in extreme liquidity preference fluctuations. If money demand is stable (as shown by the steady green line), any increase in the money supply directly translates to a predictable increase in nominal spending. If money demand is highly volatile (as shown by the erratic red line), monetary expansions can easily lock up in the banking system, severing the link to the real economy.
+
+---
+
+### 1.2.3 Friedman's Restatement of the Quantity Theory of Money (1956)
+
+Milton Friedman argumentatively restated the Quantity Theory of Money as a *theory of the demand for money*, treating money as one form of asset in a consumer's or firm's wealth portfolio.
+
+#### The Demand Function
+Demand for real money balances ($M_d/P$) is formulated as:
+$$\\frac{M_d}{P} = f\\left(W, h, r_m, r_b, r_e, P, \\frac{\\Delta P}{P}, U\\right)$$
+Where:
+- $W$ = Real wealth (comprising non-human and human wealth). In practice, Friedman used permanent income ($Y_p$) as a stable proxy $W \\approx Y_p/r$.
+- $h$ = Ratio of human wealth to non-human wealth (human wealth represents less liquid assets, raising demand for cash to maintain financial flexibility).
+- $r_m$ = Own rate of return on money (interest paid on deposits).
+- $r_b$ = Expected nominal interest rate on bonds.
+- $r_e$ = Expected nominal rate of return on equities.
+- $P$ = Price level.
+- $\\frac{\\Delta P}{P}$ = Expected rate of inflation (the cost of holding cash).
+- $U$ = Institutional and taste factors (mode of payment, market instability, political crises).
+
+#### Key Differences Between Keynes and Friedman
+| Characteristic | Keynesian Liquidity Preference | Friedman's Restatement |
+| :--- | :--- | :--- |
+| **Stability** | Highly unstable (driven by volatile animal spirits / liquidity trap shifts). | Highly stable (money demand is a function of a few stable long-run variables). |
+| **Asset substitutes** | Strict dichotomy: Money vs. Bonds. | Broad range of substitutes: Bonds, Equities, Durables, Real Goods. |
+| **Motive Segmentation** | Partitioned: Transactions ($Y$) vs. Speculative ($r$). | Unified: Money is an asset held for the utility stream of general serviceability. |
+| **Interest Elasticity** | Highly interest-elastic; contains a liquidity trap floor. | Moderate to low interest-elasticity. Shifts are offset across multiple asset yields. |
+
+---
+
+### Overlapping Generations (OLG) Model of Money
+
+Originated by Paul Samuelson (1958) and extended by Neil Wallace, the OLG framework provides microfoundations for money in which fiat money acts as a storage device to transfer purchasing power across time when no durable assets exist.
+
+#### Setup of the Basic Model
+- Individuals live for exactly **two periods**: "young" (period $t$) and "old" (period $t+1$).
+- In period $t$, $N$ young individuals are born. The population remains constant.
+- Real endowments: a young individual receives endowment $w^y$, and an old individual receives $w^o$, where $w^o < w^y$.
+- There is only one single consumption good which is non-storable (perishable). This creates a problem: how can the young save some of their surplus endowment to consume during old age?
+- **Fiat Money ($m_t$)** is introduced. It has zero intrinsic value but is accepted as a transfer medium.
+
+#### Optimization and Budget Constraints
+1. **Young stage budget constraint** (purchasing money $m_t$ at price level $P_t$):
+   $$P_t c_t^y + m_t = P_t w^y$$
+2. **Old stage budget constraint** (selling money $m_t$ to the next generation of young at $P_{t+1}$):
+   $$P_{t+1} c_{t+1}^o = P_{t+1} w^o + m_t$$
+3. **Lifetime Intertemporal Budget Constraint**:
+   Substitute $m_t$ out of the equations to obtain:
+   $$c_t^y + \\left(\\frac{P_{t+1}}{P_t}\\right) c_{t+1}^o = w^y + \\left(\\frac{P_{t+1}}{P_t}\\right) w^o$$
+   The term $\\frac{P_t}{P_{t+1}}$ represents the real return on holding fiat money.
+
+#### Utility Maximization
+The young choose consumption path $(c_t^y, c_{t+1}^o)$ to maximize intertemporal utility:
+$$\\max \\quad U(c_t^y, c_{t+1}^o) = \\ln(c_t^y) + \\beta \\ln(c_{t+1}^o)$$
+Subject to the intertemporal budget constraint.
+- Solving this optimization problem yields saving functions $s_t^y = w^y - c_t^y$, which matches the real demand for nominal money savings:
+  $$\\frac{m_t}{P_t} = s_t^y\\left(\\frac{P_t}{P_{t+1}}, w^y, w^o\\right)$$
+
+---
+
+### Other Microfoundation Models of Money
+
+- **Money in the Utility Function (MIU)**:
+  By placing real balances $m_t/P_t$ directly in the utility function: $U_t = U(c_t, l_t, m_t/P_t)$. Real money balances are treated as a direct consumption good because they yield an implicit stream of transaction-facilitating services (liquidity services).
+- **Cash-In-Advance (CIA) / Clower Constraint**:
+  Robert Clower (1967) postulated that *"goods buy money, and money buys goods, but goods do not buy goods."*
+  - The Clower constraint requires that all consumption goods must be paid for using pre-accumulated cash:
+    $$P_t C_t \\leq m_t + w_t$$
+  - Under traditional CIA models, velocity of money $V$ is completely constant ($V = 1$).
+  - Svensson (1985) introduced uncertainty: since consumers do not know state shocks before choosing cash holdings, they hold excess cash for precautionary reasons, introducing an interest-elastic velocity of cash.
+- **Transactions Cost (Shopping-Time Models)**:
+  Money is held because it reduces transaction shopping time ($n^T$).
+  Total available time is split: $1 = \\text{Leisure (L)} + \\text{Work (n)} + \\text{Shopping Time } (n^Y)$.
+  $$n^T = n^T\\left(\\frac{m_t}{P_t}, c_t\\right) \\quad \\text{where} \\quad \\text{Shopping derivative} \\leq 0$$
+  By holding more real balances, consumers spend less time shopping and trade-off foregone interest against saved leisure utility.
+
+---
+
+## CHAPTER 3: THE SUPPLY OF MONEY
+
+Money supply is not merely an exogenous variable controlled by the central bank; it is endogenous, determined by interactions between the central bank, commercial banks, depositors, and borrowers.
+
+---
+
+### 1.3.2 Endogenous Money Supply: Credit Creation Process
+
+The process of deposit multiplication operates through commercial bank lending.
+
+#### Theoretical Comparison of Money Supply Paradigms
+| Analytical Parameter | Base-Multiplier Model (Exogenous View) | Flow of Funds / Credit-Led (Endogenous View) |
+| :--- | :--- | :--- |
+| **Primary Driver of Supply** | Central Bank structural decisions (alteration of reserve requirements or outright high-powered base injection). | Private sector demand for bank loans (investment expectations and commercial loan profitability). |
+| **Monetary Base Direction** | **Active Causality**: Central Bank alters reserves, forcing banks to adjust credit levels ($MB \\rightarrow M$). | **Passive Accommodation**: Credit expansion creates deposits first, then reserves are acquired ($M \\rightarrow MB$). |
+| **Role of Bank Reserves** | Constraining anchor: reserves limit maximum deposit multipliers ($1/rr$). | Operational buffer: reserves are clearing devices; banks obtain them after-the-fact via interbank lending / central bank window. |
+| **Private Credit Stance** | Irrelevant to supply volume: assumes banks always operate on full multiplier capacities. | Crucial constraint: macro supply remains depressed if businesses decline loans, even under excess bank reserves. |
+| **Policy Transmission** | Mechanical: open-market asset purchases directly shift total cash stocks. | Behavioral: interest rate hikes discourage loan demand, reducing credit creation velocity. |
+
+#### 1. Central Bank Balance Sheet
+The central bank manages its liabilities to influence the high-powered money base:
+$$\\text{Monetary Base (MB)} = \\text{Currency in circulation (C)} + \\text{Bank Reserves (R)}$$
+- Reserves ($R$) consist of Mandatory/Required Reserves ($RR = rr \\cdot D$) and optional Excess Reserves ($ER$).
+
+#### 2. Simple Deposit Multiplier
+Assume a bank receives a fresh reserve deposit of $\\Delta R = \\$1,000,000$.
+Under a reserve ratio $rr = 10\\%$, the bank must hold $100,000 in reserves and can lend out others $900,000. These loan proceeds are deposited in another bank, which repeats the process.
+
+| Bank Stage | Increase in Deposits | Increase in Loans | Increase in Reserves |
+| :--- | :--- | :--- | :--- |
+| Some Bank | \\$0 | \\$1,000,000 | \\$0 |
+| Another Bank | \\$1,000,000 | \\$900,000 | \\$100,000 |
+| Yet Another Bank | \\$900,000 | \\$810,000 | \\$90,000 |
+| Still Another Bank | \\$810,000 | \\$729,000 | \\$81,000 |
+| **TOTALS** | **\\$10,000,000** | **\\$10,000,000** | **\\$1,000,000** |
+
+This geometric progression is summed via the Simple Deposit Multiplier:
+$$\\Delta D = \\left(\\frac{1}{rr}\\right) \\cdot \\Delta R$$
+$$\\Delta D = \\left(\\frac{1}{0.10}\\right) \\cdot 1,000,000 = 10,000,000$$
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Credit Creation Stages: Deposit Expansion Exhaustion Path (rr = 10%)",
+  "xAxis": "stage",
+  "yAxis": "deposit",
+  "data": [
+    {"stage": "Original Deposit", "new_deposit": 1000000, "added_reserves": 100000},
+    {"stage": "Stage 1", "new_deposit": 900000, "added_reserves": 90000},
+    {"stage": "Stage 2", "new_deposit": 810000, "added_reserves": 81000},
+    {"stage": "Stage 3", "new_deposit": 729000, "added_reserves": 72900},
+    {"stage": "Stage 4", "new_deposit": 656100, "added_reserves": 65610},
+    {"stage": "Stage 5", "new_deposit": 590490, "added_reserves": 59049}
+  ],
+  "series": [
+    {"key": "new_deposit", "name": "New Deposit Creation Volume", "color": "#6366f1"},
+    {"key": "added_reserves", "name": "Accumulated Safety Reserves", "color": "#cbd5e1"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — The Credit Expansion Exhaustion Path**:
+> This bar chart illustrates the progressive decay of credit creation capacity across sequential lending stages within a fractional reserve banking network. Under a 10% reserve ratio, an initial ₦1,000,000 high-powered deposit allows Bank 1 to lend out ₦900,000, retaining ₦100,000 in safety reserves. As loan proceeds flow back into Bank 2 as fresh deposits, the lending potential shrinks by exactly 10% at each step. This geometric contraction continues until the initial high-powered injection is fully absorbed as mandatory reserves across the system, resulting in a 10-fold theoretical expansion of total checkable deposits.
+
+Observe how the speed of this credit decay responds to changing statutory reserve ratios ($rr$) in the multi-scenario analytical chart below:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Optimizing Credit Controls: Multi-Scenario Credit Creation Decay Rates",
+  "xAxis": "stage",
+  "yAxis": "percentage",
+  "data": [
+    {"stage": "0. Baseline Deposit", "decay_rr_5": 100.0, "decay_rr_10": 100.0, "decay_rr_20": 100.0},
+    {"stage": "1. Stage 1", "decay_rr_5": 95.0, "decay_rr_10": 90.0, "decay_rr_20": 80.0},
+    {"stage": "2. Stage 2", "decay_rr_5": 90.3, "decay_rr_10": 81.0, "decay_rr_20": 64.0},
+    {"stage": "3. Stage 3", "decay_rr_5": 85.7, "decay_rr_10": 72.9, "decay_rr_20": 51.2},
+    {"stage": "4. Stage 4", "decay_rr_5": 81.5, "decay_rr_10": 65.6, "decay_rr_20": 41.0},
+    {"stage": "5. Stage 5", "decay_rr_5": 77.4, "decay_rr_10": 59.0, "decay_rr_20": 32.8}
+  ],
+  "series": [
+    {"key": "decay_rr_5", "name": "Highly Loose Policy (rr = 5%)", "color": "#10b981"},
+    {"key": "decay_rr_10", "name": "Standard Base (rr = 10%)", "color": "#0ea5e9"},
+    {"key": "decay_rr_20", "name": "Highly Tight Policy (rr = 20%)", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Credit Decay Multi-Ratio Comparison**:
+> This comparative plot displays how central bank macroprudential decisions alter the speed of internal deposit creation. Under high-liquidity loose policies (reserve ratio $rr = 5\\%$, green line), the lending capacity decays slowly, retaining 77.4% of deposit power even at Stage 5. Conversely, doubling the reserve standard to a tight policy ($rr = 20\\%$, red line) creates a rapid decay curve, wiping out over 67% of credit potential by Stage 5. This visualization is critical for central planning as it maps the exact path of credit-control contraction of aggregate domestic broad money.
+
+---
+
+### The Broad Money Multipliers
+
+The simple deposit multiplier is unrealistic because it assumes:
+- Depositors never hold cash (no cash drainage).
+- Banks never hold excess reserves.
+
+By defining ratios to checkable deposits $D$:
+- Currency Ratio: $c = C/D$
+- Excess Reserves Ratio: $e = ER/D$
+- Required Reserve Ratio: $rr = RR/D$
+
+#### 1. M1 Money Multiplier ($m_1$)
+Since $M_1 = C + D$ and $MB = C + R = C + rr \\cdot D + ER$, we evaluate:
+$$M_1 = D(1 + c)$$
+$$MB = D(rr + e + c) \\implies D = \\frac{MB}{rr + e + c}$$
+$$M_1 = \\left[ \\frac{1 + c}{rr + e + c} \\right] MB \\implies M_1 = m_1 \\cdot MB$$
+
+#### 2. M2 Money Multiplier ($m_2$)
+Accounting for Time/Savings Deposits ($T$) and Money Market Funds ($MMF$):
+- Time Deposit Ratio: $t = T/D$
+- MMF Ratio: $f = MMF/D$
+$$m_2 = \\frac{1 + c + t + f}{rr + e + c}$$
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "M1 vs M2 Multipliers under varying deposit ratios",
+  "xAxis": "scenario",
+  "yAxis": "multiplier",
+  "data": [
+    {"scenario": "Base (c=0.25, rr=0.2)", "M1_Mult": 2.6316, "M2_Mult": 12.0879},
+    {"scenario": "High Cash (c=0.70)", "M1_Mult": 1.8837, "M2_Mult": 8.0123},
+    {"scenario": "High Reserves (e=0.10)", "M1_Mult": 2.1523, "M2_Mult": 10.1132}
+  ],
+  "series": [
+    {"key": "M1_Mult", "name": "M1 Multiplier", "color": "#0ea5e9"},
+    {"key": "M2_Mult", "name": "M2 Multiplier", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Comparative Multipliers under System Leakages**:
+> This chart illustrates how public behavior and commercial bank reserve policies constrain money creation compared to the frictionless "simple multiplier". If the currency drain ratio rises (such as during panic or institutional distrust, where $c$ climbs to 70%), the M1 multiplier drops from 2.63 to 1.88. This occurs because cash withdrawn from circulation is removed from the banking deposit chain. Similarly, if banks increase excess safety reserves ($e$ climbing to 10%), total lending shrinks. Because M2 includes time deposits which are rarely withdrawn immediately, its overall multiplier remains far larger than M1 across all system conditions.
+
+To calculate detailed banking reserves, cash drain, and broad multipliers dynamically, launch the multiplier simulator below:
+
+\`\`\`simulator
+{
+  "mode": "money_multiplier",
+  "title": "Interactive Bank Reserves & Credit Multiplier Simulator"
+}
+\`\`\`
+
+The chart below maps how hikes in the Required Reserve Ratio (rr) systematically compress both the Simple Multiplier and the Leakage-Adjusted Broad Money Multiplier:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Policy Impact: Required Reserve Ratio (rr) vs. M1 Money Multiplier (c = 15%, e = 5%)",
+  "xAxis": "required_reserve",
+  "yAxis": "m1_multiplier",
+  "data": [
+    {"required_reserve": "2%", "m1_multiplier": 5.23, "simple_multiplier": 50.0},
+    {"required_reserve": "5%", "m1_multiplier": 4.60, "simple_multiplier": 20.0},
+    {"required_reserve": "10%", "m1_multiplier": 3.83, "simple_multiplier": 10.0},
+    {"required_reserve": "15%", "m1_multiplier": 3.29, "simple_multiplier": 6.67},
+    {"required_reserve": "20%", "m1_multiplier": 2.88, "simple_multiplier": 5.0},
+    {"required_reserve": "30%", "m1_multiplier": 2.30, "simple_multiplier": 3.33}
+  ],
+  "series": [
+    {"key": "m1_multiplier", "name": "Broad M1 Multiplier", "color": "#0ea5e9"},
+    {"key": "simple_multiplier", "name": "Simple Multiplier (1/rr)", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Policy Impact of Reserve Constraints**:
+> This sensitivity plot showcases how required reserve ratio regulation ($rr$) alters the credit multiplication slope. Under standard friction-free assumptions, raising $rr$ causes a classic hyperbola (simple multiplier $1/rr$, shown in red). Yet, once cash drains ($c=15\\%$) and hoarding buffers ($e=5\\%$) are incorporated, the actual broad multiplier ($m_1$, represented by the blue curve) is compressed significantly. Crucially, as $rr$ shifts from 2% to 30%, the gap between simple and broad multipliers continuously closes, indicating that higher baseline reserve requirements overwhelm secondary behavioral leakages in credit transmission.
+
+#### Policy Friction: Credit Freeze & Transmission Blockage
+
+Uncover how severe credit freezes and reserve hoarding by commercial banks can completely sever the link between central bank monetary expansion and real credit supply using the comparison below:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Severe Policy Friction: Central Bank Base Expansion vs. Money Supply under Credit Freeze",
+  "xAxis": "base_injection",
+  "yAxis": "money_supply",
+  "data": [
+    {"base_injection": "₦1M", "healthy_lending_m1": 3.8, "freeze_hoarding_m1": 1.2},
+    {"base_injection": "₦2M", "healthy_lending_m1": 7.6, "freeze_hoarding_m1": 1.4},
+    {"base_injection": "₦4M", "healthy_lending_m1": 15.2, "freeze_hoarding_m1": 1.8},
+    {"base_injection": "₦6M", "healthy_lending_m1": 22.8, "freeze_hoarding_m1": 2.2},
+    {"base_injection": "₦8M", "healthy_lending_m1": 30.4, "freeze_hoarding_m1": 2.6},
+    {"base_injection": "₦10M", "healthy_lending_m1": 38.0, "freeze_hoarding_m1": 3.0}
+  ],
+  "series": [
+    {"key": "healthy_lending_m1", "name": "Normal High-Multiplier Transmission (M1)", "color": "#10b981"},
+    {"key": "freeze_hoarding_m1", "name": "Credit Freeze / Reserve Hoarding Transmission (M1)", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Credit transmission block**:
+> This interactive chart highlights the limits of quantitative easing and monetary base expansion. In a healthy lending climate (represented by the upward-sloping green line), each naira of reserve base injected by the central bank multiplies strongly into M1 money supply. However, during systemic banking crises or deep recessions, banks hoard liquidity due to severe risk aversion (the excess reserve ratio $e$ rises exponentially). As shown by the flat red line, the deposit expansion chain breaks down—so massive central bank injections merely end up as idle reserves on bank balance sheets instead of expanding public credit.
+
+---
+
+### 1.3.4 Flow of Funds Approach to Money Supply
+
+The Flow of Funds (FoF) approach is an alternative to the Base-Multiplier model. Instead of stocks, it focuses on **flows** (changes in balance sheet items) and private credit creation.
+
+#### The Flow of Funds Identity
+Beginning with the broad money supply identity $M = C_p + D_p$, we rewrite in flows:
+$$\\Delta M = \\Delta C_p + \\Delta D_p$$
+Using bank balance sheet constraints, loans must match deposits: $\\Delta D_p = \\Delta L_p + \\Delta L_g$ (loans to private and public sectors). Placing this into government borrowing yields:
+$$\\Delta M \\equiv PSBR - \\Delta G_p \\pm \\Delta ext + \\Delta L_p$$
+Where:
+- $PSBR$ = Public Sector Borrowing Requirement.
+- $\\Delta G_p$ = Government bonds sold to the non-bank public.
+- $\\Delta ext$ = Monetary implications of external exchange rate flows.
+- $\\Delta L_p$ = Bank credit extension to the private sector.
+
+#### Base Multiplier (B-M) vs. Flow of Funds (FoF)
+- **B-M View**: Money supply is reserve-constrained and exogenously controlled by the central bank.
+- **FoF View**: Money supply is endogenous, driven by bank loans, and demand-constrained by the private sector's appetite for credit.
+
+---
+
+## CHAPTER 4: MONEY, PRICES AND EMPLOYMENT
+
+Monetary policy affects price levels and enters the real economy via wage and employment channels.
+
+---
+
+### 1.4.1 Money and Theories of Inflation
+
+Inflation can be demand-driven, cost-driven, or structurally-driven.
+
+#### 1. Monetarist Demand-Pull Inflation
+Milton Friedman: *"Inflation is always and everywhere a monetary phenomenon."*
+- Rising money supply ($M_s$) shifts the Aggregate Demand ($AD$) curve rightward. This increases prices and wages proportionally without impacting real output $Y$ in the long run.
+
+#### 2. Cost-Push Inflation
+Triggered by supply-side cost increases (monopoly pricing, wage-push from trade unions).
+- Shifts Aggregate Supply leftward, raising prices while reducing output.
+- **Wage-Price Spiral**: If government tries to restore full employment, $AD$ shifts rightward, validating the price increase and driving workers to demand even higher wages.
+
+#### 3. Structuralist Inflation (LDCs)
+Argues that in developing countries, inflation is caused by structural supply inelasticities:
+- **Agricultural Bottlenecks**: Land tenure and poor infrastructure render food supply inelastic. Growing population drives food prices upward.
+- **Foreign Exchange Constraints**: Sluggish export growth restricts importation of machinery, causing structural import-substitution inflation.
+
+The chart below compares the dynamic trajectory of price and real GDP indices under Demand-Pull (expansionary monetary shocks) vs. Cost-Push (stagflationary aggregate supply shocks) validation cycles:
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Shock Transmission: Cost-Push vs. Demand-Pull Macro Dynamics",
+  "xAxis": "stage",
+  "yAxis": "index_value",
+  "data": [
+    {"stage": "0. Pre-Shock Baseline", "Demand_Pull_GDP": 100, "Demand_Pull_Prices": 100, "Cost_Push_GDP": 100, "Cost_Push_Prices": 100},
+    {"stage": "1. Direct Shock Event", "Demand_Pull_GDP": 115, "Demand_Pull_Prices": 108, "Cost_Push_GDP": 85, "Cost_Push_Prices": 115},
+    {"stage": "2. Structural Adjust", "Demand_Pull_GDP": 100, "Demand_Pull_Prices": 125, "Cost_Push_GDP": 100, "Cost_Push_Prices": 130},
+    {"stage": "3. Long-Run Equilibrium", "Demand_Pull_GDP": 100, "Demand_Pull_Prices": 125, "Cost_Push_GDP": 100, "Cost_Push_Prices": 130}
+  ],
+  "series": [
+    {"key": "Demand_Pull_GDP", "name": "Demand-Pull GDP", "color": "#0ea5e9"},
+    {"key": "Demand_Pull_Prices", "name": "Demand-Pull Prices", "color": "#6366f1"},
+    {"key": "Cost_Push_GDP", "name": "Cost-Push GDP (Stagflation)", "color": "#f43f5e"},
+    {"key": "Cost_Push_Prices", "name": "Cost-Push Prices (Spiral)", "color": "#f59e0b"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Shock Transmission (Demand-Pull vs. Cost-Push)**:
+> This bar chart maps the dynamic macroeconomic adjustments triggered by structural demand vs. supply disturbances.
+> - **Demand-Pull Shock** (blue series): An expansionary money shock shifts Aggregate Demand rightward, temporarily lifting GDP (to 115) alongside moderate price rises (to 108). In the long run, nominal wages adjust, shifting supply curves leftward in reaction; GDP drops back to full employment (100) while prices permanently stabilize at a higher baseline (125).
+> - **Cost-Push Shock** (red/gold series): A supply-side factor squeeze (e.g., oil shock) shifts Aggregate Supply directly leftward, plunging output into stagflation (GDP drops to 85, prices jump to 115). If the central bank attempts to validate the employment loss with credit injection, it risks triggering a wage-price spiral, permanently stabilizing prices at a high level (130) once output climbs back to target.
+
+---
+
+### Theories of Business Cycles
+
+Does money drive industrial output fluctuations?
+
+- **R.G. Hawtrey’s Purely Monetary Theory**:
+  Trade cycles are purely monetary. Low interest rates induce traders to expand inventory borrowing, which fuels output growth. Once banks deplete capital reserves, they halt credit, causing a crash and subsequent deflationary slump.
+- **F.A. Hayek’s Over-investment Theory**:
+  When the central bank depresses the *market rate of interest* below the economy’s *natural rate*, it triggers credit expansion, overinvestment, and vertical "malinvestment" in heavy capital goods relative to consumption goods, which eventually corrected by a structural correction crash.
+- **Real Business Cycle (RBC) Theory**:
+  Rejects monetary causes. Trade cycles are fully optimal general equilibrium comovements triggered by real technology shocks, while money remains neutral.
+
+---
+
+### The Phillips Curve and Expectations
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 4.9: The Simple Phillips Curve",
+  "xAxis": "unemployment",
+  "yAxis": "inflation",
+  "data": [
+    {"unemployment": 2, "inflation": 6.0},
+    {"unemployment": 3, "inflation": 4.0},
+    {"unemployment": 4.0, "inflation": 2.5},
+    {"unemployment": 5.5, "inflation": 0.0},
+    {"unemployment": 8, "inflation": -1.5}
+  ],
+  "series": [
+    {"key": "inflation", "name": "SR Phillips Curve", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Simple Phillips Curve Trade-Off**:
+> This graph displays the historical short-run inverse tradeoff between inflation and unemployment identified by A.W. Phillips. At extremely low unemployment rates (such as 2%), strong labor bargains drive rapid wage hikes, forcing prices up by 6.0%. Conversely, during recessionary stages with unemployment near 8%, inflation collapses to deflationary zones (e.g. -1.5%) because labor surplus dismantles bargaining index weights. The central bank operates along this curve to select its preferred macroeconomic point.
+
+1. **Simple Phillips Curve (1958)**:
+   A stable tradeoff between wage inflation and unemployment.
+2. **Expectations-Augmented Phillips Curve (Friedman-Phelps)**:
+   Workers adapt their price expectations ($P^e$), eliminating any long-run tradeoff.
+   $$u - u_n = -\\beta (\\pi - \\pi^e)$$
+   - In the short run, if the central bank surprises the public with high inflation, real wages fall, and firms hire more workers ($u < u_n$).
+   - In the long run, workers adjust expectations ($\\pi^e = \\pi$). Real wages adjust back, and the economy returns to the **Natural Rate of Unemployment / NAIRU**, but at a higher rate of inflation.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Equilibrium Phillips Curve Shifts: Short-Run vs. Long-Run NAIRU Path",
+  "xAxis": "unemployment",
+  "yAxis": "inflation",
+  "data": [
+    {"unemployment": 2.0, "SR_Phillips_1": 6.0, "SR_Phillips_2": 8.0},
+    {"unemployment": 4.0, "SR_Phillips_1": 3.0, "SR_Phillips_2": 5.0},
+    {"unemployment": 5.5, "SR_Phillips_1": 2.0, "SR_Phillips_2": 4.0},
+    {"unemployment": 7.0, "SR_Phillips_1": 1.0, "SR_Phillips_2": 3.0}
+  ],
+  "series": [
+    {"key": "SR_Phillips_1", "name": "Short-Run PC (Expected Inflation = 2%)", "color": "#f43f5e"},
+    {"key": "SR_Phillips_2", "name": "Short-Run PC (Expected Inflation = 4%)", "color": "#818cf8"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Shifting Short-Run Curves and the NAIRU vertical**:
+> The shifting diagram demonstrates how inflation expectations ($P^e$) dismantle the long-run Phillips trade-off. An initial monetary expansion pushes unemployment down to 4.0% along the red short-run curve (Expected Inflation = 2%). Yet, once workers realize that price increases have eroded their purchasing power, they adjust expectations up to 4%. This revision shifts the short-run curve upward to the purple schedule, causing unemployment to return to its natural baseline ($NAIRU = 5.5\\%$) but with 4% inflation instead of 2%. In the long run, the Phillips Curve is a vertical line at the NAIRU.
+
+To dynamically simulate price level change rates across custom base years and compute general inflation weights, launch the calculator below:
+
+\`\`\`simulator
+{
+  "mode": "inflation",
+  "title": "Interactive Base & Current Year Inflation Rate Calculator"
+}
+\`\`\`
+
+---
+
+## CHAPTER 5: CENTRAL BANKING AND MONETARY POLICY
+
+The central bank uses operating targets and policy instruments to stabilize the financial system and guide macro outcomes.
+
+---
+
+### 1.5.2 Monetary Policy Targets, Interest Rates Target, Inflation Target and Instruments
+
+#### Poole's Target Selection Analysis (1970)
+William Poole modeled whether a central bank should target the **Money Supply** or **Interest Rates** to minimize output variance when the economy is hit by shocks:
+- **IS Curve Shock** (Real sector volatility, e.g., investment shifts):
+  Targeting Money Supply is preferable. As IS shifts rightward, interest rates automatically rise, crowding out some investment and dampening the output shock.
+- **LM Curve Shock** (Financial sector volatility, e.g., money demand shifts):
+  Targeting Interest Rates is preferable. The central bank automatically accommodates money demand shifts, leaving the real sector unaffected.
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "William Poole's Output Variance Analysis: Money Supply vs. Interest Rate Target",
+  "xAxis": "shock_type",
+  "yAxis": "variance",
+  "data": [
+    {"shock_type": "Real Sector Shocks (IS shifts)", "Money_Supply_Target": 15, "Interest_Rate_Target": 45},
+    {"scenario": "Financial Shocks (LM shifts)", "Money_Supply_Target": 35, "Interest_Rate_Target": 5}
+  ],
+  "series": [
+    {"key": "Money_Supply_Target", "name": "Money Supply Targeting Policy", "color": "#0ea5e9"},
+    {"key": "Interest_Rate_Target", "name": "Interest Rate Targeting (Pegging) Policy", "color": "#f59e0b"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Poole's Policy Selection Rule under Uncertainty**:
+> This bar chart models the ultimate output variance under both Money Supply targeting (blue) and Interest Rate targeting (amber) regimes:
+> - **Real Sector Shocks (IS shifts)**: When real investments or animal spirits shift unpredictably, Money Supply targeting restricts GDP volatility (variance is only 15 vs. 45 for interest-pegging). As aggregate demand rises, interest rates automatically climb to balance money supply, crowding out excess spending and self-stabilizing the economy.
+> - **Financial Shocks (LM shifts)**: When money demand fluctuates randomly, Interest Rate pegging is superior (variance is only 5 vs. 35 for money supply rules). The central bank absorbs all liquidity shocks, completely preventing them from spilling over into interest rates and disturbing real GDP.
+
+#### Operational Assessment of Monetary Policy Instruments
+| Policy Instrument | Primary Operational Mechanism | Typical Transmission Lag | Disruptive Backlash & Sector Risk | Efficacy in Deep Liquidity Trap |
+| :--- | :--- | :--- | :--- | :--- |
+| **Open Market Operations (OMO)** | Buying/selling government bonds to directly expand/contract commercial reserves. | Short (days to weeks inside interbank markets) | Low: entirely market-based and voluntary. | **Low**: increases bank reserves but fails to compel banks to lend. |
+| **Required Reserve Ratio ($rr$)** | Statutory mandate dictating the minimum percentage of deposits kept unlent. | Medium (dependent on bank accounting cycles) | High: sudden alterations force banks to recall credit/loans. | **Low**: relaxing reserves does not trigger demand for private credit. |
+| **Discount Window / Repo Rate** | Direct short-term lending to banks experiencing temporary liquidity clearing gaps. | Very Short (immediate liquidity relief) | Low: mainly serves as an emergency lender-of-last-resort backstop. | **Medium**: ensures solvency and targets bank stability but does not lift macro spending. |
+| **Quantitative Easing (QE)** | Direct central bank purchase of long-term assets to force long yields down. | Long (requires portfolio reallocation across quarters) | Medium-High: risks inflating asset bubbles and financial wealth inequality. | **Medium-High**: bypasses standard banking channels by bidding up bond prices directly. |
+
+---
+
+### 1.5.4 Interest Rates and Monetary Policy: Taylor's Rule
+
+John Taylor (1993) modeled central bank nominal interest rate setting as a feedback loop responding to inflation and output gaps:
+
+#### Nominal Taylor Rule
+$$R_t = \\pi_t + r^* + \\alpha(y_t - y_f) + \\beta(\\pi_t - \\pi^T)$$
+Where:
+- $R_t$ = Targeted nominal policy rate (e.g., Federal Funds rate).
+- $\\pi_t$ = Actual rate of inflation.
+- $r^*$ = Equilibrium real interest rate.
+- $y_t - y_f$ = Output gap.
+- $\\pi_t - \\pi^T$ = Inflation gap.
+- $\\alpha, \\beta$ = Policy tracking weights (standard weight is $\\alpha = 0.5, \\beta = 0.5$).
+
+- **The Taylor Principle**:
+  To successfully curb inflation, the central bank must raise the nominal rate by **more than** the change in inflation ($\\% \\Delta R_t > \\% \\Delta \\pi_t \\implies \\beta > 0$). This ensures the *real interest rate* rises, cooling aggregate demand.
+
+Observe the comparative time-series below illustrating how strict adherence to the Taylor Principle raises real rates to break inflation, compared to a weak monetary response that falls into a negative real yield inflation-trap:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "The Taylor Principle in Action: Policy Interest Rates vs. Inflation Shocks",
+  "xAxis": "quarter",
+  "yAxis": "rate",
+  "data": [
+    {"quarter": "Q1 (Baseline)", "Actual_Inflation": 2.0, "Taylor_Prescribed_Rate_Principle": 4.0, "Weak_Response_Rate_Inflation_Trap": 3.0},
+    {"quarter": "Q2 (Shock Event)", "Actual_Inflation": 5.0, "Taylor_Prescribed_Rate_Principle": 7.5, "Weak_Response_Rate_Inflation_Trap": 4.5},
+    {"quarter": "Q3 (Lagged Peak)", "Actual_Inflation": 6.5, "Taylor_Prescribed_Rate_Principle": 9.75, "Weak_Response_Rate_Inflation_Trap": 5.25},
+    {"quarter": "Q4 (Tightening Edge)", "Actual_Inflation": 4.5, "Taylor_Prescribed_Rate_Principle": 7.25, "Weak_Response_Rate_Inflation_Trap": 4.75},
+    {"quarter": "Q5 (Stabilizing)", "Actual_Inflation": 3.2, "Taylor_Prescribed_Rate_Principle": 5.8, "Weak_Response_Rate_Inflation_Trap": 4.1},
+    {"quarter": "Q6 (Steady State)", "Actual_Inflation": 2.0, "Taylor_Prescribed_Rate_Principle": 4.0, "Weak_Response_Rate_Inflation_Trap": 3.5}
+  ],
+  "series": [
+    {"key": "Actual_Inflation", "name": "Actual Systemic Inflation (%)", "color": "#cbd5e1"},
+    {"key": "Taylor_Prescribed_Rate_Principle", "name": "Aggressive Taylor Rule Response (beta = 1.5)", "color": "#10b981"},
+    {"key": "Weak_Response_Rate_Inflation_Trap", "name": "Weak Monetary Response (beta = 0.5)", "color": "#f43f5e"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — The Taylor Principle in Action**:
+> This dynamic timeline demonstrates the difference in macroeconomic control under different tracking weights:
+> - **Aggressive Taylor Principle Compliance** (green line, $\\beta = 1.5$): As inflation jumps from 2.0% to 6.5%, the policy interest rate is raised faster than the inflation rate, climbing to a peak of 9.75%. This successfully drives the real interest rate ($R - \\pi$) positive, cooling aggregate spending and bringing inflation back down to target within four quarters.
+> - **Weak Response Policy Failure** (red line, $\\beta = 0.5$): This policy responds to inflation by raising nominal rates too slowly (only reaching 5.25% against 6.5% inflation). The resulting negative real interest rate encourages borrowing and spending, worsening the inflation spiral.
+
+Use the interactive Taylor Rule policy loop calculator below to test policy settings:
+
+\`\`\`simulator
+{
+  "mode": "taylor_rule",
+  "title": "Interactive Taylor Rule policy rate feedback loop calculator"
+}
+\`\`\`
+
+---
+
+### 1.5.6 Carlin-Soskice 3-Equation Model
+
+This New Keynesian framework represents the modern standard for monetary policy analysis.
+
+#### The Three Core Equations:
+1. **IS Equation (Inertial demand)**:
+   $$y_1 = A - a \\cdot r_0$$
+2. **Phillips Curve (PC)**:
+   $$\\pi_1 = \\pi_0 + \\alpha (y_1 - y_e)$$
+3. **Monetary Rule (MR)**:
+   Derived by minimizing Central Bank loss:
+   $$L = (y_1 - y_e)^2 + \\beta (\\pi_1 - \\pi^T)^2$$
+   Subject to Phillips Curve constraint:
+   $$y_1 - y_e = -\\alpha \\beta (\\pi_1 - \\pi^T)$$
+
+The chart below shows how different weights on inflation aversion ($\\beta$) affect the central bank's loss penalty as actual inflation deviates from target:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Central Bank Loss Profiles: Hawk vs. Dove Loss Functions",
+  "xAxis": "inflation_deviation",
+  "yAxis": "loss_value",
+  "data": [
+    {"inflation_deviation": "-2%", "HawkLoss": 12.0, "DoveLoss": 3.0},
+    {"inflation_deviation": "-1%", "HawkLoss": 4.5, "DoveLoss": 1.1},
+    {"inflation_deviation": "0% (At Target)", "HawkLoss": 0.0, "DoveLoss": 0.0},
+    {"inflation_deviation": "1%", "HawkLoss": 4.5, "DoveLoss": 1.1},
+    {"inflation_deviation": "2%", "HawkLoss": 12.0, "DoveLoss": 3.0},
+    {"inflation_deviation": "3%", "HawkLoss": 22.5, "DoveLoss": 5.6}
+  ],
+  "series": [
+    {"key": "HawkLoss", "name": "Hawkish Governor Loss (beta = 2.0, high inflation-aversion)", "color": "#f43f5e"},
+    {"key": "DoveLoss", "name": "Dovish Governor Loss (beta = 0.5, high output-aversion)", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Governor Loss Functions and inflation penalties**:
+> This plot visualizes the quadratic loss functions representing the objective profiles of monetary policymakers under the Carlin-Soskice 3-Equation Model. The vertical axis measures total social penalty ("loss"), while the horizontal tracks inflation deviations from the target $\\pi^T$. A Hawkish Governor (red parabola, $\\beta = 2.0$) places a steep penalty weight on inflation variance. Consequently, even a minor 1% overshoot results in a large loss (4.5). A Dovish Governor (green parabola, $\\beta = 0.5$) tolerates inflation variability in favor of minimizing output gaps, suffering only a 1.1 loss penalty for the same overshoot.
+
+#### Carlin-Soskice MR Convergence Dynamics
+
+To observe how these governor aversion weights translate into different monetary policy responses, review the dynamic convergence paths of output and inflation along the **Monetary Rule (MR)** curve following an expansionary demand shock:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "New Keynesian Adjustment: Dynamic Convergence along the Monetary Rule (MR)",
+  "xAxis": "output_gap",
+  "yAxis": "inflation",
+  "data": [
+    {"output_gap": "0.0% (Equilibrium)", "HawkMR": 2.0, "DoveMR": 2.0},
+    {"output_gap": "-0.5% (Stage 3 Recovery)", "HawkMR": 2.5, "DoveMR": 2.2},
+    {"output_gap": "-1.0% (Stage 2 Recovery)", "HawkMR": 3.0, "DoveMR": 2.5},
+    {"output_gap": "-1.5% (Stage 1 Recovery)", "HawkMR": 3.5, "DoveMR": 2.8},
+    {"output_gap": "-2.0% (Direct Post-Shock)", "HawkMR": 4.0, "DoveMR": 3.2}
+  ],
+  "series": [
+    {"key": "HawkMR", "name": "Hawkish Governor Tightening Path (beta = 2.0)", "color": "#f43f5e"},
+    {"key": "DoveMR", "name": "Dovish Governor Gradualist Path (beta = 0.5)", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Policy convergence along the MR**:
+> This dynamic convergence plot diagrams how a central bank navigates back to equilibrium after a demand-push shock has driven inflation up to 4.0%.
+> - **Hawkish tightening** (red MR curve): The hawkish central bank immediately triggers aggressive interest rate raises to crush aggregate demand (opening a deep output deficit of -2.0%). This steep trade-off ensures that inflation drops rapidly back to the 2.0% target in subsequent quarters.
+> - **Dovish gradualism** (green MR curve): The dovish central bank values short-term employment, choosing to open a smaller, gradual output gap (only -1.0%). Consequently, the inflation adjustment back to target is stretched out over a longer time horizon.
+
+---
+
+### 1.5.7 Theory of Interest Rates
+
+Interest rates are determined by financial equilibrium and can vary across maturities (The Term Structure).
+
+#### 1. Real vs. Nominal Rates: The Fisher Equation
+$$1 + R = (1 + r)(1 + \\pi^e) \\implies r \\approx R - \\pi^e$$
+
+#### 2. Theories of the Yield Curve (Term Structure)
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Classical Shapes of the Yield Curve",
+  "xAxis": "maturity",
+  "yAxis": "yield",
+  "data": [
+    {"maturity": "1M", "Curve_A_Upward": 2.0, "Curve_B_Inverted": 6.8, "Curve_C_Humped": 4.0},
+    {"maturity": "1Y", "Curve_A_Upward": 3.5, "Curve_B_Inverted": 5.5, "Curve_C_Humped": 5.8},
+    {"maturity": "5Y", "Curve_A_Upward": 4.8, "Curve_B_Inverted": 4.5, "Curve_C_Humped": 5.5},
+    {"maturity": "10Y", "Curve_A_Upward": 5.8, "Curve_B_Inverted": 3.8, "Curve_C_Humped": 4.8},
+    {"maturity": "30Y", "Curve_A_Upward": 6.2, "Curve_B_Inverted": 3.5, "Curve_C_Humped": 4.2}
+  ],
+  "series": [
+    {"key": "Curve_A_Upward", "name": "Normal (Upward)", "color": "#10b981"},
+    {"key": "Curve_B_Inverted", "name": "Inverted", "color": "#ef4444"},
+    {"key": "Curve_C_Humped", "name": "Humped", "color": "#f59e0b"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Yield Curves and Term Structure Interpretations**:
+> This plot represents the fundamental yield curves reflecting expectations of future macroeconomic expansion or distress.
+> - **Normal Upward Curve** (green line): Shows rising yields over longer maturities, driven by standard term liquidity premiums (Hicksian premium) and anticipated expansion.
+> - **Inverted Curve** (red line): Features short-term yields higher than long-term yields. This historically reliable recession predictor indicates that investors expect interest rates—and inflation—to fall sharply in response to future economic contraction.
+> - **Humped Curve** (amber line): Reflects transactional demand shocks or transition phases where short-to-medium-term expectations spike temporarily before correcting over the long run.
+
+- **Expectations Hypothesis (Fisher)**:
+  Bonds of different maturities are perfect substitutes. The long-term rate is the geometric average of expected future short-term rates.
+- **Liquidity Premium Hypothesis (Hicks)**:
+  Investors prefer liquidity (short-term bonds) to avoid capital loss. Long-term borrowers must pay a risk premium to persuade lenders.
+- **Segmented Markets (Culbertson)**:
+  Maturity markets are entirely independent. Rates are set strictly by segmented supply and demand.
+- **Preferred Habitat (Modigliani & Sutch)**:
+  Investors have preferred standard maturities, but will cross segments if offered a sufficient premium.
+
+---
+
+## CHAPTER 6: MONEY IN THE OPEN ECONOMY
+
+In organic, open economies, exchange rates, international trade flows, and foreign asset yield arbitrage alter monetary policy transmission.
+
+---
+
+### 1.6.1 Short-Run and Long-Run Determination of Exchange Rate
+
+#### Real vs. Nominal Exchange Rates
+The trade competitiveness of an economy is determined by the Real Exchange Rate ($q$), which adjusts the Nominal Exchange Rate ($e$, defined here as the quantity of domestic currency required to purchase one unit of foreign currency) for relative price ratios across borders:
+$$q = \\frac{e \\cdot P_f}{P_d}$$
+Where $P_d$ is the domestic price level and $P_f$ is the foreign price level.
+- A **real depreciation** is represented by a rise in $q$ (meaning foreign goods become more expensive relative to domestic goods, which boosts export competitiveness).
+- A **real appreciation** is represented by a fall in $q$ (domestic goods become more expensive, worsening the trade balance).
+
+#### Purchasing Power Parity (PPP)
+1. **Absolute Purchasing Power Parity**:
+   Based on the *Law of One Price* (assuming frictionless markets, zero transport fees, and no tariffs), a basket of identical trade commodities must cost the same in both countries:
+   $$P_d = e \\cdot P_f \\implies e_{PPP} = \\frac{P_d}{P_f}$$
+2. **Relative Purchasing Power Parity**:
+   Because transaction frictions, trade tariffs, and non-traded inputs exist, absolute prices rarely equalize. Relative PPP states that the *rate of change* of exchange rates over time equals the domestic-foreign inflation differential:
+   $$\\frac{\\Delta e}{e} \\approx \\pi_d - \\pi_f$$
+   - **Systematic Failure & The Balassa-Samuelson Effect Model**: PPP systematically violates long-run empirical data between highly developed and developing nations. Fast productivity gains in the traded sector of rich countries drive up wages. To retain employees, non-traded sectors (barbers, dry cleaning) must raise wages, forcing up the non-traded price services index. Consequently, developed economies have systematically higher price levels, and their currencies appear overvalued on a PPP basis.
+
+#### Interest Rate Parity Dynamics
+International capital is highly fluid, seeking the highest possible yield risk-adjusted assets globally.
+
+1. **Covered Interest Rate Parity (CIP)**:
+   When exchange rate risk is eliminated through a forward contract, the domestic nominal rate ($i_d$) and foreign rate ($i_f$) must satisfy:
+   $$1 + i_d = \\left(1 + i_f\\right) \\frac{F_t}{E_t} \\implies F_t = E_t \\frac{1 + i_d}{1 + i_f}$$
+   Where $E_t$ is the spot rate and $F_t$ is the forward exchange rate. Any deviation from CIP yields riskless arbitrage, which is immediately traded out by institutional capital.
+2. **Uncovered Interest Rate Parity (UIRP)**:
+   If investors are risk-neutral and leave currency holdings unhedged, they demand equal expected returns globally:
+   $$1 + i_d = \\left(1 + i_f\\right) \\frac{E^e_{t+1}}{E_t} \\implies i_d \\approx i_f + \\frac{E^e_{t+1} - E_t}{E_t}$$
+   Where $E^e_{t+1}$ is the expected spot rate in period $t+1$. This implies that a country with a high interest rate, $i_d > i_f$, must see its currency expected to **depreciate** in value over the corresponding investment horizon to wipe out foreign yield advantages.
+   - **The Forward Premium Puzzle**: Empirically, high interest rate currencies often systematically *appreciate* rather than depreciate in the short run. This violation is attributed to risk premium fluctuations, transaction friction, or capital flows chasing momentum.
+
+#### Comparative Review of International Exchange Rate Parity Conditions
+| Parity Condition | Core Theoretical Equation | Underlying Arbitrage / Adjustment Driver | Valid Adjustment Horizon | Common Empirical Vulnerability / Failure Causes |
+| :--- | :--- | :--- | :--- | :--- |
+| **Absolute PPP** | $e_{PPP} = \\frac{P_d}{P_f}$ | Law of One Price (frictionless commodity trading across borders). | Very Long Run (decades) | Non-traded sectors, custom tariffs, transport costs, Balassa-Samuelson bias. |
+| **Relative PPP** | $\\frac{\\Delta e}{e} \\approx \\pi_d - \\pi_f$ | Dynamic consumer basket substitution relative to inflation changes. | Long Run (years to decades) | Sticky supplier prices, sudden transport fee hikes, sovereign tax updates. |
+| **Covered Interest Parity (CIP)** | $F_t = E_t \\frac{1 + i_d}{1 + i_f}$ | Risk-free exchange-rate arbitration via forward financial cover. | Ultra-Short Run (continuous/instantaneous) | Strictly holds as a financial identity; minor failures only in sovereign default risk or capital bans. |
+| **Uncovered Interest Parity (UIRP)** | $i_d \\approx i_f + \\frac{E^e_{t+1} - E_t}{E_t}$ | Risk-neutral global investor capital diversification looking for yields. | Medium to Long Run | **Forward Premium Puzzle**: Local high interest rates draw speculative inflows, triggering direct short-run appreciation. |
+
+---
+
+### Balance of Payments (BOP) Determination Approaches
+
+The Balance of Payments records all financial transactions between domestic and foreign residents. Four main models explain BOP adjustments and exchange rate corrections:
+
+#### 1. The Elasticity Approach & The Marshall-Lerner Condition
+The Elasticity Approach analyzes how a currency devaluation (a rise in nominal exchange rate, $e$) affects the real current account Balance ($NX = X - e \\cdot M$).
+
+A devaluation reduces the foreign price of domestic exports, stimulating export quantities ($X \\uparrow$). It simultaneously increases the domestic price of imports, reducing import volumes ($M \\downarrow$). However, because imports are costlier in domestic currency terms, the aggregate value of existing imports rises.
+
+For net wealth of the trade balance to improve, the quantity gains must outweigh this valuation loss. Mathematically, this is satisfied only if export and import demand elasticities are high:
+$$\\eta_x + \\eta_m > 1$$
+Where $\\eta_x$ and $\\eta_m$ are the price elasticities of demand for exports and imports, respectively.
+
+- **The J-Curve Effect**:
+  Following devaluation, the current account balance often deteriorates in the short run before improving, drawing a visual "J" shape:
+  - **Short Run**: Trade quantities are locked into fixed forward contracts. Total volumes are inelastic ($\\eta_x + \\eta_m < 1$). The price valuation shock dominates, causing a trade deficit expansion.
+  - **Medium Run (6 - 18 months)**: Contracts expire, and consumers find alternative suppliers. Elasticities increase ($\\eta_x + \\eta_m > 1$), triggering quantity adjustments that improve BOP.
+
+The chart below displays the typical asymmetric trajectory of the trade balance over time (the dynamic J-Curve path) following an exchange rate devaluation:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "The J-Curve Effect: Trade Balance Response to Devaluation",
+  "xAxis": "months_after_devaluation",
+  "yAxis": "trade_balance",
+  "data": [
+    {"months_after_devaluation": "0 (Pre-Deval)", "trade_balance": -10},
+    {"months_after_devaluation": "1M (Price Shock)", "trade_balance": -25},
+    {"months_after_devaluation": "3M (Contracts locked)", "trade_balance": -22},
+    {"months_after_devaluation": "6M (Adjusting)", "trade_balance": -8},
+    {"months_after_devaluation": "12M (ML Condition Met)", "trade_balance": 15},
+    {"months_after_devaluation": "18M (Steady State)", "trade_balance": 28}
+  ],
+  "series": [
+    {"key": "trade_balance", "name": "Current Account Balance (NX)", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — The J-Curve Trade Correction**:
+> This interactive line chart tracks the time-varying trajectory of the net trade balance ($NX$) following domestic currency devaluation. In the immediate sub-interval (1 to 3 months), fixed import/export contracts prevent immediate physical volume adjustments. Since the price of foreign currency has jumped, imports cost more in home-currency terms, which expands the trade deficit deeper to -25. Over the medium term (6 to 18 months), consumers and businesses shift contracts to domestic suppliers. As demand elasticities grow elastic, quantity gains overwhelm price shocks, driving the trade balance back into a healthy surplus of 28.
+
+#### 2. The Absorption Approach (Sydney Alexander, 1952)
+Unlike the partial-equilibrium Elasticity model, the Absorption Approach is a general equilibrium Keynesian model. It focuses on aggregate domestic absorption (spending by domestic consumers, businesses, and government, $A = C + I + G$).
+
+Starting with the GDP identity:
+$$Y = C + I + G + (X - M) \\implies Y = A + CA$$
+$$CA = Y - A$$
+Where $CA$ is the current account balance.
+- This shows that a trade deficit occurs because the nation consumes more than it produces ($A > Y$).
+- A currency devaluation improves $CA$ only if it raises national output ($Y$) relative to domestic absorption ($A$).
+  - If the economy is at **full employment** ($Y = Y_f$), devaluation cannot increase output. It will only fuel inflation unless the government implements contractionary fiscal policies to compress domestic absorption ($A \\downarrow$).
+
+#### 3. The Monetary Approach to the Balance of Payments (MABP)
+MABP focuses on the long run, treating BOP surpluses and deficits as purely monetary phenomena.
+
+- **Core Balance Sheet Identity**:
+  $$M_s = R + D$$
+  Where $M_s$ is money supply, $R$ is foreign exchange reserves held by the central bank, and $D$ is domestic credit created by banking loans.
+- In equilibrium, money supply equals stable money demand: $M_d = R + D \\implies R = M_d - D$.
+- Expressing in flows:
+  $$\\Delta R = \\Delta M_d - \\Delta D$$
+  - Under fixed exchange rates, an excessive expansion of domestic credit ($\\Delta D > \\Delta M_d$) forces investors to seek higher-yield foreign assets. Immediate capital flight follows. For the central bank to maintain the currency exchange peg, it must sell foreign reserves and buy domestic currency, reducing $R$.
+  - MABP indicates that a persistent BOP deficit is simply the result of excessive domestic credit creation ($D$), which drains foreign exchange reserves ($R$).
+
+#### 4. The Portfolio Balance Approach
+The Portfolio Balance Approach treats domestic and foreign bonds as imperfect substitutes (incorporating a risk premium). Wealth holders allocate their assets across:
+- Domestic currency ($M$)
+- Domestic government bonds ($B$)
+- Foreign-currency denominated assets ($F$)
+Any changes in interest rates, risk premiums, or wealth allocations shift asset demands, altering exchange rates to maintain financial market equilibrium.
+
+---
+
+### 1.6.3 Monetary Policy Under Alternative Exchange Rate Regimes
+
+The Mundell-Fleming model (IS-LM-BP) shows how policy efficacy depends on capital mobility and exchange rate rules:
+
+#### 1. Under Fixed Exchange Rates
+- **Monetary Policy is COMPLETELY INEFFECTIVE**:
+  - The central bank attempts an expansionary monetary policy (shifting LM rightward), which lowers interest rates below world levels ($i_d < i_f$).
+  - This lower yield triggers capital flight, which puts downward pressure on the domestic currency peg.
+  - To defend the peg, the central bank must sell foreign reserves and buy back domestic currency.
+  - This reserve drain automatically reduces the domestic monetary base, shifting the LM curve back to its original equilibrium.
+- **Fiscal Policy is HIGHLY EFFECTIVE**:
+  - Government expansion (shifting IS rightward) raises GDP and drives up interest rates ($i_d > i_f$).
+  - Higher rates trigger capital inflows, putting upward pressure on the currency.
+  - To defend the peg, the central bank must buy foreign currency and sell domestic reserves, expanding LM.
+  - This monetary accommodation prevents interest rates from rising, magnifying output expansion.
+
+#### 2. Under Floating Exchange Rates
+- **Monetary Policy is HIGHLY EFFECTIVE**:
+  - Monetary expansion (shifting LM rightward) lowers interest rates ($i_d < i_f$).
+  - Capital outflows cause the currency to depreciate.
+  - Currency depreciation boosts export competitiveness, shifting the IS curve rightward.
+  - This trade expansion multiplies the initial monetary output expansion.
+- **Fiscal Policy is COMPLETELY INEFFECTIVE**:
+  - Fiscal expansion (shifting IS rightward) raises interest rates ($i_d > i_f$).
+  - Capital inflows cause the currency to appreciate.
+  - Currency appreciation worsens competitiveness, reducing net exports and shifting the IS curve back.
+  - Capital inflows crowd out net exports, returning aggregate output to its initial level.
+
+#### The Policy Trilemma (The Inconsistent Trinity)
+An open economy can maintain at most **two** of the following three policy positions:
+1. A **Fixed Exchange Rate** (to minimize currency risk and promote trade).
+2. **Free Capital Flows** (to integrate into global financial markets).
+3. An **Independent Monetary Policy** (to stabilize domestic output and unemployment).
+
+\`\`\`chart
+{
+  "type": "pie",
+  "title": "The Monetary Trilemma: Pick at Most Two",
+  "xAxis": "choice",
+  "yAxis": "degree",
+  "data": [
+    {"choice": "Fixed Exchange Rate", "degree": 33},
+    {"choice": "Free Capital Flow", "degree": 33},
+    {"choice": "Independent Monetary Policy", "degree": 33}
+  ],
+  "series": [
+    {"key": "degree", "name": "Policy Option"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — The Trilemma Trade-Off**:
+> This interactive pie chart illustrates the institutional constraints of the Mundell-Fleming "Holy Trinity". An open economy can select at most two of these three desirable attributes:
+> 1. **Fixed Exchange Rate** (to eliminate transaction risk and foreign trade volatility).
+> 2. **Free Capital Mobility** (to integrate into global liquid reserve markets).
+> 3. **Autonomous Monetary Policy** (to adjust interest rates autonomously to stabilize domestic output).
+> For instance, a country with free capital mobility and a fixed exchange rate (like Eurozone nations) cannot run its own independent monetary policy, as interest changes would immediately destabilize the peg.
+
+#### Mundell-Fleming Policy Efficacy comparison
+
+Observe how these structural trilemma parameters dictate the overall effectiveness of domestic fiscal versus monetary expansions in the comparative interactive graph below:
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Mundell-Fleming Efficacy: Fiscal vs. Monetary Output Transmission under capital mobility",
+  "xAxis": "regime",
+  "yAxis": "efficacy",
+  "data": [
+    {"regime": "Fixed Exchange Rate System", "fiscal_policy_effect": 100, "monetary_policy_effect": 0},
+    {"regime": "Floating Exchange Rate System", "fiscal_policy_effect": 0, "monetary_policy_effect": 100}
+  ],
+  "series": [
+    {"key": "fiscal_policy_effect", "name": "Fiscal Output Efficacy (%)", "color": "#10b981"},
+    {"key": "monetary_policy_effect", "name": "Monetary Output Efficacy (%)", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Mundell-Fleming transmission**:
+> This interactive bar chart outlines the stark polarity in policy effectiveness across exchange rate regimes:
+> - **Under Fixed Rates** (left): Fiscal policy is 100% effective because spending expansion shifts IS rightward and pressures interest rates up. To defend the currency peg, the central bank must supply massive liquidity, preventing crowding out and fully expanding output. Monetary policy, however, is 0% effective, as capital outflows immediately force the central bank to absorb surplus liquidity to defend the peg.
+> - **Under Floating Rates** (right): Monetary policy is 100% effective because interest rate drops prompt capital outflows. This depreciates the currency, boosting exports and expanding output. Fiscal expansion is 0% effective because higher interest rates attract capital, appreciating the currency and fully crowding out net exports.
+
+To dynamically simulate PPP arbitrage, UIRP expected spot rate alignments, and open-economy parity conditions, launch the parity simulator below:
+
+\`\`\`simulator
+{
+  "mode": "exchange_rate",
+  "title": "Interactive Open Economy Exchange Rate Parity Simulator"
+}
+\`\`\`
+
+---
+
+### 1.6.4 Exchange Rate Overshooting: Dornbusch Sticky-Price Model (1976)
+
+Rudi Dornbusch's model explains why floating exchange rates are highly volatile. It attributes this volatility to the fact that asset markets adjust quickly to national shocks while goods prices are sticky in the short run.
+
+#### 1. The Core Equations
+1. **Asset Market Equilibrium (UIP)**:
+   $$r_t = r^* + \\dot{e}^e_t$$
+   Expectations of exchange rate adjustment are mean-reverting toward long-run equilibrium:
+   $$\\dot{e}^e_t = \\theta(\\bar{e} - e_t)$$
+   Substituting expectation yields:
+   $$r_t - r^* = -\\theta(e_t - \\bar{e})$$
+2. **Money Market Equilibrium (LM)**:
+   $$m - p_t = \\phi y_t - \\lambda r_t$$
+   Or equivalently, solving for price levels:
+   $$p_t = m - \\phi y_t + \\lambda r_t$$
+3. **Goods Market Demand**:
+   $$y^d_t = u + \\gamma(e_t - p_t) - \\sigma r_t$$
+4. **Sticky Goods Price Adjustments**:
+   $$\\dot{p}_t = \\pi(y^d_t - y)$$
+
+#### 2. The Mechanics of a Monetary Expansion Step-by-Step
+Assume an unexpected, permanent monetary expansion occurs ($m \\uparrow$):
+
+- **The Long Run (Steady State)**:
+  - Long-run goods prices are fully flexible, rising proportionally with the money supply ($p \\uparrow = \\bar{p}$).
+  - Real interest rates return to world levels ($r = r^*$).
+  - The long-run nominal exchange rate depreciates proportionally (\\bar{e} \\uparrow = e$).
+- **The Short Run (Sticky Price Stage)**:
+  1. Goods prices ($P$) are sticky and cannot adjust instantaneously ($p_o = p_t$).
+  2. The monetary expansion increases real money balances ($m - p_o \\uparrow$), creating liquidity.
+  3. This liquidity surge drives down the domestic interest rate ($r_t \\downarrow$).
+  4. With domestic interest rates below world levels ($r_t < r^*$), uncovered interest parity (UIRP) requires investors to expect the domestic currency to **appreciate** in the future.
+  5. For the currency to appreciate toward its depreciated long-run equilibrium, the current spot exchange rate ($e_t$) must immediately **depreciate past (overshoot)** its long-run equilibrium value.
+  6. **Dynamic Path**: Capital markets arbitrage the spot rate to this overshot level immediately. Over time, excess goods demand drives up sticky prices ($P \\uparrow$). This contracts real money balances ($M/P \\downarrow$), pushing interest rates back up ($r \\uparrow$) and causing the exchange rate to gradually appreciate ($E \\uparrow$) toward its long-run depreciated steady state (\\bar{e}).
+
+The chart below visualizes the dynamic adjustment path of Dornbusch's overshooting process post-shock:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Dornbusch Overshooting: Immediate Exchange Rate Volatility vs. Sticky Price Adjustments",
+  "xAxis": "time_period",
+  "yAxis": "index",
+  "data": [
+    {"time_period": "t0 (Stable Baseline)", "Exchange_Rate": 100, "Goods_Prices": 100},
+    {"time_period": "t1 (Monetary Expansion Shock)", "Exchange_Rate": 125, "Goods_Prices": 100},
+    {"time_period": "t2 (Price Adjusting Quarter 1)", "Exchange_Rate": 120, "Goods_Prices": 103},
+    {"time_period": "t3 (Price Adjusting Quarter 2)", "Exchange_Rate": 116, "Goods_Prices": 107},
+    {"time_period": "t4 (Price Adjusting Quarter 3)", "Exchange_Rate": 112, "Goods_Prices": 111},
+    {"time_period": "t5 (New Long-Run Equilibrium)", "Exchange_Rate": 110, "Goods_Prices": 110}
+  ],
+  "series": [
+    {"key": "Exchange_Rate", "name": "Spot Exchange Rate (e_t) - Over depreciation to 125", "color": "#f43f5e"},
+    {"key": "Goods_Prices", "name": "Systemic Price Level (p_t) - Initially Sticky at 100", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
+
+> **Graph Analysis — Dornbusch Exchange Rate Overshooting trajectory**:
+> This chart maps the reaction paths after an unexpected 10% monetary expansion step-shock at $t_1$.
+> - **Spot Exchange Rate** (red line): Jumps immediately from 100 to 125 (a massive 25% depreciation). It overshoots its long-run target depreciation value ($110$) by 15 percentage points because nominal goods prices are sticky, depressing domestic rates. Over subsequent quarters ($t_2 \\rightarrow t_5$), the exchange rate gradually appreciates back to its long-run resting state ($110$).
+> - **Price Level** (blue line): Remains strictly locked at 100 at $t_1$ due to goods market stickiness (menu costs/labor contracts). Slowly over time, the loose monetary policy and weak domestic currency fuel excess aggregate demand, pulling prices upward until they stabilize at their new 110 proportional baseline.
+
+| Variable | Long-Run Change (Flexible $P$) | Short-Run Impact (Sticky $P$) |
+| :--- | :--- | :--- |
+| **Money Stock ($M$)** | $+10\\%$ (Exogenous) | $+10\\%$ |
+| **Goods Price ($P$)** | $+10\\%$ | $0\\%$ (Sticky) |
+| **Interest Rate ($r$)** | Unchanged ($r = r^*$) | Decreases ($r < r^*$) |
+| **Exchange Rate ($E$)** | $+10\\%$ (Depreciated) | $+25\\%$ (Overshoot Depreciation) |
+
+`,"ug-development":`
+# SCHAUM'S STUDY GUIDE SPECIFIC COMPANION FOR DEVELOPMENT ECONOMICS
+**Perfect Alignment with Debraj Ray's Development Economics Chapters 1-5**
+
+---
+
+## CHAPTER 1: THE NATURE AND METHODOLOGY OF DEVELOPMENT ECONOMICS
+
+### 1.1 Scope and Fundamental Dual Perspective
+Development Economics is the mathematical and institutional study of the resource allocations, structural transitions, and policies required to drive sustained growth in low-income societies. This guide operates under a **dual perspective**:
+1. **The International Context**: Examining structural dependencies, external aid, capital mobility, and technology spillovers from rich to poor nations.
+2. **Internal Institutional Failures**: Emphasizing frictions within the developing nation itself, analyzing why some markets fail, how informal systems replace formal structures, and the strategic behavior of localized economic agents.
+
+### 1.2 Methodological Framework and Market Failures
+A central postulation is that developing economies are defined by pervasive, systemic **market failures** rather than rare frictions. Key microeconomic themes include:
+- **Asymmetric Information & Moral Hazard**: Restricts formal credit and insurance contracts, forcing agents to rely on highly personalized or interlinked agreements.
+- **Missing or Underfunctioning Markets**: Traditional informal institutions (e.g., tied labor, sharecropping, family farms) emerge as rational, non-market responses to cover these structural gaps.
+- **The Role of Social Norms**: Cultural and community rules (e.g., high fertility custom as old-age security, communal landholdings) act as coordinating mechanisms that dictate individual behaviors.
+- **Externalities & Strategic Complementarities**: When individual actions yield spillovers, individual choices depend heavily on expected collective inputs, frequently locking the economy into low-level traps.
+
+### 1.3 The Functional Role of Inequality
+Inequality is analyzed not merely from an ethical or normative standpoint, but through its **functional impact** on macroeconomic performance. The distribution of wealth and individual assets directly alters:
+- **Aggregate Savings Rates**: When individual savings functions are highly non-linear, redistribution can either depress or accelerate total savings depending on the average income thresholds.
+- **Credit Market Access**: Information asymmetries require physical assets (collateral) to secure credit. Highly unequal asset distributions shut out the poor from high-return investments (e.g., education, entrepreneurship), inducing aggregate macroeconomic inefficiencies.
+
+---
+
+## CHAPTER 2: ECONOMIC DEVELOPMENT - AN OVERVIEW
+
+### 2.1 Measuring Economic Well-Being: Exchange Rates vs. PPP
+To evaluate different levels of development, income comparisons are conducted via two methods:
+1. **The Exchange Rate Method**: Converts domestic income to a common currency (usually U.S. dollars) using market currency exchange values:
+   $$y_{\\text{ER}} = \\frac{\\text{Income in Local Currency}}{\\text{Market Exchange Rate (Local/USD)}}$$
+   - *Limitation*: Market exchange rates are determined strictly by internationally traded commodities, capital flows, and currency speculation. They completely ignore **non-traded goods and services** (e.g., domestic labor, services, utility infrastructure). Since labor is abundant and cheap in poor nations, non-traded services are highly inexpensive, meaning market exchange rates systematically and heavily underestimate the real income and purchasing power of developing nations.
+2. **The Purchasing Power Parity (PPP) Method**: Estimates a common set of "international prices" for a representative basket of goods to evaluate real outputs:
+   $$\\text{PPP Factor} = \\frac{\\text{Domestic Expenditure on Basket}}{\\text{Basket Cost at International Prices (USD)}}$$
+   - *The International Comparison Program (ICP)*: Compiles price parities across 150 expenditure categories, utilizing the **Geary-Ramasamy index** to compute weighted average relative parities, ensuring consistent cross-country real comparisons.
+
+### 2.2 Income Disparities and Structural Visualizations
+Applying PPP substantially reduces the apparent output gap between rich and poor nations (e.g., transforming a 400:1 market exchange rate gap between Switzerland and Tanzania into a 30:1 real purchasing power gap).
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 2.2: World's Largest Economies (1993 $ billions)",
+  "xAxis": "country",
+  "data": [
+    {"country": "United States", "ExchangeRate": 6300, "PPP": 6300},
+    {"country": "Japan", "ExchangeRate": 4200, "PPP": 2600},
+    {"country": "China", "ExchangeRate": 400, "PPP": 1700},
+    {"country": "Germany", "ExchangeRate": 1900, "PPP": 1400},
+    {"country": "India", "ExchangeRate": 300, "PPP": 1200}
+  ],
+  "series": [
+    {"key": "ExchangeRate", "name": "Exchange Rate Method", "color": "#ef4444"},
+    {"key": "PPP", "name": "PPP Method (Purchasing Power Parity)", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+---
+
+## CHAPTER 2 (Cont.): HISTORICAL EXPERIENCES AND MOBILITY
+
+### 2.2.2 Diverse Trajectories of Wealth
+Over the period 1960–1985, the aggregate relative distribution of world income remained highly stationary: the richest 5% of nations constantly averaged approximately 29 times the average per-capita income of the poorest 5% (even under PPP). This global equilibrium, however, conceals highly diverse internal dynamics:
+- **The East Asian Miracle**: Korea, Taiwan, Hong Kong, Singapore, and China achieved meteoric rises, sustaining annual per-capita growth rates above 5.5% over decades.
+- **The Stagnation of the 1980s**: sub-Saharan Africa and Latin America experienced severe retrogressions, with Latin American per-capita income falling by 11% behind U.S. levels.
+
+### 2.2.3 Growth and Doubling Times
+The compounding effect of exponential growth is demonstrated by the "Rule of 70". If a country grows at constant annual rate $r$, its doubling time ($T$) solves:
+$$(1 + r/100)^T = 2 \\implies T \\ln(1 + r/100) = \\ln(2)$$
+Assuming small $r$, $\\ln(1 + x) \\approx x$:
+$$T \\approx \\frac{\\ln(2)}{r/100} \\approx \\frac{70}{r}$$
+*Example*: An East Asian economy growing at $5\\%$ per year doubles its per-capita income every $14$ years!
+
+### 2.2.4 Country Income Mobility Matrix (Quah, 1993)
+To trace whether poor countries are trapped or converging, incomes are normalized relative to world mean, creating five categories: $1/4$, $1/2$, $1$, $2$, and $\\infty$.
+
+| 1962 \\ 1984 | Income < 1/4 | 1/4 to 1/2 | 1/2 to 1 | 1 to 2 | Income > 2 |
+|---|---|---|---|---|---|
+| **< 1/4 (Poorest)** | **76%** | 12% | 12% | 0% | 0% |
+| **1/4 to 1/2** | 52% | **31%** | 10% | 7% | 0% |
+| **1/2 to 1** | 9% | 20% | **46%** | 26% | 0% |
+| **1 to 2** | 0% | 0% | 24% | **53%** | 24% |
+| **> 2 (Richest)** | 0% | 0% | 0% | 5% | **95%** |
+
+*Interpretation*: The extremes are exceptionally sticky (76% of poorest and 95% of richest remained in their original state), indicating low absolute mobility. However, middle-income nations (category 1/2 to 1) display significantly higher upward transitions.
+
+---
+
+## CHAPTER 2 (Cont.): INCOME DISTRIBUTION AND INEQUALITY
+
+### 2.3 Economic Inequality Measurement
+Inequality must be quantified using index functions $I(y_1, y_2, \\dots, y_n)$ that strictly satisfy **Four Fundamental Axioms**:
+1. **Anonymity Principle**: Permutations of incomes amongst individuals do not alter the measured inequality.
+2. **Population Principle**: Cloning the population structure leaves measured inequality invariant.
+3. **Relative Income Principle**: Scales are invariant to the level of income; only relative ratios matter:
+   $$I(y_1, y_2, \\dots, y_n) = I(\\lambda y_1, \\lambda y_2, \\dots, \\lambda y_n) \\quad \\text{for } \\lambda > 0$$
+4. **Dalton (Pigou-Dalton) Principle**: Any transfer of income from a richer individual to a poorer individual that does not reverse their ranking must strictly decrease inequality:
+   $$I(y_1, \\dots, y_i, \\dots, y_j, \\dots, y_n) < I(y_1, \\dots, y_i - \\delta, \\dots, y_j + \\delta, \\dots, y_n) \\quad \\text{for } y_i \\le y_j \\text{ and } \\delta > 0$$
+
+### 2.3.2 The Kuznets Inverted-U Hypothesis
+Simon Kuznets (1955) proposed that economic progression initially coordinates with **widening inequality** (as labor moves to high-wage modern sectors) followed subsequently by **declining inequality** (as low-income wages are bid up).
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 2.6: The Kuznets Inverted-U Hypothesis",
+  "xAxis": "gdp_per_capita",
+  "data": [
+    {"gdp_per_capita": 500, "inequality": 0.40},
+    {"gdp_per_capita": 1000, "inequality": 0.45},
+    {"gdp_per_capita": 2000, "inequality": 0.52},
+    {"gdp_per_capita": 4000, "inequality": 0.59},
+    {"gdp_per_capita": 6000, "inequality": 0.58},
+    {"gdp_per_capita": 9000, "inequality": 0.48},
+    {"gdp_per_capita": 15000, "inequality": 0.39},
+    {"gdp_per_capita": 25000, "inequality": 0.35}
+  ],
+  "series": [
+    {"key": "inequality", "name": "Estimated Gini Coefficient", "color": "#d946ef"}
+  ]
+}
+\`\`\`
+
+*The Latin Effect*: Once country-specific dummy variables (country fixed effects) are introduced to panel datasets (Deininger and Squire 1996b), the inverted-U pattern disappears in 80% of cases. The cross-sectional inverted-U is largely a statistical artifact of pooling intermediate-income Latin American nations (which possess historically high structural inequality due to colonial land tenure) with low-income Asian nations.
+
+---
+
+## CHAPTER 2 (Cont.): THE MANY FACES OF UNDERDEVELOPMENT
+
+### 2.4 Human Development & Multi-Dimensional Indicators
+Economic development cannot be captured solely by pecuniary per-capita GDP. A prosperous nation must secure high physical quality of life. The **Human Development Index (HDI)** combines:
+1. **Life Expectancy at Birth ($L$)**: Reflects health and nutritional status, relative to an ultimate target of 85 years:
+   $$L \\equiv \\frac{l - 25}{85 - 25}$$
+2. **Educational Attainment ($E$)**: Relies on Adult Literacy ($A \\equiv a/100$, weight 2/3) and gross primary/secondary/tertiary enrollment ($e/100$, weight 1/3).
+3. **Adjusted Income Index ($Y$)**: Reflects diminishing marginal utility of money above poverty thresholds:
+   $$Y \\equiv \\frac{y - 100}{5,448 - 100}$$
+
+### 2.4.2 Sri Lanka vs. Guatemala vs. Pakistan Case Study (1993 PPP Data)
+These neighboring/relative economies display how developmental outcomes diverge despite comparable incomes:
+
+| Indicator / Metric | Sri Lanka | Guatemala | Pakistan |
+|---|---|---|---|
+| **Per-Capita income (PPP $)** | $2,990 | $3,350 | $2,170 |
+| **Share of Poorest 40%** | **22%** | 8% | 21% |
+| **Share of Richest 20%** | **39%** | 63% | 40% |
+| **Life Expectancy (Years)** | **72** | 65 | 62 |
+| **Adult Literacy (%)** | **89%** | 54% | 36% |
+| **HDI Rank Differential** | **+5 (Positive)** | -20 (Negative) | -28 (Negative) |
+
+*Analysis*: Equal distribution of income in Sri Lanka paired with localized public health and education investments yielded substantially superior quality of life compared to richer, unequal nations.
+
+### 2.5 Structural Features of Developing Countries
+- **Demographic**: High birth/death rates, transitioning to rapid population growth as mortality plummets, creating **highly young populations** (echo effects).
+- **Occupational**: Extreme labor force concentration in the rural/agricultural sector (60–80% vs. 1–7% in developed nations), displaying structurally lower productivity.
+- **Urban Services & Informality**: Fast rural-to-urban migration exceeds industrial job absorption, forcing surplus labor into the informal services sector (e.g., street hawkers, shoe shines).
+
+---
+
+## CHAPTER 3: THEORIES OF ECONOMIC GROWTH - HARROD-DOMAR MODEL
+
+### 3.3 Investment, Savings, and Macroeconomic Balance
+The aggregate production process is bounded by intertemporal resource allocation. At macroeconomic balance, aggregate output ($Y$) must cover consumption ($C$) and saving-investment ($S, I$):
+$$\\text{Accounting identity: } Y(t) = C(t) + S(t) \\quad \\text{(3.1)}$$
+$$\\text{Value of produced output: } Y(t) = C(t) + I(t) \\quad \\text{(3.2)}$$
+$$\\text{Macroeconomic Balance: } S(t) = I(t) \\quad \\text{(3.3)}$$
+
+### 3.3.1 The Harrod–Domar Model
+The models assumes constant capital-output ratio $\\theta \\equiv K(t)/Y(t)$ and no substitution between inputs. Output is linear in capital: $Y(t) = K(t)/\\theta$. Capital accumulates via:
+$$K(t+1) = (1 - \\delta)K(t) + I(t) \\quad \\text{(3.4)}$$
+If savings is a constant fraction $s$ of income ($S(t) = sY(t)$):
+$$\\theta Y(t+1) = (1 - \\delta)\\theta Y(t) + sY(t)$$
+Dividing by $\\theta Y(t)$ yields the overall growth rate $g \\equiv \\frac{Y(t+1) - Y(t)}{Y(t)}$:
+$$\\mathbf{g = \\frac{s}{\\theta} - \\delta} \\quad \\text{(3.5)}$$
+
+### 3.3.2 Population Growth Corrections
+If population ($P$) grows at constant rate $n$, let $P(t+1) = (1+n)P(t)$ and per-capita growth be $g^*$:
+$$\\frac{s}{\\theta} = (1 + g^*)(1 + n) - (1 - \\delta) \\quad \\text{(3.6)}$$
+Approximating for small rates ($g^* \\cdot n \\approx 0$):
+$$\\mathbf{\\frac{s}{\\theta} \\approx g^* + n + \\delta} \\quad \\text{(3.7)}$$
+- *Prescriptive Application*: Central planning boards (e.g., the Soviet Gosplan in the first Five Year Plan 1928-1932) utilized these ratios to coordinate industrial targets (heavy vs. consumer goods).
+
+| Target Category (1928-1932) | Plan Target (Rubles) | Actual Achievement (Rubles) |
+|---|---|---|
+| **National Income** | 49.7 Billion | 45.5 Billion |
+| **Gross Industrial Production** | 43.2 Billion | 43.3 Billion |
+| **- Producers' Goods (Heavy)** | **18.1 Billion** | **23.1 Billion (Overperformed)** |
+| **- Consumers' Goods** | 25.1 Billion | 20.2 Billion (Underperformed) |
+| **Gross Agricultural Production**| 25.8 Billion | 16.6 Billion (Spectacular failure) |
+
+---
+
+## CHAPTER 3 (Cont.): THE SOLOW GROWTH MODEL
+
+### 3.3.3 Capital Substitution & Diminishing Returns
+Solow (1956) resolves the Harrod-Domar "knife-edge" Instability by introducing a continuous production function with **diminishing marginal returns** to capital and constant returns to scale:
+$$Y = F(K, L) \\implies y = f(k) \\quad \\text{where } y \\equiv Y/L \\text{ and } k \\equiv K/L$$
+Per-capita transitions with population growth $n$ and depreciation $\\delta$:
+$$\\mathbf{(1+n)k(t+1) = (1 - \\delta)k(t) + sf(k(t))} \\quad \\text{(3.9)}$$
+In the long-run steady-state, $k(t+1) = k(t) = k^*$:
+$$\\mathbf{\\frac{k^*}{y^*} = \\frac{s}{n + \\delta}} \\quad \\text{(3.10)}$$
+
 \`\`\`chart
 {
   "type": "area",
-  "title": "Figure 4.1: The Lorenz Curve",
-  "xAxis": "population_share",
-  "yAxis": "income_share",
+  "title": "Figure 3.4: Solow Steady State Dynamics",
+  "xAxis": "capital_per_capita",
   "data": [
-    {"population_share": 0, "equality": 0, "actual": 0},
-    {"population_share": 20, "equality": 20, "actual": 5},
-    {"population_share": 40, "equality": 40, "actual": 15},
-    {"population_share": 60, "equality": 60, "actual": 30},
-    {"population_share": 80, "equality": 80, "actual": 55},
-    {"population_share": 100, "equality": 100, "actual": 100}
+    {"capital_per_capita": 0, "investment": 0, "depreciation": 0},
+    {"capital_per_capita": 10, "investment": 9.2, "depreciation": 4},
+    {"capital_per_capita": 20, "investment": 13.8, "depreciation": 8},
+    {"capital_per_capita": 40, "investment": 20.3, "depreciation": 16},
+    {"capital_per_capita": 60, "investment": 24.0, "depreciation": 24},
+    {"capital_per_capita": 80, "investment": 26.5, "depreciation": 32},
+    {"capital_per_capita": 100, "investment": 28.2, "depreciation": 40}
   ],
   "series": [
-    {"key": "equality", "name": "Line of Perfect Equality", "color": "#94a3b8"},
-    {"key": "actual", "name": "Lorenz Curve", "color": "#3b82f6"}
+    {"key": "investment", "name": "Savings-Investment sf(k)", "color": "#10b981"},
+    {"key": "depreciation", "name": "Required Investment (n+d)k", "color": "#ef4444"}
   ]
 }
 \`\`\`
-`,
 
-  "ug-financial": `
+- *Implication*: If capital grows faster than labor (e.g., to the left of $k^* = 60$), diminishing returns to capital lower the output-capital ratio, pulling down growth. At the steady state, per-capita growth is **zero**. Hence, the savings rate $s$ only exerts a **level effect** (shifting $y^*$ and $k^*$ upward), but has **zero growth-rate effect** in the long-run.
+
+---
+
+## CHAPTER 3 (Cont.): TECHNICAL PROGRESS AND CONVERGENCE
+
+### 3.4 Technological Progress and Labor Efficiency
+To secure perpetual long-run growth, Solow introduces labor-augmenting technical progress. Let aggregate labor in efficiency units be:
+$$L(t) = E(t)P(t) \\quad \\text{(3.11)}$$
+Where Efficiency $E(t)$ grows at technological progress rate $\\pi$: $E(t+1) = (1+\\pi)E(t)$. Aggregate labor force $P(t)$ grows at $n$.
+Normalizing capital and output per effective unit of labor ($\\hat{k} \\equiv \\frac{K}{EP}$ and $\\hat{y} \\equiv \\frac{Y}{EP}$):
+$$\\mathbf{(1+n)(1+\\pi)\\hat{k}(t+1) = (1-\\delta)\\hat{k}(t) + s\\hat{y}(t)} \\quad \\text{(3.12)}$$
+At steady state, the capital-output ratio per efficiency unit is:
+$$\\mathbf{\\frac{\\hat{k}^*}{\\hat{y}^*} \\approx \\frac{s}{n + \\pi + \\delta}} \\quad \\text{(3.13)}$$
+Long-run per-capita income grows precisely at the exogenous technological progress rate $\\pi$.
+
+### 3.5 Convergence Regressions and Mankiw-Romer-Weil (1992)
+Unconditional convergence postulates that history is irrelevant: all nations converge to the same steady state (Figure 3.7). Empirical checks (Baumol 1986 vs. De Long 1988) show that when selection bias is removed, absolute convergence is rejected. 
+To test conditional convergence, Mankiw, Romer, and Weil specify Cobb-Douglas function $Y = K^\\alpha (EP)^{1-\\alpha}$:
+$$\\mathbf{\\ln y(t) \\approx A + \\frac{\\alpha}{1-\\alpha} \\ln s - \\frac{\\alpha}{1-\\alpha} \\ln(n + \\pi + \\delta)} \\quad \\text{(3.15)}$$
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 3.10: Per Capita GDP vs. Annual Growth (No Unconditional Convergence)",
+  "xAxis": "gdp_1960",
+  "data": [
+    {"gdp_1960": 500, "growth_rate": 1.5},
+    {"gdp_1960": 1000, "growth_rate": 4.2},
+    {"gdp_1960": 2000, "growth_rate": -0.8},
+    {"gdp_1960": 3500, "growth_rate": 3.4},
+    {"gdp_1960": 5000, "growth_rate": 1.2},
+    {"gdp_1960": 7000, "growth_rate": 2.2},
+    {"gdp_1960": 9000, "growth_rate": 0.5},
+    {"gdp_1960": 10100, "growth_rate": 1.8}
+  ],
+  "series": [
+    {"key": "growth_rate", "name": "Annual Growth Rate (%)", "color": "#f59e0b"}
+  ]
+}
+\`\`\`
+
+- *MRW Regression Results*: Regression has high explanatory power ($R^2 = 0.59$), confirming conditional convergence. However, OLS coefficients are much too large (\\ln s coeff = $1.42$, expected $0.5$), indicating other forms of capital (human capital) must be integrated.
+
+---
+
+## CHAPTER 4: THE NEW GROWTH THEORIES (ENDOGENOUS GROWTH)
+
+### 4.2 Human Capital Accumulation Model
+Endogenous growth theories relax the assumption of diminishing returns to aggregate factors. By expanding capital to include human capital ($h$):
+$$y = k^\\alpha h^{1-\\alpha} \\quad \\text{(4.1)}$$
+Accumulation equations (with constant aggregate population and no depreciation):
+- Physical capital investment rate $s$:
+  $$k(t+1) - k(t) = sy(t) \\quad \\text{(4.2)}$$
+- Human capital investment rate $q$:
+  $$h(t+1) - h(t) = qy(t) \\quad \\text{(4.3)}$$
+Let the capital ratio be $r = h/k$, which solves to $r = q/s$ in the long run. Substituting $r$ back reveals that per-capita income grows perpetually at rate:
+$$\\mathbf{g = s^\\alpha q^{1-\\alpha}}$$
+- *Key Outcome*: Returns to $k$ and $h$ individually are diminishing, but the aggregate returns to physical and human capital combined are **constant**. Hence, savings rate $s$ and education rate $q$ have permanent, endogenous **growth effects**.
+
+### 4.4 deliberate Technical Progress (Romer, 1990)
+Romer formalizes technical progress as the deliberate output of R&D by profit-seeking monopolists:
+- **Aggregate Output**:
+  $$Y(t) = E(t)^\\gamma K(t)^\\alpha [uH]^{1-\\alpha} \\quad \\text{(4.5)}$$
+- **R&D Sector** (using human capital fraction $1-u$):
+  $$\\mathbf{\\frac{E(t+1)-E(t)}{E(t)} = a(1-u)H} \\quad \\text{(4.6)}$$
+  The total stock of human capital $H$ directly determines the rate of technical progress, demonstrating permanent growth-rate spillovers.
+
+### 4.4.4 Capital Externality Model (Romer, 1986)
+If individual firm investments produce industry-wide knowledge spillovers, firm-level CRS coexists with aggregate increasing returns:
+$$Y(t) = E(t)K(t)^\\alpha P(t)^{1-\\alpha} \\quad \\text{firm level}$$
+$$E(t) = a K^*(t)^\\beta \\quad \\text{macro externality (average capital stock } K^*)$$
+$$social Production: \\mathbf{Y = a K^{\\alpha+\\beta} P^{1-\\alpha}} \\quad \\text{with } \\alpha+\\beta \\ge 1$$
+
+---
+
+## CHAPTER 5: COORDINATION FAILURES, LINKAGES, AND HISTORY
+
+### 5.2 Complementarities and Multiple Equilibria
+A **complementarity** arises when the payoff to an action increases with the number of other agents taking that action. This leads to **multiple stable equilibria** and "pessimistic" traps (e.g., QWERTY keyboard, Figure 5.1).
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 4.3: Multiple Equilibria & Underdevelopment",
+  "xAxis": "average_investment",
+  "data": [
+    {"average_investment": 0, "individual_choice": 15, "line_45": 0},
+    {"average_investment": 20, "individual_choice": 20, "line_45": 20},
+    {"average_investment": 40, "individual_choice": 33, "line_45": 40},
+    {"average_investment": 60, "individual_choice": 60, "line_45": 60},
+    {"average_investment": 80, "individual_choice": 83, "line_45": 80},
+    {"average_investment": 100, "individual_choice": 100, "line_45": 100}
+  ],
+  "series": [
+    {"key": "individual_choice", "name": "Individual Response s", "color": "#a855f7"},
+    {"key": "line_45", "name": "45-Degree Coordination Line", "color": "#475569"}
+  ]
+}
+\`\`\`
+
+- *Analysis of Equilibria*: The intersections at $s_{1}^* = 20$ (low-level trap) and $s_{2}^* = 100$ (high-level optimum) are stable Nash equilibria. If belief is uncoordinated, the economy is trapped in $s_{1}^*$ because no individual firm will unilaterally invest.
+
+### 5.2.3 Linkages and Policy Interventions
+To break coordination failures, developmental planners assess structural linkages:
+1. **Backward Linkage**: An expansion in sector $X$ creates demand for inputs from sector $Y$ (e.g., steel industry demands coal).
+2. **Forward Linkage**: An expansion in sector $X$ lowers output prices, facilitating downstream operations (e.g., steel lowers cost of shipbuilding).
+- *The Big Push (Rosenstein-Rodan)*: Simulataneous, massive public investment across various complementary sectors to push the economy beyond the coordination trap threshold (e.g., the $60$ point in the chart above).
+- *Unbalanced Growth (Hirschman)*: Selectively subsidizing highly linked "leading sectors" (like heavy industry), letting market demands naturally pull downstream sectors.
+
+### 5.3 total Factor Productivity (TFP) Accounting
+TFP isolates output growth driven by technical progress rather than factor accumulation:
+$$\\mathbf{TFPG(t) = \\frac{\\Delta Y(t)}{Y(t)} - \\sigma_k(t) \\frac{\\Delta K(t)}{K(t)} - \\sigma_p(t) \\frac{\\Delta P(t)}{P(t)}} \\quad \\text{(4.12)}$$
+Where $\\sigma_k, \\sigma_p$ are capitals and labor income shares. Alwyn Young (1995) showed that East Asian growth was heavily "input-driven" rather than productivity-driven (TFP growth was low, e.g., Singapore $-1.0\\%$, South Korea $1.7\\%$, Canada $0.5\\%$, Japan $2.0\\%$, Brazil $1.6\\%$, Mexico $1.2\\%$, Venezuela $2.6\\%$, after correcting for massive drops in agricultural employment, education upgrades, and rising labor force participation rates).
+`,"ug-financial":`
 # COMPREHENSIVE FINANCIAL ECONOMICS STUDY GUIDE
 
 *Based on Financial Economics, Second Edition by Zvi Bodie, Robert C. Merton, and David L. Cleeton*
@@ -1378,7 +3050,7 @@ Financial intermediaries are categorized by how they acquire and distribute fund
 **2.5 Classification of Financial Markets**
 Financial markets can be segmented along several dimensions:
 - **Debt vs. Equity Markets**: Debt instruments (bonds, notes) represent borrower-lender arrangements with fixed payments; equity instruments (common stock) represent ownership claims with residual payouts.
-- **Money vs. Capital Markets**: Money markets deal in short-term debt instruments (maturity $< 1$ year, e.g., T-bills, commercial paper) requiring high liquidity and very low risk. Capital markets trade long-term debt and equity issues (maturity $\ge 1$ year, e.g., corporate bonds, treasury bonds, stocks).
+- **Money vs. Capital Markets**: Money markets deal in short-term debt instruments (maturity $< 1$ year, e.g., T-bills, commercial paper) requiring high liquidity and very low risk. Capital markets trade long-term debt and equity issues (maturity $\\ge 1$ year, e.g., corporate bonds, treasury bonds, stocks).
 - **Primary vs. Secondary Markets**: In primary markets, newly issued securities are sold to initial buyers (e.g., IPOs). Secondary markets facilitate the trading of pre-existing securities between investors, providing vital liquidity and establishing market prices.
 
 **2.6 Financial Market Rates**
@@ -1386,7 +3058,7 @@ An interest rate is a promised rate of return, representing the price of borrowi
 - **Nominal Interest Rate ($i$)**: The interest rate expressed in ordinary monetary terms, unadjusted for changes in purchasing power.
 - **Real Interest Rate ($r$)**: The rate of return measured in terms of constant purchasing power (real goods and services).
 
-Accounting for the rate of inflation ($\pi$), the exact relationship (the Fisher Multiplicative Equation) is:
+Accounting for the rate of inflation ($\\pi$), the exact relationship (the Fisher Multiplicative Equation) is:
 $$ 1 + r = \\frac{1 + i}{1 + \\pi} $$
 
 Often, for low inflation rates, this is approximated by the linear **Fisher Equation**:
@@ -1599,7 +3271,7 @@ For a **growth perpetuity** where cash flows grow at a constant rate $g$:
 $$ PV = \\frac{C_1}{i - g} $$
 
 Growth Perpetuity (Constant Growth):
-$$ PV = \\\frac{C_1}{i - g} $$
+$$ PV = \\frac{C_1}{i - g} $$
 
 \`\`\`simulator
 {
@@ -1884,11 +3556,11 @@ The promised cash payment on a pure discount bond is called its **face value** o
 
 The **yield** (interest rate) on a pure discount bond is the annualized rate of return to investors who buy it and hold it until it matures. For a pure discount bond with a one-year maturity such as the one in our example, we get:
 
-$$ \\text{Yield on 1-Year Pure Discount Bond} = \\frac{\\text{Face Value} - \\text{Price}}{\\text{Price}} = \\frac{\\$1,000 - \\$950}{\\$950} = 0.0526 \\text{ or } 5.26\% $$
+$$ \\text{Yield on 1-Year Pure Discount Bond} = \\frac{\\text{Face Value} - \\text{Price}}{\\text{Price}} = \\frac{\\$1,000 - \\$950}{\\$950} = 0.0526 \\text{ or } 5.26\\% $$
 
 If, however, the bond has a maturity different from one year, we would use the present value formula to find its annualized yield. Thus, suppose we observe a two-year pure discount bond with a face value of $1,000 and a price of $880. We would compute the annualized yield on this bond as the discount rate that makes its face value equal to its price:
 
-$$ 880 = \\frac{1000}{(1+YTM)^2} \\implies YTM \\approx 6.60\% $$
+$$ 880 = \\frac{1000}{(1+YTM)^2} \\implies YTM \\approx 6.60\\% $$
 
 **8.3 Coupon Bonds, Current Yield, and Yield to Maturity**
 A **coupon bond** obligates the issuer to make periodic payments of interest—called *coupon payments*—to the bondholder for the life of the bond, and then to pay the face value of the bond when the bond matures (i.e., when the last payment comes due). The periodic payments of interest are called *coupons* because at one time most bonds had coupons attached to them that investors would tear off and present to the bond issuer for payment.
@@ -2228,9 +3900,9 @@ By the Law of One Price (no-arbitrage pricing), we establish the exact relations
 
 - **Arbitrage Proof (Discrete Compounding)**:
   - If $F_0 > S_0(1+r)^T$, an arbitrageur executes a **Cash-and-Carry Arbitrage**: borrow $S_0$ at rate $r$ to buy the asset in the spot market today, and simultaneously sell (short) a forward contract at $F_0$. At time $T$, deliver the asset to settle the forward for $F_0$, and pay back the loan ($S_0(1+r)^T$). Net riskless profit is:
-    $$ \text{Profit} = F_0 - S_0(1+r)^T > 0 $$
+    $$ \\text{Profit} = F_0 - S_0(1+r)^T > 0 $$
   - If $F_0 < S_0(1+r)^T$, they execute a **Reverse Cash-and-Carry Arbitrage**: short-sell the asset today for $S_0$, invest the proceeds at rate $r$, and long a forward contract at $F_0$. At $T$, buy back the asset for $F_0$ using the forward to close the short position. Net riskless profit:
-    $$ \text{Profit} = S_0(1+r)^T - F_0 > 0 $$
+    $$ \\text{Profit} = S_0(1+r)^T - F_0 > 0 $$
 
 **14.4 Parity with Holding Income and Costs**
 If holding the underlying asset entails costs or benefits, the cost of carry model must adjust:
@@ -2412,9 +4084,7 @@ $$ \\text{Expanded NPV} = \\text{Static NPV} + \\text{Real Option Premium} $$
 
 - *Implication 1*: A project with a negative static NPV may actually be highly valuable ($E\\_NPV > 0$) if it contains an exceptionally valuable option to expand, delay, or switch.
 - *Implication 2*: Volatility is the enemy of static NPV, but it is the friend of options. Higher project cash flow volatility ($\\sigma$) increases the likelihood of highly profitable outcomes while the downside exposure is protected by the option to abandon or defer. Thus, higher volatility *increases* the Real Option Premium, making highly risky, flexible projects more valuable than rigid, low-risk alternatives.
-`,
-
-  "ug-international": `
+`,"ug-international":`
 # COMPREHENSIVE INTERNATIONAL ECONOMICS STUDY GUIDE
 
 ## CHAPTER 1: THE BASIS OF INTERNATIONAL TRADE
@@ -2480,9 +4150,8 @@ Governments use tariffs (taxes) and quotas (limits) to protect domestic industri
 
 ### 5.1 Purchasing Power Parity (PPP)
 The exchange rate between two currencies should equal the ratio of the two countries' price levels.
-$$E = \\\frac{P_1}{P_2}$$
-`,
-  "ug-macro": `
+$$E = \\frac{P_1}{P_2}$$
+`,"ug-macro":`
 # Macroeconomics: Eleventh Edition - Chapter by Chapter Summary
 
 This document provides a chapter-by-chapter summary of the textbook *Macroeconomics*, Eleventh Edition, by Dornbusch, Fischer, and Startz. It includes key concepts, mathematical equations, referenced tables, and graphs.
@@ -2893,9 +4562,9 @@ Explains the forward-looking nature of financial markets and the concept of arbi
 Examines extreme macroeconomic events. Summarizes the causes of the Great Depression, hyperinflations (driven by monetization of large deficits/inflation tax), and the ongoing debate surrounding government deficits and social security.
 
 **Key Equations:**
-- **Budget Financing Identity:** $Budget\ Deficit = Sales\ of\ Bonds + Increase\ in\ Money\ Base$
-- **Inflation-Adjusted Deficit:** $Total\ Deficit - (Inflation\ Rate \\times National\ Debt)$
-- **Inflation Tax Revenue:** $Inflation\ Rate \\times Real\ Money\ Base$
+- **Budget Financing Identity:** $Budget\\ Deficit = Sales\\ of\\ Bonds + Increase\\ in\\ Money\\ Base$
+- **Inflation-Adjusted Deficit:** $Total\\ Deficit - (Inflation\\ Rate \\times National\\ Debt)$
+- **Inflation Tax Revenue:** $Inflation\\ Rate \\times Real\\ Money\\ Base$
 - **Debt-Income Ratio:** $Debt / PY$
 
 **Key Graphs & Tables:**
@@ -2936,96 +4605,823 @@ Explores the modern frontier of macroeconomics: Rational Expectations, Real Busi
 ---
 *End of Summary*
 
-`,
-  "ug-statistical": `
-# COMPREHENSIVE STATISTICAL ECONOMICS STUDY GUIDE
-
-## CHAPTER 1: DATA AND STATISTICS
-
-### 1.1 Data Collection and Representation
-Statistics is the science of collecting, analyzing, presenting, and interpreting data. In economics, data provides the empirical foundation for theories.
-
-### 1.2 Types of Data
-1. **Time Series Data**: Observations over time (e.g., Annual GDP over 20 years).
-2. **Cross-Sectional Data**: Observations of different units at the same point in time (e.g., Income of 100 households in 2023).
-3. **Panel Data**: Combination of both (e.g., Annual GDP of 10 countries over 20 years).
+`,"ug-statistical":`
+# SCHAUM'S STUDY GUIDE SPECIFIC COMPANION FOR STATISTICAL ECONOMICS
+**Perfect Alignment with Salvatore & Reagle's Theory and Problems of Statistics and Econometrics**
 
 ---
 
-## CHAPTER 2: PROBABILITY DISTRIBUTIONS
+## Chapter 1: Introduction to Econometrics
 
-### 2.1 The Normal Distribution
-The most important distribution in statistics, characterized by its bell-shaped curve and symmetry around the mean.
+### 1.1 The Nature of Statistics and Econometrics
+Statistics is the mathematical science concerned with the collection, presentation, analysis, and interpretation of numerical data. It is fundamentally divided into:
+- **Descriptive Statistics**: Summarizes and visualizes the key characteristics of a dataset (e.g., mean, median, standard deviation, and graphical plots).
+- **Inferential Statistics**: Draws analytical conclusions about a broader population based on representative sample evidence.
 
-### 2.2 Standard Normal Distribution (Z)
-A normal distribution with a mean of 0 and a standard deviation of 1.
-$$Z = \\frac{X - \\}{\\sigma}$$
+**Econometrics** goes a step further by integrating economic theory, mathematical economics, and statistical methods:
+- **Economic Theory** provides the qualitative hypotheses about human and market behaviors.
+- **Mathematical Economics** formalizes these hypotheses into deterministic mathematical equations.
+- **Econometrics** adds a stochastic dimension to these equations, allowing us to estimate, test, and forecast economic models with real-world, noisy data.
 
-\`\`\`chart
-{
-  "type": "area",
-  "title": "Figure 2.1: The Normal Distribution Curve",
-  "xAxis": "z_score",
-  "data": [
-    {"z_score": -3, "prob": 0.01},
-    {"z_score": -2, "prob": 0.05},
-    {"z_score": -1, "prob": 0.24},
-    {"z_score": 0, "prob": 0.4},
-    {"z_score": 1, "prob": 0.24},
-    {"z_score": 2, "prob": 0.05},
-    {"z_score": 3, "prob": 0.01}
-  ],
-  "series": [
-    {"key": "prob", "name": "Probability Density", "color": "#6366f1"}
-  ]
-}
+\`\`\`
+                      +-----------------------------+
+                      |   Economic Theory           |
+                      |   (Qualitative Hypotheses)  |
+                      +--------------+--------------+
+                                     |
+                                     v
+                      +-----------------------------+
+                      |   Mathematical Model        |
+                      |   (Deterministic Equations) |
+                      +--------------+--------------+
+                                     |
+                                     v
+                      +-----------------------------+
+                      |   Econometric Model         |
+                      |   (Stochastic Equations)    |
+                      +--------------+--------------+
+                                     |
+                                     v
+                      +-----------------------------+
+                      |   Empirical Analysis        |
+                      |   (Estimation and Testing)  |
+                      +-----------------------------+
 \`\`\`
 
----
+### 1.2 The Stochastic Disturbance Term
+A deterministic model (such as $Y = \\beta_1 + \\beta_2 X$) assumes that the dependent variable $Y$ is completely determined by the explanatory variable $X$. However, real-world economic relationships are never exact. To model this uncertainty, we specify a stochastic model:
+$$Y = \\beta_1 + \\beta_2 X + u$$
+Where $u$ is the **stochastic disturbance (or error) term**. It represents:
+1. **Omitted Variables**: Influences on $Y$ that are not explicitly included in the model.
+2. **Measurement Errors**: Imperfections in how the variables are recorded.
+3. **Human Indeterminacy**: Purely random or erratic elements intrinsic to human behavior.
+4. **Proxy Imperfections**: Discrepancies between theoretical concepts and their empirical approximations.
 
-## CHAPTER 3: STATISTICAL INFERENCE
+### 1.3 Step-by-Step Methodology of Econometrics
+Economic modeling follows a highly structured, iterative workflow:
+1. **Formulating the Hypothesis**: Specifying a behavioral assertion (e.g., Keynesian consumption law where MPC is positive but less than 1).
+2. **Mathematical Specification**: Expressing the hypothesis as a deterministic relation:
+   $$Y = \\beta_1 + \\beta_2 X$$
+3. **Stochastic Specification**: Adding the disturbance term to make the model empirically viable:
+   $$Y = \\beta_1 + \\beta_2 X + u$$
+4. **Data Acquisition**: Gathering representative data (cross-sectional, time-series, or panel).
+5. **Parameter Estimation**: Computing numerical estimates (such as $\\hat{\\beta}_1$ and $\\hat{\\beta}_2$) using econometric techniques.
+6. **Hypothesis Testing**: Performing statistical tests (e.g., t-tests) to verify if the estimates support the original theory.
+7. **Forecasting**: Predicting future values of $Y$ given assumed configurations of $X$.
+8. **Policy Recommendations**: Formulating structural recommendations or policy designs based on parameter elasticities.
 
-### 3.1 Sampling Distributions
-The distribution of a statistic (like the sample mean) computed from all possible samples of a fixed size.
-
-### 3.2 Central Limit Theorem (CLT)
-States that for a large enough sample size, the sampling distribution of the mean will be approximately normal, regardless of the population distribution.
-
-### 3.3 Hypothesis Testing
-- **Null Hypothesis ($H_0$)**: Statement of no effect or no difference.
-- **Alternative Hypothesis ($H_a$)**: Statement of what we want to prove.
-
----
-
-## CHAPTER 4: REGRESSION ANALYSIS
-
-### 4.1 Simple Linear Regression
-$Y = \\beta_0 + \\beta_1 X + \\$
-
-### 4.2 Correlation Coefficient ($r$)
-Measures the strength and direction of the linear relationship between two variables. Range: [-1, 1].
+### 1.4 Empirical Examples in Practice
+1. **Keynesian Consumption Relation**: Over a 10-year period, a national government observes household income ($X$) and consumption expenditure ($Y$). If autonomous consumption is \\$400 and the MPC is 0.75, the estimated model is:
+   $$Y = 400 + 0.75X + u$$
+2. **Agricultural Supply Function**: A study regresses agricultural crop yield ($Y$ in bushels) against rainfall amount ($X$ in inches):
+   $$Y = 15.2 + 2.4X + u$$
+3. **Earnings and Education**: A cross-sectional survey of 500 professionals estimates the returns to schooling by regressing hourly wage ($Y$) on years of education ($X$):
+   $$\\text{Wage} = 5.3 + 1.8 \\text{Education} + u$$
+4. **Investment Capital Asset Pricing**: An analyst relates the expected returns of a mutual fund ($Y$) to the systemic market risk index Beta ($X$):
+   $$R_i = 0.04 + 0.08 \\beta_i + u$$
+5. **Real-Estate Valuation**: A study of 200 metropolitan apartments computes home prices ($Y$) based on living area size ($X$ in square meters):
+   $$\\text{Price} = 50000 + 1200 \\text{Area} + u$$
+6. **Advertising Impact on Sales**: A consumer goods company tracks its monthly marketing expenditure ($X$) and total product sales revenue ($Y$):
+   $$\\text{Sales} = 12000 + 5.5 \\text{AdSpend} + u$$
+7. **Marshallian Demand for Coffee**: A retail group estimates the quantity of coffee demanded ($Y$ in bags) in relation to its retail price ($X$ in dollars):
+   $$\\text{Quantity} = 850 - 45 \\text{Price} + u$$
+8. **Phillips Curve Trade-Off**: An economic institute relates annual wage inflation ($Y$) to the national unemployment rate ($X$):
+   $$\\text{Inflation} = 6.2 - 0.8 \\text{Unemployment} + u$$
 
 \`\`\`chart
 {
   "type": "scatter",
-  "title": "Figure 4.1: Correlation Analysis",
-  "xAxis": "x",
-  "yAxis": "y",
-  "regression": true,
+  "title": "Figure 1.1: Empirical Scattering and OLS Fit (Income vs. Consumption)",
+  "xAxis": "Income",
+  "yAxis": "Consumption",
   "data": [
-    {"x": 10, "y": 12},
-    {"x": 20, "y": 25},
-    {"x": 30, "y": 28},
-    {"x": 40, "y": 45},
-    {"x": 50, "y": 48},
-    {"x": 60, "y": 62},
-    {"x": 70, "y": 75}
+    {"Income": 1000, "Consumption": 1150},
+    {"Income": 1500, "Consumption": 1520},
+    {"Income": 2000, "Consumption": 1880},
+    {"Income": 2500, "Consumption": 2300},
+    {"Income": 3000, "Consumption": 2680},
+    {"Income": 3500, "Consumption": 3020}
   ],
   "series": [
-    {"key": "y", "name": "Data Points", "color": "#8b5cf6"}
+    {"key": "Consumption", "name": "Observed Consumption (Y)", "color": "#0ea5e9"}
   ]
 }
 \`\`\`
-`
-};
 
+---
+
+## Chapter 2: Descriptive Statistics
+
+### 2.1 Organizing Raw Data
+Raw statistical observations are unstructured. To analyze them, we construct:
+- **Frequency Distributions**: Grouping raw data into mutually exclusive classes or intervals.
+- **Histograms & Polygons**: Graphically displaying class intervals on the horizontal axis and frequencies on the vertical axis.
+- **Ogive Curves**: Mapping cumulative relative frequencies to identify percentile boundaries.
+
+### 2.2 Mathematical Measures of Central Tendency
+Central tendency metrics identify the "center" or representative value of a dataset:
+- **Arithmetic Mean ($\\bar{X}$)**:
+  $$\\bar{X} = \\frac{\\sum_{i=1}^n {X_i}}{n}$$
+- **Median** (for grouped data):
+  $$\\text{Median} = L + \\left( \\frac{\\frac{n}{2} - F}{f_m} \\right) c$$
+  Where $L$ is the lower limit of the median class, $F$ is the cumulative frequency of the preceding class, $f_m$ is the frequency of the median class, and $c$ is the class interval width.
+- **Mode** (for grouped data):
+  $$\\text{Mode} = L + \\left( \\frac{d_1}{d_1 + d_2} \\right) c$$
+  Where $d_1$ is the difference in frequency between the modal class and the preceding class, and $d_2$ is the difference between the modal class and the succeeding class.
+- **Weighted Mean ($\\bar{X}_w$)**: Used when observations carry unequal importance:
+  $$\\bar{X}_w = \\frac{\\sum_{i=1}^n w_i X_i}{\\sum_{i=1}^n w_i}$$
+- **Geometric Mean ($G$)**: Ideal for calculating average relative changes or compounding returns over time:
+  $$G = \\sqrt[n]{X_1 \\cdot X_2 \\cdots X_n}$$
+- **Harmonic Mean ($H$)**: Crucial for averaging ratios, rates, or multiples (like price-to-earnings ratios):
+  $$H = \\frac{n}{\\sum_{i=1}^n \\frac{1}{X_i}}$$
+
+### 2.3 Mathematical Measures of Dispersion
+Dispersion metrics quantify the spread of observations around their central value:
+- **Sample Variance ($s^2$)**: Computed with a degrees-of-freedom correction ($n-1$) to ensure unbiasedness:
+  $$s^2 = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})^2}{n - 1}$$
+- **Sample Standard Deviation ($s$)**: Expressed in the original units of measurement:
+  $$s = \\sqrt{s^2}$$
+- **Coefficient of Variation ($V$)**: A unit-free, relative measure of dispersion, useful for comparing datasets with different scales:
+  $$V = \\frac{s}{\\bar{X}} \\times 100\\%$$
+
+### 2.4 Shape of Frequency Distributions
+- **Skewness**: Quantifies the asymmetry of a distribution. Pearson's coefficient of skewness is given by:
+  $$SK = \\frac{3(\\bar{X} - \\text{Median})}{s}$$
+  - $SK = 0 \\implies \\text{Symmetric (Normal)}$
+  - $SK > 0 \\implies \\text{Positive (Skewed to the right)}$
+  - $SK < 0 \\implies \\text{Negative (Skewed to the left)}$
+- **Kurtosis**: Measures the peakedness and tail weight of a distribution:
+  - **Leptokurtic**: Highly peaked with thick tails (kurtosis $> 3$).
+  - **Mesokurtic**: Normal distribution peak (kurtosis $= 3$).
+  - **Platykurtic**: Flat peak with thin tails (kurtosis $< 3$).
+
+### 2.5 Covariance and Correlation
+- **Sample Covariance ($s_{XY}$)**: Evaluates the direction of joint movement between two variables:
+  $$s_{XY} = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})(Y_i - \\bar{Y})}{n - 1}$$
+- **Pearson's Correlation Coefficient ($r$)**: Standardizes covariance to a value bounded between $-1$ and $+1$:
+  $$r = \\frac{s_{XY}}{s_X s_Y}$$
+
+### 2.6 Empirical Examples in Practice
+1. **Weighted Average Cost of Capital (WACC)**: A firm is funded by 30% bank debt (interest rate $= 6\\%$) and 70% equity market capital (expected return $= 12\\%$). The weighted mean cost of capital is:
+   $$\\bar{X}_w = 0.30(6\\%) + 0.70(12\\%) = 10.2\\%$$
+2. **Compound Stock Returns (Geometric Mean)**: An equity portfolio achieves annual returns of $+10\\%$, $+25\\%$, and $-15\\%$ over 3 consecutive years. The average compounded growth multiplier is:
+   $$G = \\sqrt[3]{1.10 \\times 1.25 \\times 0.85} - 1 \\approx 4.04\\%$$
+3. **Portfolio PE Ratio (Harmonic Mean)**: An investor allocates equal amounts to two stocks. Stock A has a PE ratio of 10, and Stock B has a PE ratio of 30. The average PE ratio is:
+   $$H = \\frac{2}{\\frac{1}{10} + \\frac{1}{30}} = 15$$
+4. **Comparing Volatility (CV)**: Stock A (mean return $= 8\\%$, $s = 2\\%$) has a CV of $25\\%$. Stock B (mean return $= 18\\%$, $s = 3.6\\%$) has a CV of $20\\%$. Stock B offers a lower relative dispersion.
+5. **Pearson Skewness of Earnings**: A national logistics sector has an average wage of \\$28/hour, a median wage of \\$24/hour, and a standard deviation of \\$8. The coefficient of skewness is:
+   $$SK = \\frac{3(28 - 24)}{8} = +1.5 \\quad \\text{(highly right-skewed)}$$
+6. **Grouped Median Inflation**: A study organizes price indices into intervals (0-2%, 2-4%, 4-6%) with frequencies of $[5, 12, 3]$. The median class is 2-4%. The grouped median is:
+   $$\\text{Median} = 2.0 + \\left( \\frac{10 - 5}{12} \\right) \\times 2.0 \\approx 2.83\\%$$
+7. **Bivariate Covariance of Stock Moves**: Over 5 trading days, we calculate the covariance between Stock X and Stock Y:
+   $$s_{XY} = \\frac{(2-4)(3-5) + (6-4)(7-5) + (4-4)(5-5) + (3-4)(4-5) + (5-4)(6-5)}{4} = \\frac{4 + 4 + 0 + 1 + 1}{4} = 2.5$$
+8. **Bivariate Pearson Correlation**: Given $s_{XY} = 2.5$, $s_X = 1.58$, and $s_Y = 1.58$:
+   $$r = \\frac{2.5}{1.58 \\times 1.58} = \\frac{2.5}{2.5} = +1.0 \\quad \\text{(perfect positive correlation)}$$
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 2.1: Stock Market Relative Return Frequencies (Right-Skewed)",
+  "labels": ["-20% to -10%", "-10% to 0%", "0% to 10%", "10% to 20%", "20% to 30%"],
+  "datasets": [
+    {
+      "label": "Number of Trading Weeks",
+      "data": [3, 11, 32, 14, 5]
+    }
+  ]
+}
+\`\`\`
+
+#### Interactive Descriptive Statistics Tool
+\`\`\`simulator
+{
+  "mode": "descriptive_stats",
+  "title": "Interactive Descriptive Statistics Calculator"
+}
+\`\`\`
+
+---
+
+## Chapter 3: Probability and Probability Distributions
+
+### 3.1 Fundamental Rules of Probability
+Probability measures the likelihood of occurrence of a random event, bounded by $0 \\le P(A) \\le 1$.
+- **Addition Rule (Union)**:
+  $$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$$
+- **Multiplication Rule (Intersection)**:
+  $$P(A \\cap B) = P(A) \\cdot P(B \\mid A)$$
+- **Bayes' Theorem**: Updates a priori probabilities using empirical evidence:
+  $$P(A_i \\mid B) = \\frac{P(B \\mid A_i) \\cdot P(A_i)}{\\sum_{j=1}^k P(B \\mid A_j) \\cdot P(A_j)}$$
+
+### 3.2 Discrete Probability Distributions: The Binomial Distribution
+Used for independent Bernoulli trials with binary outcomes (success probability $p$, failure probability $q = 1-p$):
+$$P(X = x) = \\binom{n}{x} p^x q^{n-x}$$
+Where the mean is $\\mu = np$ and the variance is $\\sigma^2 = npq$.
+
+### 3.3 The Poisson Distribution
+Models the frequency of discrete occurrences over a continuous interval of time or space:
+$$P(X = x) = \\frac{e^{-\\lambda} \\lambda^x}{x!}$$
+Where $\\lambda$ represents both the mean and the variance of the distribution.
+
+### 3.4 Continuous Probability Distributions: The Normal Distribution
+The standard normal distribution is symmetric and bell-shaped, fully characterized by its mean $\\mu$ and standard deviation $\\sigma$:
+$$Z = \\frac{X - \\mu}{\\sigma} \\sim N(0, 1)$$
+
+### 3.5 Empirical Examples in Practice
+1. **Bayesian Auditing of Credit Risks**: A bank's historical data shows that 4% of corporate clients default on loans ($P(D) = 0.04$). An early-warning system correctly flags defaulting clients 90% of the time ($P(W \\mid D) = 0.90$), and falsely flags non-defaulting clients 15% of the time ($P(W \\mid ND) = 0.15$). The probability that a flagged client will actually default is:
+   $$P(D \\mid W) = \\frac{P(W \\mid D)P(D)}{P(W \\mid D)P(D) + P(W \\mid ND)P(ND)} = \\frac{0.90 \\times 0.04}{(0.90 \\times 0.04) + (0.15 \\times 0.96)} = \\frac{0.036}{0.036 + 0.144} = 20.0\\%$$
+2. **Binomial Loan Portfolio Failures**: In a portfolio of 8 independent loans, each with a default probability of $p = 0.05$. The probability of exactly 2 loan failures is:
+   $$P(X = 2) = \\binom{8}{2} (0.05)^2 (0.95)^6 = 28 \\times 0.0025 \\times 0.7351 \\approx 5.15\\%$$
+3. **Poisson Customer Service Workload**: A brokerage firm receives an average of $\\lambda = 2.0$ trading applications per minute. The probability of receiving exactly 4 applications in any given minute is:
+   $$P(X = 4) = \\frac{e^{-2} 2^4}{4!} = \\frac{0.1353 \\times 16}{24} \\approx 9.02\\%$$
+4. **Z-Score of Energy Costs**: Monthly industrial energy costs are normally distributed with a mean of \\$1200 and a standard deviation of \\$150. The probability that a factory's energy costs will exceed \\$1500 is found by computing the Z-score:
+   $$Z = \\frac{1500 - 1200}{150} = 2.0 \\implies P(Z > 2.0) = 1 - 0.9772 = 2.28\\%$$
+5. **Addition Risk for Sovereign Bond Sales**: A country estimates a 10% chance of a currency devaluation ($P(A) = 0.10$) and a 15% chance of a sovereign rating downgrade ($P(B) = 0.15$). The joint probability of both occurring is 5% ($P(A \\cap B) = 0.05$). The probability that either event occurs is:
+   $$P(A \\cup B) = 0.10 + 0.15 - 0.05 = 20.0\\%$$
+6. **Binomial Probability of Stock Gains**: An active trader selects 4 uncorrelated growth stocks, each with a 60% probability of gaining value in next trading quarter. The probability that all 4 stocks gain value is:
+   $$P(X = 4) = (0.60)^4 = 12.96\\%$$
+7. **Poisson Rate of System Crashes**: A digital clearing desk experiences an average of 0.5 database crashes per quarter ($\\lambda = 0.5$). The probability of a crash-free quarter is:
+   $$P(X = 0) = \\frac{e^{-0.5} 0.5^0}{0!} = e^{-0.5} \\approx 60.65\\%$$
+8. **Normalized Portfolio Risk Boundaries**: A portfolio's annual returns are centered at 10% with a standard deviation of 8%. The probability of receiving negative returns ($X < 0$) is:
+   $$Z = \\frac{0 - 10}{8} = -1.25 \\implies P(Z < -1.25) \\approx 10.56\\%$$
+
+\`\`\`simulator
+{
+  "mode": "probability",
+  "title": "Interactive Probability Rules & Distributions Engine"
+}
+\`\`\`
+
+---
+
+## Chapter 4: Statistical Inference and Estimation
+
+### 4.1 Classical Sampling Distributions
+Statistical inference uses sample statistics to estimate unknown population parameters.
+- **Simple Random Sampling**: Every individual in the population has an equal probability of selection.
+- **Sampling Distribution of the Mean ($\\bar{X}$)**: For a sample of size $n$:
+  $$\\mu_{\\bar{X}} = \\mu$$
+  $$\\sigma_{\\bar{X}} = \\frac{\\sigma}{\\sqrt{n}} \\times \\sqrt{\\frac{N - n}{N - 1}} \\quad \\text{(FPC adjustment used if } \\frac{n}{N} > 0.05\\text{)}$$
+
+### 4.2 Properties of Point Estimators
+An estimator $\\hat{\\theta}$ is a rule or formula used to approximate a population parameter $\\theta$:
+- **Unbiasedness ($E[\\hat{\\theta}] = \\theta$)**: On average, the estimator equals the true parameter value.
+- **Efficiency**: Among all unbiased estimators, the one with the smallest variance is the most efficient.
+- **Consistency ($\\text{plim } \\hat{\\theta}_n = \\theta$)**: As the sample size $n$ approaches infinity, the estimated value converges in probability to the true parameter value.
+- **Mean Squared Error (MSE)**: Balances variance and bias:
+  $$\\text{MSE}(\\hat{\\theta}) = \\text{Var}(\\hat{\\theta}) + \\left[ \\text{Bias}(\\hat{\\theta}) \\right]^2$$
+
+### 4.3 Confidence Intervals
+A confidence interval defines a range of values that is likely to contain the population parameter:
+- **Large-Sample Confidence Interval ($n \\ge 30$)**: Uses the standard normal $Z$-distribution:
+  $$CI = \\bar{X} \\pm Z_{\\alpha/2} \\left( \\frac{s}{\\sqrt{n}} \\right)$$
+- **Small-Sample Confidence Interval ($n < 30$, $\\sigma$ unknown)**: Uses the Student's t-distribution:
+  $$CI = \\bar{X} \\pm t_{\\alpha/2, n-1} \\left( \\frac{s}{\\sqrt{n}} \\right)$$
+
+### 4.4 Empirical Examples in Practice
+1. **Audit Standard Error of Revenue**: A large retail firm has $N = 10,000$ invoice transactions with a population standard deviation of $\\sigma =$ \\$80. A random audit sample of $n = 400$ invoices is drawn. The standard error of the mean is:
+   $$\\sigma_{\\bar{X}} = \\frac{80}{\\sqrt{400}} = \\text{USD } 4$$
+2. **Large-Sample Wage Confidence Bounds**: A survey of $n = 64$ database developers finds an average hourly wage of $\\bar{X} =$ \\$45 with a sample standard deviation of $s =$ \\$8. The 95% confidence interval ($Z_{0.025} = 1.96$) is:
+   $$CI = 45 \\pm 1.96 \\left( \\frac{8}{\\sqrt{64}} \\right) = 45 \\pm 1.96 = [43.04, 46.96]$$
+3. **Small-Sample Bond Valuation Intervals**: A fund manager analyzes $n = 16$ municipal bonds, finding a mean yield-to-maturity of $\\bar{X} = 6.5\\%$ and a sample standard deviation of $s = 1.2\\%$. The 95% confidence interval ($t_{0.025, 15} = 2.131$) is:
+   $$CI = 6.5 \\pm 2.131 \\left( \\frac{1.2}{\\sqrt{16}} \\right) = 6.5 \\pm 0.639 = [5.86\\%, 7.14\\%]$$
+4. **Estimating Population Proportions**: A market survey of $n = 500$ consumers finds that 300 prefer Brand A ($\\hat{p} = 0.60$). The 99% confidence interval ($Z_{0.005} = 2.576$) is:
+   $$CI = 0.60 \\pm 2.576 \\sqrt{\\frac{0.60 \\times 0.40}{500}} = 0.60 \\pm 0.056 = [54.4\\%, 65.6\\%]$$
+5. **Finite Population Correction (FPC)**: A regional bank has $N = 500$ credit accounts. A sample of $n = 100$ accounts is evaluated. Since the sampling ratio exceeds 5% ($100/500 = 20\\%$), we apply the FPC:
+   $$\\text{FPC} = \\sqrt{\\frac{500 - 100}{500 - 1}} = \\sqrt{0.8016} \\approx 0.895 \\implies \\text{Standard error is reduced by 10.5\\%}$$
+6. **Efficiency Evaluation**: A statistician compares two unbiased estimators of the population mean, finding $\\text{Var}(\\hat{\\theta}_1) = 1.2$ and $\\text{Var}(\\hat{\\theta}_2) = 1.5$. The relative efficiency of $\\hat{\\theta}_1$ to $\\hat{\\theta}_2$ is:
+   $$\\text{RE} = \\frac{1.5}{1.2} = 1.25 \\quad \\text{(estimator 1 is 25\\% more efficient)}$$
+7. **Consistent Mean Convergence**: An academic study models the standard error of the sample mean for different sample sizes, showing how the interval shrinks from $\\$10$ at $n=100$ to $\\$3.16$ at $n=1000$.
+8. **Point Estimation of Firm Liquidity**: A random sample of 5 physical retail branches finds current asset ratios of $[1.5, 2.0, 1.8, 1.4, 2.3]$. The unbiased point estimate of the population mean current ratio is:
+   $$\\bar{X} = \\frac{1.5 + 2.0+ 1.8 + 1.4 + 2.3}{5} = 1.8$$
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 4.1: Shrinking Interval Bounds (Margin of Error vs. Sample Size)",
+  "labels": ["n=10", "n=25", "n=50", "n=100", "n=200", "n=500"],
+  "datasets": [
+    {
+      "label": "Margin of Error Size",
+      "data": [3.16, 2.00, 1.41, 1.00, 0.71, 0.45]
+    }
+  ]
+}
+\`\`\`
+
+#### Interactive Statistical Estimation Tool
+\`\`\`simulator
+{
+  "mode": "statistical_inference",
+  "title": "Interactive Confidence Intervals (Estimation) Simulator"
+}
+\`\`\`
+
+---
+
+## Chapter 5: Statistical Inference and Hypothesis Testing
+
+### 5.1 Hypothesis Testing Principles
+Hypothesis testing is a systematic framework used to evaluate statements about population parameters:
+- **Null Hypothesis ($H_0$)**: Represents the status quo or assertion of no effect (e.g., $H_0: \\mu = \\mu_0$).
+- **Alternative Hypothesis ($H_1$)**: Evaluates the research statement ofinterest (e.g., $H_1: \\mu \\neq \\mu_0$).
+
+Every test is subject to two types of statistical error:
+- **Type I Error ($\\alpha$)**: Rejecting $H_0$ when it is actually true (the significance level of the test).
+- **Type II Error ($\\beta$)**: Failing to reject $H_0$ when it is actually false. The power of the test is defined as $1 - \\beta$.
+
+### 5.2 Test Statistics and Decision Rules
+We use specific test statistics to evaluate the null hypothesis:
+- **One-Sample $Z$-Test for the Mean** (when $\\sigma$ is known):
+  $$Z = \\frac{\\bar{X} - \\mu_0}{\\frac{\\sigma}{\\sqrt{n}}}$$
+- **One-Sample $t$-Test for the Mean** (when $\\sigma$ is unknown):
+  $$t = \\frac{\\bar{X} - \\mu_0}{\\frac{s}{\\sqrt{n}}} \\quad \\text{with df} = n-1$$
+- **Two-Sample $t$-Test for the Difference of Means** (assuming equal variances):
+  $$t = \\frac{\\bar{X}_1 - \\bar{X}_2}{s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}} \\quad \\text{where } s_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1 + n_2 - 2}$$
+- **Chi-Square Goodness-of-Fit Test**:
+  $$\\chi^2 = \\sum \\frac{(O_i - E_i)^2}{E_i} \\quad \\text{with df} = k - 1$$
+- **Analysis of Variance (ANOVA) $F$-Test**: Compares means across multiple groups:
+  $$F = \\frac{\\text{MS}_{Between}}{\\text{MS}_{Within}} = \\frac{\\frac{\\text{SS}_{Between}}{c-1}}{\\frac{\\text{SS}_{Within}}{n-c}}$$
+
+### 5.3 Nonparametric Testing Methods
+Nonparametric tests are used when data does not meet parametric normality assumptions:
+- **Wilcoxon Signed-Rank Test**: The nonparametric alternative to the paired t-test, assessing differences in ranks.
+- **Kruskal-Wallis Test**: The nonparametric alternative to one-way ANOVA, comparing multiple independent groups.
+- **Kolmogorov-Smirnov Test**: Tests whether a sample comes from a specific distribution (e.g., checks for normality).
+
+### 5.4 Empirical Examples in Practice
+1. **Hypothesis Test of Branch Operations**: We test the null hypothesis that a factory's daily output equals 50 units ($H_0: \\mu = 50$) against the alternative $H_1: \\mu \\neq 50$. A sample of $n = 100$ operational days yields $\\bar{X} = 51.5$ and $s = 5.0$. The test statistic is:
+   $$t = \\frac{51.5 - 50}{\\frac{5.0}{\\sqrt{100}}} = \\frac{1.5}{0.5} = 3.0$$
+   Since $|t| > 1.98$ (the critical value at the 5% significance level with df $= 99$), we reject the null hypothesis, concluding that daily output differs from 50.
+2. **Two-Sample Comparison of Regional Spending**: A study compares average household spending in two regions. Region 1: $n_1=45$, $\\bar{X}_1 =$ \\$350, $s_1 =$ \\$40. Region 2: $n_2=45$, $\\bar{X}_2 =$ \\$330, $s_2 =$ \\$35. The calculated $Z$-statistic is:
+   $$Z = \\frac{350 - 330}{\\sqrt{\\frac{40^2}{45} + \\frac{35^2}{45}}} = \\frac{20}{\\sqrt{35.55 + 27.22}} = \\frac{20}{7.92} \\approx 2.52$$
+   Since $Z > 1.96$, we reject the null hypothesis, concluding that household spending differs between regions.
+3. **ANOVA of Consumer Price Index (CPI) Across Sectors**: An analyst compares price increases across three sectors (Food, Energy, Services). The calculated $F$-statistic is:
+   $$F = \\frac{\\text{MS}_{Between}}{\\text{MS}_{Within}} = \\frac{24.5}{4.1} = 5.98$$
+   Since $F_{\\text{cal}} = 5.98 > F_{0.05, 2, 27} \\approx 3.35$, we reject the null hypothesis, concluding that price increases differ significantly across sectors.
+4. **Chi-Square Test of Industry Defaults and Location**: A regional bank tests if corporate loan defaults are independent of geographic location. Across 3 locations, the calculated Chi-Square statistic is $\\chi^2 = 12.45$. Since $\\chi^2 > 5.99$ (the critical value with df $= 2$ at the 5% level), we reject the null hypothesis of independence.
+5. **Kruskal-Wallis Test of Agricultural Yields**: Evaluates crop yields across four field types under non-normal conditions. The calculated $H$-statistic is $9.82$. Since this exceeds the critical value of $7.81$ (df $= 3$), we reject the null hypothesis of equal distributions.
+6. **One-Tailed Test of Portfolio Gains**: A fund manager tests if active returns exceed the benchmark rate of 8% ($H_0: \\mu = 8\\%, H_1: \\mu > 8\\%$). For $n = 36, \\bar{X} = 9.8\\%, s = 4\\%$:
+   $$t = \\frac{9.8 - 8.0}{\\frac{4.0}{\\sqrt{36}}} = \\frac{1.8}{0.67} = 2.70$$
+   Since $t > 1.69$ (one-tailed critical value), we reject the null hypothesis at the 5% significance level, concluding that returns significantly exceed 8%.
+7. **Wilcoxon Match-Pair Test of Training Programs**: Assesses employee productivity ranks before and after a technical training course, rejecting the null hypothesis of equal ranks.
+8. **Kolmogorov-Smirnov Normality Diagnostics**: Tests whether residuals from a simple model conform to a normal distribution. The KS statistic of $0.034$ is below the critical threshold, confirming the normality assumption.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 5.1: Chi-Square Distribution Profiles over Degrees of Freedom (df)",
+  "labels": ["X=0.5", "X=1", "X=2", "X=4", "X=6", "X=8", "X=10"],
+  "datasets": [
+    {
+      "label": "df=3",
+      "data": [0.35, 0.24, 0.15, 0.08, 0.04, 0.02, 0.01]
+    },
+    {
+      "label": "df=6",
+      "data": [0.08, 0.14, 0.18, 0.16, 0.10, 0.06, 0.03]
+    }
+  ]
+}
+\`\`\`
+
+#### Interactive Hypothesis Testing Tool
+\`\`\`simulator
+{
+  "mode": "hypothesis_testing",
+  "title": "Interactive Hypothesis Testing (Z-test / t-test) Simulator"
+}
+\`\`\`
+
+---
+
+## Chapter 6: The Simple Linear Regression Model
+
+### 6.1 Model Specification and Setup
+The simple linear regression model expresses the relationship between a dependent variable $Y$ and a single independent variable $X$:
+$$Y_i = \\beta_0 + \\beta_1 X_i + u_i$$
+Where $\\beta_0$ and $\\beta_1$ are the population parameters (intercept and slope), and $u_i$ is the stochastic disturbance term.
+
+### 6.2 Ordinary Least Squares (OLS) Estimation
+Ordinary Least Squares (OLS) estimates parameters by minimizing the sum of squared residuals (RSS):
+$$\\text{RSS} = \\sum_{i=1}^n \\hat{u}_i^2 = \\sum_{i=1}^n (Y_i - \\hat{\\beta}_0 - \\hat{\\beta}_1 X_i)^2$$
+
+To find the minimum, we take the partial derivatives with respect to $\\hat{\\beta}_0$ and $\\hat{\\beta}_1$, set them to zero, and solve the system. This yields the slope estimator:
+$$\\hat{\\beta}_1 = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})(Y_i - \\bar{Y})}{\\sum_{i=1}^n (X_i - \\bar{X})^2} = \\frac{\\text{Cov}(X,Y)}{\\text{Var}(X)}$$
+And the intercept estimator:
+$$\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X}$$
+
+### 6.3 Goodness of Fit and $R^2$
+We decompose the variation in the dependent variable into explained and unexplained components:
+$$\\text{TSS} = \\text{ESS} + \\text{RSS}$$
+$$\\sum (Y_i - \\bar{Y})^2 = \\sum (\\hat{Y}_i - \\bar{Y})^2 + \\sum \\hat{u}_i^2$$
+
+The **Coefficient of Determination ($R^2$)** measures the proportion of total variation in $Y$ explained by the regression model:
+$$R^2 = \\frac{\\text{ESS}}{\\text{TSS}} = 1 - \\frac{\\text{RSS}}{\\text{TSS}}$$
+
+### 6.4 Precision and Inference of OLS Estimators
+Under the Gauss-Markov assumptions, the OLS estimators are Best Linear Unbiased Estimators (BLUE). The standard errors of the estimators are:
+$$\\text{se}(\\hat{\\beta}_1) = \\frac{\\hat{\\sigma}}{\\sqrt{\\sum (X_i - \\bar{X})^2}} \\quad \\text{where } \\hat{\\sigma}^2 = s^2 = \\frac{\\text{RSS}}{n-2}$$
+
+To test individual significance ($H_0: \\beta_1 = 0$), we use the t-statistic:
+$$t = \\frac{\\hat{\\beta}_1}{\\text{se}(\\hat{\\beta}_1)} \\sim t(n-2)$$
+
+### 6.5 Empirical Examples in Practice
+1. **Consumption Function OLS Estimation**: Given a sample of 5 household records, we calculate OLS estimates:
+   - Income ($X$): $[100, 200, 300, 400, 500] \\implies \\bar{X} = 300$
+   - Consumption ($Y$): $[90, 160, 250, 310, 390] \\implies \\bar{Y} = 240$
+   - Computed sums: $\\sum (X_i - \\bar{X})^2 = 100,000$ and $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 74,000$
+   - Estimates:
+     $$\\hat{\\beta}_1 = \\frac{74,000}{100,000} = 0.74 \\quad \\text{(the MPC)}$$
+     $$\\hat{\\beta}_0 = 240 - 0.74(300) = 18 \\quad \\text{(autonomous consumption)}$$
+     $$\\text{Regression Equation: } \\hat{Y} = 18 + 0.74X$$
+2. **Standard Error of the Slope**: Given $RSS = 390$ and $n = 5$, we estimate the residual variance:
+   $$s^2 = \\frac{390}{5 - 2} = 130 \\implies s = \\sqrt{130} \\approx 11.4$$
+   The standard error of $\\hat{\\beta}_1$ is:
+   $$\\text{se}(\\hat{\\beta}_1) = \\frac{11.4}{\\sqrt{100,000}} = \\frac{11.4}{316.2} \\approx 0.036$$
+   The calculated t-ratio is $t = 0.74 / 0.036 \\approx 20.55$, indicating high statistical significance.
+3. **Okun's Law Model**: Regresses changes in the unemployment rate ($Y$) on GDP growth rates ($X$):
+   $$\\hat{Y} = 1.2 - 0.35X$$
+   This indicates that a 1% increase in GDP growth is associated with a 0.35% decrease in the unemployment rate.
+4. **Real-Estate Area Valuations**: Logistical analysis of 50 home sales yields:
+   $$\\hat{Y} = 45000 + 1150 \\text{Area} \\quad (R^2 = 0.82)$$
+   A 1 square-meter increase in area is associated with an \\$1150 increase in home price.
+5. **Coefficient of Determination ($R^2$) Decompositions**: Given $\\text{TSS} = 20,000$ and $\\text{RSS} = 2,500$:
+   $$R^2 = 1 - \\frac{2,500}{20,000} = 87.5\\%$$
+6. **Verification of Average Residuals**: For any regression model with an intercept, the sum of OLS residuals is mathematically guaranteed to equal zero:
+   $$\\sum_{i=1}^n \\hat{u}_i = 0$$
+7. **Interest Yield Margins**: Regressing bond yields ($Y$) on central bank interest rates ($X$) yields a slope of $0.92$, showing high transmission efficiency.
+8. **Testing OLS Assumptions (Breusch-Pagan)**: White's test on the consumption residuals confirms a homoscedastic distribution ($p$-value $= 0.45 > 0.05$).
+
+\`\`\`simulator
+{
+  "mode": "simple_regression",
+  "title": "Interactive Simple Linear Regression OLS Line Calculator"
+}
+\`\`\`
+
+---
+
+## Chapter 7: The Multiple Linear Regression Model
+
+### 7.1 Model Specification in Matrix Form
+Multiple linear regression generalizes the model to include $k$ explanatory variables:
+$$Y_i = \\beta_0 + \\beta_1 X_{1i} + \\beta_2 X_{2i} + \\dots + \\beta_k X_{ki} + u_i$$
+
+In matrix form:
+$$\\mathbf{Y} = \\mathbf{X}\\boldsymbol{\\beta} + \\mathbf{u}$$
+Where:
+$$\\mathbf{Y} = \\begin{bmatrix} Y_1 \\\\ \\vdots \\\\ Y_n \\end{bmatrix}, \\quad \\mathbf{X} = \\begin{bmatrix} 1 & X_{11} & \\dots & X_{k1} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ 1 & X_{1n} & \\dots & X_{kn} \\end{bmatrix}, \\quad \\boldsymbol{\\beta} = \\begin{bmatrix} \\beta_0 \\\\ \\beta_1 \\\\ \\vdots \\\\ \\beta_k \\end{bmatrix}, \\quad \\mathbf{u} = \\begin{bmatrix} u_1 \\\\ \\vdots \\\\ u_n \\end{bmatrix}$$
+
+### 7.2 Matrix Derivation of OLS Estimators
+The sum of squared residuals in matrix form is:
+$$\\text{RSS} = \\mathbf{\\hat{u}'\\hat{u}} = (\\mathbf{Y} - \\mathbf{X}\\hat{\\boldsymbol{\\beta}})'(\\mathbf{Y} - \\mathbf{X}\\hat{\\boldsymbol{\\beta}}) = \\mathbf{Y'Y} - 2\\hat{\\boldsymbol{\\beta}}'\\mathbf{X'Y} + \\hat{\\boldsymbol{\\beta}}'\\mathbf{X'X}\\hat{\\boldsymbol{\\beta}}$$
+
+Taking the derivative with respect to $\\hat{\\boldsymbol{\\beta}}$ and setting it to zero yields the normal equations:
+$$\\mathbf{X'X}\\hat{\\boldsymbol{\\beta}} = \\mathbf{X'Y} \\implies \\hat{\\boldsymbol{\\beta}} = (\\mathbf{X'X})^{-1}\\mathbf{X'Y}$$
+
+The variance-covariance matrix of OLS estimators is:
+$$\\text{Var}(\\hat{\\boldsymbol{\\beta}}) = \\sigma^2 (\\mathbf{X'X})^{-1}$$
+
+### 7.3 Goodness of Fit, Adjusted $R^2$, and Joint Significance
+- **Adjusted $R^2$ ($\\bar{R}^2$)**: Penalizes the inclusion of unnecessary explanatory variables:
+  $$\\bar{R}^2 = 1 - (1 - R^2)\\left( \\frac{n - 1}{n - k - 1} \\right)$$
+- **Overall Model Significance ($F$-Test)**: Tests if all slope coefficients are simultaneously zero ($H_0: \\beta_1 = \\beta_2 = \\dots = \\beta_k = 0$):
+  $$F = \\frac{\\frac{\\text{ESS}}{k}}{\\frac{\\text{RSS}}{n-k-1}} = \\frac{\\frac{R^2}{k}}{\\frac{1-R^2}{n-k-1}}$$
+
+### 7.4 Empirical Examples in Practice
+1. **Cobb-Douglas Production Model**: Running a multiple log-log regression to estimate capital ($X_1$) and labor ($X_2$) elasticities:
+   $$\\ln Y = 2.3 + 0.65 \\ln X_1 + 0.35 \\ln X_2$$
+   This indicates that a 1% increase in capital is associated with a 0.65% increase in output, holding labor constant.
+2. **Pricing Model with Structural Controls**: Pricing houses based on square meters ($X_1$) and distance to city center ($X_2$ in kilometers):
+   $$\\hat{Y} = 120,000 + 1,400 X_1 - 1,800 X_2$$
+3. **F-Test for Joint Parameter Significance**: Given $R^2 = 0.75$, $n = 30$, and $k = 2$. We compute the $F$-statistic to test if the variables are jointly significant:
+   $$F = \\frac{\\frac{0.75}{2}}{\\frac{1-0.75}{30-2-1}} = \\frac{0.375}{\\frac{0.25}{27}} = 40.5$$
+   Since $F = 40.5 > 3.35$ (critical value), we reject the null hypothesis of joint insignificance.
+4. **Computing the Adjusted $R^2$**: Given $R^2 = 0.82$, $n=25$, and $k=4$:
+   $$\\bar{R}^2 = 1 - (1 - 0.82) \\left( \\frac{24}{25-4-1} \\right) = 1 - 0.18(1.2) = 1 - 0.216 = 78.4\\%$$
+5. **Partial Correlation Coefficient Calculation**: Given simple correlations $r_{Y,X1} = 0.8$, $r_{Y,X2} = 0.7$, and $r_{X1,X2} = 0.6$. The partial correlation between $Y$ and $X_1$ controlling for $X_2$ is:
+   $$r_{Y1.2} = \\frac{0.8 - 0.7 \\times 0.6}{\\sqrt{(1 - 0.7^2)(1 - 0.6^2)}} = \\frac{0.8 - 0.42}{\\sqrt{0.51 \\times 0.64}} = \\frac{0.38}{\\sqrt{0.3264}} = \\frac{0.38}{0.571} \\approx 0.665$$
+6. **Matrix OLS Estimation Parameter Mechanics**: An analyst calculates the inverse matrix $(\\mathbf{X'X})^{-1}$ and uses it to compute standard errors for the slope parameters from diagonal elements.
+7. **Monetary Taylor Rule Model**: Regressing policy interest rates ($Y$) on the inflation gap ($X_1$) and output gap ($X_2$):
+   $$\\hat{Y} = 0.02 + 1.5 X_1 + 0.5 X_2$$
+8. **Unbiased Variance of Disturbance Term**: Decomposing total OLS errors to estimate the true population error variance:
+   $$s^2 = \\frac{\\mathbf{\\hat{u}'\\hat{u}}}{n - k - 1}$$
+
+\`\`\`simulator
+{
+  "mode": "multiple_regression",
+  "title": "Interactive Multiple Linear Regression OLS Significance Simulator"
+}
+\`\`\`
+
+---
+
+## Chapter 8: Specification Errors and Measurement Problems
+
+### 8.1 Model Specification Errors
+Model specification errors occur when the regression model does not match the actual data-generating process:
+- **Omission of a Relevant Variable**:
+  Suppose the true model is $Y = \\beta_1 + \\beta_2 X_2 + \\beta_3 X_3 + u$, but we estimate $Y = \\alpha_1 + \\alpha_2 X_2 + e$. 
+  
+  This omission introduces **Omitted Variable Bias (OVB)**. The expected value of the OLS estimator is:
+  $$E[\\hat{\\alpha}_2] = \\beta_2 + \\beta_3 \\delta_2 \\quad \\text{where } \\delta_2 = \\frac{\\text{Cov}(X_2, X_3)}{\\text{Var}(X_2)}$$
+  The estimated parameter will be biased unless the omitted variable has no effect on $Y$ ($\\beta_3 = 0$) or is uncorrelated with the included variable ($\\text{Cov}(X_2, X_3) = 0$).
+- **Inclusion of an Irrelevant Variable**:
+  If we include an unnecessary variable $X_3$ that has no actual effect on $Y$, the estimated parameters remain unbiased:
+  $$E[\\hat{\\beta}_2] = \\beta_2$$
+  However, including the irrelevant variable leads to a loss of efficiency. It increases the variance of the estimated coefficients, reducing the precision and power of our hypothesis tests.
+
+### 8.2 Measurement Errors
+Measurement errors occur when the recorded data does not reflect the true values of the variables of interest:
+- **Measurement Error in the Dependent Variable ($Y$)**:
+  Our observed dependent variable includes a random measurement error: $Y_i = Y_i^* + \\epsilon_i$.
+  - **Consequences**: If the measurement error $\\epsilon_i$ is uncorrelated with $X_i$, the OLS estimators remain unbiased and consistent. However, the error variance increases, which inflates the standard errors and reduces the precision of our estimates.
+- **Measurement Error in the Independent Variable ($X$)**:
+  Our observed independent variable includes a random measurement error: $X_i = X_i^* + w_i$.
+  - **Consequences**: This violates a key Gauss-Markov assumption (Exogeneity), leading to biased and inconsistent estimates. Under the assumption that $\\text{Cov}(X_i^*, w_i) = 0$, the probability limit of the OLS slope estimator is:
+    $$\\text{plim } \\hat{\\beta}_1 = \\beta_1 \\left( \\frac{\\sigma_{X^*}^2}{\\sigma_{X^*}^2 + \\sigma_w^2} \\right)$$
+    Since the term in parentheses is less than 1, the estimated coefficient is biased toward zero. This bias is known as **Attenuation Bias** (or errors-in-variables bias).
+
+### 8.3 Empirical Examples in Practice
+1. **Omitted Ability Bias in Returns to Education**: Regressing wages ($Y$) on years of schooling ($X_2$) without controlling for unobserved innate ability ($X_3$) introduces positive bias (OVB) because ability has a positive impact on wages ($\\beta_3 > 0$) and is positively correlated with education ($\\text{Cov}(X_2, X_3) > 0$).
+2. **Calculating Attenuation Bias**: An analyst regresses sales on advertising expenditure. If the true variance of advertising is $\\sigma_{X^*}^2 = 100$ and the measurement error variance of the recording system is $\\sigma_w^2 = 25$, the OLS estimated slope will be biased toward zero:
+   $$\\text{plim } \\hat{\\beta}_1 = \\beta_1 \\left( \\frac{100}{100 + 25} \\right) = 0.80 \\beta_1 \\quad \\text{(a 20\\% underestimation bias)}$$
+3. **Inclusion of Irrelevant Variables and Efficiency Loss**: Regressing household consumption on income ($X_2$) and household phone number digits ($X_3$) does not introduce bias (since $\\beta_3 = 0$), but it inflates the variance of the estimated coefficient on income if $X_2$ and $X_3$ are weakly correlated.
+4. **White's Test for Measurement System Variance**: A study confirms that errors in the dependent variable are uncorrelated with $X_i$ ($p$-value $= 0.64$), indicating the estimates remain unbiased.
+5. **Evaluating the Direction of Omitted Variable Bias**:
+   - If $\\beta_{\\text{omitted}} > 0$ and $\\text{Cov}(X_2, X_3) > 0 \\implies \\text{Positive Bias}$
+   - If $\\beta_{\\text{omitted}} > 0$ and $\\text{Cov}(X_2, X_3) < 0 \\implies \\text{Negative Bias}$
+   - If $\\beta_{\\text{omitted}} < 0$ and $\\text{Cov}(X_2, X_3) > 0 \\implies \\text{Negative Bias}$
+   - If $\\beta_{\\text{omitted}} < 0$ and $\\text{Cov}(X_2, X_3) < 0 \\implies \\text{Positive Bias}$
+6. **Determining True Volatility in Financial Assets**: Correcting for attenuation bias in asset return models using high-frequency proxy variables.
+7. **Bivariate Simulation of Instrumental Variables (2SLS)**: Resolving endogeneity caused by measurement error in $X$ by using an instrument $Z$ that is correlated with $X$ but uncorrelated with the error term.
+8. **Double-log Formulation of OVB Systems**: Using log-log specifications to simplify the mathematical representation of omitted interactive variables.
+
+---
+
+## Chapter 9: Dummy Variables
+
+### 9.1 Qualitative Explanatory Variables
+Dummy variables (or indicator variables) are binary variables used to represent qualitative characteristics such as gender, region, or policy periods:
+$$D_i = \\begin{cases} 1 & \\text{if the attribute is present} \\\\ 0 & \\text{otherwise} \\end{cases}$$
+
+### 9.2 The Dummy Variable Trap
+The dummy variable trap occurs when dummy variables are perfectly collinear with the intercept term. If a qualitative variable has $m$ categories, we must include only **$m-1$** dummy variables in the regression if an intercept is present. 
+
+For example, if we have two categories (e.g., Male and Female):
+$$Y_i = \\beta_0 + \\beta_1 D_{\\text{Male}, i} + \\beta_2 D_{\\text{Female}, i} + u_i \\quad \\text{(Violates No-Collinearity assumption because } D_{\\text{Male}} + D_{\\text{Female}} = 1)$$
+To avoid this perfect collinearity, we must either drop the intercept or, more commonly, omit one dummy variable to serve as the baseline or reference category:
+$$Y_i = \\beta_0 + \\beta_1 D_{\\text{Male}, i} + u_i \\quad \\text{(Female is the reference category represented by } \\beta_0\\text{)}$$
+
+### 9.3 Slope Dummies and Interaction Terms
+Dummy variables can also interact with continuous variables to allow the effect of the explanatory variable to vary across groups:
+$$Y_i = \\beta_0 + \\beta_1 X_i + \\gamma D_i + \\delta (D_i \\times X_i) + u_i$$
+- **Base Group ($D_i = 0$):**
+  $$Y_i = \\beta_0 + \\beta_1 X_i + u_i \\implies \\text{Intercept} = \\beta_0, \\quad \\text{Slope} = \\beta_1$$
+- **Comparison Group ($D_i = 1$):**
+  $$Y_i = (\\beta_0 + \\gamma) + (\\beta_1 + \\delta)X_i + u_i \\implies \\text{Intercept} = \\beta_0 + \\gamma, \\quad \\text{Slope} = \\beta_1 + \\delta$$
+
+### 9.4 Structural Breaks: The Chow Test
+To determine if a model's parameters are stable across two distinct time periods or sub-populations (e.g., before and after a policy change), we use the Chow test:
+1. Run the pooled regression for the entire dataset (sample size $n = n_1 + n_2$) to obtain the pooled residual sum of squares ($RSS_P$).
+2. Run separate regressions for sub-population 1 (sample size $n_1$) and sub-population 2 (sample size $n_2$) to obtain their respective residual sums of squares ($RSS_1$ and $RSS_2$).
+3. Compute the Chow F-statistic:
+   $$F = \\frac{\\frac{RSS_P - (RSS_1 + RSS_2)}{k}}{\\frac{RSS_1 + RSS_2}{n_1 + n_2 - 2k}}$$
+   Where $k$ is the total number of parameters estimated (including the intercept). If $F$ exceeds the critical value, we reject the null hypothesis of parameter stability, indicating a structural break occurred.
+
+### 9.5 Empirical Examples in Practice
+1. **Gender Wage Gap with Intercept Shift**: Regressing wage on years of schooling and a female dummy variable:
+   $$\\text{Wage} = 15.0 + 3.2 \\text{Education} - 2.50 D_{\\text{Female}}$$
+   This indicates that females earn \\$2.50 less per hour than males with the same level of education.
+2. **Interaction Slope Shift (Returns to Education)**:
+   $$\\text{Wage} = 12.0 + 2.5 \\text{Education} + 1.0 (D_{\\text{Female}} \\times \\text{Education})$$
+   This indicates that the return to education is \\$2.50/hour for males and \\$3.50/hour for females.
+3. **Evaluating a Policy Reform (The Chow Test)**: A study evaluates if investment behaviors changed after a tax reform. Pooled regression ($n = 100$): $RSS_P = 25,000$. Pre-reform ($n_1 = 50$): $RSS_1 = 8,000$. Post-reform ($n_2 = 50$): $RSS_2 = 12,000$. The number of parameters is $k = 3$. We compute the Chow $F$-statistic:
+   $$F = \\frac{\\frac{25,000 - (8,000 + 12,000)}{3}}{\\frac{8,000 + 12,000}{100 - 6}} = \\frac{\\frac{5,000}{3}}{\\frac{20,000}{94}} = \\frac{1,666.67}{212.77} \\approx 7.83$$
+   Since $F = 7.83 > 2.70$ (critical value), we reject parameter stability, confirming a structural break.
+4. **Seasonal Fluctuations using Dummy Variables**: A retail company models quarterly sales using three seasonal dummy variables:
+   $$\\hat{Y} = 1500 + 450 D_{\\text{Q1}} + 200 D_{\\text{Q2}} + 350 D_{\\text{Q3}}$$
+   Where Q4 is the reference category represented by the intercept of 1500.
+5. **Dummy Variables for Regional Tax Rates**: A study of small business locations uses three regional dummy variables (North, South, West) with East serving as the reference category.
+6. **Interaction Slope Analysis for Financial Beta**: A study evaluates if portfolio returns respond differently to market Beta during recessions ($D_{\\text{Recession}} = 1$).
+7. **Modeling COVID-19 Structural Shocks**: Using a dummy variable ($D_{\\text{COVID}} = 1$ for observations after Q1 2020) to capture structural shifts in consumer spending.
+8. **Chow Test of Sector Stability**: A study of manufacturing vs. services sectors confirms structural differences using separate and pooled OLS regressions.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 9.1: Slope and Intercept Shifts (D=0 vs. D=1)",
+  "labels": ["X=0", "X=1", "X=2", "X=3", "X=4", "X=5"],
+  "datasets": [
+    {
+      "label": "Base Group (D=0)",
+      "data": [10, 15, 20, 25, 30, 35]
+    },
+    {
+      "label": "Shifted Group (D=1)",
+      "data": [25, 32, 39, 46, 53, 60]
+    }
+  ]
+}
+\`\`\`
+
+---
+
+## Chapter 10: Multicollinearity
+
+### 10.1 Definition and Classifications
+Multicollinearity refers to a situation in multiple regression where two or more independent variables are highly correlated with each other, making it difficult to isolate their individual effects on the dependent variable:
+- **Perfect Multicollinearity**: A perfect linear relationship exists among the independent variables:
+  $$\\lambda_1 X_1 + \\lambda_2 X_2 + \\dots + \\lambda_k X_k = 0$$
+  In this case, the matrix $(\\mathbf{X'X})$ is singular and cannot be inverted, meaning the OLS parameters cannot be calculated.
+- **Near (Stochastic) Multicollinearity**: High, but not perfect, correlation exists:
+  $$\\lambda_1 X_1 + \\lambda_2 X_2 + \\dots + \\lambda_k X_k + v_i = 0 \\quad \\text{where } v_i \\text{ is a random error term}$$
+
+### 10.2 Consequences of Multicollinearity
+While the OLS estimators remain unbiased and consistent in the presence of multicollinearity, several issues arise:
+1.  **High Variances and Standard Errors**: The precision of the estimates decreases, leading to larger standard errors:
+    $$\\text{Var}(\\hat{\\beta}_j) = \\frac{\\sigma^2}{\\sum x_j^2} \\times \\frac{1}{1 - R_j^2} = \\frac{\\sigma^2}{\\sum x_j^2} \\times {\\text{VIF}_j}$$
+    Where $R_j^2$ is the coefficient of determination obtained by regressing $X_j$ on all other explanatory variables.
+2.  **Insignificant t-Statistics**: Due to the inflated standard errors, the calculated t-ratios ($t = \\hat{\\beta}_j / \\text{se}(\\hat{\\beta}_j)$) tend to be small, often leading to the incorrect conclusion that individual variables are statistically insignificant.
+3.  **High $R^2$ with Insignificant t-Statistics**: The overall model may have a high $R^2$ and a highly significant F-statistic, even though individual t-tests fail to reject the null hypothesis for most variables.
+4.  **Sensitivity to Small Changes**: The estimated coefficients can change dramatically in response to minor additions or deletions of data.
+
+### 10.3 Detection Methods
+1.  **High Pairwise Correlations**: Checking the correlation matrix of the independent variables. If pairwise correlations exceed $0.8$, multicollinearity may be a concern.
+2.  **Auxiliary Regressions**: Regressing each independent variable on all other independent variables. A high auxiliary $R_j^2$ indicates strong collinearity.
+3.  **Variance Inflation Factor (VIF)**: Measures how much the variance of an estimated coefficient is inflated due to collinearity:
+    $$\\text{VIF}_j = \\frac{1}{1 - R_j^2}$$
+    *   $\\text{VIF}_j > 10$ is a common threshold indicating severe multicollinearity.
+
+### 10.4 Empirical Examples in Practice
+1.  **VIF Calculation for Marketing Budgets**: A digital agency regresses sales on Google AdSpend ($X_1$) and YouTube AdSpend ($X_2$). Since both channels are scaled together, regressing Google AdSpend on YouTube AdSpend yields $R_1^2 = 0.96$. {The Variance Inflation Factor is:}
+    $$\\text{VIF}_1 = \\frac{1}{1 - 0.96} = 25$$
+    Since $\\text{VIF} = 25 > 10$, this indicates severe multicollinearity, leading to inflated standard errors.
+2.  **Evaluating Correlated Demographics**: A developer attempts to estimate retail demand using average household income ($X_1$) and average home value ($X_2$). Because income and wealth are highly correlated, the estimated coefficients on both variables are statistically insignificant, despite a model $R^2 = 0.85$.
+3.  **dropping redundant collinear variables**: To resolve multicollinearity in the marketing model, the analyst drops Google AdSpend and estimates sales using total combined ad spend, reducing standard errors by 60%.
+4.  **Acquiring More Data to Resolve Collinearity**: A demographic study increases its sample size from $n = 50$ to $n = 500$, adding variation that helps isolate individual parameters even in the presence of multicollinearity.
+5.  **First-Difference Variable Transformations**: A time-series model reduces correlation between variables by transforming them into first differences:
+    $$\\Delta Y_t = \\beta_1 \\Delta X_{1t} + \\beta_2 \\Delta X_{2t} + u_t$$
+6.  **VIF Diagnostics for Credit Models**: A bank's credit risk model flags collinearity between credit utilization ($X_1$) and household debt ratio ($X_2$), obtaining $\\text{VIF}_1 = 12.5$.
+7.  **Principal Component Analysis (PCA) transformations**: A financial index combines 5 highly correlated interest rate series into a single principal component index, resolving multicollinearity.
+8.  **Evaluating Parameter Sensitivity**: A study of small business investments demonstrates that dropping 2 extreme observations causes estimated coefficients to change by over 200% due to multicollinearity.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 10.1: Inflated Variance of Estimates via High VIF",
+  "labels": ["R_j^2 = 0.0", "R_j^2 = 0.5", "R_j^2 = 0.8", "R_j^2 = 0.9", "R_j^2 = 0.95", "R_j^2 = 0.98"],
+  "datasets": [
+    {
+      "label": "Variance Inflation Factor (VIF)",
+      "data": [1, 2, 5, 10, 20, 50]
+    }
+  ]
+}
+\`\`\`
+
+---
+
+## Chapter 11: Heteroscedasticity
+
+### 11.1 Definition and Setup
+Heteroscedasticity occurs when the variance of the error term is not constant across all observations:
+$$\\text{Var}(u_i \\mid X_i) = \\sigma_i^2 \\quad \\forall i$$
+
+### 11.2 Consequences of Heteroscedasticity
+1.  **OLS is No Longer BLUE**: OLS estimators remain unbiased and consistent, but they are no longer efficient (they do not have the minimum variance among linear unbiased estimators).
+2.  **Biased Standard Errors**: The standard OLS formulas for standard errors are biased, usually underestimating the true variability of the estimates.
+3.  **Invalid Statistical Inference**: Because the standard errors are biased, the calculated t and F statistics are invalid, which can lead to incorrect conclusions about the significance of the variables.
+
+### 11.3 Diagnostic Detection Tests
+- **Graphical Inspection**: Plotting the squared residuals ($\\hat{u}_i^2$) against the independent variables ($X_i$) or the fitted values ($\\hat{Y}_i$) to look for systematic patterns.
+- **The Goldfeld-Quandt Test**:
+  1. Sort the observations in ascending order based on the values of the variable $X$.
+  2. Omit a central chunk of $c$ observations (typically about 20% of the sample) to help distinguish between the two groups.
+  3. Run separate OLS regressions on the remaining two groups: Group 1 (small values of $X$) and Group 2 (large values of $X$).
+  4. Calculate the ratio of the residual sums of squares:
+     $$F = \\frac{\\text{RSS}_2}{\\text{RSS}_1}$$
+     If $F > F_{\\alpha}$, we reject the null hypothesis of homoscedasticity.
+- **The Breusch-Pagan-Godfrey (BPG) Test**:
+  1. Estimate the OLS model and obtain the squared residuals $\\hat{u}_i^2$.
+  2. Run an auxiliary regression of $\\hat{u}_i^2$ on the explanatory variables:
+     $$\\hat{u}_i^2 = \\alpha_0 + \\alpha_1 Z_{1i} + \\dots + \\alpha_m Z_{mi} + v_i$$
+  3. Compute the BPG test statistic:
+     $$\\Theta = n \\cdot R_{\\text{aux}}^2 \\sim \\chi^2(m)$$
+
+### 11.4 Remedial Measures
+- **Weighted Least Squares (WLS)**: If the structure of the heteroscedasticity is known (e.g., $\\text{Var}(u_i \\mid X_i) = \\sigma^2 X_i^2$), we transform the model by dividing by $X_i$:
+  $$\\frac{Y_i}{X_i} = \\beta_0 \\left( \\frac{1}{X_i} \\right) + \\beta_1 + \\frac{u_i}{X_i}$$
+  The transformed error term $u_i^* = u_i / X_i$ is homoscedastic:
+  $$\\text{Var}(u_i^*) = \\text{Var}\\left( \\frac{u_i}{X_i} \\right) = \\frac{1}{X_i^2} \\text{Var}(u_i) = \\frac{\\sigma^2 X_i^2}{X_i^2} = \\sigma^2$$
+- **White's Robust Standard Errors**: If the structure of the heteroscedasticity is unknown, we adjust the standard errors to make statistical inference valid, without altering the estimated OLS coefficients themselves.
+
+### 11.5 Empirical Examples in Practice
+1.  **Heteroscedastic Spending Variance**: A regression of household consumption on income has errors whose variance increases with income. Low-wage households have stable spending, while high-income households have volatile spending.
+2.  **Performing a Goldfeld-Quandt Test**: A sample of $n = 30$ stores is analyzed. Observations are sorted by store size, and the middle $c = 6$ observations are omitted. Separate regressions on the remainining groups yield $RSS_1 = 120$ (small stores) and $RSS_2 = 480$ (large stores). The test statistic is:
+   $$F = \\frac{480}{120} = 4.0$$
+   Since $F = 4.0 > F_{0.05, 11, 11} \\approx 2.82$, we reject the null hypothesis of homoscedasticity.
+3.  **BPG Auxiliary Test for Small Business Profits**: Running a regression of squared residuals on business age and asset size yields an auxiliary $R_{\\text{aux}}^2 = 0.24$ with $n=50$. The BPG test statistic is:
+   $$\\Theta = 50 \\times 0.24 = 12.0$$
+   Since $\\Theta = 12.0 > 5.99$ (critical value with df $= 2$), we reject homoscedasticity.
+4.  **WLS Transformation for Housing Wealth**: A study of family wealth divides the regression model by $\\sqrt{\\text{Income}_i}$ to correct for heteroscedasticity when variance is proportional to income.
+5.  **Robust standard errors evaluation**: A wage regression uses White's robust standard errors, which increases the standard error of the education coefficient from $0.05$ to $0.08$, reducing the calculated t-ratio but ensuring valid statistical inference.
+6.  **Fanning Residual Plots**: A regression of corporate profits on marketing assets shows residuals that fan out, indicating heteroscedasticity.
+7.  **White's Test with Interaction Terms**: A regression is run with cross-products of independent variables, confirming heteroscedasticity ($W = 18.52 > \\chi^2_{\\text{crit}}$).
+8.  **Remedying Volatility via Logarithmic Transformation**: An analyst applies a natural log transformation to both the dependent and independent variables ($\\ln Y_t$ and $\\ln X_t$), which reduces heteroscedasticity.
+
+\`\`\`chart
+{
+  "type": "scatter",
+  "title": "Figure 11.1: Heteroscedastic Error Spread (Fitted Values vs. Residuals)",
+  "xAxis": "Fitted_Value",
+  "yAxis": "Residual",
+  "data": [
+    {"Fitted_Value": 10, "Residual": 0.5},
+    {"Fitted_Value": 20, "Residual": -0.8},
+    {"Fitted_Value": 30, "Residual": 1.4},
+    {"Fitted_Value": 40, "Residual": -2.2},
+    {"Fitted_Value": 50, "Residual": 3.9},
+    {"Fitted_Value": 60, "Residual": -5.1}
+  ],
+  "series": [
+    {"key": "Residual", "name": "Model Residual (u-hat)", "color": "#ef4444"}
+  ]
+}
+\`\`\`
+
+---
+
+## Chapter 12: Autocorrelation
+
+### 12.1 Definition and Setup
+Autocorrelation (or serial correlation) occurs when the error terms of different observations in a model are correlated with each other, which is common in time-series data:
+$$\\text{Cov}(u_t, u_s) \\neq 0 \\quad \\text{for } t \\neq s$$
+
+The most common form is first-order autoregressive autocorrelation, denoted as $AR(1)$:
+$$u_t = \\rho u_{t-1} + \\epsilon_t \\quad \\text{where } |\\rho| < 1 \\text{ and } \\epsilon_t \\sim iid(0, \\sigma_{\\epsilon}^2)$$
+- $\\rho$: The parameter of serial correlation.
+  - $\\rho > 0 \\implies \\text{Positive Autocorrelation}$
+  - $\\rho < 0 \\implies \\text{Negative Autocorrelation}$
+
+### 12.2 Consequences of Autocorrelation
+1.  **OLS is No Longer BLUE**: The OLS estimators remain unbiased and consistent, but they are no longer efficient.
+2.  **Underestimated Standard Errors**: Standard OLS standard error formulas are biased downward, meaning they underestimate the true variability of the estimates.
+3.  **Artificially High $R^2$**: The model's goodness of fit and individual t-statistics will appear higher than they actually are, leading to inflated Type I error rates.
+
+### 12.3 Diagnostic Detection Tests
+- **The Durbin-Watson ($d$) Test**: Designed to test for first-order ($AR(1)$) autocorrelation:
+  $$d = \\frac{\\sum_{t=2}^n (\\hat{u}_t - \\hat{u}_{t-1})^2}{\\sum_{t=1}^n \\hat{u}_t^2} \\approx 2(1 - \\hat{\\rho})$$
+  - **Interpretation of $d$**:
+    - $d \\approx 2 \\implies \\text{No Autocorrelation } (\\hat{\\rho} = 0)$
+    - $d \\approx 0 \\implies \\text{Positive Autocorrelation } (\\hat{\\rho} = 1)$
+    - $d \\approx 4 \\implies \\text{Negative Autocorrelation } (\\hat{\\rho} = -1)$
+- **The Breusch-Godfrey (LM) Test**: More general and can test for higher-order autocorrelation ($AR(p)$), even in the presence of lagged dependent variables:
+  $$\\hat{u}_t = \\alpha_0 + \\beta_1 X_{1t} + \\dots + \\rho_1 \\hat{u}_{t-1} + \\rho_2 \\hat{u}_{t-2} + \\dots + \\rho_p \\hat{u}_{t-p} + v_t$$
+  The test statistic is:
+  $$LM = (n - p) \\times R_{\\text{aux}}^2 \\sim \\chi^2(p)$$
+
+### 12.4 Remedial Measures
+- **Cochrane-Orcutt Iterative Procedure**: If the autocorrelation structure is $AR(1)$ with parameter $\\rho$, we can transform the model using quasi-first differencing:
+  $$Y_t^* = Y_t - \\rho Y_{t-1}$$
+  $$X_t^* = X_t - \\rho X_{t-1}$$
+  We then run OLS on the transformed model:
+  $$Y_t^* = \\beta_0(1-\\rho) + \\beta_1 X_t^* + \\epsilon_t$$
+- **Newey-West HAC Robust Standard Errors**: Adjusts the standard errors to make statistical inference valid, without altering the estimated OLS coefficients themselves.
+
+### 12.5 Empirical Examples in Practice
+1.  **First-Order Autoregressive Errors**: Regressing national consumption on GDP using monthly time-series data yields a residual sequence where positive errors follow positive errors, indicating positive autocorrelation.
+2.  **Using the Durbin-Watson Test**: An OLS regression of asset sales yields a Durbin-Watson statistic $d = 0.60$. This indicates strong positive first-order autocorrelation ($\\hat{\\rho} \\approx 1 - 0.60/2 = 0.70$).
+3.  **Using the Breusch-Godfrey Test**: A quarterly model estimates the relationship between interest rates and inflation. To test for second-order autocorrelation, we run an auxiliary regression of the residuals on the explanatory variables and two lags of the residuals, finding $R_{\\text{aux}}^2 = 0.18$ with $n=40$. The test statistic is:
+   $$LM = (40 - 2) \\times 0.18 = 6.84$$
+   Since $LM = 6.84 > 5.99$ (critical value with df $= 2$ at the 5% level), we reject the null hypothesis of no autocorrelation of order 2.
+4.  **Cochrane-Orcutt quasi-first differencing transformation**: To correct for autocorrelation, an analyst transforms the variables using $Y_t - 0.70 Y_{t-1}$ and runs OLS on the transformed model, eliminating serial correlation.
+5.  **Robust HAC standard errors evaluation**: A time-series model of price changes uses Newey-West HAC standard errors, which increases the standard error of the slope coefficient from $0.12$ to $0.18$, making statistical inference valid.
+6.  **Limitations of the Durbin-Watson Test**: An analyst models stock prices using a lagged dependent variable ($Y_{t-1}$), rendering the Durbin-Watson test invalid and prompting the use of Durbin's h-statistic instead.
+7.  **Breusch-Godfrey Test with High-Order Lags**: A time-series model of industrial output uses 4 lags of the residuals to check for seasonal autocorrelation.
+8.  **First-Difference Transformations for Random Walks**: To correct for strong autocorrelation ($\\rho \\approx 1$), an analyst transforms the model into first differences:
+   $$\\Delta Y_t = \\beta_1 \\Delta X_t + \\epsilon_t$$
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 12.1: Positive Serial Correlation (Cyclical Residual Trend over Time)",
+  "labels": ["t=1", "t=2", "t=3", "t=4", "t=5", "t=6", "t=7", "t=8", "t=9"],
+  "datasets": [
+    {
+      "label": "Residual value (u-hat)",
+      "data": [1.5, 1.8, 1.2, 0.4, -0.8, -1.2, -1.5, -0.7, 0.3]
+    }
+  ]
+}
+\`\`\`
+
+\`\`\`simulator
+{
+  "mode": "autocorrelation",
+  "title": "Interactive Durbin-Watson Autocorrelation Bound Detector"
+}
+\`\`\`
+
+`};

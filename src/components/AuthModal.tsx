@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../useAuth';
 
 interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   defaultLevel?: 'secondary' | 'undergraduate';
   defaultIsLogin?: boolean;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultLevel = 'secondary', defaultIsLogin = true }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = false, onClose = () => {}, defaultLevel = 'secondary', defaultIsLogin = true }) => {
   const [isLogin, setIsLogin] = useState(defaultIsLogin);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
