@@ -2,6 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, Scale, Factory, Zap, Info, Percent, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { StatsSimulator } from './StatsSimulator';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie
+} from 'recharts';
 
 type SimulatorMode = 
   | 'utility' 
@@ -24,7 +41,11 @@ type SimulatorMode =
   | 'hypothesis_testing'
   | 'simple_regression'
   | 'multiple_regression'
-  | 'autocorrelation';
+  | 'autocorrelation'
+  | 'population'
+  | 'labour_market'
+  | 'nigerian_economy'
+  | 'distributive_trade';
 
 interface SimulatorProps {
   mode: SimulatorMode;
@@ -158,6 +179,26 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
       defaults.annual_income = 50000;
       defaults.interest_rate = 5;
       defaults.brokerage_cost = 10;
+    } else if (mode === 'population') {
+      defaults.birth_rate = 38;
+      defaults.death_rate = 11;
+      defaults.net_migration_rate = -1;
+      defaults.years_to_project = 10;
+      defaults.initial_population = 200;
+    } else if (mode === 'labour_market') {
+      defaults.working_age_pop = 120;
+      defaults.participation_rate = 65;
+      defaults.unemployment_rate = 33;
+    } else if (mode === 'nigerian_economy') {
+      defaults.oil_price = 75;
+      defaults.oil_production = 1.4;
+      defaults.other_rev_trillions = 12;
+      defaults.exchange_rate = 1500;
+    } else if (mode === 'distributive_trade') {
+      defaults.producer_cost = 1000;
+      defaults.wholesaler_markup = 15;
+      defaults.retailer_markup = 25;
+      defaults.logistics_cost = 200;
     }
     return { ...defaults, ...initialValues };
   });
@@ -536,6 +577,83 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
         }
         break;
       }
+      case 'population': {
+        const br = values.birth_rate !== undefined ? values.birth_rate : 38;
+        const dr = values.death_rate !== undefined ? values.death_rate : 11;
+        const nm = values.net_migration_rate !== undefined ? values.net_migration_rate : -1;
+        const years = values.years_to_project !== undefined ? values.years_to_project : 10;
+        const initPop = values.initial_population !== undefined ? values.initial_population : 200;
+
+        const growthRatePer1000 = br - dr + nm;
+        const growthRatePct = growthRatePer1000 / 10;
+        const projectedPop = initPop * Math.pow(1 + growthRatePct / 100, years);
+        const doublingTime = growthRatePct > 0 ? 70 / growthRatePct : 0;
+
+        setResult({
+          growthRatePct: growthRatePct.toFixed(2) + '%',
+          projectedPop: projectedPop.toFixed(2) + 'M',
+          doublingTime: doublingTime > 0 ? doublingTime.toFixed(1) + ' Years' : 'Never'
+        });
+        break;
+      }
+      case 'labour_market': {
+        const working = values.working_age_pop !== undefined ? values.working_age_pop : 120;
+        const part = values.participation_rate !== undefined ? values.participation_rate : 65;
+        const unemp = values.unemployment_rate !== undefined ? values.unemployment_rate : 33;
+
+        const lf = working * (part / 100);
+        const unemployed = lf * (unemp / 100);
+        const employed = lf - unemployed;
+
+        setResult({
+          labourForce: lf.toFixed(1) + 'M',
+          employed: employed.toFixed(1) + 'M',
+          unemployed: unemployed.toFixed(1) + 'M',
+          participationRate: part.toFixed(1) + '%',
+          unemploymentRate: unemp.toFixed(1) + '%'
+        });
+        break;
+      }
+      case 'nigerian_economy': {
+        const price = values.oil_price !== undefined ? values.oil_price : 75;
+        const prod = values.oil_production !== undefined ? values.oil_production : 1.4;
+        const other = values.other_rev_trillions !== undefined ? values.other_rev_trillions : 12;
+        const xrate = values.exchange_rate !== undefined ? values.exchange_rate : 1500;
+
+        const dailyOilUsd = price * prod;
+        const dailyOilNgn = dailyOilUsd * xrate;
+        const annualOilNgnTrillion = (dailyOilNgn * 365) / 1000000;
+        const totalRev = annualOilNgnTrillion + other;
+        const oilShare = totalRev > 0 ? (annualOilNgnTrillion / totalRev) * 100 : 0;
+
+        setResult({
+          oilRevenue: annualOilNgnTrillion.toFixed(2) + 'T ₦',
+          totalRevenue: totalRev.toFixed(2) + 'T ₦',
+          oilShare: oilShare.toFixed(1) + '%'
+        });
+        break;
+      }
+      case 'distributive_trade': {
+        const cost = values.producer_cost !== undefined ? values.producer_cost : 1000;
+        const wMarkup = values.wholesaler_markup !== undefined ? values.wholesaler_markup : 15;
+        const rMarkup = values.retailer_markup !== undefined ? values.retailer_markup : 25;
+        const logistics = values.logistics_cost !== undefined ? values.logistics_cost : 200;
+
+        const wholesalerPrice = cost * (1 + wMarkup / 100);
+        const finalConsumerPrice = (wholesalerPrice + logistics) * (1 + rMarkup / 100);
+        const directPrice = cost + logistics;
+        const markupPrem = finalConsumerPrice - directPrice;
+        const inflationPct = directPrice > 0 ? (markupPrem / directPrice) * 100 : 0;
+
+        setResult({
+          wholesaler_price: '₦' + wholesalerPrice.toFixed(2),
+          final_consumer_price: '₦' + finalConsumerPrice.toFixed(2),
+          premium: '₦' + markupPrem.toFixed(2),
+          direct_price: '₦' + directPrice.toFixed(2),
+          inflation_pct: inflationPct.toFixed(1) + '%'
+        });
+        break;
+      }
     }
   };
 
@@ -755,40 +873,327 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             </div>
           </div>
         );
+      case 'population':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Birth Rate (per 1,000)" value={values.birth_rate} onChange={v => handleInputChange('birth_rate', v)} />
+              <Input label="Death Rate (per 1,000)" value={values.death_rate} onChange={v => handleInputChange('death_rate', v)} />
+              <Input label="Net Migration (per 1,000)" value={values.net_migration_rate} onChange={v => handleInputChange('net_migration_rate', v)} />
+              <Input label="Initial Pop. (Millions)" value={values.initial_population} onChange={v => handleInputChange('initial_population', v)} />
+            </div>
+            <Input label="Projection Period (Years)" value={values.years_to_project} onChange={v => handleInputChange('years_to_project', v)} />
+          </div>
+        );
+      case 'labour_market':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              <Input label="Working Age Pop (Millions)" value={values.working_age_pop} onChange={v => handleInputChange('working_age_pop', v)} />
+              <Input label="Participation Rate (%)" value={values.participation_rate} onChange={v => handleInputChange('participation_rate', v)} />
+              <Input label="Unemployment Rate (%)" value={values.unemployment_rate} onChange={v => handleInputChange('unemployment_rate', v)} />
+            </div>
+          </div>
+        );
+      case 'nigerian_economy':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Oil Price ($/barrel)" value={values.oil_price} onChange={v => handleInputChange('oil_price', v)} />
+              <Input label="Oil Prodn (M barrels/day)" value={values.oil_production} onChange={v => handleInputChange('oil_production', v)} />
+              <Input label="Exchange Rate (₦/$)" value={values.exchange_rate} onChange={v => handleInputChange('exchange_rate', v)} />
+              <Input label="Non-Oil Sector (Trillion ₦)" value={values.other_rev_trillions} onChange={v => handleInputChange('other_rev_trillions', v)} />
+            </div>
+          </div>
+        );
+      case 'distributive_trade':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Producer Unit Cost (₦)" value={values.producer_cost} onChange={v => handleInputChange('producer_cost', v)} />
+              <Input label="Logistics & Transport (₦)" value={values.logistics_cost} onChange={v => handleInputChange('logistics_cost', v)} />
+              <Input label="Wholesaler Mark-up (%)" value={values.wholesaler_markup} onChange={v => handleInputChange('wholesaler_markup', v)} />
+              <Input label="Retailer Mark-up (%)" value={values.retailer_markup} onChange={v => handleInputChange('retailer_markup', v)} />
+            </div>
+          </div>
+        );
     }
   };
 
   const renderResult = () => {
     if (!result) return null;
     switch (mode) {
-      case 'utility':
-        return <ResultCard label="Marginal Utility (MU)" value={result.mu} icon={<Zap className="text-amber-500" />} description="The additional satisfaction gained from consuming one more unit." />;
-      case 'elasticity':
+      case 'utility': {
+        const tu1 = values.tu1 !== undefined ? values.tu1 : 15;
+        const tu2 = values.tu2 !== undefined ? values.tu2 : 25;
+        const q1 = values.q1 !== undefined ? values.q1 : 1;
+        const q2 = values.q2 !== undefined ? values.q2 : 2;
+        const avg_mu = q2 !== q1 ? (tu2 - tu1) / (q2 - q1) : 0;
+        
+        const chartData = [
+          { name: `Qty ${q1}`, 'Total Utility': tu1, 'Avg Marginal Utility': tu1 / q1 },
+          { name: `Qty ${q2}`, 'Total Utility': tu2, 'Avg Marginal Utility': avg_mu }
+        ];
+
         return (
-          <div className="space-y-3">
-            <ResultCard label="Price Elasticity (PED)" value={result.ped} icon={<TrendingUp className="text-sky-500" />} />
-            <div className={cn(
-              "p-4 rounded-2xl text-center font-bold text-sm uppercase tracking-widest",
-              result.type === 'Elastic' ? "bg-sky-100 text-sky-700" : "bg-slate-100 text-slate-700"
-            )}>
-              {result.type} Demand
+          <div className="space-y-4">
+            <ResultCard label="Marginal Utility (MU)" value={result.mu} icon={<Zap className="text-amber-500" />} description="The additional satisfaction gained from consuming one more unit." />
+            
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Quantity</th>
+                    <th className="px-3 py-2 text-right">Total Utility</th>
+                    <th className="px-3 py-2 text-right">Marginal Utility</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Unit {q1}</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">{tu1}</td>
+                    <td className="px-3 py-2 text-right text-muted">{(tu1 / q1).toFixed(1)}</td>
+                  </tr>
+                  <tr className="bg-slate-50/40 dark:bg-slate-850/20">
+                    <td className="px-3 py-2 font-medium text-ink">Unit {q2}</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">{tu2}</td>
+                    <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400 font-bold">{avg_mu.toFixed(1)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '10px' }} />
+                  <Line type="monotone" dataKey="Total Utility" stroke="#0ea5e9" strokeWidth={2} dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="Avg Marginal Utility" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
-      case 'equilibrium':
+      }
+      case 'elasticity': {
+        const p1 = values.p1 !== undefined ? values.p1 : 10;
+        const p2 = values.p2 !== undefined ? values.p2 : 12;
+        const q1 = values.q1 !== undefined ? values.q1 : 100;
+        const q2 = values.q2 !== undefined ? values.q2 : 80;
+
+        const chartData = [
+          { name: `P=₦${p1}`, Price: p1, Quantity: q1 },
+          { name: `P=₦${p2}`, Price: p2, Quantity: q2 }
+        ].sort((a, b) => a.Price - b.Price);
+
         return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <ResultCard label="Equilibrium Price (P*)" value={`₦${result.p}`} icon={<Scale className="text-sky-500" />} />
-            <ResultCard label="Equilibrium Qty (Q*)" value={result.q} icon={<Scale className="text-sky-500" />} />
+          <div className="space-y-4">
+            <ResultCard label="Price Elasticity (PED)" value={result.ped} icon={<TrendingUp className="text-sky-500" />} />
+            <div className={cn(
+              "p-3 rounded-xl text-center font-bold text-xs uppercase tracking-widest border border-border",
+              result.type === 'Elastic' ? "bg-sky-50 dark:bg-sky-950/20 text-sky-600 dark:text-sky-400" : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+            )}>
+              {result.type} Demand Curve Segment
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">State</th>
+                    <th className="px-3 py-2 text-right">Price</th>
+                    <th className="px-3 py-2 text-right">Quantity</th>
+                    <th className="px-3 py-2 text-right">Total Revenue</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Initial (A)</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">₦{p1}</td>
+                    <td className="px-3 py-2 text-right text-ink">{q1}</td>
+                    <td className="px-3 py-2 text-right text-muted font-mono">₦{p1 * q1}</td>
+                  </tr>
+                  <tr className="bg-slate-50/40 dark:bg-slate-850/20">
+                    <td className="px-3 py-2 font-medium text-ink">Final (B)</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">₦{p2}</td>
+                    <td className="px-3 py-2 text-right text-ink">{q2}</td>
+                    <td className="px-3 py-2 text-right text-muted font-mono">₦{p2 * q2}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="Quantity" tick={{ fontSize: 9 }} label={{ value: 'Quantity', position: 'insideBottom', offset: -5, fontSize: 9 }} />
+                  <YAxis dataKey="Price" tick={{ fontSize: 9 }} label={{ value: 'Price (₦)', angle: -90, position: 'insideLeft', fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Line name="Demand curve" type="linear" dataKey="Price" stroke="#3b82f6" strokeWidth={3} dot={{ r: 6, fill: '#fff', strokeWidth: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         );
-      case 'production':
+      }
+      case 'equilibrium': {
+        const a = values.a !== undefined ? values.a : 100;
+        const b = values.b !== undefined ? values.b : 2;
+        const c = values.c !== undefined ? values.c : 20;
+        const d = values.d !== undefined ? values.d : 3;
+
+        const eqP = (a - c) / (b + d);
+        
+        const eqData = [];
+        if (eqP > 0 && b + d > 0) {
+          const minP = Math.max(0, Math.floor(eqP * 0.4));
+          const maxP = Math.round(eqP * 1.6);
+          const step = Math.max(1, Math.round((maxP - minP) / 5));
+          for (let pVal = minP; pVal <= maxP; pVal += step) {
+            eqData.push({
+              Price: pVal,
+              Demand: Math.max(0, parseFloat((a - b * pVal).toFixed(1))),
+              Supply: Math.max(0, parseFloat((c + d * pVal).toFixed(1)))
+            });
+          }
+        }
+
         return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <ResultCard label="Average Product (AP)" value={result.ap} icon={<Factory className="text-indigo-500" />} />
-            <ResultCard label="Marginal Product (MP)" value={result.mp} icon={<Factory className="text-indigo-500" />} />
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <ResultCard label="Equilibrium Price (P*)" value={`₦${result.p}`} icon={<Scale className="text-sky-500" />} />
+              <ResultCard label="Equilibrium Qty (Q*)" value={result.q} icon={<Scale className="text-sky-500" />} />
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Price (P)</th>
+                    <th className="px-3 py-2 text-right">Quantity Demanded (Qd)</th>
+                    <th className="px-3 py-2 text-right">Quantity Supplied (Qs)</th>
+                    <th className="px-3 py-2 text-right">State</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {eqData.map((row, idx) => {
+                    const isEq = Math.abs(row.Price - eqP) < 1.0;
+                    return (
+                      <tr key={idx} className={isEq ? "bg-emerald-50/40 dark:bg-emerald-950/20 font-semibold" : ""}>
+                        <td className="px-3 py-2 text-ink">₦{row.Price}</td>
+                        <td className="px-3 py-2 text-right text-indigo-600 dark:text-indigo-400">{row.Demand}</td>
+                        <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400">{row.Supply}</td>
+                        <td className="px-3 py-2 text-right text-[10px]">
+                          {row.Demand > row.Supply ? (
+                            <span className="text-rose-500">Shortage</span>
+                          ) : row.Demand < row.Supply ? (
+                            <span className="text-amber-500">Surplus</span>
+                          ) : (
+                            <span className="text-emerald-600 font-bold">Equilibrium</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Curve Chart */}
+            {eqData.length > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={eqData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                    <XAxis dataKey="Price" tick={{ fontSize: 9 }} label={{ value: 'Price (₦)', position: 'insideBottom', offset: -5, fontSize: 9 }} />
+                    <YAxis tick={{ fontSize: 9 }} />
+                    <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                    <Legend wrapperStyle={{ fontSize: '10px' }} />
+                    <Line type="monotone" name="Demand" dataKey="Demand" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 3 }} />
+                    <Line type="monotone" name="Supply" dataKey="Supply" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         );
+      }
+      case 'production': {
+        const tp1 = values.tp1 !== undefined ? values.tp1 : 150;
+        const tp2 = values.tp2 !== undefined ? values.tp2 : 180;
+        const l1 = values.l1 !== undefined ? values.l1 : 5;
+        const l2 = values.l2 !== undefined ? values.l2 : 6;
+        const ap1 = l1 > 0 ? tp1 / l1 : 0;
+        const ap2 = l2 > 0 ? tp2 / l2 : 0;
+        const mpVal = l2 !== l1 ? (tp2 - tp1) / (l2 - l1) : 0;
+
+        const prodData = [
+          { name: `L=${l1}`, TP: tp1, AP: parseFloat(ap1.toFixed(1)), MP: parseFloat(ap1.toFixed(1)) },
+          { name: `L=${l2}`, TP: tp2, AP: parseFloat(ap2.toFixed(1)), MP: parseFloat(mpVal.toFixed(1)) }
+        ];
+
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <ResultCard label="Average Product (AP)" value={result.ap} icon={<Factory className="text-indigo-500" />} />
+              <ResultCard label="Marginal Product (MP)" value={result.mp} icon={<Factory className="text-indigo-500" />} />
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Labour (L)</th>
+                    <th className="px-3 py-2 text-right">Total Product (TP)</th>
+                    <th className="px-3 py-2 text-right">Average Product (AP)</th>
+                    <th className="px-3 py-2 text-right">Marginal Product (MP)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">{l1} Workers</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">{tp1}</td>
+                    <td className="px-3 py-2 text-right text-muted">{ap1.toFixed(1)}</td>
+                    <td className="px-3 py-2 text-right text-muted">-</td>
+                  </tr>
+                  <tr className="bg-slate-50/40 dark:bg-slate-850/20">
+                    <td className="px-3 py-2 font-medium text-ink">{l2} Workers</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">{tp2}</td>
+                    <td className="px-3 py-2 text-right text-indigo-600 dark:text-indigo-400 font-medium">{ap2.toFixed(1)}</td>
+                    <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400 font-bold">{mpVal.toFixed(1)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Bar Chart comparing AP vs MP */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={prodData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '10px' }} />
+                  <Bar name="Average Product" dataKey="AP" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                  <Bar name="Marginal Product" dataKey="MP" fill="#10b981" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      }
       case 'inflation':
         return (
           <div className="space-y-4">
@@ -807,7 +1212,30 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             </div>
           </div>
         );
-      case 'future_value':
+      case 'future_value': {
+        const initialPv = values.pv !== undefined ? values.pv : 1000;
+        const rateLimit = values.r !== undefined ? values.r : 8;
+        const yearsFV = values.n !== undefined ? values.n : 5;
+        const compoundingM = values.m !== undefined ? values.m : 1;
+        const rDecimal = rateLimit / 100;
+        
+        const fvData = [];
+        for (let yr = 0; yr <= yearsFV; yr++) {
+          let compoundVal = 0;
+          if (compoundingM === -1) {
+            // Continuous
+            compoundVal = initialPv * Math.exp(rDecimal * yr);
+          } else {
+            compoundVal = initialPv * Math.pow(1 + rDecimal / compoundingM, yr * compoundingM);
+          }
+          const simpleVal = initialPv * (1 + rDecimal * yr);
+          fvData.push({
+            year: `Yr ${yr}`,
+            'Compound Value': parseFloat(compoundVal.toFixed(1)),
+            'Simple Value': parseFloat(simpleVal.toFixed(1)),
+          });
+        }
+
         return (
           <div className="space-y-4">
             <ResultCard label="Future Value (FV)" value={`₦${result.fv}`} icon={<Coins className="text-emerald-500" />} description={`Compound worth of capital at Year ${values.n || 5}.`} />
@@ -820,10 +1248,42 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
                 Compounding earned you an additional <strong className="text-emerald-600 dark:text-emerald-400 font-bold">₦{result.gain}</strong> over simple interest!
               </p>
             </div>
+
+            {/* Compound Curve Chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={fvData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="year" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '10px' }} />
+                  <Area type="monotone" name="Compound Value" dataKey="Compound Value" stroke="#10b981" fillOpacity={1} fill="url(#colorComp)" strokeWidth={2} />
+                  <Line type="monotone" name="Simple Value" dataKey="Simple Value" stroke="#94a3b8" strokeDasharray="4 4" strokeWidth={1.5} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         );
-      case 'capital_budgeting':
+      }
+      case 'capital_budgeting': {
         const viewingAlternativeDecisionMetrics = values.tab === 2;
+        const outVal = values.outlay !== undefined ? values.outlay : 1000;
+        const budgetingData = [
+          { year: 'Yr 0 (Cost)', 'Cash Flow': -outVal },
+          { year: 'Yr 1', 'Cash Flow': values.cf1 !== undefined ? values.cf1 : 300 },
+          { year: 'Yr 2', 'Cash Flow': values.cf2 !== undefined ? values.cf2 : 400 },
+          { year: 'Yr 3', 'Cash Flow': values.cf3 !== undefined ? values.cf3 : 500 },
+          { year: 'Yr 4', 'Cash Flow': values.cf4 !== undefined ? values.cf4 : 600 },
+          { year: 'Yr 5', 'Cash Flow': values.cf5 !== undefined ? values.cf5 : 700 }
+        ];
+
         return (
           <div className="space-y-4">
             {!viewingAlternativeDecisionMetrics ? (
@@ -855,9 +1315,45 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
                 </p>
               </>
             )}
+
+            {/* Cash Flow Timeline Columns Chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={budgetingData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="year" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Bar dataKey="Cash Flow" radius={[4, 4, 0, 0]}>
+                    {budgetingData.map((item, index) => {
+                      const isNegative = item['Cash Flow'] < 0;
+                      return <Cell key={`cell-${index}`} fill={isNegative ? '#f43f5e' : '#10b981'} />;
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         );
-      case 'bond_valuation':
+      }
+      case 'bond_valuation': {
+        const bondFace = values.face !== undefined ? values.face : 1000;
+        const bondCoupon = values.coupon !== undefined ? values.coupon : 6;
+        const bondYears = values.years !== undefined ? values.years : 10;
+        const annualCouponVal = bondFace * (bondCoupon / 100);
+        
+        const cashFlows = [];
+        for (let i = 1; i <= Math.min(15, bondYears); i++) {
+          let flowVal = annualCouponVal;
+          if (i === bondYears) {
+            flowVal += bondFace;
+          }
+          cashFlows.push({
+            year: `Yr ${i}`,
+            'Expected Cashflow': flowVal,
+          });
+        }
+
         return (
           <div className="space-y-4">
             <ResultCard label="Intrinsic Bond Price" value={`₦${result.price}`} icon={<Coins className="text-indigo-500" />} description="Fair present value of coupons plus par at maturity." />
@@ -877,26 +1373,82 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
                 {result.pricingStatus}
               </span>
             </div>
+
+            {/* Bond cash flow chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={cashFlows} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="year" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Bar name="Annual Cashflow Received" dataKey="Expected Cashflow" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         );
-      case 'capm':
+      }
+      case 'capm': {
+        const rf = values.rf !== undefined ? values.rf : 4;
+        const beta = values.beta !== undefined ? values.beta : 1.2;
+        const optType = values.optType !== undefined ? values.optType : 1; 
+        const premiumOrReturn = values.premiumOrReturn !== undefined ? values.premiumOrReturn : 10;
+        
+        let mr = 0;
+        let mrp = 0;
+        if (optType === 1) {
+          mr = premiumOrReturn;
+          mrp = mr - rf;
+        } else {
+          mrp = premiumOrReturn;
+          mr = rf + mrp;
+        }
+        
+        const expectedReturn = rf + beta * mrp;
+
+        const smlData = [
+          { betaPoint: 0.0, name: 'Risk-Free (Rf)', Return: rf },
+          { betaPoint: 0.5, name: 'Low Beta', Return: rf + 0.5 * mrp },
+          { betaPoint: 1.0, name: 'Market (Rm)', Return: mr },
+          { betaPoint: parseFloat(beta.toFixed(2)), name: 'Our Asset', Return: parseFloat(expectedReturn.toFixed(2)) },
+          { betaPoint: 1.5, name: 'High Beta', Return: rf + 1.5 * mrp }
+        ].sort((a,b) => a.betaPoint - b.betaPoint);
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans">
             <ResultCard label="Required Return (Re)" value={result.expectedReturn} icon={<TrendingUp className="text-indigo-500" />} description="The cost of equity required for this asset beta risk level." />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <ResultCard label="Market Return (Rm)" value={result.mr} icon={<Scale className="text-slate-400" />} />
               <ResultCard label="Risk Premium (MRP)" value={result.mrp} icon={<Percent className="text-amber-500" />} />
             </div>
-            <div className="p-3 rounded-2xl bg-paper dark:bg-slate-800 border border-border">
-              <p className="text-[10px] text-muted leading-relaxed font-mono text-center">
-                Re = Rf + Beta(Rm - Rf) = Rf + Beta(MRP)
-              </p>
+
+            {/* SML Line Chart */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={smlData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="betaPoint" type="number" scale="linear" domain={[0, 2]} tick={{ fontSize: 9 }} name="Beta" label={{ value: 'Systemic Risk (Beta)', position: 'insideBottom', offset: -5, fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} label={{ value: 'Required Return (%)', angle: -90, position: 'insideLeft', fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Line name="Security Market Line" type="linear" dataKey="Return" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
-      case 'money_multiplier':
+      }
+      case 'money_multiplier': {
+        const mb = values.mb !== undefined ? values.mb : 1000000;
+        const fdData = [
+          { name: 'Required Reserves', value: parseFloat(result.requiredReserves), color: '#3b82f6' },
+          { name: 'Excess Reserves', value: parseFloat(result.excessReserves), color: '#f59e0b' },
+          { name: 'Currency Drainage', value: parseFloat(result.currencyDrain), color: '#ef4444' },
+          { name: 'Active Economic Deposits', value: Math.max(0, parseFloat(result.m1Supply) - parseFloat(result.requiredReserves) - parseFloat(result.excessReserves) - parseFloat(result.currencyDrain)), color: '#10b981' }
+        ].filter(item => item.value > 0);
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 font-sans">
             <ResultCard label="M1 Money Multiplier (m₁)" value={result.m1Mult} icon={<Percent className="text-emerald-500" />} description="Ratio of total money supply to base money assets." />
             <ResultCard label="M1 Money Supply (M1)" value={`₦${parseFloat(result.m1Supply).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Coins className="text-sky-500" />} />
             <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
@@ -905,21 +1457,79 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
               <ResultCard label="Cash Drainage" value={`₦${parseFloat(result.currencyDrain).toLocaleString(undefined, {minimumFractionDigits: 0})}`} icon={<Scale className="text-slate-400" />} />
               <ResultCard label="Simple Multiplier" value={result.simpleMult} icon={<Percent className="text-slate-400" />} description="1 / rr (no leaks)" />
             </div>
-            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
-                <Info size={14} />
-                <span>Economic Theory & Interpretation</span>
-              </div>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Leakage-Adjusted Multiplier:</strong> In a realistic banking system, the actual multiplier (<span className="text-sky-600 dark:text-sky-400 font-semibold">{result.m1Mult}</span>) is substantially lower than the theoretical simple credit multiplier (<span className="text-slate-500 font-semibold">{result.simpleMult}</span>). This shrinkage is caused by systemic leakages: cash drainage into the public hands (cash ratio <span className="text-amber-600 dark:text-amber-400 font-semibold">{(values.c !== undefined ? values.c : 0.15) * 100}%</span>) and excessive reserve hoarding by commercial banks (excess ratio <span className="text-amber-600 dark:text-amber-400 font-semibold">{(values.e !== undefined ? values.e : 0.05) * 100}%</span>).
-              </p>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Credit Transmission Path:</strong> From the initial high-powered money base, fractional systems create <span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.m1Supply).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> total M1 supply. Commercial credit expansion accumulates ₦{parseFloat(result.requiredReserves).toLocaleString()} in required reserves and ₦{parseFloat(result.excessReserves).toLocaleString()} in extra safety buffers, while ₦{parseFloat(result.currencyDrain).toLocaleString()} leaks away as currency in circulation. This demonstrates the central role of public behavior and banking confidence in monetary transmission.
-              </p>
+
+            {/* Multiplier components comparison table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[10px] sm:text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">System Asset Element</th>
+                    <th className="px-3 py-2 text-right">Amount</th>
+                    <th className="px-3 py-2 text-right">Proportion</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {fdData.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="px-3 py-2 font-medium text-ink flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: row.color }}></span>
+                        {row.name}
+                      </td>
+                      <td className="px-3 py-2 text-right text-ink font-semibold">₦{row.value.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
+                      <td className="px-3 py-2 text-right text-muted font-mono">
+                        {((row.value / parseFloat(result.m1Supply)) * 100).toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+
+            {/* Pie Chart of allocations */}
+            {fdData.length > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={fdData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={65}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {fdData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: any) => `₦${parseFloat(value).toLocaleString()}`} />
+                    <Legend wrapperStyle={{ fontSize: '9px' }} layout="horizontal" align="center" verticalAlign="bottom"/>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         );
-      case 'taylor_rule':
+      }
+      case 'taylor_rule': {
+        const r_star = values.r_star !== undefined ? values.r_star : 2;
+        const target_inf = values.target_inf !== undefined ? values.target_inf : 2;
+        const current_inf = values.current_inf !== undefined ? values.current_inf : 4;
+        const output_gap = values.output_gap !== undefined ? values.output_gap : 2;
+        const alpha = values.alpha !== undefined ? values.alpha : 0.5;
+        const betaVal = values.beta !== undefined ? values.beta : 0.5;
+
+        const inf_gap = current_inf - target_inf;
+        const nominal_rate = current_inf + r_star + alpha * output_gap + betaVal * inf_gap;
+        
+        const neutralNominalRate = current_inf + r_star;
+
+        const taylorCompareData = [
+          { name: 'Neutral Policy', Rate: neutralNominalRate },
+          { name: 'Taylor Suggested Rate', Rate: parseFloat(nominal_rate.toFixed(2)) }
+        ];
+
         return (
           <div className="space-y-4">
             <ResultCard label="Suggested Nominal Rate" value={result.nominal_rate} icon={<Percent className="text-emerald-500" />} description="Target central bank policy interest rate." />
@@ -927,25 +1537,55 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
               <ResultCard label="Inflation Gap" value={result.inf_gap} icon={<TrendingUp className="text-sky-500" />} />
               <ResultCard label="Implied Real Rate" value={result.real_rate} icon={<Percent className="text-indigo-500" />} description="R - π (adjusted for inflation)" />
             </div>
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-border text-center">
-              <p className="text-[10px] text-muted leading-relaxed font-mono">
-                R = π + r* + α(y - y*) + β(π - π*)
-              </p>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Macroeconomic Input Variable</th>
+                    <th className="px-3 py-2 text-right">Value Rate</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border text-[11px]">
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Target Inflation Rate (π*)</td>
+                    <td className="px-3 py-2 text-right text-slate-700 dark:text-slate-200">{target_inf}%</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Current Inflation Rate (π)</td>
+                    <td className="px-3 py-2 text-right text-rose-500 font-medium">{current_inf}%</td>
+                  </tr>
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Real GDP Output Gap</td>
+                    <td className="px-3 py-2 text-right text-amber-500 font-medium">{output_gap}%</td>
+                  </tr>
+                  <tr className="bg-slate-100/50 dark:bg-slate-800/30 font-bold">
+                    <td className="px-3 py-2 text-ink">Taylor Policy Suggestion Rate</td>
+                    <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400">{nominal_rate.toFixed(2)}%</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
-                <Info size={14} />
-                <span>Economic Theory & Interpretation</span>
-              </div>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Policy Rate Guidance (R):</strong> The rule recommends a central bank policy nominal interest rate of <span className="text-sky-600 dark:text-sky-400 font-semibold">{result.nominal_rate}%</span> to steer aggregate demand toward steady state.
-              </p>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>The Taylor Principle:</strong> The feedback coefficient ensures that when inflation rises above the target, the nominal rate is lifted by more than 1-to-1 (the feedback slope). This drives the implied real interest rate up to <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{result.real_rate}%</span>, successfully cooling the economy's output gap to contain demand-pull pressures.
-              </p>
+
+            {/* Bar comparison */}
+            <div className="h-36 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={taylorCompareData} margin={{ top: 10, right: 15, left: -15, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Bar name="Interest Rate (%)" dataKey="Rate" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                    <Cell fill="#94a3b8" />
+                    <Cell fill="#10b981" />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
+      }
       case 'exchange_rate':
         return (
           <div className="space-y-4">
@@ -989,7 +1629,17 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             </div>
           </div>
         );
-      case 'barter_pricing':
+      case 'barter_pricing': {
+        const n_goods = values.n_goods !== undefined ? values.n_goods : 10;
+        const complexityData = [];
+        for (let n = 2; n <= Math.max(15, n_goods); n += 2) {
+          complexityData.push({
+            goods: n,
+            'Barter Prices': (n * (n - 1)) / 2,
+            'Money Prices': n - 1
+          });
+        }
+
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -999,21 +1649,50 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 font-semibold leading-relaxed border border-emerald-100 dark:border-emerald-900/30 rounded-xl text-center text-xs">
               Value Exchange Optimization: Using money reduces the number of transactional price listings by {result.saved_pct}!
             </div>
-            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
-                <Info size={14} />
-                <span>Economic Theory & Interpretation</span>
-              </div>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Exploding Price Tag Complexity:</strong> In a pure barter system with <span className="text-sky-600 dark:text-sky-400 font-semibold">{values.n_goods !== undefined ? values.n_goods : 10}</span> goods, every commodity must exchange directly against every other commodity. This forces prices to grow quadratically at a rate of <code>n(n - 1) / 2</code>, resulting in <span className="text-rose-600 dark:text-rose-400 font-semibold">{result.barter_prices}</span> distinct cross-market prices.
-              </p>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Money's Optimization Paradigm:</strong> Introducing a single unit of account (money) reduces price complexity to a linear function <code>n - 1</code>, requiring only <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{result.money_prices}</span> prices. This collapses search costs and computational overhead by <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{result.saved_pct}</span>, illustrating the supreme efficiency gain of a monetized economy.
-              </p>
+
+            {/* Line/Curve chart showing explosive barter growth */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={complexityData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="goods" tick={{ fontSize: 9 }} label={{ value: 'Number of Goods (N)', position: 'insideBottom', offset: -5, fontSize: 9 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '10px' }} />
+                  <Line type="monotone" name="Barter (N(N-1)/2)" dataKey="Barter Prices" stroke="#f43f5e" strokeWidth={2.5} dot={{ r: 3 }} />
+                  <Line type="monotone" name="Money (N-1)" dataKey="Money Prices" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
-      case 'baumol_tobin':
+      }
+      case 'baumol_tobin': {
+        const Y = values.annual_income !== undefined ? values.annual_income : 50000;
+        const R = values.interest_rate !== undefined ? values.interest_rate : 5;
+        const b = values.brokerage_cost !== undefined ? values.brokerage_cost : 10;
+        const r_decimal = R / 100;
+
+        const optimalW = parseFloat(result.w_star);
+        const bData = [];
+        if (optimalW > 0) {
+          // generate sweep points around W* to show the trade-off
+          const startPoints = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+          startPoints.forEach(pFactor => {
+            const currentW = Math.round(optimalW * pFactor);
+            const numWith = currentW > 0 ? Y / currentW : 0;
+            const bCost = b * numWith;
+            const iCost = r_decimal * (currentW / 2);
+            const tCost = bCost + iCost;
+            bData.push({
+              W: `W*${pFactor.toFixed(2)}`,
+              'Brokerage Cost': parseFloat(bCost.toFixed(1)),
+              'Interest Cost': parseFloat(iCost.toFixed(1)),
+              'Total Cost': parseFloat(tCost.toFixed(1))
+            });
+          });
+        }
+
         return (
           <div className="space-y-4">
             <ResultCard label="Optimal Withdrawal (W*)" value={`₦${parseFloat(result.w_star).toLocaleString(undefined, {minimumFractionDigits: 2})}`} icon={<Coins className="text-emerald-500" />} description="Ideal size for cash withdrawal to minimize overhead + foregone interest." />
@@ -1026,20 +1705,385 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
             <p className="text-[10px] text-muted text-center font-mono py-1 border border-dashed border-border rounded-xl">
               Total Cost = {`₦${parseFloat(result.total_cost).toLocaleString(undefined, {minimumFractionDigits: 2})}`}
             </p>
-            <div className="mt-4 p-4 rounded-xl bg-sky-50/50 dark:bg-sky-950/10 border border-sky-100 dark:border-sky-900/30 text-left space-y-2">
-              <div className="flex items-center gap-1.5 text-sky-700 dark:text-sky-400 font-bold text-xs">
-                <Info size={14} />
-                <span>Economic Theory & Interpretation</span>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[10px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-2 py-1.5">Size vs W*</th>
+                    <th className="px-2 py-1.5 text-right">Brokerage</th>
+                    <th className="px-2 py-1.5 text-right">Interest Foregone</th>
+                    <th className="px-2 py-1.5 text-right">Total Cost</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {bData.filter((_, i) => i % 2 === 1).map((row, idx) => {
+                    const isOptimal = row.W === 'W*1.00';
+                    return (
+                      <tr key={idx} className={isOptimal ? "bg-emerald-50/40 dark:bg-emerald-950/20 font-semibold" : ""}>
+                        <td className="px-2 py-1.5 text-ink">{isOptimal ? 'Optimal (1.0x)' : row.W}</td>
+                        <td className="px-2 py-1.5 text-right font-mono">₦{row['Brokerage Cost']}</td>
+                        <td className="px-2 py-1.5 text-right font-mono">₦{row['Interest Cost']}</td>
+                        <td className="px-2 py-1.5 text-right text-emerald-600 dark:text-emerald-400 font-bold font-mono">₦{row['Total Cost']}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Line Chart */}
+            {bData.length > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={bData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                    <XAxis dataKey="W" tick={{ fontSize: 8 }} />
+                    <YAxis tick={{ fontSize: 9 }} />
+                    <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                    <Legend wrapperStyle={{ fontSize: '9px' }} />
+                    <Line type="monotone" name="Brokerage Cost" dataKey="Brokerage Cost" stroke="#ef4444" strokeWidth={1.5} dot={false} />
+                    <Line type="monotone" name="Interest Cost" dataKey="Interest Cost" stroke="#3b82f6" strokeWidth={1.5} dot={false} />
+                    <Line type="monotone" name="Total Cost" dataKey="Total Cost" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Optimal Lot Size (W*):</strong> Initiating cash withdrawals of <span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.w_star).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> minimizes the sum of transaction brokerage costs and foregone bond interest. This balances the classic inventory trade-off perfectly.
-              </p>
-              <p className="text-[11px] text-muted leading-relaxed">
-                <strong>Inventory Trade-Off Equilibrium:</strong> At this optimal point, your annual brokerage fee overhead (<span className="text-amber-600 dark:text-amber-400 font-semibold">₦{parseFloat(result.brokerage_cost_total).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>) is exactly equal to the foregone interest income (<span className="text-sky-600 dark:text-sky-400 font-semibold">₦{parseFloat(result.foregone_interest_total).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>) on your average cash holding (half of W*). This confirms the mathematical condition of the Baumol-Tobin square-root model.
-              </p>
+            )}
+          </div>
+        );
+      }
+      case 'population': {
+        const br = values.birth_rate !== undefined ? values.birth_rate : 38;
+        const dr = values.death_rate !== undefined ? values.death_rate : 11;
+        const nm = values.net_migration_rate !== undefined ? values.net_migration_rate : -1;
+        const years = values.years_to_project !== undefined ? values.years_to_project : 10;
+        const initPop = values.initial_population !== undefined ? values.initial_population : 200;
+
+        const growthRatePer1000 = br - dr + nm;
+        const growthRatePct = growthRatePer1000 / 10;
+        
+        const popProjectionData = [];
+        let currentPop = initPop;
+        for (let yr = 0; yr <= Math.min(20, years); yr++) {
+          popProjectionData.push({
+            year: `Yr ${yr}`,
+            Population: parseFloat(currentPop.toFixed(2)),
+          });
+          currentPop = currentPop * (1 + growthRatePct / 100);
+        }
+
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Projected Population" value={result.projectedPop} icon={<Scale className="text-emerald-500" />} description="Future population size after projection years." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="Growth Rate" value={result.growthRatePct} icon={<TrendingUp className="text-sky-500" />} />
+              <ResultCard label="Doubling Horizon" value={result.doublingTime} icon={<Scale className="text-amber-500" />} description="Estimated years to double population (Rule of 70)." />
+            </div>
+
+            {/* Projection Data Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Milestone Year</th>
+                    <th className="px-3 py-2 text-right">Population Size</th>
+                    <th className="px-3 py-2 text-right">Incremental Increase</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  <tr>
+                    <td className="px-3 py-2 font-medium text-ink">Baseline Year 0</td>
+                    <td className="px-3 py-2 text-right text-ink font-semibold">{initPop.toFixed(1)}M</td>
+                    <td className="px-3 py-2 text-right text-muted">-</td>
+                  </tr>
+                  {popProjectionData.length > 1 && (
+                    <>
+                      {years > 2 && (
+                        <tr>
+                          <td className="px-3 py-2 font-medium text-ink">Mid-Point Year {Math.floor(years / 2)}</td>
+                          <td className="px-3 py-2 text-right text-ink font-semibold">
+                            {popProjectionData[Math.floor(years / 2)]?.Population.toFixed(1)}M
+                          </td>
+                          <td className="px-3 py-2 text-right text-muted">
+                            +{(popProjectionData[Math.floor(years / 2)]?.Population - initPop).toFixed(1)}M
+                          </td>
+                        </tr>
+                      )}
+                      <tr className="bg-emerald-50/40 dark:bg-emerald-950/20 font-semibold">
+                        <td className="px-3 py-2 text-ink">Target Year {years}</td>
+                        <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400">{popProjectionData[popProjectionData.length - 1]?.Population.toFixed(1)}M</td>
+                        <td className="px-3 py-2 text-right text-emerald-600 dark:text-emerald-400">
+                          +{(popProjectionData[popProjectionData.length - 1]?.Population - initPop).toFixed(1)}M
+                        </td>
+                      </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Line/Area chart of compounding population growth */}
+            {popProjectionData.length > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={popProjectionData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorPop" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                    <XAxis dataKey="year" tick={{ fontSize: 9 }} />
+                    <YAxis tick={{ fontSize: 9 }} />
+                    <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                    <Area type="monotone" name="Population (M)" dataKey="Population" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorPop)" strokeWidth={2.5} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        );
+      }
+      case 'labour_market': {
+        const working = values.working_age_pop !== undefined ? values.working_age_pop : 120;
+        const part = values.participation_rate !== undefined ? values.participation_rate : 65;
+        const unemp = values.unemployment_rate !== undefined ? values.unemployment_rate : 33;
+
+        const lf = working * (part / 100);
+        const unemployed = lf * (unemp / 100);
+        const employed = lf - unemployed;
+        const outOfLabourForce = working - lf;
+
+        const marketAllocData = [
+          { name: 'Employed', value: parseFloat(employed.toFixed(1)), color: '#10b981' },
+          { name: 'Unemployed', value: parseFloat(unemployed.toFixed(1)), color: '#ef4444' },
+          { name: 'Out of Labour Force', value: parseFloat(outOfLabourForce.toFixed(1)), color: '#64748b' }
+        ].filter(item => item.value > 0);
+
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Active Labour Force" value={result.labourForce} icon={<Scale className="text-emerald-500" />} description="Citizens working or actively searching for employment." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="Employed" value={result.employed} icon={<TrendingUp className="text-sky-500" />} />
+              <ResultCard label="Unemployed" value={result.unemployed} icon={<Scale className="text-rose-500" />} />
+            </div>
+
+            {/* Allocation Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Economic Class Segment</th>
+                    <th className="px-3 py-2 text-right">Size (M)</th>
+                    <th className="px-3 py-2 text-right">Share (%)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {marketAllocData.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="px-3 py-2 font-medium text-ink flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: row.color }}></span>
+                        {row.name}
+                      </td>
+                      <td className="px-3 py-2 text-right text-ink font-semibold">{row.value}M</td>
+                      <td className="px-3 py-2 text-right text-muted font-mono">
+                        {((row.value / working) * 100).toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-slate-50/40 dark:bg-slate-800/20 font-semibold border-t-2 border-border">
+                    <td className="px-3 py-2 text-ink">Total Working Age Pop</td>
+                    <td className="px-3 py-2 text-right text-ink font-bold">{working}M</td>
+                    <td className="px-3 py-2 text-right text-muted font-mono">100.0%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pie Chart */}
+            {marketAllocData.length > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={marketAllocData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={65}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {marketAllocData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: any) => `${value}M Workers`} />
+                    <Legend wrapperStyle={{ fontSize: '9px' }} layout="horizontal" align="center" verticalAlign="bottom" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        );
+      }
+      case 'nigerian_economy': {
+        const price = values.oil_price !== undefined ? values.oil_price : 75;
+        const prod = values.oil_production !== undefined ? values.oil_production : 1.4;
+        const other = values.other_rev_trillions !== undefined ? values.other_rev_trillions : 12;
+        const xrate = values.exchange_rate !== undefined ? values.exchange_rate : 1500;
+
+        const dailyOilUsd = price * prod;
+        const dailyOilNgn = dailyOilUsd * xrate;
+        const annualOilNgnTrillion = (dailyOilNgn * 365) / 1000000;
+        const totalRev = annualOilNgnTrillion + other;
+
+        const revPieces = [
+          { name: 'Crude Oil exports', value: parseFloat(annualOilNgnTrillion.toFixed(2)), color: '#f59e0b' },
+          { name: 'Other Sector revenues', value: parseFloat(other.toFixed(2)), color: '#10b981' }
+        ];
+
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Annual Oil Revenue" value={result.oilRevenue} icon={<Coins className="text-amber-500" />} description="Projected state intake from crude exports." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="total unified GDP/Rev" value={result.totalRevenue} icon={<Scale className="text-sky-500" />} />
+              <ResultCard label="Oil Revenue Share" value={result.oilShare} icon={<Percent className="text-indigo-500" />} />
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-3 py-2">Revenue Channel Stream</th>
+                    <th className="px-3 py-2 text-right">Annual Earned (₦)</th>
+                    <th className="px-3 py-2 text-right">Revenue Share</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {revPieces.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="px-3 py-2 font-medium text-ink flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: row.color }}></span>
+                        {row.name}
+                      </td>
+                      <td className="px-3 py-2 text-right text-ink font-semibold">{row.value.toFixed(2)}T ₦</td>
+                      <td className="px-3 py-2 text-right text-muted font-mono">
+                        {((row.value / totalRev) * 100).toFixed(1)}%
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-slate-50/40 dark:bg-slate-800/20 font-semibold border-t-2 border-border">
+                    <td className="px-3 py-2 text-ink">Total Consolidated Revenue</td>
+                    <td className="px-3 py-2 text-right text-ink font-bold">{totalRev.toFixed(2)}T ₦</td>
+                    <td className="px-3 py-2 text-right text-muted font-mono">100.0%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pie Chart of Exposure */}
+            {totalRev > 0 && (
+              <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={revPieces}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={65}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {revPieces.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: any) => `${value}T ₦`} />
+                    <Legend wrapperStyle={{ fontSize: '9px' }} layout="horizontal" align="center" verticalAlign="bottom" />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        );
+      }
+      case 'distributive_trade': {
+        const cost = values.producer_cost !== undefined ? values.producer_cost : 1000;
+        const wMarkup = values.wholesaler_markup !== undefined ? values.wholesaler_markup : 15;
+        const rMarkup = values.retailer_markup !== undefined ? values.retailer_markup : 25;
+        const logistics = values.logistics_cost !== undefined ? values.logistics_cost : 200;
+
+        const wholesalerPrice = cost * (1 + wMarkup / 100);
+        const costAndLogistics = wholesalerPrice + logistics;
+        const finalConsumerPrice = costAndLogistics * (1 + rMarkup / 100);
+
+        const cascadeStages = [
+          { stage: 'Producer Cost', price: cost, added: 0, tag: 'Starting Base' },
+          { stage: 'Wholesaler Price', price: parseFloat(wholesalerPrice.toFixed(1)), added: parseFloat((wholesalerPrice - cost).toFixed(1)), tag: `+${wMarkup}% Markup` },
+          { stage: 'Plus Logistics', price: parseFloat(costAndLogistics.toFixed(1)), added: logistics, tag: 'Transport Costs' },
+          { stage: 'Final Retailer Price', price: parseFloat(finalConsumerPrice.toFixed(1)), added: parseFloat((finalConsumerPrice - costAndLogistics).toFixed(1)), tag: `+${rMarkup}% Markup` }
+        ];
+
+        return (
+          <div className="space-y-4">
+            <ResultCard label="Final Consumer Price" value={result.final_consumer_price} icon={<Coins className="text-rose-500" />} description="The price paid by end-users after markups." />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard label="Direct (No Middlemen)" value={result.direct_price} icon={<Scale className="text-emerald-500" />} />
+              <ResultCard label="Middlemen Markup Premium" value={result.premium} icon={<TrendingUp className="text-rose-500" />} />
+            </div>
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/25 border border-rose-100 dark:border-rose-900/30 rounded-xl text-center">
+              <span className="text-[11px] text-rose-800 dark:text-rose-400 font-bold">
+                Middlemen markups inflated final price by {result.inflation_pct}!
+              </span>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-border rounded-xl">
+              <table className="w-full text-[10px] sm:text-[11px] text-left text-muted">
+                <thead className="bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-2 py-1.5">Distribution Stage</th>
+                    <th className="px-2 py-1.5 text-right">Value (₦)</th>
+                    <th className="px-2 py-1.5 text-right">Cost Element</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {cascadeStages.map((row, idx) => (
+                    <tr key={idx} className={idx === cascadeStages.length - 1 ? "bg-rose-50/30 dark:bg-rose-950/10 font-bold" : ""}>
+                      <td className="px-2 py-1.5 text-ink">{row.stage}</td>
+                      <td className="px-2 py-1.5 text-right text-ink">₦{row.price.toLocaleString(undefined, {minimumFractionDigits: 1})}</td>
+                      <td className="px-2 py-1.5 text-right text-slate-500 text-[10px] font-mono">{row.tag}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Bar Chart cascade build-up */}
+            <div className="h-44 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={cascadeStages} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="stage" tick={{ fontSize: 8 }} />
+                  <YAxis tick={{ fontSize: 9 }} />
+                  <Tooltip formatter={(value: any) => `₦${value}`} contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Bar name="Price Build-up (₦)" dataKey="price" fill="#ef4444" radius={[4, 4, 0, 0]}>
+                    {cascadeStages.map((entry, index) => {
+                      const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+                      return <Cell key={`cell-${index}`} fill={colors[index]} />;
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
+      }
     }
   };
 

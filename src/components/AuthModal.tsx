@@ -37,19 +37,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = false, onClose = 
     try {
       const existingProfile = await getUserProfile(firebaseUser.uid);
       if (!existingProfile) {
-        // Provide a default level if registering new
+        // Provide a pending level so they must choose a roadmap first
         const newProfile = await createUserProfile({ 
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: name || firebaseUser.displayName 
-        }, defaultLevel);
+        }, 'pending');
         setProfile(newProfile);
         onClose();
         navigate('/select-level');
       } else {
         setProfile(existingProfile);
         onClose();
-        navigate('/dashboard');
+        if (existingProfile.level === 'pending') {
+          navigate('/select-level');
+        } else {
+          navigate('/study-guide/ss1-ch1');
+        }
       }
     } catch (err: any) {
       console.error(err);

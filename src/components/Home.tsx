@@ -1,34 +1,192 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { AuthModal } from './AuthModal';
 
 export const Home = () => {
     const { user, profile } = useAuth();
     const navigate = useNavigate();
 
-    const roadmap = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
-    const progress = profile?.progress || {};
-    const completedCount = Object.values(progress).filter(Boolean).length;
-    const totalCount = roadmap.length;
-    const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authDefaultIsLogin, setAuthDefaultIsLogin] = useState(true);
     const [animatedPercentage, setAnimatedPercentage] = useState(0);
 
+    const level = profile?.level || 'secondary';
+    const roadmap = level === 'secondary-ss2' ? SECONDARY_SS2_ROADMAP : (level === 'undergraduate' ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
+    const progress = profile?.progress || {};
+    const completedCount = Object.values(progress).filter(Boolean).length;
+    const totalCount = roadmap ? roadmap.length : 0;
+    const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setAnimatedPercentage(percentage);
         }, 100);
+        return () => clearTimeout(timer);
     }, [percentage]);
 
-    const activeCourse = roadmap.find(t => !progress[t.id]) || roadmap[0];
+    useEffect(() => {
+        if (profile?.level === 'pending') {
+            navigate('/select-level', { replace: true });
+        }
+    }, [profile, navigate]);
+
+    if (user && !profile) {
+        return (
+            <div className="flex bg-surface text-on-surface w-full min-h-screen items-center justify-center font-['Hanken_Grotesk']">
+                <div className="flex flex-col items-center gap-4">
+                    <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+                    <p className="font-semibold text-on-surface/60 opacity-80">Loading your account...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (profile?.level === 'pending') {
+        return (
+            <div className="flex bg-surface text-on-surface w-full min-h-screen items-center justify-center font-['Hanken_Grotesk']">
+                <div className="flex flex-col items-center gap-4">
+                    <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+                    <p className="font-semibold text-on-surface/60 opacity-80">Preparing your academy...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const activeCourse = (roadmap || []).find(t => !progress[t.id]) || (roadmap || [])[0];
     const completedCoursesForActive = activeCourse ? 0 : 0; // Simplified
+
+    if (!user) {
+        return (
+            <div className="bg-surface text-on-surface min-h-screen font-['Hanken_Grotesk'] overflow-x-hidden">
+                {/* Header Navbar */}
+                <header className="w-full bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/10 px-6 py-4 flex justify-between items-center max-w-7xl mx-auto">
+                    <div className="flex items-center gap-xs">
+                        <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-2xl shadow-lg">
+                            <span className="text-on-primary font-bold text-xl">E</span>
+                        </div>
+                        <h1 className="text-2xl font-bold text-primary tracking-tight ml-2">EcoMastery</h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <button 
+                            onClick={() => { setAuthDefaultIsLogin(false); setIsAuthOpen(true); }}
+                            className="bg-primary hover:bg-primary/95 text-on-primary px-6 py-2.5 rounded-full font-bold shadow-lg shadow-primary/15 hover:shadow-primary/25 active:scale-95 transition-all text-sm"
+                        >
+                            Get Started
+                        </button>
+                    </div>
+                </header>
+
+                {/* Hero Section */}
+                <main className="max-w-7xl mx-auto px-6 py-12 md:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div className="space-y-6 max-w-xl text-left">
+                        <div className="inline-flex items-center gap-2 bg-secondary-container/25 text-primary px-4 py-1.5 rounded-full font-bold text-xs tracking-wider border border-secondary-container/20">
+                            <span className="material-symbols-outlined text-[16px]">verified</span>
+                            <span>COMPETITIVE MULTIPLAYER MACROECONOMICS</span>
+                        </div>
+                        <h2 className="text-4xl md:text-6xl font-black text-primary tracking-tight leading-tight">
+                            Master the <br/>
+                            Economics <span className="text-secondary text-emerald-600 dark:text-emerald-400">Curriculums.</span>
+                        </h2>
+                        <p className="text-on-surface-variant text-base md:text-lg leading-relaxed font-medium">
+                            EcoMastery is an interactive Economics training arena. Study structured chapters for SS1, SS2, or University levels, solve daily policy crises, and revise with real-time multiplayer duels.
+                        </p>
+                        <div className="pt-4">
+                            <button 
+                                onClick={() => { setAuthDefaultIsLogin(false); setIsAuthOpen(true); }}
+                                className="w-full sm:w-auto px-8 py-4 bg-primary text-on-primary font-bold text-lg rounded-2xl shadow-xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                            >
+                                <span className="material-symbols-outlined">rocket_launch</span>
+                                Get Started
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-6 pt-6 border-t border-outline-variant/25">
+                            <div>
+                                <h4 className="text-2xl font-black text-primary">5,000+</h4>
+                                <p className="text-xs font-bold text-outline tracking-wider uppercase mt-1">Scholars Active</p>
+                            </div>
+                            <div className="h-8 w-[1px] bg-outline-variant/30"></div>
+                            <div>
+                                <h4 className="text-2xl font-black text-primary">120+</h4>
+                                <p className="text-xs font-bold text-outline tracking-wider uppercase mt-1">Economic Quizzes</p>
+                            </div>
+                            <div className="h-8 w-[1px] bg-outline-variant/30"></div>
+                            <div>
+                                <h4 className="text-2xl font-black text-primary">100%</h4>
+                                <p className="text-xs font-bold text-outline tracking-wider uppercase mt-1">Syllabus Covered</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Interactive Showcase Grid */}
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-secondary/10 to-primary/5 rounded-[2.5rem] blur-3xl pointer-events-none -z-10" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Card 1 */}
+                            <div className="p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-sm hover:shadow-md transition-all space-y-4">
+                                <div className="p-3 bg-secondary-container/20 text-secondary w-fit rounded-2xl">
+                                    <span className="material-symbols-outlined text-2xl">sports_esports</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-primary">Arena PvP Duels</h3>
+                                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
+                                    Challenge other students in real-time GDP prediction duels under timed market pressures.
+                                </p>
+                            </div>
+                            {/* Card 2 */}
+                            <div className="p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-sm hover:shadow-md transition-all space-y-4">
+                                <div className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 w-fit rounded-2xl">
+                                    <span className="material-symbols-outlined text-2xl">menu_book</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-primary">Active Roadmaps</h3>
+                                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
+                                    Study tailored Curriculums for Senior Secondary (SS1, SS2, and SS3) Economics.
+                                </p>
+                            </div>
+                            {/* Card 3 */}
+                            <div className="p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-sm hover:shadow-md transition-all space-y-4">
+                                <div className="p-3 bg-amber-500/10 text-amber-500 w-fit rounded-2xl">
+                                    <span className="material-symbols-outlined text-2xl">extension</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-primary">Daily Puzzles</h3>
+                                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
+                                    Solve tactical scenarios like surprise inflation surges and interest rate hikes with direct policy models.
+                                </p>
+                            </div>
+                            {/* Card 4 */}
+                            <div className="p-6 bg-surface-container-lowest border border-outline-variant/20 rounded-[2rem] shadow-sm hover:shadow-md transition-all space-y-4">
+                                <div className="p-3 bg-rose-500/10 text-rose-500 w-fit rounded-2xl">
+                                    <span className="material-symbols-outlined text-2xl">leaderboard</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-primary">Global Rankings</h3>
+                                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
+                                    Earn Mastery Points by completing modules and winning duels to climb the Diamond and Gold leagues.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <footer className="w-full bg-surface-container-low border-t border-outline-variant/10 py-12 mt-16 text-center text-xs text-outline font-bold tracking-widest uppercase">
+                    EcoMastery Arena © 2026 • Real-Time Educational Game-Theory
+                </footer>
+
+                {/* Auth Screen Modal */}
+                <AuthModal 
+                    isOpen={isAuthOpen} 
+                    onClose={() => setIsAuthOpen(false)} 
+                    defaultIsLogin={authDefaultIsLogin} 
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="bg-background text-on-background min-h-screen pb-24 font-['Hanken_Grotesk']">
             {/* TopAppBar */}
             <header className="w-full sticky top-0 z-40 bg-surface dark:bg-surface-container-low shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex justify-between items-center px-grid-margin py-md">
-                <div className="flex items-center gap-sm">
+                <div onClick={() => navigate('/study')} className="flex items-center gap-sm cursor-pointer group select-none">
                     <div className="relative active:scale-95 duration-150 transition-transform">
                         <img 
                             className="w-10 h-10 rounded-full border-2 border-secondary-container object-cover" 
@@ -36,11 +194,11 @@ export const Home = () => {
                             alt="User Avatar" 
                         />
                         <div className="absolute -bottom-1 -right-1 bg-secondary-fixed-dim text-on-secondary-fixed text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-sm">
-                            {profile?.level === 'undergraduate' ? 'UG' : 'HS'}
+                            {levelLabel}
                         </div>
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="font-headline-md text-headline-md-mobile font-bold text-primary dark:text-secondary-fixed">EcoMastery</h1>
+                        <h1 className="font-headline-md text-headline-md-mobile font-bold text-primary dark:text-secondary-fixed group-hover:text-secondary transition-colors animate-pulse">EcoMastery</h1>
                         <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{profile?.displayName?.split(' ')[0] || 'Scholar'}</span>
                     </div>
                 </div>
@@ -75,7 +233,15 @@ export const Home = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     {/* Study Progress Card */}
                     <div 
-                        onClick={() => navigate('/study')}
+                        onClick={() => {
+                            const defaultChapters: Record<string, string> = {
+                                'secondary': 'ss1-ch1',
+                                'secondary-ss2': 'ss2-ch1',
+                                'undergraduate': 'ug-ch1'
+                            };
+                            const defaultId = defaultChapters[level] || 'ss1-ch1';
+                            navigate(activeCourse ? `/study-guide/${activeCourse.id}` : `/study-guide/${defaultId}`);
+                        }}
                         className="bg-surface-container-lowest p-5 rounded-xl shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow">
                         <div>
                             <div className="flex justify-between items-start mb-4">
@@ -161,7 +327,13 @@ export const Home = () => {
                         {/* User's Position */}
                         <div className="flex items-center gap-4 px-4 py-3 bg-secondary-container/20">
                             <span className="w-6 font-bold text-secondary text-center">12</span>
-                            <img className="w-10 h-10 rounded-full object-cover" src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuBwnLbWe-4qLSQ7ew6ZxdFhatOx3p1i5RF6JFskvQykoUnowvT2GHSs_KCr4BRtYBrsUTZ3AjKpNGv12dYGLVLyIaMGiK7mnBUdf5nOCcH9cb2LL72QgRUO-dTDarHd6K6ymumXzmvCDm1HV5uOw_wh7ZB5yMUaP0QVUc2bVHAj1EII-KwTMY77ROGdYIothxXAjIdeeeP9pCRuh1wfgac09E-771EtZ6woOWK0fgR4Z5Aw_nBeh22NMNHBDTzfk887uaDWLDanxXY"} alt="User" />
+                            {user?.photoURL ? (
+                                <img className="w-10 h-10 rounded-full object-cover shrink-0" src={user.photoURL} alt="User" />
+                            ) : (
+                                <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-lg shrink-0">
+                                    {profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                                </div>
+                            )}
                             <div className="flex-1">
                                 <p className="font-label-md text-label-md text-on-surface font-bold text-sm">You ({profile?.displayName?.split(' ')[0] || 'Scholar'})</p>
                                 <p className="font-label-sm text-label-sm text-secondary font-semibold text-xs">Gold League</p>

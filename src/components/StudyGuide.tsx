@@ -13,9 +13,11 @@ import {
 import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles, Copy, Check } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../useAuth';
-import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { MICRO_STUDY_GUIDE } from '../lib/studyData';
 import { ADVANCED_STUDY_GUIDE } from '../lib/advancedStudyData';
+import { SS2_STUDY_GUIDE } from '../lib/ss2StudyData';
+import { SS3_STUDY_GUIDE } from '../lib/ss3StudyData';
 import { generateStudyGuide } from '../gemini';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -89,7 +91,13 @@ const CopyMathButton = ({ latex, isBlock }: { latex: string, isBlock?: boolean }
 export const StudyGuide = ({ topicId }: { topicId: string }) => {
   const { profile } = useAuth();
   const navigate = useNavigate();
-  const roadmap = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+  
+  const roadmap = useMemo(() => {
+    if (topicId.startsWith('ss2-')) return SECONDARY_SS2_ROADMAP;
+    if (topicId.startsWith('ug-')) return UNDERGRADUATE_ROADMAP;
+    return SECONDARY_ROADMAP;
+  }, [topicId]);
+
   const topic = roadmap.find(t => t.id === topicId);
   
   const [content, setContent] = useState<string | null>(null);
@@ -103,19 +111,18 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
 
   useEffect(() => {
     const fetchGuide = async () => {
-      const isSecondary = topicId.startsWith('ss1-');
-      const currentRoadmap = isSecondary ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+      const currentRoadmap = topicId.startsWith('ss2-') ? SECONDARY_SS2_ROADMAP : (topicId.startsWith('ug-') ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
       const currentTopic = currentRoadmap.find(t => t.id === topicId);
       if (!currentTopic) return;
       setLoading(true);
 
-      const localContent = MICRO_STUDY_GUIDE[topicId] || ADVANCED_STUDY_GUIDE[topicId];
+      const localContent = topicId.startsWith('ss2-') ? SS2_STUDY_GUIDE[topicId] : (topicId.startsWith('ug-') ? SS3_STUDY_GUIDE[topicId] : MICRO_STUDY_GUIDE[topicId]);
       let guideContent = "";
 
       if (localContent) {
         guideContent = localContent;
       } else {
-        guideContent = await generateStudyGuide(currentTopic.title, isSecondary ? 'secondary' : 'undergraduate', currentTopic.description);
+        guideContent = await generateStudyGuide(currentTopic.title, topicId.startsWith('ug-') ? 'undergraduate' : 'secondary', currentTopic.description);
       }
 
       setContent(guideContent);
@@ -712,48 +719,6 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                         {pages[currentPage] || ''}
                       </ReactMarkdown>
                     </div>
-
-                    {/* Cover Page Special Syllabus Directory Grid */}
-                    {currentPage === 0 && headingsWithPages.length > 0 && (
-                      <div className="mt-10 pt-10 border-t border-slate-100 dark:border-slate-800/60">
-                        <div className="flex items-center gap-2 mb-6">
-                          <BookOpen className="w-4 h-4 text-sky-600 dark:text-sky-400" />
-                          <h3 className="text-xs font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest">
-                            Course Chapters Index
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {headingsWithPages
-                            .filter(h => h.level === 2) // only show H2 level chapters
-                            .map((heading, i) => (
-                              <button
-                                key={i}
-                                onClick={() => handleHeadingClick(heading.id, heading.pageIndex)}
-                                className="text-left p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 hover:border-sky-500 hover:bg-white dark:hover:bg-slate-950/80 transition-all group flex justify-between items-center cursor-pointer font-sans"
-                              >
-                                <div className="pr-2">
-                                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 uppercase block mb-1">
-                                    Chapter {i + 1}
-                                  </span>
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors line-clamp-2 leading-snug">
-                                    {heading.text.replace(/^[C|c]hapter\s+([a-zA-Z0-9_.-]+):?\s*/i, '')}
-                                  </span>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
-                              </button>
-                            ))}
-                        </div>
-                        <div className="mt-8 flex justify-center">
-                          <button
-                            onClick={nextPage}
-                            className="px-8 py-3 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:shadow-lg transition-all animate-pulse flex items-center gap-2 cursor-pointer"
-                          >
-                            <span>Start Lessons</span>
-                            <ArrowRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Final module complete banner ONLY render on the absolute last page */}
                     {currentPage === totalPages - 1 && (

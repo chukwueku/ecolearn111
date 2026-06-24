@@ -1,6 +1,6 @@
 {
-  "name": "Statistics & Econometrics Ref",
-  "description": "A comprehensive reference interface for the Statistics and Econometrics study guide, browsing chapters, tables, and mathematical equations.",
+  "name": "Economics Curriculum",
+  "description": "A comprehensive WAEC/NECO Economics study guide covering SS1, SS2, and SS3 levels with interactive mathematical simulators and topic roadmaps.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

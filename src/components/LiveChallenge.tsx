@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
 import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, timeoutMatchTurn, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
-import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, SECONDARY_SS3_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -231,20 +231,26 @@ export const LiveChallenge: React.FC = () => {
                   );
                   updateDoc(matchRef, { players: updatedPlayers });
 
+                  const currentPoints = profile?.points || 0;
+                  const isKeynes = currentPoints >= 3000;
+                  const winPoints = isKeynes ? 15 : 25; // reduced points from original 50
+                  const drawPoints = isKeynes ? 5 : 10; // reduced points from original 20
+                  const participationPoints = isKeynes ? 2 : 5; // reduced points from original 10
+
                   if (me.score > opponent.score) {
-                    updatePoints(user.uid, 50); // Win bonus
+                    updatePoints(user.uid, winPoints); // Win bonus
                     saveDuelResult({
                       winnerUid: user.uid,
                       winnerName: profile!.displayName,
                       loserUid: opponent.id,
                       loserName: opponent.displayName,
                       topicId: selectedTopicId || 'General',
-                      pointsAwarded: 50
+                      pointsAwarded: winPoints
                     });
                   } else if (me.score === opponent.score) {
-                    updatePoints(user.uid, 20); // Draw
+                    updatePoints(user.uid, drawPoints); // Draw
                   } else {
-                    updatePoints(user.uid, 10); // Participation
+                    updatePoints(user.uid, participationPoints); // Participation
                   }
               }
           }
@@ -354,13 +360,12 @@ export const LiveChallenge: React.FC = () => {
     if (!incomingChallenge || !profile) return;
     setLoading(true);
     expectingMatchRef.current = true;
-    const topics = profile.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
-    const topic = topics.find(t => t.id === incomingChallenge.topicId) || topics[0];
+    const topicId = incomingChallenge.topicId;
     
     try {
-      const questions = await getQuestions(topic.id);
+      const questions = await getQuestions(topicId);
       const finalQuestions: Question[] = questions.length > 0 ? questions : [
-         { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
+         { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topicId, explanation: "" }
       ];
       await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
     } catch(e) { console.error(e); }
@@ -446,7 +451,7 @@ export const LiveChallenge: React.FC = () => {
     if (!matchData?.matchId || !profile) return;
     setLoading(true);
     setDuelStarted(true);
-    const topics = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+    const topics = SECONDARY_ROADMAP;
     const topic = topics.find(t => t.id === matchData.topicId) || topics[0];
     
     const questions = await getQuestions(topic.id);
@@ -468,22 +473,16 @@ export const LiveChallenge: React.FC = () => {
       setSearchTime(0);
     } else {
       if (!selectedTopicId) {
-        alert("Please select a topic first!");
+        alert("Please select a curriculum first!");
         return;
       }
       
       setLoading(true);
-      const topics = profile.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
-      const topic = topics.find(t => t.id === selectedTopicId);
-      if (!topic) {
-        setLoading(false);
-        return;
-      }
 
       try {
-        const questions = await getQuestions(topic.id);
+        const questions = await getQuestions(selectedTopicId);
         const finalQuestions: Question[] = questions.length > 0 ? questions : [
-          { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
+          { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: selectedTopicId, explanation: "" }
         ];
 
         setIsSearching(true);
@@ -516,13 +515,13 @@ export const LiveChallenge: React.FC = () => {
         {/* Victory/Defeat Background Glow */}
         <div className={cn(
           "absolute inset-0 pointer-events-none blur-[120px] opacity-20 transition-all duration-1000",
-          won ? "bg-sky-500" : draw ? "bg-slate-500" : "bg-rose-500"
+          won ? "bg-primary" : draw ? "bg-outline" : "bg-error"
         )} />
         
         <motion.div 
           initial={{ y: 40, opacity: 0, scale: 0.9 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
-          className="bg-white dark:bg-slate-900 p-8 md:p-16 rounded-[4rem] border border-slate-200 dark:border-slate-800 shadow-2xl text-center max-w-xl w-full relative z-10 backdrop-blur-3xl"
+          className="bg-surface-container-lowest p-8 md:p-16 rounded-[4rem] border border-outline-variant/30 shadow-2xl text-center max-w-xl w-full relative z-10 backdrop-blur-3xl"
         >
           <div className="mb-16">
             <div className="relative inline-block">
@@ -531,53 +530,53 @@ export const LiveChallenge: React.FC = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 className={cn(
                   "absolute inset-0 rounded-full blur-2xl",
-                  won ? "bg-sky-500" : draw ? "bg-slate-500" : "bg-rose-500"
+                  won ? "bg-primary" : draw ? "bg-outline" : "bg-error"
                 )}
               />
               <div className={cn(
                 "w-32 h-32 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 transition-all relative z-10 border-2",
-                won ? "bg-sky-500 text-white shadow-2xl shadow-sky-500/40 border-sky-400" : draw ? "bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700" : "bg-rose-500 text-white shadow-2xl shadow-rose-500/40 border-rose-400"
+                won ? "bg-primary text-on-primary shadow-2xl shadow-primary/40 border-primary" : draw ? "bg-surface-container-low text-outline border-outline-variant/30" : "bg-error text-on-error shadow-2xl shadow-error/40 border-error"
               )}>
                 <Trophy size={64} className={won ? "animate-bounce" : ""} />
               </div>
             </div>
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-slate-900 dark:text-white mb-4 uppercase font-display italic">
+            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-on-surface mb-4 uppercase font-display italic">
               {won ? 'Victory' : draw ? 'Stalemate' : 'Defeat'}
             </h2>
               <div className="flex items-center justify-center gap-3">
-                <div className="w-8 h-[1px] bg-slate-400 dark:bg-slate-800" />
-                <p className="text-[10px] text-slate-700 dark:text-slate-500 font-bold uppercase tracking-[0.4em]">Arena Results</p>
-                <div className="w-8 h-[1px] bg-slate-400 dark:bg-slate-800" />
+                <div className="w-8 h-[1px] bg-outline-variant/50" />
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-[0.4em]">Arena Results</p>
+                <div className="w-8 h-[1px] bg-outline-variant/50" />
               </div>
               {matchData?.forfeitedBy && (
-                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-rose-500 animate-pulse">
+                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-error animate-pulse">
                    {matchData.forfeitedBy === user?.uid ? "Match Resigned" : "Opponent Forfeited"}
                 </p>
               )}
           </div>
 
-          <div className="grid grid-cols-2 gap-px bg-slate-200 dark:bg-slate-800 rounded-[3rem] overflow-hidden border border-slate-200 dark:border-slate-800 mb-16 shadow-inner">
-            <div className="bg-slate-100 dark:bg-slate-900/50 p-6 md:p-12 group transition-colors hover:bg-white dark:hover:bg-slate-900">
-              <p className="text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4">Your Score</p>
-              <p className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{me?.score}</p>
+          <div className="grid grid-cols-2 gap-px bg-outline-variant/30 rounded-[3rem] overflow-hidden border border-outline-variant/30 mb-16 shadow-inner">
+            <div className="bg-surface-container-lowest p-6 md:p-12 group transition-colors hover:bg-surface">
+              <p className="text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-4">Your Score</p>
+              <p className="text-5xl md:text-7xl font-bold text-on-surface font-mono tracking-tighter group-hover:text-primary transition-colors">{me?.score}</p>
             </div>
-            <div className="bg-slate-100 dark:bg-slate-900/50 p-6 md:p-12 group transition-colors hover:bg-white dark:hover:bg-slate-900">
-              <p className="text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4">Opponent</p>
-              <p className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white font-mono tracking-tighter group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">{opponent?.score}</p>
+            <div className="bg-surface-container-lowest p-6 md:p-12 group transition-colors hover:bg-surface">
+              <p className="text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-4">Opponent</p>
+              <p className="text-5xl md:text-7xl font-bold text-on-surface font-mono tracking-tighter group-hover:text-error transition-colors">{opponent?.score}</p>
             </div>
           </div>
 
           <div className="space-y-6">
             {rematchOffered ? (
-              <div className="bg-sky-100 dark:bg-sky-900/20 p-10 rounded-[3rem] mb-10 border border-sky-200 dark:border-sky-900/30 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full blur-3xl transition-all" />
-                <p className="text-[10px] font-bold text-sky-600 dark:text-sky-400 mb-8 uppercase tracking-[0.3em] relative z-10">
+              <div className="bg-primary/10 p-10 rounded-[3rem] mb-10 border border-primary/20 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl transition-all" />
+                <p className="text-[10px] font-bold text-primary mb-8 uppercase tracking-[0.3em] relative z-10">
                   {rematchOffered.challengerName} is seeking redemption
                 </p>
                 <button 
                   onClick={acceptRematch}
                   disabled={loading}
-                  className="w-full bg-sky-600 text-white font-bold py-6 rounded-2xl hover:bg-sky-700 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-sky-500/30 uppercase tracking-[0.3em] text-[10px] relative z-10"
+                  className="w-full bg-primary text-on-primary font-bold py-6 rounded-2xl hover:bg-primary/90 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-primary/30 uppercase tracking-[0.3em] text-[10px] relative z-10"
                 >
                   {loading ? <Loader2 className="animate-spin" size={20} /> : <Zap size={20} />}
                   Accept Rematch
@@ -587,7 +586,7 @@ export const LiveChallenge: React.FC = () => {
               <button 
                 onClick={handleRematch}
                 disabled={rematchRequested}
-                className="w-full bg-slate-900 dark:bg-sky-600 text-white font-bold py-6 rounded-2xl hover:bg-slate-800 dark:hover:bg-sky-500 transition-all disabled:opacity-50 flex items-center justify-center gap-4 uppercase tracking-[0.3em] text-[10px] shadow-xl"
+                className="w-full bg-surface-container-high text-on-surface-variant font-bold py-6 rounded-2xl hover:bg-surface-container-highest transition-all disabled:opacity-50 flex items-center justify-center gap-4 uppercase tracking-[0.3em] text-[10px] shadow-xl"
               >
                 {rematchRequested ? <Loader2 className="animate-spin" size={20} /> : <Swords size={20} />}
                 {rematchRequested ? 'Waiting for response...' : 'Request Rematch'}
@@ -601,7 +600,7 @@ export const LiveChallenge: React.FC = () => {
                 setDuelStarted(false);
                 currentMatchIdRef.current = null;
               }}
-              className="w-full py-6 text-slate-700 dark:text-slate-500 font-bold hover:text-slate-900 dark:hover:text-white transition-all text-[10px] uppercase tracking-[0.4em] group"
+              className="w-full py-6 text-on-surface-variant font-bold hover:text-on-surface transition-all text-[10px] uppercase tracking-[0.4em] group"
             >
               <span className="group-hover:tracking-[0.6em] transition-all">Return to Lobby</span>
             </button>
@@ -1095,7 +1094,7 @@ export const LiveChallenge: React.FC = () => {
                     <p className="text-slate-500 text-sm mb-20 font-medium leading-relaxed max-w-xs mx-auto">
                       Scanning the arena for a worthy opponent in <br />
                       <span className="text-white font-bold text-lg block mt-2 tracking-tight">
-                        {(profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP).find(t => t.id === selectedTopicId)?.title || 'Selected Topic'}
+                        {selectedTopicId === 'ss1' ? 'SS1 Curriculum' : selectedTopicId === 'ss2' ? 'SS2 Curriculum' : selectedTopicId === 'ug' ? 'SS3 Curriculum' : 'Selected Curriculum'}
                       </span>
                     </p>
 
@@ -1122,29 +1121,29 @@ export const LiveChallenge: React.FC = () => {
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-2xl max-w-sm w-full text-center relative overflow-hidden"
+                className="bg-surface-container-lowest p-10 rounded-[3rem] border border-outline-variant/30 shadow-2xl max-w-sm w-full text-center relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="w-20 h-20 bg-sky-100 dark:bg-sky-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Swords className="text-sky-500" size={40} />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Swords className="text-primary" size={40} />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 uppercase font-display tracking-tight">Challenge</h3>
+                <h3 className="text-2xl font-bold text-on-surface mb-2 uppercase font-display tracking-tight">Challenge</h3>
                 
                 <div className="flex items-center justify-center gap-2 mb-4">
-                   <div className="px-3 py-1 bg-sky-500/10 rounded-full border border-sky-500/20 flex items-center gap-2">
+                   <div className="px-3 py-1 bg-primary/10 rounded-full border border-primary/20 flex items-center gap-2">
                       {MODE_CONFIGS[incomingChallenge.gameMode as keyof typeof MODE_CONFIGS]?.icon}
-                      <span className="text-[10px] font-black text-sky-600 uppercase tracking-widest">
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">
                          {MODE_CONFIGS[incomingChallenge.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
                       </span>
                    </div>
                 </div>
 
-                <p className="text-slate-500 text-sm mb-8 font-medium">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{incomingChallenge.challengerName}</span> has challenged you!
+                <p className="text-on-surface-variant text-sm mb-8 font-medium">
+                  <span className="font-bold text-on-surface">{incomingChallenge.challengerName}</span> has challenged you!
                 </p>
                 <div className="flex gap-4">
-                  <button onClick={handleDeclineChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Decline</button>
-                  <button onClick={handleAcceptChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-sky-500 text-white shadow-[0_4px_0_theme(colors.sky.700)] active:translate-y-1 active:shadow-none transition-all">Accept</button>
+                  <button onClick={handleDeclineChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-surface-container-low text-on-surface hover:bg-surface-container-high transition-all">Decline</button>
+                  <button onClick={handleAcceptChallenge} className="flex-1 py-4 font-bold rounded-2xl bg-primary text-on-primary shadow-[0_4px_0_var(--color-primary)] active:translate-y-1 active:shadow-none transition-all">Accept</button>
                 </div>
               </motion.div>
             </motion.div>
@@ -1152,32 +1151,32 @@ export const LiveChallenge: React.FC = () => {
         </AnimatePresence>
 
         {activeMatchBanner && (
-          <div className="mb-8 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="mb-8 bg-tertiary/10 border border-tertiary/20 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
              <div className="flex items-center gap-3">
-                <Timer className="text-amber-500" size={24} />
+                <Timer className="text-tertiary" size={24} />
                 <div>
-                  <h3 className="font-bold text-amber-500 text-sm uppercase tracking-wider">Match In Progress!</h3>
-                  <p className="text-amber-500/70 text-xs">You have an unfinished duel. Resume or forfeit to start a new one.</p>
+                  <h3 className="font-bold text-tertiary text-sm uppercase tracking-wider">Match In Progress!</h3>
+                  <p className="text-tertiary/70 text-xs">You have an unfinished duel. Resume or forfeit to start a new one.</p>
                 </div>
              </div>
              <div className="flex items-center gap-3 w-full md:w-auto">
-                <button onClick={forfeitBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-amber-500/10 text-amber-500 text-[10px] font-bold hover:bg-amber-500/20 transition-all uppercase tracking-widest border border-amber-500/20">Forfeit</button>
-                <button onClick={resumeBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-amber-500 text-slate-900 text-[10px] font-black hover:bg-amber-400 transition-all uppercase tracking-widest shadow-[0_4px_0_theme(colors.amber.600)] active:translate-y-1 active:shadow-none">Resume</button>
+                <button onClick={forfeitBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-tertiary/10 text-tertiary text-[10px] font-bold hover:bg-tertiary/20 transition-all uppercase tracking-widest border border-tertiary/20">Forfeit</button>
+                <button onClick={resumeBannerMatch} className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-tertiary text-on-tertiary text-[10px] font-black hover:bg-tertiary/90 transition-all uppercase tracking-widest shadow-[0_4px_0_var(--color-tertiary)] active:translate-y-1 active:shadow-none">Resume</button>
              </div>
           </div>
         )}
 
         {/* Header Section */}
-        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 border-b-4 border-slate-200 dark:border-slate-800 pb-16 relative">
+        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 border-b-4 border-outline-variant/30 pb-16 relative">
           <div className="relative z-10 w-full md:w-auto">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-2 h-2 bg-sky-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(14,165,233,0.5)]" />
-              <span className="text-[12px] font-black text-sky-700 dark:text-sky-400 uppercase tracking-widest">Live Arena</span>
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_var(--color-primary)]" />
+              <span className="text-[12px] font-black text-primary uppercase tracking-widest">Live Arena</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tight mb-6 uppercase block font-display shadow-sm break-words md:break-normal w-full">Duel Arena</h1>
-            <p className="text-slate-700 dark:text-slate-500 text-base font-bold leading-relaxed w-full md:max-w-md">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-on-surface tracking-tight mb-6 uppercase block font-display shadow-sm break-words md:break-normal w-full">Duel Arena</h1>
+            <p className="text-on-surface-variant text-base font-bold leading-relaxed w-full md:max-w-md">
               Challenge peers in real-time economic combat. <br className="hidden md:block" />
-              <span className="text-slate-900 dark:text-slate-300">Climb the global leaderboard and claim your status.</span>
+              <span className="text-on-surface">Climb the global leaderboard and claim your status.</span>
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10 w-full md:w-auto mt-6 md:mt-0">
@@ -1186,45 +1185,45 @@ export const LiveChallenge: React.FC = () => {
               className={cn(
                 "px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none flex items-center gap-4 group",
                 isSearching
-                  ? "bg-rose-500 text-white hover:bg-rose-600 border-b-4 border-rose-700"
-                  : "bg-blue-500 text-white hover:bg-blue-600 border-b-4 border-blue-700"
+                  ? "bg-error text-on-error hover:bg-error/90 border-b-4 border-error/50"
+                  : "bg-primary text-on-primary hover:bg-primary/90 border-b-4 border-primary/50"
               )}
             >
               <Zap size={20} className={cn("transition-transform group-hover:scale-110", isSearching && "animate-pulse")} />
               {isSearching ? "In Matchmaking" : "Enter Arena Queue"}
             </button>
-            <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 px-6 py-4 rounded-xl shadow-sm flex items-center gap-5 backdrop-blur-md">
-              <Users size={20} className="text-slate-400 dark:text-slate-600" />
+            <div className="bg-surface-container-low border-2 border-outline-variant/30 px-6 py-4 rounded-xl shadow-sm flex items-center gap-5 backdrop-blur-md">
+              <Users size={20} className="text-outline" />
               <div className="flex flex-col">
-                 <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">{lobbyUsers.filter(u => u.status === 'searching').length} in Queue</span>
-                 <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{lobbyUsers.length} Online</span>
+                 <span className="text-xs font-black text-on-surface uppercase tracking-widest">{lobbyUsers.filter(u => u.status === 'searching').length} in Queue</span>
+                 <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">{lobbyUsers.length} Online</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Action Bar: Topic & Mode Selection */}
-        <div className="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm mb-16 flex flex-col lg:flex-row items-stretch md:items-center gap-8 md:gap-10">
+        <div className="bg-surface-container-lowest p-8 md:p-10 rounded-[3rem] border border-outline-variant/30 shadow-sm mb-16 flex flex-col lg:flex-row items-stretch md:items-center gap-8 md:gap-10">
           <div className="flex-1">
-            <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Combat Topic</label>
+            <label className="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-4 ml-1">Combat Topic</label>
             <div className="relative">
               <select
                 value={selectedTopicId}
                 onChange={(e) => setSelectedTopicId(e.target.value)}
-                className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 px-8 py-5 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-8 focus:ring-sky-500/5 transition-all appearance-none cursor-pointer"
+                className="w-full bg-surface-container-low border border-outline-variant/50 px-8 py-5 rounded-2xl text-sm font-bold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
               >
-                <option value="">Choose a topic...</option>
-                {(profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP).map(t => (
-                  <option key={t.id} value={t.id}>{t.title}</option>
-                ))}
+                <option value="">Choose a curriculum...</option>
+                <option value="ss1">SS1 Curriculum</option>
+                <option value="ss2">SS2 Curriculum</option>
+                <option value="ug">SS3 Curriculum</option>
               </select>
-              <ChevronRight size={20} className="absolute right-8 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 dark:text-slate-600 pointer-events-none" />
+              <ChevronRight size={20} className="absolute right-8 top-1/2 -translate-y-1/2 rotate-90 text-outline pointer-events-none" />
             </div>
           </div>
 
           <div className="w-full lg:w-[450px]">
-            <label className="block text-[10px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Speed Control</label>
-            <div className="flex gap-2 p-2 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <label className="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-4 ml-1">Speed Control</label>
+            <div className="flex gap-2 p-2 bg-surface-container-low rounded-2xl border border-outline-variant/30">
                {(Object.keys(MODE_CONFIGS) as Array<keyof typeof MODE_CONFIGS>).map((mode) => (
                  <button
                     key={mode}
@@ -1232,8 +1231,8 @@ export const LiveChallenge: React.FC = () => {
                     className={cn(
                       "flex-1 py-4 px-3 rounded-xl flex items-center justify-center gap-3 transition-all",
                       gameMode === mode 
-                        ? "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md text-sky-600 dark:text-sky-400" 
-                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5"
+                        ? "bg-surface-container-lowest border border-outline-variant/50 shadow-md text-primary" 
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest/50"
                     )}
                  >
                     {MODE_CONFIGS[mode].icon}
@@ -1250,19 +1249,19 @@ export const LiveChallenge: React.FC = () => {
         {/* Lobby Grid */}
         <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="relative flex-1 max-w-md w-full">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-outline" size={18} />
             <input 
               id="lobby-search-input"
               type="text"
               value={lobbySearchQuery}
               onChange={(e) => setLobbySearchQuery(e.target.value)}
               placeholder="Search opponent by name..."
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-14 pr-6 py-4 rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-8 focus:ring-sky-500/5 transition-all shadow-sm"
+              className="w-full bg-surface-container-lowest border border-outline-variant/50 pl-14 pr-6 py-4 rounded-2xl text-sm font-bold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all shadow-sm"
             />
           </div>
-          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-outline">
              <span>{lobbyUsers.filter(u => u.uid !== user?.uid && u.displayName?.toLowerCase().includes(lobbySearchQuery.toLowerCase())).length} Results</span>
-             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+             <div className="w-1.5 h-1.5 rounded-full bg-outline-variant/50" />
              <span>Lobby Filter</span>
           </div>
         </div>
@@ -1277,34 +1276,34 @@ export const LiveChallenge: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="card-gamified p-8 relative overflow-hidden group border-[3px] border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 shadow-[0_8px_0_theme(colors.indigo.200)] translate-y-[-4px]"
+              className="card-gamified p-8 relative overflow-hidden group border-2 border-outline-variant/30 bg-surface-container-lowest translate-y-[-4px]"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/0 group-hover:bg-indigo-500/10 rounded-full blur-3xl transition-all pointer-events-none" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/0 group-hover:bg-primary/5 rounded-full blur-3xl transition-all pointer-events-none" />
               
               <div className="flex items-center justify-between mb-8 relative z-10">
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl border-b-4 border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-3xl text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white group-hover:border-indigo-600 transition-all shadow-sm">
+                <div className="w-16 h-16 bg-surface-container-low rounded-2xl border-b-4 border-outline-variant/30 flex items-center justify-center font-black text-3xl text-primary group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary transition-all shadow-sm">
                   {u.displayName ? u.displayName[0] : '?'}
                 </div>
                 <div className={cn(
                   "flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-all font-black text-[10px] uppercase tracking-widest",
                   u.status === 'searching' 
-                    ? "bg-amber-100 border-amber-300 text-amber-700" 
+                    ? "bg-tertiary/10 border-tertiary/30 text-tertiary" 
                     : u.status === 'playing' 
-                      ? "bg-slate-100 border-slate-300 text-slate-500" 
-                      : "bg-emerald-100 border-emerald-300 text-emerald-700"
+                      ? "bg-surface-container-high border-outline-variant/30 text-on-surface-variant" 
+                      : "bg-secondary/10 border-secondary/30 text-secondary"
                 )}>
                   {u.status === 'searching' ? "Queue" : u.status === 'playing' ? "In Duel" : "Idle"}
                 </div>
               </div>
               <div className="mb-10 relative z-10">
                 <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase group-hover:text-indigo-600 transition-colors">{u.displayName}</h3>
-                  <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-500/20">
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black tracking-widest uppercase text-emerald-600 dark:text-emerald-400">Online</span>
+                  <h3 className="text-2xl font-black text-on-surface tracking-tight uppercase group-hover:text-primary transition-colors">{u.displayName}</h3>
+                  <div className="flex items-center gap-1.5 bg-secondary/10 px-2 py-0.5 rounded-md border border-secondary/20">
+                    <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse" />
+                    <span className="text-[9px] font-black tracking-widest uppercase text-secondary">Online</span>
                   </div>
                 </div>
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{u.level || 'Economics'} Scholar</p>
+                <p className="text-xs font-black text-outline uppercase tracking-widest">{u.level || 'Economics'} Scholar</p>
               </div>
               <button
                 onClick={() => handleChallenge(u)}
@@ -1319,34 +1318,34 @@ export const LiveChallenge: React.FC = () => {
           ))}
           
             {lobbyUsers.length <= 1 && (
-              <div className="col-span-full py-24 text-center rounded-[4rem] border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/30">
-                <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                  <Users className="text-slate-200 dark:text-slate-700" size={40} />
+              <div className="col-span-full py-24 text-center rounded-[4rem] border border-dashed border-outline-variant bg-surface/30">
+                <div className="w-24 h-24 bg-surface-container-lowest rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
+                  <Users className="text-outline" size={40} />
                 </div>
-                <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
-                <p className="text-slate-500 font-medium">Be the first to enter the matchmaking queue.</p>
+                <h3 className="text-3xl font-bold text-on-surface mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
+                <p className="text-on-surface-variant font-medium">Be the first to enter the matchmaking queue.</p>
               </div>
             )}
           </div>
 
           {/* Sidebar: Leaderboard & Stats */}
           <div className="space-y-8">
-            <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-sm">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 flex items-center gap-2">
-                <Trophy size={14} className="text-amber-500" />
+            <div className="bg-surface-container-lowest p-8 rounded-[3rem] border border-outline-variant/30 shadow-sm">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-outline mb-8 flex items-center gap-2">
+                <Trophy size={14} className="text-tertiary" />
                 Top Gladiators
               </h3>
               <div className="space-y-4">
                 {leaderboard.map((u, i) => (
                   <div key={i} className="flex items-center justify-between group">
                     <div className="flex items-center gap-3">
-                      <span className="w-5 text-[8px] font-bold text-slate-400 group-hover:text-sky-500 transition-colors uppercase">#{i+1}</span>
-                      <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center font-bold text-slate-900 dark:text-white group-hover:bg-sky-500 group-hover:text-white transition-all">
+                      <span className="w-5 text-[8px] font-bold text-outline group-hover:text-primary transition-colors uppercase">#{i+1}</span>
+                      <div className="w-10 h-10 bg-surface-container-low rounded-xl flex items-center justify-center font-bold text-on-surface group-hover:bg-primary group-hover:text-on-primary transition-all">
                         {u.displayName?.[0]}
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate flex-1 group-hover:text-slate-900 transition-colors">{u.displayName || 'Unknown'}</span>
+                      <span className="text-xs font-bold text-on-surface-variant truncate flex-1 group-hover:text-on-surface transition-colors">{u.displayName || 'Unknown'}</span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400">{u.points || 0}</span>
+                    <span className="text-[10px] font-mono font-bold text-primary">{u.points || 0}</span>
                   </div>
                 ))}
               </div>

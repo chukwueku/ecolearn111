@@ -12,7 +12,7 @@ export const AppNavigation = () => {
     const isAdmin = profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com';
 
     const tabs = [
-        { id: 'home', path: '/dashboard', label: 'Home', icon: 'home' },
+        { id: 'home', path: '/', label: 'Home', icon: 'home' },
         { id: 'study', path: '/study', label: 'Study', icon: 'menu_book' },
         { id: 'play', path: '/live', label: 'Play', icon: 'sports_esports' },
         { id: 'ranks', path: '/leaderboard', label: 'Ranks', icon: 'leaderboard' },
@@ -28,7 +28,7 @@ export const AppNavigation = () => {
             {/* Mobile Bottom Nav */}
             <nav className="fixed bottom-0 left-0 w-full z-[100] bg-surface-container dark:bg-surface-container-lowest shadow-[0_-4px_12px_rgba(15,23,42,0.06)] flex justify-around items-center h-[72px] px-2 pb-safe border-t border-outline-variant/20 md:hidden text-on-surface-variant font-['Hanken_Grotesk']">
                 {tabs.map((tab) => {
-                    const isActive = location.pathname === tab.path;
+                    const isActive = location.pathname === tab.path || (tab.id === 'study' && (location.pathname.startsWith('/study-guide') || location.pathname === '/study' || location.pathname === '/dashboard'));
                     return (
                         <button key={tab.id} onClick={() => navigate(tab.path)} className={`flex flex-col items-center justify-center py-1 transition-all active:scale-95 duration-200 ${isActive ? 'bg-secondary-container text-on-secondary-container rounded-full px-5' : 'hover:text-secondary'}`}>
                             <span className="material-symbols-outlined text-[24px]" style={{fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0"}}>{tab.icon}</span>
@@ -46,7 +46,7 @@ export const AppNavigation = () => {
                 
                 <div className="flex flex-col gap-6 flex-1 w-full items-center">
                     {tabs.map((tab) => {
-                        const isActive = location.pathname === tab.path;
+                        const isActive = location.pathname === tab.path || (tab.id === 'study' && (location.pathname.startsWith('/study-guide') || location.pathname === '/study' || location.pathname === '/dashboard'));
                         return (
                             <button key={tab.id} onClick={() => navigate(tab.path)} className={`flex flex-col items-center justify-center w-full transition-all hover:text-secondary active:scale-95 duration-200 group`}>
                                 <div className={`flex items-center justify-center w-14 h-8 rounded-full mb-1 transition-colors ${isActive ? 'bg-secondary-container text-on-secondary-container' : 'group-hover:bg-surface-container-highest'}`}>

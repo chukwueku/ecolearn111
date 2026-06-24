@@ -7,7 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 
 async function startServer() {
   const app = express();
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
   
   const httpServer = createServer(app);
   
@@ -64,7 +64,7 @@ Make it educational, engaging, and easy to understand for a ${level} level.`;
 
     try {
       const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3.5-flash",
         contents: prompt
       }));
       res.json({ result: response.text });
@@ -103,7 +103,7 @@ Ensure the questions are challenging but appropriate for the ${level} level.`;
 
     try {
       const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-1.5-flash",
+        model: "gemini-3.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -114,6 +114,55 @@ Ensure the questions are challenging but appropriate for the ${level} level.`;
       console.error("Gemini Error:", error);
       const status = error?.status || 500;
       const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to generate questions";
+      res.status(status).json({ questions: [], error: message });
+    }
+  });
+
+  app.post("/api/extractFromPdf", async (req, res) => {
+    const { pdfBase64, level, count, topicId } = req.body;
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
+    
+    // The prompt guides the model to extract questions specifically addressing the PDF content
+    const prompt = `You are an expert Economics examiner. Given the provided document, extract and generate ${count || 5} multiple-choice questions suitable for a ${level} student.
+
+Each question must have:
+- A clear question text directly related to the concepts in the document.
+- Exactly 4 options.
+- The index of the correct answer (0-3).
+- A brief explanation for the correct answer based on the document.
+
+Return the response in JSON format as an array of objects with the following schema:
+[
+  {
+    "question": "string",
+    "options": ["string", "string", "string", "string"],
+    "correctAnswer": number,
+    "explanation": "string"
+  }
+]`;
+
+    try {
+      const response = await withRetry(() => ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { inlineData: { mimeType: "application/pdf", data: pdfBase64 } },
+              { text: prompt }
+            ]
+          }
+        ],
+        config: {
+          responseMimeType: "application/json",
+        }
+      }));
+      res.json({ questions: JSON.parse(response.text || "[]") });
+    } catch (error: any) {
+      console.error("Gemini PDF Extract Error:", error);
+      const status = error?.status || 500;
+      const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to extract questions from PDF";
       res.status(status).json({ questions: [], error: message });
     }
   });

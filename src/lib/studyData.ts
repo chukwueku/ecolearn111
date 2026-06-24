@@ -82,6 +82,20 @@ There are several reasons for studying economics:
 5. **Usefulness to the society**: The student becomes more useful to the society through the occasional pieces of advice he offers to members of his community.
 6. **Preparation for a practical future life**: The study of economics prepares the student for gainful employment.
 
+#### Marginal Utility & Choice Simulator
+\`\`\`simulator
+{
+  "mode": "utility",
+  "title": "Interactive Marginal Utility & Choice Simulator",
+  "initialValues": {
+    "tu1": 15,
+    "tu2": 25,
+    "q1": 1,
+    "q2": 2
+  }
+}
+\`\`\`
+
 `,
 
   "ss1-ch2": `
@@ -353,6 +367,14 @@ Where:
 
 ### Mode
 The mode is the number that appears or occurs the most in a set of data. It is the number with the highest frequency.
+
+#### Measures of Central Tendency Solver
+\`\`\`simulator
+{
+  "mode": "descriptive_stats",
+  "title": "Interactive Central Tendency Solver"
+}
+\`\`\`
 `,
 
   "ss1-ch3": `
@@ -490,6 +512,20 @@ Revenue refers to all the money income accruing to a firm from the sale of goods
 2. **Average Revenue (AR)**: The average money income per unit of product sold. $AR = TR / Q$.
 3. **Marginal Revenue (MR)**: The additional money income from the sale of one extra unit. $MR = \Delta TR / \Delta Q$.
 
+#### Price Elasticity of Demand (PED) Simulator
+\`\`\`simulator
+{
+  "mode": "elasticity",
+  "title": "Interactive Price Elasticity of Demand Solver",
+  "initialValues": {
+    "p1": 10,
+    "p2": 12,
+    "q1": 100,
+    "q2": 80
+  }
+}
+\`\`\`
+
 `,
 
 "ss1-ch4": `
@@ -592,27 +628,81 @@ Firms can be small, medium, or large scale based on turnover and number of worke
 6. **Research**: Funds to invest in new methods/products.
 7. **Welfare**: Providing facilities like canteens for employees.
 
+#### Average & Marginal Product Theory Simulator
+\`\`\`simulator
+{
+  "mode": "production",
+  "title": "Interactive Average & Marginal Product Calculator",
+  "initialValues": {
+    "l1": 5,
+    "l2": 6,
+    "tp1": 150,
+    "tp2": 180
+  }
+}
+\`\`\`
+
 `,
 
 "ss1-ch5": `
 # Chapter 5: Economic System
 
 ## Meaning of Economic System
-An economic system is the set of arrangements that classifies activities in the society according to who owns and controls the means of production, distribution and exchange.
+An economic system is the set of arrangements that classifies activities in the society according to who owns and controls the means of production, distribution and exchange. 
 
-### Basic Types:
-1. **Capitalist System (Free Market)**: Private individuals own and control resources. Decisions are based on profit and price mechanism.
-2. **Command Economy (Socialist)**: Means of production are collectively owned (state). Decisions are made by a central planning agency based on social welfare.
-3. **Mixed Economy**: State-owned and privately-owned enterprises exist side by side.
+The three basic types of economic systems are:
+1. **Capitalist System**: A system of free enterprise where the means of production are owned and controlled by private individuals.
+2. **Command Economy**: Also known as a socialist system, where the state collectively owns and manages resources on behalf of the public.
+3. **Mixed Economy**: An economic system like Nigeria where state-owned and privately-owned enterprises exist side by side, dividing production and distribution roles.
+
+---
 
 ## Basic Economic Problems of Society
-1. **What to produce**: Determining types and quantities of goods.
-2. **How to produce**: Choosing production style (Capital-intensive vs Labour-intensive).
-3. **For whom to produce**: Distribution of products among citizens.
-4. **Efficient use of resources**: Maximising output from scarce inputs.
+Every society faces fundamental economic problems because human wants are numerous and insatiable, while the resources to satisfy them are scarce but have alternative uses. These basic problems are categorized under four headings:
+### 1. What to Produce
+Because resources are limited, a country cannot produce all the goods and services citizens want. Decisions must be made on what goods and services to prioritize in terms of quality and quantity (e.g., foods, clothing, or military defense).
+*   **In a Capitalist System**: The decision of what to produce is guided by the price mechanism and profit motive in the hands of private individuals.
+*   **In a Socialist System**: The central planning agency decides what to produce based on calculations of social welfare rather than prices.
+*   **In a Mixed Economy**: It is a joint responsibility. The government produces public infrastructure (schools, electricity, dams, roads), while the private sector produces consumer goods (food, furniture, clothing, shoes, etc.).
+
+### 2. How to Produce
+This speaks to the method or style of production to adopt in an economy. There are two basic ways of production:
+*   **Capital-Intensive Method**: relying heavily on machines and modern technology. Humans are replaced with machinery (e.g., a modern textile factory with automated spinning and weaving).
+*   **Labour-Intensive Method**: relying heavily on human effort and manual labor rather than tractors and complex machines (e.g., manually weeding farms).
+*   **Choice of method depends on several factors**:
+    1. Level of technological development in the country.
+    2. Relative cost of factors of production (cheap labour encourages labour-intensive methods).
+    3. Level of unemployment (high unemployment rates favor labour-intensive methods to create jobs).
+
+### 3. For Whom to Produce
+Once goods are produced, the society must decide how they will be distributed among consumers:
+*   **In a Capitalist Economy**: Price determines who gets what. Whoever is willing and able to pay the market price gets the product; those who can't pay must do without.
+*   **In a Socialist Economy**: The state often uses a quota system to distribute goods, ensuring rich people do not buy up everything and the poor get their basic needs.
+*   **In a Mixed Economy**: Government allows price mechanisms for luxury products but intervenes using price ceilings and price controls on essential commodities to keep them affordable.
+
+### 4. Efficient Use of Resources
+Under this platform, efforts are geared towards finding how scarce resources can be optimized to produce maximum output and satisfaction. Efficiency can be stated mathematically:
 
 ### Efficiency Formula:
 $$\\text{Efficiency} = \\frac{\\text{Output of goods or services}}{\\text{Input of resources}}$$
+
+#### Resource Allocation Comparison Chart
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Private vs Public Control in Economic Systems (%)",
+  "xAxis": "system",
+  "data": [
+    {"system": "Capitalism", "Private Sector": 90, "Public Sector": 10},
+    {"system": "Socialism", "Private Sector": 5, "Public Sector": 95},
+    {"system": "Mixed Economy", "Private Sector": 55, "Public Sector": 45}
+  ],
+  "series": [
+    {"key": "Private Sector", "name": "Private Sector Control", "color": "#10b981"},
+    {"key": "Public Sector", "name": "Public/State Control", "color": "#3b82f6"}
+  ]
+}
+\`\`\`
 
 `,
 
@@ -620,280 +710,766 @@ $$\\text{Efficiency} = \\frac{\\text{Output of goods or services}}{\\text{Input 
 # Chapter 6: Business Organisation and Finance
 
 ## Meaning of Firms and Industries
-*   **Firm**: A business unit that is administered independently (e.g., Nestle).
-*   **Industry**: A collection of all individual firms producing similar commodities (e.g., the oil industry).
+*   **Firm**: A business unit under independent administration that produces goods or services (e.g., Nestle).
+*   **Industry**: A collection of all individual firms producing similar commodities or services (e.g., the tobacco industry, textile industry, or food and beverage industry).
 
-## Types of Business Enterprises
-1. **Sole Proprietorship**: Owned and financed by one individual.
-    *   *Advantages*: Quick decisions, privacy, personal attention to customers.
-    *   *Disadvantages*: Unlimited liability, limited capital, lack of continuity.
-2. **Partnership**: Formed by 2 to 20 people (up to 10 for banking).
-    *   *Deed of Partnership*: Written agreement governing the business.
-    *   *Advantages*: Larger capital base, shared ideas.
-    *   *Disadvantages*: Unlimited liability (usually), potential for disputes.
-3. **Joint-Stock Company**: Jointly owned by many people and registered as a liability company.
-    *   **Private Company**: 2 to 50 members. Cannot appeal to the public for shares.
-    *   **Public Company**: Minimum 7 members, no upper limit. Shares are sold to the general public.
-4. **Cooperative Society**: Association of people with a common interest (e.g., Consumers’, Producers’, Credit and Thrift).
-5. **Public Enterprise**: Owned and managed by the government (e.g., NIPOST, NNPC).
+---
 
-## Sources of Fund for Business
-| Short term | Long term |
+## Meaning and Objective of Business Organisation
+A business organization is an establishment which brings together human and material resources to produce and distribute goods and services. The primary objective or motive of any business organization is profit-making. This distinguishes it from other organizations like social clubs, charities, or churches.
+
+---
+
+## Types and Basic Features of Business Enterprises
+Business enterprises take different forms depending on ownership, funding, and liability:
+
+### 1. Sole Proprietorship (Sole Trader / One-man Business)
+Owned, financed, and managed by a single individual who makes all key decisions. Very common in Nigeria, requiring low startup capital and minimal registration (though business premises registration with local/state government is necessary).
+*   **Advantages**:
+    1. Quick and easy decision-making.
+    2. Great sense of personal commitment.
+    3. Intimate relations with employees.
+    4. Free use of personal initiative.
+    5. Privacy (not required by law to publish audited accounts).
+    6. Attentive customer relations.
+*   **Disadvantages**:
+    1. Unlimited liability (owner's personal assets can be sold to settle business debts).
+    2. No separate legal identity (cannot sue or be sued on its own).
+    3. Small capital base (limited to personal savings and small loans).
+    4. Lack of continuity (risk of folding up if the owner dies or gets sick).
+    5. Long hours of work and fewer holidays.
+
+### 2. Partnership
+An association of 2 to 20 people (up to 10 in banking) who agree to run a business together. Partners sign a **Deed of Partnership** (or written agreement) outlining capitalization, profit-sharing ratios, death of partners guidelines, and admission of new members.
+*   **Advantages**:
+    1. Larger capital base than sole traders.
+    2. Diverse ideas from different partners.
+    3. Low cost of registration (only trade name needs registration).
+    4. Continued business privacy.
+    5. Easier access to credit than individuals.
+*   **Disadvantages**:
+    1. No separate legal entity.
+    2. Unlimited liability for ordinary partners.
+    3. Small capital compared to companies.
+    4. Vulnerable to partner disputes.
+    5. Consultations may delay urgent actions.
+
+### 3. Joint-Stock Company
+A business enterprise owned by multiple shareholders and registered under company law. It features limited liability (liabilities do not exceed value of shares held).
+*   **Private Limited Liability Company**: 2 to 50 members. Formed by friends or relations. Share transfers need mutual consent. Cannot appeal to the public for shares. (Ends in "Ltd" like Adi & Sons Ltd).
+    *   *Advantages*: Separate legal identity (can sue and be sued), limited liability, privacy (no need to publish accounts), easy to raise capital within limits.
+    *   *Disadvantages*: Restricted share transfer, 50-member limit caps capital potential, cannot make public appeals.
+*   **Public Limited Liability Company (Plc)**: Minimum of 7 members, no upper limit. Rules are governed by **Memorandum of Association** (exterior relations, names, addresses, objectives) and **Articles of Association** (interior operations, meetings, voting, directors). Releases a **Prospectus** to invite public share subscriptions. Once conditions are met, the Registrar of Companies issues a **Certificate of Incorporation** and a **Trading Certificate**.
+    *   *Advantages*: Distinct legal identity, limited liability, unlimited capital via public stock offerings, large-scale production, top professional management, infinite continuity.
+    *   *Disadvantages*: Agency gap (owners are separate from managers, causing loss of direct control), impersonal relationships, bureaucratic rules, high setup costs, mandatory public disclosure of audited reports.
+
+### 4. Cooperative Societies
+An association of people with a common interest formed to engage in business or provide services, governed by democratic principles (one member, one vote). Profits (or surpluses) are shared based on patronage.
+*   **Types**: Consumers' Wholesale, Consumers' Retail, Producers', Credit and Thrift (rotating savings).
+*   **Advantages**: Democratic management, low cost by bypassing middlemen, high member loyalty, government support.
+*   **Disadvantages**: Inefficient management (due to popular but unskilled leaders), illiterate members, limited capital.
+
+### 5. State / Public Enterprises
+Owned and managed by the government to provide essential services to the public.
+*   **Types**: Government Departments (e.g., NIPOST), Municipal Enterprises (local government utilities), Government Companies (limited liability with 51%+ state share, e.g., NNPC), and Public Corporations (created by special acts of parliament: e.g., Nigerian Railway Corporation NRC, FRCN, NTA).
+*   **Reasons for State Ownership**: Raise revenue, produce essential but unprofitable goods, hold macro control, quicken developmental projects, create employment.
+*   **Disadvantages**: Low efficiency, bureaucratic delays, nonchalant employee attitude (seen as "nobody's business"), political intervention.
+
+---
+
+## Sources of Fund for Business Enterprises
+Firms finance their short-term and long-term needs through various internal and external channels:
+
+| Short-Term Sources (Under 3 Years) | Long-Term Sources |
 | :--- | :--- |
-| Loans from commercial banks | Personal savings |
-| Trade bills | Retained profits |
-| Trade credit | Shares |
-| | Debentures |
-| | Grants from financial institutions |
+| **Bank Overdrafts & Loans**: Paid back quickly. | **Personal Savings**: Accumulated income. |
+| **Trade Credit**: Buying items on credit terms. | **Retained Profits**: Undistributed business surplus. |
+| **Trade Bills**: Post-dated cheques or bills. | **Grants**: Government/institutional development funding. |
+| | **Issue of Shares**: Selling Ordinary Shares (at risk, have votes) or Preference Shares (fixed %, paid first, participating/cumulative options). |
+| | **Debentures**: Issuing debt certs stating rate of interest. Debenture holders are creditors. |
 
-## Factors determining the size of a firm:
-1. Extent of the market
-2. Managerial ability
-3. Availability of capital
-4. Risk bearing ability of the owner
-5. Individual tastes
-6. Complexity and rising cost
+---
+
+## Factors Determining the Size of a Firm
+A firm's size and ability to expand are limited or promoted by several factors:
+1.  **Extent of the Market**: The size of consumer demand. If there are few buyers, the firm remains tiny.
+2.  **Managerial Ability**: Large firms need high-level coordination. If management is poor, diseconomies of scale arise.
+3.  **Availability of Capital**: Banks and markets are slow to finance small firms; Plc firms have easier funding.
+4.  **Risk-Bearing Ability**: Owners must be willing to expand despite the hazard of loss.
+5.  **Individual Tastes**: Personalized services (e.g., tailoring, portrait painting) naturally constrain firms to a small scale.
+6.  **Complexity & Rising Costs**: When complexity causes input costs to build up faster than sales revenue, further growth is halted.
+
+#### Business Financing & Growth Compound Interest Simulator
+\`\`\`simulator
+{
+  "mode": "future_value",
+  "title": "Business Investment Growth Solver",
+  "initialValues": {
+    "pv": 5000,
+    "r": 10,
+    "n": 5
+  }
+}
+\`\`\`
 `,
 
   "ss1-ch7": `
 # Chapter 7: Population
 
 ## Introduction
-The size of the population and its composition have significant implications for the supply of labour and the overall economy.
+Since human beings are the suppliers of labour, population size, growth rate, and age structure directly influence an economy’s productive capacity and consumption levels.
+
+---
 
 ## Determinants of Population Growth
-1. **Death Rate**: Number of deaths per 1,000 people per year. Influenced by medical facilities, nutrition, hygiene, and disasters.
-2. **Birth Rate**: Number of births per 1,000 people per year. Influenced by age distribution, family planning, infant mortality, and social attitudes.
-3. **Migration**: Inflow (Immigration) and outflow (Emigration) of people.
-4. **Natural Growth Rate**: The difference between birth rate and death rate.
-   $$\\text{Natural Growth Rate} = \\text{Birth Rate} - \\text{Death Rate}$$
+The size and growth rate of a country’s population are determined by three main demographic forces:
+
+### 1. Death Rate (Mortality)
+The number of deaths per 1,000 people in a year. Influenced by:
+*   Availability of medical and health facilities.
+*   Nutritional standards of the citizens.
+*   Frequency and scale of wars.
+*   Public sanitation and personal hygiene.
+*   Climate and natural disasters (droughts, floods, earthquakes).
+
+### 2. Birth Rate (Natality)
+The number of births per 1,000 people in a year. Influenced by:
+*   **Age and sex distribution**: A high proportion of women of child-bearing age increases the birth rate.
+*   **Family planning**: conscious efforts to space out pregnancies.
+*   **Infant mortality**: history of child mortality drives parents to have more children to ensure survival.
+*   **Social attitudes**: traditional beliefs viewing children as wealth/capital tools vs modern costs.
+*   **Educational pursuit**: late marriage.
+
+### 3. Migration
+The movement of people into (**Immigration**) or out of (**Emigration**) a country.
+*   $$\\text{Net Migration} = \\text{Immigration} - \\text{Emigration}$$
+*   $$\\text{Natural Growth Rate} = \\text{Birth Rate} - \\text{Death Rate}$$
+
+---
 
 ## Implications of Population Size
-*   **Political**: Representation in legislature, voting strength, and national defense.
-*   **Economic**: Supply of labour, exploitation of natural resources, and government expenditure on social amenities.
+*   **Political**: States with large populations usually wield higher influence in global politics, receive higher representation in legislatures, and maintain larger armies.
+*   **Economic**: Determines the size of the domestic market and supply of labour, but can also trigger unemployment, environmental degradation, and massive demands on public utilities.
 
-## Implications of Population Growth
-1. **Rising Population**: Leads to increased potential labour force, higher volume of output, and increased demand for goods.
-2. **Declining Population**: Slows down production, reduces demand, and can lead to structural unemployment.
-3. **Ageing Population**: High proportion of old people; leads to unbalanced consumer-to-producer ratio and reduced labour mobility.
-4. **Young Population**: High proportion of people below school-leaving age; puts pressure on the working population to provide for them.
+---
+
+## Implications of Population Growth Types
+
+### 1. Rising Population
+*   *Consequences*: Increase in potential labour force, higher aggregate demand for food and clothing, overcrowded cities, and reduced agricultural land per person.
+
+### 2. Declining Population
+*   *Consequences*: Slows down the rate of production growth, causes a fall in overall output, reduces consumer demand leading to business closures, and causes structural unemployment.
+
+### 3. Young Population (dominated by people below school-leaving age)
+*   *Consequences*: Puts high care and financial burden on the active working population, increases demand for child-specific goods, but promises a large future workforce.
+
+### 4. Ageing Population (dominated by elderly citizens)
+*   *Consequences*: High burden of consumers compared to active producers, fall in output, pressure on pension funds and healthcare, and highly immobile labour forces.
+
+---
 
 ## Theories of Population
-### Malthusian Population Theory
-Proposed by Thomas Malthus in 1798.
-*   **Assumptions**: Constant passion between sexes; food supply is fixed by land.
-*   **Conclusions**: Population grows geometrically (1, 2, 4, 8...), while food supply grows arithmetically (1, 2, 3, 4...).
-*   **Checks**: 
-    *   *Positive Checks*: War, famine, disease.
-    *   *Preventive Checks*: Moral restraint, late marriage (birth control).
 
-### Demographic Transition Theory
-Explains stages of population growth:
-1. **Stage 1**: High birth rate, high death rate (Stable population).
-2. **Stage 2**: High birth rate, declining death rate (Rapid growth).
-3. **Stage 3**: Low birth rate, low death rate (Stable, older population).
+### 1. Malthusian Population Theory
+Advanced by Reverend Thomas Malthus in 1798.
+*   **Assumptions**:
+    1. Constant passion between sexes leads to continuous procreation.
+    2. Food is necessary for human existence and is limited by land of fixed supply.
+*   **Conclusions**:
+    - Population grows at a **geometric progression** (doubling: $1, 2, 4, 8, 16, 32...$ every 25 years).
+    - Food supply grows at an **arithmetical progression** ($1, 2, 3, 4, 5, 6...$).
+    - Over time, population outstrips food supply, causing extreme starvation and poverty.
+*   **Malthusian Checks**:
+    - *Positive Checks*: Natural forces like war, pestilence, famine, and disease that cut down population size.
+    - *Preventive Checks*: Man-made constraints like moral restraint, late marriage, and birth control to keep births down.
+*   **Criticisms**: Failed to foresee massive technological revolutions raising agricultural yields, and failed to predict the opening of vast new lands (USA, Australia, Canada, New Zealand).
 
-## Geographical Distribution in Nigeria
-Influenced by:
-1. **Climate**: Favourable weather attracts more people (e.g., Southern Nigeria).
-2. **Employment Opportunity**: Factories and offices attract job seekers (e.g., Lagos).
-3. **Nature of Soil**: Fertile soil attracts farmers (e.g., Anambra, Oyo).
-4. **Social and Historical Factors**: Administrative headquarters (e.g., Lagos, Abuja).
+### 2. Demographic Transition Theory
+Explains how population growth evolves through three main historical stages:
+1.  **Stage 1 (Pre-industrial)**: High birth rate and high death rate. Population remains stable but ready to grow. High growth potential.
+2.  **Stage 2 (industrialising)**: High birth rate and declining death rate due to improved medicine and nutrition. Triggers explosive population growth with a young age structure.
+3.  **Stage 3 (Modernized)**: Low birth rate and low death rate. Stable, highly urbanized, older, and larger population level.
+
+### 3. Relative Income Theory of Population
+Argues that birth rates respond to the business cycle and standard of living a person experienced in childhood, rather than absolute GDP.
+
+---
+
+## Geographical Distribution of Population in Nigeria
+Population in Nigeria is unevenly distributed based on:
+1.  **Climate**: Favourable weather in the south attracts denser populations than the dry north.
+2.  **Employment Opportunity**: Industrial hubs and commercial spaces (e.g., Lagos density is 2,695 per sq km, Niger State is 53).
+3.  **Nature of Soil**: Highly fertile soils attract farming populations (e.g., Anambra, Imo, Oyo densities are 863, 725, and 204 per sq km).
+4.  **Social/Historical**: Former and present administrative capitals attract massive settlements (Lagos, Abuja).
+
+### Table 7.1: Estimated Population of Nigeria by Selected States (2006 Census)
+| Rank | State | Population |
+| :--- | :--- | :--- |
+| 1 | Kano | 9,401,288 |
+| 2 | Lagos | 9,113,605 |
+| 3 | Kaduna | 6,113,503 |
+| 4 | Katsina | 5,801,584 |
+| 5 | Oyo | 5,580,894 |
+| 6 | Rivers | 5,198,716 |
+| 7 | Bauchi | 4,653,066 |
+| 8 | Jigawa | 4,361,002 |
+| 9 | Benue | 4,253,641 |
+| 10 | Anambra | 4,177,828 |
+| 11 | Borno | 4,171,104 |
+| 12 | Delta | 4,112,445 |
+| 13 | Imo | 3,927,563 |
+| 14 | Niger | 3,954,772 |
+
+### Table 7.2: Estimated Population of Nigeria by Age and Sex (2006 Census)
+| Age Group | Total | Male | Female |
+| :--- | :--- | :--- | :--- |
+| **0 – 4** | 22,594,967 | 11,569,218 | 11,025,749 |
+| **5 - 9** | 20,005,380 | 10,388,611 | 9,616,769 |
+| **10 – 14** | 16,135,950 | 8,504,319 | 7,631,631 |
+| **15 – 19** | 14,899,419 | 7,536,532 | 7,362,887 |
+| **20 - 24** | 13,435,079 | 6,237,549 | 7,197,530 |
+| **25 – 29** | 12,211,426 | 5,534,458 | 6,676,968 |
+| **30 - 34** | 9,467,538 | 4,505,186 | 4,962,352 |
+| **35 - 39** | 7,331,755 | 3,661,133 | 3,670,622 |
+| **40 – 44** | 6,456,470 | 3,395,489 | 3,060,981 |
+| **45 - 49** | 4,591,293 | 2,561,526 | 2,029,767 |
+| **50 - 54**| 4,249,219 | 2,363,937 | 1,885,282 |
+| **55 - 59** | 2,066,247 | 1,189,770 | 876,477 |
+| **60 - 64** | 2,450,286 | 1,363,219 | 1,087,067 |
+| **65 – 69**| 1,151,048 | 628,436 | 522,612 |
+| **70 - 74** | 1,330,597 | 765,988 | 564,609 |
+| **75 – 79** | 579,838 | 327,416 | 252,422 |
+| **80 - 84** | 760,053 | 408,680 | 351,373 |
+| **85+** | 715,225 | 404,021 | 311,204 |
+| **Total** | **140,431,790** | **71,345,488** | **69,086,302** |
+
+### Table 7.3: Population of Nigeria (1931 - 2006 Historical Censuses)
+| Year | Population (in millions) |
+| :--- | :--- |
+| **1931** | 19.5 |
+| **1948** | 30.5 |
+| **1963** | 55.7 |
+| **1973** | *Controversial* (cancelled) |
+| **1980** | 76.4 *(estimates)* |
+| **1984** | 94.5 *(estimates)* |
+| **1991** | 88.9 |
+| **2006** | 154.7 *(estimates)* / 140.4 *(enumerated)* |
+
+---
 
 ## Population Census
-A count of people in a country, usually every 10 years.
-*   **Importance**: Planning social amenities, determining labour force, fiscal planning, and political constituencies.
-*   **Problems**: High cost, lack of experts, religious beliefs (confinement of women), transport issues, and political manipulation of figures.
+A systematic counting of the country's population, usually at intervals of ten years.
+*   **Importance**: Shows labour supply pool, age distribution helps social planning (pensions vs schools), enables budget allocations, lets producers assess market size, and helps divide political constituencies.
+*   **Census Problems in Nigeria**: High cost (N600 billion assigned budget), illiteracy, local geography constraints, religious practices (confinement of women in purdah blocks counting), and political inflation of census outputs.
+
+---
 
 ## Migration
-Movement of people from one area to another.
+The movement of people from one area to another.
 *   **Types**: Rural-urban, Urban-rural, Rural-rural, Urban-urban, International, Mega-urban, Mega-rural, Seasonal.
 *   **Rural-Urban Migration**:
     *   *Reasons*: Economic opportunities, social amenities, desire for white-collar jobs, social status.
     *   *Remedies*: Rural infrastructure, rural industries, improved agricultural techniques, and educational facilities in villages.
 
+#### Demographic Projection & Population Growth Simulator
+\`\`\`simulator
+{
+  "mode": "population",
+  "title": "Interactive Demographic Projection Simulator",
+  "initialValues": {
+    "birth_rate": 38,
+    "death_rate": 11,
+    "net_migration_rate": -1,
+    "years_to_project": 10,
+    "initial_population": 200
+  }
+}
+\`\`\`
 `,
 
 "ss1-ch8": `
 # Chapter 8: Labour Market
 
 ## Concept of Labour Force
-The total number of people of working age in a country who are able and willing to work. It excludes children, the elderly, the disabled, and those unwilling to work.
+The total proportion of the population within the active working age range (usually 15-64 or 18-60 years) who are actively employed or seeking employment. It excludes children below school-leaving age, the elderly, retirees, disabled persons, and people who are able-bodied but unwilling to work (e.g., non-seeking students, full-time housewives, or people living on idle personal fortunes).
+
+---
 
 ## Concept of Labour Market
-An area where buyers (employers) and sellers (potential employees) come together to conduct transactions for labour services.
+An interactive market structure where buyers of labour (employers) and suppliers of labour (workers) interact to transact labour services. In a labour market, what is bought and sold is not the worker, but their services (dexterity, mental, and physical efforts).
+*   **Labour Exchange**: A government institution created to assemble registered unemployed individuals and open job vacancies to match them together.
+
+---
 
 ## Efficiency of Labour
-The quality and quantity of output produced by a worker within a given period.
+Refers to the quality and volume of goods or services a worker can produce in a given timeframe under exact and optimal standards.
+
 $$\\text{Labour Efficiency} = \\frac{\\text{Output of goods and services}}{\\text{Number of hours of work}}$$
 
-### Factors influencing efficiency:
-1. Skill possessed (Dexterity, expertise).
-2. Attitude and commitment.
-3. Physical and mental state.
-4. Natural intelligence.
-5. Physical working conditions (Temperature, environment).
-6. Social working conditions (Interpersonal relations).
-7. Efficiency of other factors (Tools, machinery).
+### Factors Influencing Labour Efficiency:
+1.  **Skill Level and Training**: Specialized education, vocational training, apprenticeships, and natural dexterity.
+2.  **Attitude & Motivation**: Employee dedication, reasonable wage structures, bonuses, and motivational promotion policies.
+3.  **Physical and Mental Health**: Well-fed, healthy, and alert workers generate higher output per hour.
+4.  **Natural Intelligence**: Higher innate intelligence speeds up comprehension of instruction and reduces industrial wastage.
+5.  **Physical Working Conditions**: Cool, well-ventilated, and clean environmental workspaces prevent excessive fatigue.
+6.  **Social Working Conditions**: Friendly relationship channels, cooperation, and job security boost moral.
+7.  **Efficiency of Other Production Factors**: Direct access to advanced tools, modern computers, and well-maintained machinery.
+
+---
 
 ## Mobility of Labour
-The ability of labour to move from one geographical area to another (**Geographical Mobility**) or from one occupation to another (**Occupational Mobility**).
+The capacity of a worker to move from one geographic location to another, or to switch from one occupation or industry to another.
 
-### Barriers to Mobility:
-1. Insufficient ability and training.
-2. Lack of relevant work experience.
-3. Discrimination (Sex, tribe, religion).
-4. Social background and ties (Family, friends).
-5. Cost of transferring.
-6. Ignorance of job opportunities.
+### 1. Geographical Mobility of Labour
+The ability of labour to migrate from location to location to take up job roles (e.g., moving from Kano to Lagos).
+*   *Barriers to Geographical Mobility*:
+    1.  **Personal & Family Ties**: Strong emotional links to friends, family members, and hometown environment.
+    2.  **Financial Costs**: High expenditure associated with physically relocating household properties.
+    3.  **Social Affiliation & Language Barriers**: Differences in dialects, traditions, and local integration patterns.
+    4.  **Family Disruption**: Difficulty in moving children across schools.
+    5.  **Ignorance**: Complete lack of awareness about vacanies in other cities or states.
 
-## Factors affecting the size of the labour force:
-1. Size of the total population.
-2. School-leaving and retirement age.
-3. Proportion of non-workers (Disabled, unwilling).
-4. Age distribution.
-5. Number of people working beyond retirement age.
-6. Sex distribution (Proportion of men vs women).
-7. Social practices and values (Attitude towards work).
-8. Government policies (Education grants, tax relief).
+### 2. Occupational Mobility of Labour
+The ability of labour to switch from one job career role to another, or from one industry to another (e.g., a commercial bank teller turning into a high school teacher).
+*   *Barriers to Occupational Mobility*:
+    1.  **Long Training Requirements**: Professions matching extensive certifications (medicine, law, engineering) block immediate ingress.
+    2.  **Aptitude Gaps**: Lack of basic mental or physical capacities for specialized actions.
+    3.  **Trade Unions restrictions**: Strict rules by professional cartels requiring memberships.
+    4.  **Age Limits**: Age stipulations set by employers for entry positions.
+    5.  **Sex Discrimination**: Gender prejudices in certain conventional careers.
 
+---
+
+## Factors Affecting the Size of the Labour Force
+The numeric strength of a nation’s workforce depends on several factors:
+1.  **Size of the Total Population**: A large population naturally yields a larger labor pool.
+2.  **School-leaving and Retirement Age**: Raising the retirement age or lowering the legal working age expands the workforce size.
+3.  **Proportion of Non-workers**: High numbers of disabled persons, full-time students, or wealthy idle individuals compress the active workforce.
+4.  **Age and Sex Distribution**: A youthful age distribution produces a smaller labor force at present (due to large student dependents) but promises a massive future labout supply.
+5.  **Health and Nutrition Standards**: High life expectancy keeps workers physically active for longer.
+6.  **Cultural and Social Values**: Traditional restrictions on women in employment reduce active labor force participation.
+7.  **Government Policies**: Direct educational grants keeping youths in schools vs tax reliefs to encourage pensioners to keep working.
+
+#### Labour Force Participation & Unemployment Simulator
+\`\`\`simulator
+{
+  "mode": "labour_market",
+  "title": "Interactive Labour Market Simulator",
+  "initialValues": {
+    "working_age_pop": 120,
+    "participation_rate": 65,
+    "unemployment_rate": 33
+  }
+}
+\`\`\`
 `,
 
 "ss1-ch9": `
 # Chapter 9: The Nigerian Economy and its Potentials
 
 ## Overview
-The Nigerian economy has transitioned from being agriculture-based (1960s) to being dominated by the petroleum sector.
+At independence in 1960, Nigeria was an agricultural-led nation, with agriculture providing over 50% of the GDP and the bulk of export revenue. In the late 1960s, the emergence of the petroleum sector reshaped the structure of the economy, making crude oil exports the mainstay of the country.
+
+---
 
 ## Sectors of the Economy
-1. **Primary Sector**: Extraction of raw materials (Agriculture, Mining).
-2. **Secondary Sector**: Manufacturing and construction (Processing raw materials).
-3. **Tertiary Sector**: Service industry (Trade, Transport, Banking).
-4. **Quaternary Sector**: Intellectual activities (Research, Education, IT).
-5. **Quinary Sector**: High-level decision making (Government, Universities).
+Economic activities are broadly divided into five sectors based on tasks:
+1.  **Primary Sector**: Harvesting or extracting natural raw products directly from the soil or water (e.g., agriculture, mining, forestry, hunting, and fishing). In West Africa, over 60% of the active workforce operates in this sector.
+2.  **Secondary Sector**: Manufacturing, assembly, and construction. Processing raw materials into finished merchandise (e.g., textiles, bakeries, steel forging, brick manufacturing).
+3.  **Tertiary Sector**: Service industries providing support structures (e.g., trade, transport, banking, teaching, medical services).
+4.  **Quaternary Sector**: Intellectual activities including research and development, libraries, universities, and IT.
+5.  **Quinary Sector**: High-level decision-making and planning (e.g., government cabinet ministries, university board members, and strategic corporate executive teams).
+
+---
 
 ## Components of Agriculture
-1. **Crop Production**: Food crops (Yam, Cassava) and Cash crops (Cocoa, Rubber).
-2. **Livestock Farming**: Rearing animals (Cattle, Poultry).
-3. **Forestry**: Planting and felling trees (Timber, Medicinal herbs).
-4. **Fish Farming**: Breeding fish in ponds or oceans.
+Agriculture in Nigeria is composed of four main sub-sectors:
+1.  **Crop Production**: Food crops (for local consumption like yam, cassava, maize) vs Cash crops (for export and industrial raw material like cocoa, rubber, palm oil, cotton).
+2.  **Livestock Farming**: Rearing animals (cattle, sheep, goats, poultry) for meat, diary products, leather, or immediate cash sales.
+3.  **Forestry**: Planting, tending, and harvesting timber plants (iroko, mahogany, ebony) or harvesting wild medicinal herbs.
+4.  **Fish Farming**: Breeding fish in natural waters (oceans, lagoons) or artificial ponds.
+
+---
 
 ## Systems of Agriculture
-1. **Subsistence Agriculture**: Production for family consumption using crude tools and little capital.
-2. **Plantation Agriculture**: Large-scale monoculture for commercial purposes; capital intensive.
-3. **Mechanised Farming**: Use of machines and advanced devices.
-4. **Cooperative Farming**: Farmers joining together to enjoy government incentives.
-5. **Settlement Schemes**: Government settling farmers in consolidated areas with amenities.
+*   **Subsistence Agriculture**: Small-scale family farming utilizing crude tools (hoas, cutlasses) with a lack of specialized labor or machinery, aimed purely at family food consumption.
+*   **Plantation Agriculture**: Large-scale land holdings dedicated to monoculture growing of cash crops (coffee, tea, rubber, cocoa) for commercial sale, relying on capital-intensive methods.
+*   **Mechanised Farming**: Utilizing heavy industrial agricultural machinery (tractors, harvesters, seeders) to farm large expanses.
+*   **Cooperative Farming**: Smallholders pooling lands, tools, and savings to secure fertilizers, transport, and modern storage silos.
+*   **Settlement Schemes**: Large government-supervised agricultural reserves developed to encourage youths to venture into modern commercial farming.
 
-## Importance of Large-Scale Agriculture
-*   Application of modern methods.
-*   Integration of animal and crop farming.
-*   Increased employment opportunities.
-*   Easier access to credit and experts.
-*   Source of government revenue (Taxes, duties).
+### Importance of Large-Scale Agriculture:
+*   Enables the application of modern technical skills and automatic machinery.
+*   Facilitates full integration of crop and livestock operations (animal manure fertilizes crops).
+*   Creates stable, well-paying rustic employment.
+*   Enables easy access to bank loans and government extension specialists.
+*   Generates massive foreign exchange and excise taxes for the government.
 
+---
+
+## Statistical Tables for Nigerian Agriculture
+
+### Table 9.1: Index of Agricultural Production in Nigeria (1980 - 1982 | Base 1975 = 100)
+| Sub-Sector | 1980 | 1981 | 1982 | % Change (1980/81) | % Change (1981/82) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Crops (Staples)** | 67.6 | 70.1 | 73.2 | 3.7 | 4.4 |
+| **Crops (Other)** | 109.4 | 115.1 | 114.6 | 5.2 | -0.4 |
+| **Livestock** | 117.1 | 120.5 | 126.8 | 2.9 | 5.2 |
+| **Fish** | 102.8 | 104.5 | 107.7 | 1.7 | 3.1 |
+| **Forestry** | 114.5 | 116.8 | 113.4 | 2.0 | -2.9 |
+| **Aggregate** | **89.4** | **92.2** | **94.7** | **3.4** | **2.5** |
+
+### Table 9.2: Index of Agricultural Production in Nigeria (1984 - 1986 | Base 1975 = 100)
+| Sub-Sector | Weights | 1984 | 1985 | 1986 | % Change (1984/85) | % Change (1985/86) |
+| :--- | :--- | :--- | :--- | :--- | : --- | :--- |
+| **Crops** | 51.6 | 81.5 | 88.9 | 97.6 | 9.2 | 9.8 |
+| **Other Crops** | 14.6 | 115.1 | 119.6 | 121.2 | 3.9 | 1.3 |
+| **Livestock** | 13.6 | 102.4 | 106.7 | 110.6 | 4.2 | 3.7 |
+| **Fish** | 9.2 | 73.6 | 51.9 | 52.8 | -29.5 | 1.7 |
+| **Forestry** | 11.0 | 107.4 | 110.6 | 110.7 | 3.0 | 0.1 |
+| **Aggregate** | **100.0**| **91.4** | **94.8** | **100.1**| **3.7** | **5.6** |
+
+### Table 9.3: Estimated Output of Major Agricultural Commodities (in '000 Tonnes)
+| Commodity | 1983 | 1984 | 1985 | % Change (1983/84) | % Change (1984/85) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Maize** | 694 | 1,058 | 1,190 | 52.4 | 12.5 |
+| **Rice** | 145 | 157 | 196 | 8.3 | 24.8 |
+| **Beans**| 664 | 477 | 611 | -28.2 | 28.1 |
+| **Yams** | 4,998 | 4,600 | 4,738 | -8.0 | 3.0 |
+| **Palm Oil**| 500 | 550 | 615 | 10.0 | 11.8 |
+| **Cocoa** | 140 | 150 | 110 | 7.1 | -26.7 |
+| **Rubber**| 45 | 58 | 60 | 28.9 | 3.5 |
+| **Poultry**| 58 | 62 | 64 | 6.9 | 3.2 |
+| **Pork** | 24 | 28 | 31 | 16.2 | 10.7 |
+| **Roundwood**| 88,454| 89,538| 92,538| 1.6 | 3.0 |
+| **Groundnuts**| 396 | 591 | 621 | 49.2 | 5.1 |
+| **Cotton Seed**| 120 | 108 | 114 | -10.0| 5.6 |
+| **Beef** | 177 | 199 | 212 | 12.4 | 6.5 |
+
+---
+
+## Agriculture in English-Speaking West African Countries
+*   **Nigeria**: Traditional staple farming dominates. South produces cocoa, kola nuts, yams, and palm produce; north produces groundnuts, cotton, and cattle.
+*   **Ghana**: Agriculture employs 60% of workers and yields 70% of export revenue. Ghana is historically one of the world's leading cocoa exporters, alongside timber.
+*   **The Gambia**: Heavily dependent on groundnut farming (comprising over 90% of Gambia's export trade), alongside subsistence rice and cattle raising.
+*   **Sierra Leone**: Farms specialize in swamp/upland rice (the staple food, grown by 80% of farmers on 70% of arable lands). Key exports include coffee, piassava, and cocoa.
+
+#### Nigerian Revenue Structural & Oil Exposure Simulator
+\`\`\`simulator
+{
+  "mode": "nigerian_economy",
+  "title": "Interactive Nigerian Oil Revenue Exposure Simulator",
+  "initialValues": {
+    "oil_price": 75,
+    "oil_production": 1.4,
+    "exchange_rate": 1500,
+    "other_rev_trillions": 12
+  }
+}
+\`\`\`
 `,
 
 "ss1-ch10": `
 # Chapter 10: Financial Institutions
 
 ## Meaning of Financial Institutions
-Business organisations that hold money for individuals and institutions and act as channels for funds to flow from lenders to borrowers.
+Financial institutions are business organizations that hold money or assets on behalf of individuals, firms, and state agencies, and act as channels or intermediaries to transfer funds from surplus units (lenders/savers) to deficit units (borrowers).
+
+---
 
 ## Types of Financial Institutions
-1. **Banking Institutions**: Commercial, Merchant, Development, Savings, and Central banks.
-2. **Non-Banking Institutions**: Insurance companies, Hire-purchase companies, Acceptance houses, Discount houses.
+They are broadly divided into two major functional classes:
+
+### 1. Banking Financial Institutions
+Business organizations whose liabilities are counted as part of the country's money supply. They deal directly in general deposit liabilities and intermediate general money:
+*   **Commercial Banks**: Joint-stock companies set up for profit that accept general deposits, facilitate payment instruments, and make short-term loans.
+*   **Central Bank**: A government-owned apex institution that directs and regulates the currency and monetary policy.
+*   **Merchant Banks**: Acceptance or investment houses that accept very large deposits and provide specialized financial services for medium/large businesses (underwriting, issuing shares, and long-term project loans).
+*   **Development Banks**: State-backed specialized banks set up to provide key medium and long-term finance to critical priority sectors of the economy (e.g., Bank of Industry BOI, Bank of Agriculture BOA, Federal Mortgage Bank FMBN).
+
+### 2. Non-Banking Financial Institutions
+Institutions that mobilize savings and intermediate funds but whose operational liabilities are not considered part of the active money supply:
+*   **Insurance Companies**: Pool premium payments from policyholders to cover risks and invest the funds in long-term stocks/bonds.
+*   **Hire-Purchase Companies**: Firms that purchase consumer durables and let customers lease them with regular installments until full ownership is attained.
+*   **Discount Houses & Acceptance Houses**: Financial intermediaries that specialize in buying (discounting) and selling short-term bills of exchange and treasury certificates.
+*   **Pension Funds**: Collect regular pension contributions to invest in low-risk securities and pay employees upon retirement.
+
+---
 
 ## Commercial Banks
-Joint-stock companies engaged in receiving deposits and making short-term loans.
-*   **Functions**: Accepting deposits, risk reduction (cheques, ATMs), agents of payment, document security, provision of loans, helping foreign trade.
-*   **Types of Accounts**: Savings, Current, Fixed/Time-deposit, Special.
+Commercial banks are joint-stock companies set up to make profit for their owners (shareholders).
 
-### Money Creation
-Banks create money through continuous lending and re-lending of borrowed money. The amount depends on the **Cash-Deposit Ratio**.
-$$\\text{Amount Created} = \\text{Initial Deposit} \\times \\frac{1}{\\text{Cash-Deposit Ratio}}$$
+### Types of Deposit Accounts:
+1.  **Current Account**: An account primarily designed for businessmen, allowing immediate withdrawals of money on demand without prior notice.
+    -   *Key features*: No interest is paid (instead, banks levy a Commission on Turnover, COT); and owners can withdraw beyond their balance using a pre-arranged **Bank Overdraft**. Payments are made via **cheques** (written instructions to pay a specified party).
+2.  **Savings Account**: Designed for low-income savers to accumulate small sums.
+    -   *Key features*: Accumulates interest, requires a small minimum opening balance, and withdrawals are made using a debit card, withdrawal slip, or passbook.
+3.  **Fixed / Time Deposit Account**: Designed for savers who want to lock away large amounts for a specified period (e.g., 3 months, 6 months, or 1 year).
+    -   *Key features*: Attracts a very high interest rate, and withdrawal before the agreed maturity date results in forfeiting part or all of the interest.
 
-## Merchant Banks
-Accept large deposits and provide large loans on short or long-term basis. They also act as acceptance and issuing houses.
+---
 
-## Development Banks
-Specialised organisations financed by the government to provide medium and long-term loans for industrial/agricultural projects (e.g., Bank of Industry, Bank of Agriculture).
+## Credit (Money) Creation by Commercial Banks
+Commercial banks can literally "create" money through their lending activities. When a person deposits money ($D_0$), the bank does not keep it all idle in its vault. It keeps a small fraction (regulated by the Central Bank as the **Cash-Deposit Ratio**, or Reserve Requirement, $r$) and lends out the rest. This loan is eventually deposited back into another bank account, starting another round of lending.
 
-## Central Bank
-A government banker that regulates the currency and monetary policy of a country.
-*   **Functions**: Issuing currency, government's banker, banker's bank, lender of last resort, facilitation of foreign transactions, data bank.
-*   **Tools of Control**:
-    1. Open Market Operation (Buying/selling treasury bills).
-    2. Bank or Discount Rate.
-    3. Cash Ratio.
-    4. Liquidity Ratio.
-    5. Special Deposits.
-    6. Funding (Converting short-term to long-term loans).
-    7. Physical Control (Directives).
-    8. Moral Suasion (Appeals).
+### Mathematical Representation of Money Creation:
 
+$$\\text{Total Credit Created} = \\text{Initial Deposit} \\times \\frac{1}{\\text{Cash-Deposit Ratio}}$$
+
+$$\\text{Multiplier} (M) = \\frac{1}{r}$$
+
+### Practical Example:
+Suppose a customer deposits an initial $\\mathbf{\\#10,000}$ cash into Bank A, and the central bank requires a Cash-Deposit Ratio of **10%** ($r = 0.10$):
+1.  Bank A keeps **\\#1,000** (10%) as vault reserves and lends out **\\#9,000** to Customer X.
+2.  Customer X deposits the **\\#9,000** in Bank B.
+3.  Bank B keeps **\\#900** (10%) and lends out **\\#8,100** to Customer Y, and so on.
+
+The final cumulative expansion is calculated as:
+
+$$\\text{Total Credit Created} = \\#10,000 \\times \\frac{1}{0.10} = \\#10,000 \\times 10 = \\#100,000$$
+
+The total money supply in the economy has grown from \\#10,000 to \\#100,000 through credit creation.
+
+---
+
+## The Central Bank and Monetary Control
+The Central Bank of Nigeria (CBN), established in 1958, acts as the regulator of all financial activities, acts as the government's banker and advisor, manages the national debt, and prints the national currency (Naira).
+
+### Tools of Credit Control (Monetary Policy Instruments):
+The CBN uses these instruments to combat inflation (by reducing money supply) or recessions (by expanding money supply):
+
+#### A. Quantitative (Direct/General) Instruments:
+1.  **Open Market Operations (OMO)**: The direct buying or selling of government security bills (Treasury Bills) in the open market.
+    -   *To fight inflation*: CBN sells treasury bills to commercial banks, soaking up their liquid funds and reducing their lending capacity.
+    -   *To fight recession*: CBN buys back treasury bills, pumping money into the banks.
+2.  **Bank Rate (Discount Rate)**: The interest rate at which the Central Bank lends money to commercial banks as the "lender of last resort."
+    -   *To fight inflation*: Raising the discount rate forces commercial banks to raise their lending rates, discouraging borrowers.
+3.  **Cash Reserve Ratio (CRR)**: The minimum ratio of customer deposits that commercial banks must keep physically with the Central Bank.
+    -   *To fight inflation*: CRR is increased to contract bank liquidity.
+4.  **Liquidity Ratio**: The minimum proportion of total assets that commercial banks must keep in highly liquid formats (cash, treasury bills) to meet sudden withdrawals.
+5.  **Special Deposits**: Mandating commercial banks to freeze specific deposits with the Central Bank until further notice.
+
+#### B. Qualitative (Selective) Instruments:
+1.  **Directives (Special Guidance)**: Specific instructions telling banks which sectors to prioritize for credit (e.g., directing banks to lend at least 20% of their loan books to agriculture).
+2.  **Moral Suasion**: Diplomatic appeals and discussions by the Central Bank Governor to commercial bank CEOs to restrain credit lending.
+3.  **Credit Rationing**: Setting a strict statutory ceiling limit on the maximum amount a commercial bank can lend.
+
+#### Bank Credit Creation & Money Multiplier Simulator
+\`\`\`simulator
+{
+  "mode": "money_multiplier",
+  "title": "Interactive Commercial Bank Credit Creation Simulator",
+  "initialValues": {
+    "mb": 1000,
+    "rr": 10,
+    "c": 15,
+    "e": 5
+  }
+}
+\`\`\`
 `,
 
 "ss1-ch11": `
 # Chapter 11: Money
 
-## Definition
-Money is anything that is universally accepted within a given community in payment for goods and services and for the settlement of debts.
+## Definition of Money
+Money is anything that is universally accepted within a country or community as as medium of exchange for goods and services or for the settlement of private and public debts.
 
-## The Barter System
-Direct exchange of one commodity or service for another.
-*   **Difficulties**: Coincidence of wants, lack of standard measure of value, indivisibility of large goods, difficulty in saving and borrowing.
+---
+
+## The Barter System and its Limitations
+Before modern money, societies used the **Barter System** — the direct exchange of one commodity or service for another. This crude system suffered from critical architectural limitations:
+1.  **Double Coincidence of Wants**: To transact, one must find someone who has what they want AND who wants what they have (e.g., a farmer with yams seeking fish must find a fisherman seeking yams).
+2.  **Lack of a General/Common Measure of Value**: There was no standard pricing scale (e.g., how many bags of beans equal one cow?).
+3.  **Indivisibility of Certain Goods**: Many assets cannot be divided into small bits without destroying their utility (e.g., you cannot divide a live goat in halves to buy a small cup of salt).
+4.  **Difficulty of Storing Wealth**: Perishable foods (tomatoes, meat, yams) rot quickly, preventing long-term accumulation of savings.
+5.  **Lack of Standard for Deferred Payment**: It was extremely difficult to enter long-term credit contracts or borrow because repayment value changes physically.
+
+---
+
+## Historical Stages in the Evolution of Money
+To escape the problems of barter, money evolved through several distinct stages:
+1.  **Commodity Money**: Standard physical goods (cowrie shells, salt, cattle, tobacco, beads) acted as money.
+2.  **Metallic Coins**: Solid gold, silver, and copper coins were minted, with standard weights.
+3.  **Paper Notes**: Originated from receipts issued by goldsmiths who stored gold securely. People found exchanging the goldsmiths’ receipts was easier than carrying heavy gold. Governments eventually monopolized note-issuance.
+4.  **Bank (Credit) Money**: Customer deposits in current accounts transferred securely using **cheques** and bank drafts.
+5.  **Modern Digital / E-Payment Instruments**: Instant digital settlement via credit/debit cards (Mastercard, Visa), internet transfers, PayPal, Western Union, and state-backed mobile apps.
+
+---
 
 ## Functions of Money
-1. **Medium of Exchange**: Used to pay for goods/services.
-2. **Store of Value**: Saving wealth for future use.
-3. **Standard of Deferred Payment**: Facilitating credit and future payments.
-4. **Unit of Account**: Measuring and quoting prices.
+Modern money performs four essential economic functions:
 
-## Types of Money
-1. **Coins**: Standard money (value of metal) and Token money (face value > metal value).
-2. **Paper Money**: Bank notes (legal tender).
-3. **Bank Money**: Deposits in current accounts (transferred via cheques).
+### 1. Primary Functions:
+*   **Medium of Exchange**: Acts as an intermediary, splitting the transaction into separate acts of sale and purchase, completely eliminating the need for a double coincidence of wants.
+*   **Measure of Value (Unit of Account)**: Acts as a standard "price yardstick," allowing goods and services to be priced in a uniform national currency (e.g., Naira).
 
-## Characteristics of Money
-Acceptability, Divisibility, Homogeneity, Portability, Scarcity, Recognisability, Durability, Stability in value.
+### 2. Secondary Functions:
+*   **Store of Value (Asset)**: Allows purchasing power to be transferred from the present to the future. Money is highly liquid and does not rot, though inflation can erode its real purchasing power.
+*   **Standard of Deferred Payment**: Facilitates credit and deferred business deals. Contracts are specified in money, assuring lenders of predictable repayment values.
 
-## ICT Aided Payment Instruments
-Credit cards, Debit cards, Online banking, Western Union, PayPal.
+---
 
+## Technical Characteristics of Good Money
+For any asset to serve as money, it must possess these eight characteristics:
+1.  **General Acceptability**: Every citizen must be willing to accept it in exchange.
+2.  **Portability**: Must be easy to transport in large values without heavy weight.
+3.  **Divisibility**: Must be breakable into tiny, fractional denominations without losing value.
+4.  **Homogeneity**: Every single note of the same denomination must look identical.
+5.  **Relative Scarcity**: Its supply must be strictly limited to prevent hyper-inflation.
+6.  **Recognisability**: It must have distinct visual markers or security features to prevent counterfeiting.
+7.  **Durability**: Must be physically tough to resist tearing or washing.
+8.  **Stability in Value**: Its purchasing power must remain relatively stable over short-to-medium horizons.
+
+---
+
+## The Quantity Theory of Money (Fisher's Equation)
+Formulated by Irving Fisher, this theory states that there is a direct relationship between the quantity of money in an economy and the price level of goods and services.
+
+### The Equation of Exchange:
+
+$$M \\cdot V = P \\cdot T$$
+
+Where:
+*   $M$ = Total Quantity of Money in circulation.
+*   $V$ = Velocity of Circulation (number of times a unit of money is spent in a year).
+*   $P$ = Average Price Level of goods and services.
+*   $T$ = Total Volume of Transactions (real output).
+
+### Key Assumption:
+Fisher assumed that $V$ (velocity) and $T$ (real output) are constant in the short run because they are determined by real socio-institutional and technical factors.
+
+### Policy Implications:
+With $V$ and $T$ constant, any direct increase in the money supply ($M$) must lead to a proportionate increase in the general price level ($P$), causing **inflation**.
+
+$$P = M \\cdot \\left(\\frac{V}{T}\\right)$$
+
+#### Barter System vs Monetary Economy Price Tag Complexity Simulator
+\`\`\`simulator
+{
+  "mode": "barter_pricing",
+  "title": "Interactive Barter vs Money Complexity Simulator",
+  "initialValues": {
+    "n_goods": 10
+  }
+}
+\`\`\`
 `,
 
 "ss1-ch12": `
 # Chapter 12: Distributive Trade
 
-## Meaning of Distribution
-The physical flow of goods and services from the producers to the consumers through certain channels.
+## Meaning of Distributive Trade and Distribution
+Distributive trade refers to the collective business activities which facilitate the physical movement of finished goods and services from the initial points of production to the final points of consumption. Distribution is the physical component of trade that ensures that goods reach the right locations in the correct quantities when needed by users. Production is not complete until the produced goods reach the final consumers.
+
+---
 
 ## Channels of Distribution
-1. **Producer → Consumer** (Direct)
-2. **Producer → Retailer → Consumer**
-3. **Producer → Wholesaler → Retailer → Consumer** (Traditional)
+A channel of distribution refers to the commercial path or chain of intermediaries (middlemen) through which goods flow from the factory/farm to the final user.
 
-## Middlemen
-### Wholesalers
-Buy in large quantities and sell in small bits to retailers (**Bulk Breaking**).
-*   **Functions**: Financing producers/retailers, warehousing, providing market information, transport, and marketing.
+### Key Paths:
+1.  **Producer $\\rightarrow$ Consumer (Direct)**: Bypasses all middlemen.
+    -   *When appropriate*: For highly perishable goods (fresh milk, vegetables), custom heavy machines, or direct service industries (tailoring, barbing).
+2.  **Producer $\\rightarrow$ Retailer $\\rightarrow$ Consumer**:
+    -   *When appropriate*: For large-scale retail giants (like Shoprite, SPUR) who can purchase directly in massive bulks from manufacturers, or for perishable items requiring rapid retail turnover.
+3.  **Producer $\\rightarrow$ Wholesaler $\\rightarrow$ Retailer $\\rightarrow$ Consumer (Traditional)**:
+    -   *When appropriate*: Used for standard consumer goods (packaged foods, detergents, clothing). Best when producers operate far from fragmented local markets.
+4.  **Producer $\\rightarrow$ Wholesaler $\\rightarrow$ Consumer**:
+    -   *When appropriate*: Very rare, though sometimes operates when industrial users buy raw materials or heavy parts in bulk from wholesale distributors.
 
-### Retailers
-The link between the wholesaler and the consumer.
-*   **Functions**: Storage, distribution to remote areas, providing variety, proximity to consumers, and information to manufacturers.
-*   **Types**:
-    *   *Small Scale*: Hawkers, peddlers, street vendors, kiosks.
-    *   *Large Scale*: Variety chain stores (Shoprite), Multiple stores, Department stores, Supermarkets, Cooperative retail shops.
+---
 
-## Problems of Distribution in Nigeria
-1. Wastage of valuable time (queuing).
-2. Shortage of capital and trained personnel.
-3. Poor transportation and communication systems.
-4. Hoarding (creating artificial scarcity).
-5. Imperfect market statistics.
-6. Large numbers of middlemen (increasing final price).
-7. Inadequate storage facilities.
+## The Role of Middlemen
+
+### 1. The Wholesaler
+A large-scale trade intermediary who acts as a linker between the primary manufacturer and the small-scale retailers. Wholesalers buy in massive bulks directly from factories and sell in smaller sub-bulks to retailers. This is known as **bulk-breaking**.
+
+#### A. Functions to the Producer:
+*   **Bulk Buying**: Assures producers of instant, stable bulk sales, allowing them to focus purely on high-volume production.
+*   **Financing**: Often pays cash in advance for orders or funds production runs, easing the manufacturer's cash flow.
+*   **Warehousing**: Stores massive reserves of goods in strategic wholesale depots, reducing the manufacturer’s storage burden.
+*   **Market Intelligence**: Passes valuable feedback from local retailers back to the producer regarding customer tastes or complaints.
+*   **Transport Facilitation**: Collects items directly from the factory gates using its own fleet of trucks.
+
+#### B. Functions to the Retailer:
+*   **Bulk-Breaking**: Sells in affordable, smaller fractions that match the retailer's limited capital.
+*   **Credit Provision**: Allows trusted retailers to cart away stocks on credit terms, enabling them to sell before paying.
+*   **Variety of Goods**: Accumulates items from multiple competing manufacturers, letting retailers buy a diverse basket in one visit.
+*   **Rapid Delivery**: Operates local warehouses close to high-street retailers for fast stock replenishments.
+
+---
+
+### 2. The Retailer
+A retail trader who operates at the terminal end of the distribution channel, purchasing smaller batches of stocks from the wholesaler and selling them in single units directly to the ultimate consumer.
+
+#### A. Functions to the Consumer:
+*   **Convenience and Proximity**: Establishes shops on neighborhood streets, saving consumers from traveling to thick wholesale zones.
+*   **Product Information / Advice**: Welcomes customers, explains product features, and demonstrates how items operate.
+*   **Credit Facilities**: Offers informal credit books to neighborhood families.
+*   **Sells in Tiny Units**: Sells in single units or loose fractions (e.g., a single egg or slice of bread).
+*   **Durable Variety**: stocks items from different wholesalers to maximize consumer choice.
+
+---
+
+### Classification of Retail Trade
+
+#### A. Small-Scale Retailing:
+Characterized by low startup capital, no formal business registration, single-person operation, and mobile structures:
+*   **Hawking / Mobile Peddling**: carrying items on heads, baskets, or wheelbarrows from house-to-house.
+*   **Street / Roadside Traders**: displaying items on temporary planks or tables along busy motor roads.
+*   **Kiosks / Small Roadside Stalls**: wooden or metallic cabin stores built at street junctions.
+*   **Mobile Vans**: Custom trucks carrying specific merchandise (e.g., sound equipment, bookshops).
+
+#### B. Large-Scale Retailing:
+Requires heavy initial capital, structured corporate governance, many assistants, and permanent buildings:
+*   **Department Stores**: Giant, multi-floor retail buildings divided into different "departments" under one roof (clothing, electronics, cosmetics) managed by a unified central office.
+*   **Supermarkets**: Large and spacious self-service stores specializing primarily in foods, books, and household products.
+*   **Multiple (Chain) Stores**: A network of identical retail branches scattered across different cities under a single corporate name and layout (e.g., Shoprite, Genesis).
+*   **Mail Order Retailers**: Selling items purely via catalogues or online pages and delivering parcels to buyers' doorsteps.
+*   **Cooperative Retail Shops**: Owned and run democratically by consumers to provide low-cost goods with shared profits.
+
+---
+
+## The Debate: Should the Wholesaler be Eliminated?
+
+Critics often argue that wholesalers are unnecessary middlemen who raise final commodity prices by adding markup margins at each stage of transfer, and should be eliminated to simplify trade.
+
+### Arguments FOR Eliminating the Wholesaler:
+1.  **Lower Prices**: Bypassing wholesalers allows retailers or consumers to buy at lower factory prices, reducing the cost of living.
+2.  **Faster Delivery**: Speeds up physical transport by removing unnecessary warehouse holding stops.
+3.  **Direct Contact**: Lets manufacturers talk directly to final customers, gaining immediate feedback.
+
+### Arguments AGAINST Eliminating the Wholesaler:
+1.  **Capital Suffocation**: Without bulk-buying and advance payments from wholesalers, manufacturers would suffer from severe cash-flow crunches.
+2.  **Logistical Nightmare**: Manufacturers would be forced to establish thousands of tiny retail delivery routes, ballooning operational overheads.
+3.  **Retail Collapse**: Small-scale retailers who depend on bulk-breaking and informal credit lines from local wholesalers would be driven out of business.
+
+---
+
+## Problems of Distributive Trade and Distribution in Nigeria
+The efficiency of distribution across West Africa is restricted by several structural challenges:
+1.  **Deplorable Transportation Infrastructure**: Bad roads, inadequate rail networks, and high vehicle maintenance costs cause delivery delays and spoil perishable items (e.g., fruits rotting on delayed trucks).
+2.  **Inadequate Cold Storage & Warehouses**: High electricity deficits undermine frozen food warehouses, causing heavy waste.
+3.  **Multiplicity of Middlemen**: Over-fragmented channels with numerous sub-wholesalers boost final consumer prices artificialy.
+4.  **Hoarding & Artificial Scarcity**: Corrupt middlemen lock up essential products (e.g., petrol/grains) in order to trigger artificial scarcity and sell at high prices.
+5.  **Inadequate Financing**: Lack of access to modern low-interest bank loans limits wholesalers and retailers from scaling.
+6.  **Lack of Market Statistics and Data**: Extreme difficulty in predicting demand across diverse regions.
+7.  **Insecurity & Interstate Tolls**: Frequent highway robberies, illegal roadblocks, and multiplicity of state/local government tolls raise shipping costs.
+
+#### Distributive Trade Middlemen Markup Cascade Simulator
+\`\`\`simulator
+{
+  "mode": "distributive_trade",
+  "title": "Interactive Middlemen Markup Cascade Simulator",
+  "initialValues": {
+    "producer_cost": 1000,
+    "wholesaler_markup": 15,
+    "retailer_markup": 25,
+    "logistics_cost": 200
+  }
+}
+\`\`\`
 `,
 
   "ug-micro": `

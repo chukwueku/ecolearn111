@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { updateUserLevel } from '../firebase';
 
 export const Dashboard = () => {
-    const { user, profile } = useAuth();
+    const { user, profile, setProfile } = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    const roadmap = profile?.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
+    const level = profile?.level || 'secondary';
+    const roadmap = level === 'secondary-ss2' ? SECONDARY_SS2_ROADMAP : (level === 'undergraduate' ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
     const progress = profile?.progress || {};
 
     const filteredRoadmap = roadmap.filter(topic => 
@@ -16,22 +18,40 @@ export const Dashboard = () => {
         topic.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
+    const levelTitle = level === 'secondary-ss2' ? 'Economics SS2 Curriculum' : (level === 'undergraduate' ? 'Economics SS3 Curriculum' : 'Economics Curriculum');
+    const levelSubtitle = level === 'secondary-ss2' ? 'Advanced Senior Secondary School 2 WAEC/NECO curriculum.' : (level === 'undergraduate' ? 'Comprehensive Senior Secondary School 3 WAEC/NECO syllabus including comparative economics, human capital development, international trade, and public finance.' : 'This syllabus is designed to assess candidates’ knowledge of basic economic principles needed for rational decision making relating to individuals, businesses, government and society. Such knowledge is necessary in enhancing their appreciation of government economic policies, problems of implementation and how they impact on the economy. This will help candidates to understand that economics is not only an academic field of study but also a practical subject.');
+
     return (
         <div className="bg-surface font-body-md text-on-surface min-h-screen pb-24 font-['Hanken_Grotesk']">
             {/* TopAppBar */}
             <header className="bg-surface dark:bg-surface-container-low w-full sticky top-0 z-40 shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex justify-between items-center px-grid-margin py-md">
-                <div className="flex items-center gap-sm">
+                <div 
+                    onClick={() => {
+                        setSearchQuery('');
+                        navigate('/study');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }} 
+                    className="flex items-center gap-sm cursor-pointer group select-none active:scale-[0.98] transition-transform duration-100"
+                    title="Home / Reset Curriculum"
+                >
                     <div className="relative">
-                        <img 
-                            className="w-10 h-10 rounded-full border-2 border-secondary-container object-cover" 
-                            src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuA0IQ9QLALrQhU-R36iXLCf0mJ8TDlUnFvrAMwbVnkBWxV9zYtB2CrpLUDsmWrDG7mxuQRqJqliPuxbEaoL5pgHgNYVPtQcnpwpXAKonEqPIQbqzYg3lip5gn-DOhAKe77zrF2IeGaU_k0QWb6scJsn09iZbCKXvBFYiAR2UHw-QbHMepWijv_Jf43GtB_GH6iKXmILsnI40AGb0_w2aPkKtiglBvtjuNKJedGiY9VLHn_u03J0P6tK8V2Z2WDhGZZcvXZrlIvdrWw"} 
-                            alt="Profile"
-                        />
+                        {user?.photoURL ? (
+                            <img 
+                                className="w-10 h-10 rounded-full border-2 border-secondary-container object-cover shrink-0" 
+                                src={user.photoURL} 
+                                alt="Profile"
+                            />
+                        ) : (
+                            <div className="w-10 h-10 rounded-full border-2 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-lg shrink-0">
+                                {profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                            </div>
+                        )}
                         <span className="absolute -bottom-1 -right-1 bg-secondary text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
-                            {profile?.level === 'undergraduate' ? 'UG' : 'HS'}
+                            {levelLabel}
                         </span>
                     </div>
-                    <span className="font-headline-md text-headline-md-mobile font-bold text-primary dark:text-secondary-fixed">EcoMastery</span>
+                    <span className="font-headline-md text-headline-md-mobile font-bold text-primary dark:text-secondary-fixed group-hover:text-secondary transition-colors duration-150">EcoMastery</span>
                 </div>
                 <button className="flex items-center gap-xs px-md py-1.5 bg-surface-container-high rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 duration-150">
                     <span className="material-symbols-outlined text-secondary" style={{fontVariationSettings: "'FILL' 1"}}>generating_tokens</span>
@@ -42,10 +62,31 @@ export const Dashboard = () => {
             <main className="px-5 py-lg space-y-lg max-w-4xl mx-auto mt-4">
                 {/* Search & Header */}
                 <section className="space-y-md mb-8">
-                    <div>
-                        <h1 className="font-headline-lg text-headline-lg-mobile text-on-surface font-bold text-3xl mb-1">Curriculum</h1>
-                        <p className="font-body-md text-on-surface-variant">Master the market through focused study modules.</p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+                        <div 
+                            onClick={() => {
+                                setSearchQuery('');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="cursor-pointer select-none group max-w-2xl"
+                            title="Click to reset search and view all chapters"
+                        >
+                            <h1 className="font-headline-lg text-headline-lg-mobile text-on-surface group-hover:text-secondary font-bold text-3xl mb-1 transition-colors duration-150">
+                                {levelTitle}
+                            </h1>
+                            <p className="font-body-md text-on-surface-variant font-medium group-hover:text-secondary transition-colors duration-150 text-sm">
+                                {levelSubtitle}
+                            </p>
+                        </div>
+                        <button 
+                            onClick={() => navigate('/select-level')}
+                            className="shrink-0 self-start md:self-center flex items-center gap-2 px-5 py-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 rounded-full font-bold text-xs transition-all active:scale-[0.98] shadow-sm"
+                        >
+                            <span className="material-symbols-outlined text-[16px] font-bold">school</span>
+                            Switch Level
+                        </button>
                     </div>
+
                     <div className="relative group mt-6">
                         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
                             <span className="material-symbols-outlined text-outline">search</span>
@@ -79,76 +120,75 @@ export const Dashboard = () => {
                             </div>
                             <div className="space-y-xs mb-6">
                                 <h2 className="font-headline-md text-headline-md-mobile text-white text-2xl font-bold mb-1">{roadmap[0].title}</h2>
-                                <p className="font-body-md text-on-primary-container max-w-xs opacity-90">{roadmap[0].description}</p>
-                            </div>
-                            <div className="flex items-center gap-md gap-4">
-                                <button 
-                                    onClick={() => navigate(`/study-guide/${roadmap[0].id}`)}
-                                    className="px-6 py-3 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-xl hover:brightness-105 active:scale-95 transition-all">
-                                    Resume Lesson
-                                </button>
-                                <div className="flex flex-col">
-                                    <span className="font-label-sm text-label-sm text-white">0% Complete</span>
-                                    <div className="w-24 h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
-                                        <div className="h-full bg-secondary-fixed" style={{ width: '0%' }}></div>
+                                        <p className="font-body-md text-on-primary-container max-w-sm opacity-90 mb-3">{roadmap[0].description}</p>
+                                        {roadmap[0].subtopics && roadmap[0].subtopics.length > 0 && (
+                                            <div className="mt-2 text-white/90 max-w-xl">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {roadmap[0].subtopics.map((sub, sIdx) => (
+                                                        <span key={sIdx} className="text-[11px] bg-white/10 px-2.5 py-1 rounded-full border border-white/10 font-medium">
+                                                            {sub}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                {/* Categories List */}
-                <section className="space-y-md">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-headline-md text-headline-md-mobile text-xl font-bold">Study Modules</h3>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {filteredRoadmap.map((topic, index) => {
-                            const isCompleted = progress[topic.id];
-                            const icons = ['query_stats', 'public', 'extension', 'psychology'];
-                            const backgrounds = ['bg-tertiary-fixed text-on-tertiary-fixed', 'bg-secondary-fixed-dim text-on-secondary-fixed-variant', 'bg-surface-container-highest text-on-primary-fixed-variant', 'bg-tertiary-fixed-dim text-on-tertiary-container'];
-                            const icon = icons[index % icons.length];
-                            const bg = backgrounds[index % backgrounds.length];
-                            
-                            return (
-                                <div key={topic.id} className="bg-surface-container-lowest border border-outline-variant p-5 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 group flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className={`p-3 rounded-xl ${bg}`}>
-                                                <span className="material-symbols-outlined">{icon}</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="font-label-sm text-label-sm text-outline capitalize">{topic.category}</span>
-                                            </div>
-                                        </div>
-                                        <h4 className="font-headline-md text-primary font-bold text-lg mb-1">{topic.title}</h4>
-                                        <p className="font-body-md text-on-surface-variant text-sm mb-4 line-clamp-2">{topic.description}</p>
-                                    </div>
-                                    <div>
-                                        <div className="space-y-xs mb-4">
-                                            <div className="flex justify-between font-label-sm text-label-sm mb-1 text-xs">
-                                                <span>Progress</span>
-                                                <span className={isCompleted ? "text-secondary font-bold" : "text-outline"}>{isCompleted ? '100%' : 'Not Started'}</span>
-                                            </div>
-                                            <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                                                <div className="h-full bg-secondary" style={{ width: isCompleted ? '100%' : '0%' }}></div>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center gap-md gap-4 pt-2">
                                         <button 
-                                            onClick={() => navigate(`/study-guide/${topic.id}`)}
-                                            className="w-full py-2.5 bg-surface-container-high text-primary font-bold rounded-lg group-hover:bg-secondary group-hover:text-white transition-colors flex items-center justify-center gap-2">
-                                            <span>{isCompleted ? 'Review' : 'Start'}</span>
-                                            <span className="material-symbols-outlined text-sm">{isCompleted ? 'arrow_forward' : 'play_arrow'}</span>
+                                            onClick={() => navigate(`/study-guide/${roadmap[0].id}`)}
+                                            className="px-6 py-3 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-xl hover:brightness-105 active:scale-95 transition-all">
+                                            Resume Lesson
                                         </button>
+                                        <div className="flex flex-col">
+                                            <span className="font-label-sm text-label-sm text-white">0% Complete</span>
+                                            <div className="w-24 h-1.5 bg-white/20 rounded-full mt-1 overflow-hidden">
+                                                <div className="h-full bg-secondary-fixed" style={{ width: '0%' }}></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </section>
-            </main>
+                            </section>
+                        )}
 
+                        {/* Categories List */}
+                        <section className="space-y-4 max-w-4xl mx-auto pb-12">
+                            {filteredRoadmap.map((topic, index) => {
+                                const isChCompleted = progress[topic.id];
+                                
+                                return (
+                                    <button
+                                        key={topic.id} 
+                                        onClick={() => navigate(`/study-guide/${topic.id}`)}
+                                        className="w-full text-left bg-[#0B1121] border border-slate-800/60 p-5 sm:p-6 rounded-2xl shadow-sm hover:border-slate-700 hover:bg-[#111827] hover:-translate-y-0.5 transition-all duration-200 group flex items-center justify-between"
+                                    >
+                                        <div className="flex-1 pr-4">
+                                            <div className="flex items-center gap-3 mb-1.5">
+                                                <span className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">
+                                                    {topic.category || `Chapter ${index + 1}`}
+                                                </span>
+                                                {isChCompleted && (
+                                                    <span className="bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                                        Completed
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h4 className="text-base sm:text-lg md:text-xl font-bold text-slate-200 group-hover:text-white transition-colors">
+                                                {topic.title}
+                                            </h4>
+                                            {topic.subtopics && topic.subtopics.length > 0 && (
+                                                <div className="mt-3 text-slate-400 text-xs sm:text-sm line-clamp-1 border-t border-slate-800/50 pt-3">
+                                                    {topic.subtopics.join(" • ")}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-800/50 group-hover:bg-slate-700 transition-colors">
+                                            <span className="material-symbols-outlined text-sm text-slate-400 group-hover:text-white transition-colors">arrow_forward_ios</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </section>
+            </main>
 
         </div>
     );

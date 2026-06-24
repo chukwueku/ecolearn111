@@ -71,7 +71,7 @@ export interface UserProfile {
   email: string;
   displayName: string;
   photoURL?: string;
-  level: 'secondary' | 'undergraduate';
+  level: 'secondary' | 'secondary-ss2' | 'undergraduate' | 'pending';
   progress: Record<string, boolean>;
   scores?: Record<string, number>;
   role?: 'admin' | 'user';
@@ -138,7 +138,7 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
   return null;
 };
 
-export const createUserProfile = async (user: any, level: 'secondary' | 'undergraduate' = 'secondary'): Promise<UserProfile> => {
+export const createUserProfile = async (user: any, level: 'secondary' | 'undergraduate' | 'pending' = 'pending'): Promise<UserProfile> => {
   const isAdmin = user.email === 'chukwuekudavid@gmail.com';
   const profile: UserProfile = {
     uid: user.uid || user.id,
@@ -180,7 +180,12 @@ export const saveQuestions = async (questions: Question[]) => {
 export const getQuestions = async (topicId: string): Promise<Question[]> => {
   const path = 'questions';
   try {
-    const q = query(collection(db, 'questions'), where('topicId', '==', topicId));
+    let q;
+    if (topicId === 'ss1' || topicId === 'ss2' || topicId === 'ug') {
+      q = query(collection(db, 'questions'), where('topicId', '>=', topicId + '-'), where('topicId', '<=', topicId + '-\uf8ff'));
+    } else {
+      q = query(collection(db, 'questions'), where('topicId', '==', topicId));
+    }
     const snap = await getDocs(q);
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Question));
   } catch(e) {
@@ -258,7 +263,7 @@ export const updateUserRole = async (uid: string, role: 'admin' | 'user'): Promi
   }
 };
 
-export const updateUserLevel = async (uid: string, level: 'secondary' | 'undergraduate'): Promise<void> => {
+export const updateUserLevel = async (uid: string, level: 'secondary' | 'secondary-ss2' | 'undergraduate' | 'pending'): Promise<void> => {
   const path = `users/${uid}`;
   try {
      await updateDoc(doc(db, 'users', uid), { level });

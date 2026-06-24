@@ -24,22 +24,13 @@ export const Profile = () => {
     
     // Fallback counts or real data calculation
     const progress = profile?.progress || {};
+    const level = profile?.level || 'secondary';
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
     const completedCount = Object.values(progress).filter(Boolean).length;
     const wins = 0;
 
-    const handleSwitchLevel = async () => {
-        if (!user || !profile) return;
-        const newLevel = profile.level === 'secondary' ? 'undergraduate' : 'secondary';
-        
-        // Let's assume a native confirm is okay for this prototype
-        if (window.confirm(`Switch to ${newLevel} level roadmap? Your progress in the current level will be saved.`)) {
-            try {
-                await updateUserLevel(user.uid, newLevel);
-                setProfile({ ...profile, level: newLevel });
-            } catch (e) {
-                console.error(e);
-            }
-        }
+    const handleSwitchLevel = () => {
+        navigate('/select-level');
     };
 
     const handleLogout = async () => {
@@ -135,11 +126,17 @@ export const Profile = () => {
                     <form onSubmit={handleUpdateProfile} className="space-y-6">
                         <div className="flex flex-col items-center mb-8">
                             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                                <img 
-                                    className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover mb-4 group-hover:opacity-75 transition-opacity" 
-                                    src={editPhotoURL || user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuAfzyP_Cs1fhh76Mfc5oxxTt3jrhfEKTIVkLomLlMJBJ4TIAaYQPS6np0hqP8wrxcB1qINH4CNUHkMvoROAvbjvt6gfpx74WXh4bmyRkM37ZZ48f34cpZlJcCmjoVMdrqAfpUllVSB-bgB3UJeXEb67VNsF6PJqauhJ58sMxVa2vBCQpjWA3mCPWbm4Q9itUJ3PR_gzEYGkHOgtbfnFaK8KO136EOFmU0vJxE3Qywds1Bf8Wq-oYz073mppqPg5Lwzx6kYfvj7vt3M"} 
-                                    alt="Avatar" 
-                                />
+                                {(editPhotoURL || user?.photoURL) ? (
+                                    <img 
+                                        className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover mb-4 group-hover:opacity-75 transition-opacity shrink-0" 
+                                        src={editPhotoURL || user?.photoURL || ""} 
+                                        alt="Avatar" 
+                                    />
+                                ) : (
+                                    <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-4xl shrink-0 mb-4 group-hover:opacity-75 transition-opacity">
+                                        {editName?.[0]?.toUpperCase() || profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                                    </div>
+                                )}
                                 <div className="absolute inset-x-0 bottom-4 flex justify-center">
                                     <div className="bg-primary/80 text-on-primary p-1.5 rounded-full shadow-lg group-hover:scale-110 transition-transform">
                                         <span className="material-symbols-outlined text-sm">photo_camera</span>
@@ -239,13 +236,19 @@ export const Profile = () => {
                 {/* Profile Header */}
                 <section className="flex flex-col items-center bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_12px_rgba(15,23,42,0.04)] border border-outline-variant/20">
                     <div className="relative mb-4">
-                        <img 
-                            className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover" 
-                            src={profile?.photoURL || user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuAfzyP_Cs1fhh76Mfc5oxxTt3jrhfEKTIVkLomLlMJBJ4TIAaYQPS6np0hqP8wrxcB1qINH4CNUHkMvoROAvbjvt6gfpx74WXh4bmyRkM37ZZ48f34cpZlJcCmjoVMdrqAfpUllVSB-bgB3UJeXEb67VNsF6PJqauhJ58sMxVa2vBCQpjWA3mCPWbm4Q9itUJ3PR_gzEYGkHOgtbfnFaK8KO136EOFmU0vJxE3Qywds1Bf8Wq-oYz073mppqPg5Lwzx6kYfvj7vt3M"} 
-                            alt="User Avatar" 
-                        />
+                        {(profile?.photoURL || user?.photoURL) ? (
+                            <img 
+                                className="w-24 h-24 rounded-full border-4 border-secondary-container object-cover shrink-0" 
+                                src={profile?.photoURL || user?.photoURL || ""} 
+                                alt="User Avatar" 
+                            />
+                        ) : (
+                            <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-4xl shrink-0">
+                                {profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                            </div>
+                        )}
                         <div className="absolute bottom-0 right-0 bg-secondary text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-md border-2 border-white">
-                            {profile?.level === 'undergraduate' ? 'UG' : 'HS'}
+                            {levelLabel}
                         </div>
                     </div>
                     <h2 className="font-headline-lg text-primary text-2xl font-bold mb-1">{profile?.displayName || 'Scholar'}</h2>
@@ -290,18 +293,18 @@ export const Profile = () => {
                             <span className="material-symbols-outlined text-outline">chevron_right</span>
                         </div>
 
-                        {/* Switch Level */}
+                        {/* Switch Learning Path */}
                         <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchLevel}>
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
                                     <span className="material-symbols-outlined">school</span>
                                 </div>
                                 <div>
-                                    <p className="font-label-md font-bold text-primary">Academic Level</p>
-                                    <p className="font-label-sm text-on-surface-variant capitalize">Current: {profile?.level}</p>
+                                    <p className="font-label-md font-bold text-primary">Change Learning Path</p>
+                                    <p className="font-label-sm text-on-surface-variant">Switch between SS1 and SS2</p>
                                 </div>
                             </div>
-                            <span className="material-symbols-outlined text-outline">sync</span>
+                            <span className="material-symbols-outlined text-outline">chevron_right</span>
                         </div>
 
                         {/* Profile Settings */}

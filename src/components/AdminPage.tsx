@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { generateQuestions } from '../gemini';
+import React, { useState, useEffect, useRef } from 'react';
+import { generateQuestions, extractQuestionsFromPdf } from '../gemini';
 import { 
   saveQuestions, Question, getAllUsers, UserProfile, deleteUserAccount, 
   updateUserRole, getAdminStats, getAllQuestionsAdmin, updateQuestion, 
@@ -11,7 +11,7 @@ import {
   Database, Plus, Save, Loader2, CheckCircle2, Users, Search, Mail, 
   Calendar, ShieldCheck, User, Trash2, UserPlus, UserMinus, BarChart3, 
   History, Settings, Megaphone, Edit3, X, ChevronRight, TrendingUp, 
-  BookOpen, Award, Activity, AlertTriangle, Check, Shield
+  BookOpen, Award, Activity, AlertTriangle, Check, Shield, FileUp, FileText
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { 
@@ -38,7 +38,7 @@ export const AdminPage: React.FC = () => {
   }, [authLoading, isAdmin, navigate]);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'questions' | 'users' | 'activity' | 'settings'>('overview');
-  const [subTab, setSubTab] = useState<'generate' | 'bank' | 'create'>('generate');
+  const [subTab, setSubTab] = useState<'generate' | 'extract' | 'bank' | 'create'>('generate');
   
   // Stats State
   const [stats, setStats] = useState<any>(null);
@@ -50,6 +50,11 @@ export const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
   const [saved, setSaved] = useState(false);
+  
+  // PDF Extraction State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfBase64, setPdfBase64] = useState<string>('');
   const [bankQuestions, setBankQuestions] = useState<Question[]>([]);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const emptyQuestion = { question: '', options: ['', '', '', ''], correctAnswer: 0, topicId: '', level: 'secondary' as const, explanation: '', createdAt: new Date() };
@@ -116,15 +121,72 @@ export const AdminPage: React.FC = () => {
   };
 
   const handleGenerate = async () => {
-    if (!topicId) return;
+    if (!topicId) {
+      alert("Please select a topic.");
+      return;
+    }
     setLoading(true);
     setSaved(false);
     const topic = topics.find(t => t.id === topicId);
-    if (!topic) return;
+    if (!topic) {
+      setLoading(false);
+      return;
+    }
 
-    const questions = await generateQuestions(topic.title, level, count);
-    setGeneratedQuestions(questions);
-    setLoading(false);
+    try {
+      const questions = await generateQuestions(topic.title, level, count);
+      if (!questions || questions.length === 0) {
+        alert("Failed to generate questions. Please try again.");
+      } else {
+        setGeneratedQuestions(questions);
+      }
+    } catch (error) {
+      console.error("Error in handleGenerate:", error);
+      alert("An error occurred while generating. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/pdf") {
+      if (file.size > 20 * 1024 * 1024) { // 20MB limit
+        alert("File size exceeds 20MB limit.");
+        return;
+      }
+      setPdfFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result?.toString().split(',')[1] || '';
+        setPdfBase64(base64String);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please upload a valid PDF document.");
+    }
+  };
+
+  const handleExtractFromPdf = async () => {
+    if (!pdfBase64 || !topicId) {
+      alert("Please ensure a PDF is uploaded and a topic is selected.");
+      return;
+    }
+    setLoading(true);
+    setSaved(false);
+    try {
+      const questions = await extractQuestionsFromPdf(pdfBase64, level, count);
+      if (!questions || questions.length === 0) {
+        alert("Failed to extract questions. Please try a different PDF or format.");
+      } else {
+        setGeneratedQuestions(questions);
+      }
+    } catch (error) {
+      console.error("Error in handleExtractFromPdf:", error);
+      alert("An error occurred while uploading. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -393,6 +455,15 @@ export const AdminPage: React.FC = () => {
                 Generate
               </button>
               <button
+                onClick={() => setSubTab('extract')}
+                className={cn(
+                   "px-2 sm:px-6 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider sm:tracking-widest rounded-lg sm:rounded-xl transition-all text-center flex items-center justify-center",
+                   subTab === 'extract' ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md" : "text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                )}
+              >
+                Extract
+              </button>
+              <button
                 onClick={() => setSubTab('bank')}
                 className={cn(
                    "px-2 sm:px-6 py-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider sm:tracking-widest rounded-lg sm:rounded-xl transition-all text-center flex items-center justify-center",
@@ -426,8 +497,8 @@ export const AdminPage: React.FC = () => {
                         }}
                         className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
                       >
-                        <option value="secondary font-sans">Secondary School</option>
-                        <option value="undergraduate font-sans">Undergraduate</option>
+                        <option value="secondary">Economics SS1</option>
+                        <option value="undergraduate">Undergraduate</option>
                       </select>
                     </div>
 
@@ -513,6 +584,160 @@ export const AdminPage: React.FC = () => {
                   </div>
                 )}
               </div>
+            ) : subTab === 'extract' ? (
+              <div className="space-y-6 sm:space-y-8">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
+                  <div className="mb-6 sm:mb-10">
+                    <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">Document Parsing</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                       Extract from PDF
+                    </h3>
+                  </div>
+                  
+                  {/* Upload Interface */}
+                  <div className="mb-6 sm:mb-8">
+                    <label 
+                      htmlFor="pdf-upload" 
+                      className="flex flex-col items-center justify-center w-full h-32 sm:h-48 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl sm:rounded-2xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group"
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <FileUp className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400 group-hover:text-sky-500 transition-colors mb-3 sm:mb-4" />
+                        <p className="mb-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-bold">
+                          <span className="text-sky-500">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest">PDF (MAX. 20MB)</p>
+                      </div>
+                      <input 
+                        id="pdf-upload" 
+                        type="file" 
+                        accept="application/pdf"
+                        className="hidden" 
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                      />
+                    </label>
+                  </div>
+
+                  {pdfFile && (
+                    <div className="flex items-center justify-between p-4 bg-sky-50 dark:bg-sky-900/20 rounded-xl sm:rounded-2xl border border-sky-100 dark:border-sky-900/30 mb-6 sm:mb-8">
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-sky-500" size={20} />
+                        <div>
+                          <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{pdfFile.name}</p>
+                          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold">{(pdfFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setPdfFile(null);
+                          setPdfBase64('');
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-10">
+                    <div className="space-y-2 sm:space-y-3">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
+                      <select
+                        value={level}
+                        onChange={(e) => {
+                          setLevel(e.target.value as any);
+                          setTopicId('');
+                        }}
+                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
+                      >
+                        <option value="secondary">Economics SS1</option>
+                        <option value="undergraduate">Undergraduate</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2 sm:space-y-3">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Target Topic</label>
+                      <select
+                        value={topicId}
+                        onChange={(e) => setTopicId(e.target.value)}
+                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
+                      >
+                        <option value="">Select a topic</option>
+                        {topics.map(t => (
+                          <option key={t.id} value={t.id}>{t.title}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2 sm:space-y-3 col-span-1 sm:col-span-2 md:col-span-1">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Question Count</label>
+                      <input
+                        type="number"
+                        value={isNaN(count) ? '' : count}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          setCount(isNaN(val) ? 0 : val);
+                        }}
+                        min="1"
+                        max="20"
+                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleExtractFromPdf}
+                    disabled={loading || !topicId || !pdfBase64}
+                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 sm:py-5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest text-[10px]"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : <FileText size={18} />}
+                    Extract Questions
+                  </button>
+                </div>
+
+                {generatedQuestions.length > 0 && (
+                  <div className="space-y-6 sm:space-y-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-5 sm:pb-6 gap-4">
+                      <div>
+                        <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">AI Output</p>
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight font-sans">Extracted Preview</h2>
+                      </div>
+                      <button
+                        onClick={handleSave}
+                        disabled={loading}
+                        className="bg-sky-600 text-white px-6 sm:px-8 py-3.5 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-sky-500/20 hover:bg-sky-700 transition-all w-full sm:w-auto"
+                      >
+                        Save to Bank
+                      </button>
+                    </div>
+                    <div className="grid gap-4 sm:gap-6">
+                      {generatedQuestions.map((q, i) => (
+                        <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
+                          <div className="flex items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
+                            <span className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl sm:rounded-2xl flex items-center justify-center text-base sm:text-lg font-bold">
+                              {i + 1}
+                            </span>
+                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ml-0 sm:ml-14 md:ml-16">
+                            {q.options.map((opt: string, idx: number) => (
+                              <div key={idx} className={cn(
+                                "p-4 sm:p-5 rounded-xl sm:rounded-2xl border text-xs sm:text-sm font-bold transition-all",
+                                idx === q.correctAnswer 
+                                  ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-900/30 text-sky-700 dark:text-sky-400' 
+                                  : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-500'
+                              )}>
+                                {opt}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : subTab === 'create' ? (
               <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
                 <div className="mb-6 sm:mb-10">
@@ -533,8 +758,8 @@ export const AdminPage: React.FC = () => {
                         className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer font-sans"
                         required
                       >
-                        <option value="secondary font-sans">Secondary School</option>
-                        <option value="undergraduate font-sans">Undergraduate</option>
+                        <option value="secondary">Economics SS1</option>
+                        <option value="undergraduate">Undergraduate</option>
                       </select>
                     </div>
 
