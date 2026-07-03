@@ -6,7 +6,7 @@ import { Trophy, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export const Leaderboard: React.FC = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [leaders, setLeaders] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +23,8 @@ export const Leaderboard: React.FC = () => {
 
     const fetchLeaders = async () => {
       try {
-        const data = await getLeaderboard(50);
+        const mainPath = profile?.level === 'undergraduate' ? 'undergraduate' : 'secondary';
+        const data = await getLeaderboard(50, mainPath);
         setLeaders(data);
         
         // Auto-select league based on highest populated or default to eco_titan if keynes is empty
@@ -38,7 +39,7 @@ export const Leaderboard: React.FC = () => {
       }
     };
     fetchLeaders();
-  }, []);
+  }, [user, profile, authLoading]);
 
   if (loading) {
 

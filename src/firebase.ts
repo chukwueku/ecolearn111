@@ -71,7 +71,7 @@ export interface UserProfile {
   email: string;
   displayName: string;
   photoURL?: string;
-  level: 'secondary' | 'secondary-ss2' | 'undergraduate' | 'pending';
+  level: 'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate' | 'pending';
   progress: Record<string, boolean>;
   scores?: Record<string, number>;
   role?: 'admin' | 'user';
@@ -181,13 +181,13 @@ export const getQuestions = async (topicId: string): Promise<Question[]> => {
   const path = 'questions';
   try {
     let q;
-    if (topicId === 'ss1' || topicId === 'ss2' || topicId === 'ug') {
+    if (topicId === 'ss1' || topicId === 'ss2' || topicId === 'ug' || topicId === 'uni') {
       q = query(collection(db, 'questions'), where('topicId', '>=', topicId + '-'), where('topicId', '<=', topicId + '-\uf8ff'));
     } else {
       q = query(collection(db, 'questions'), where('topicId', '==', topicId));
     }
     const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Question));
+    return snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) } as Question));
   } catch(e) {
     handleFirestoreError(e, OperationType.LIST, path);
     return [];
@@ -263,7 +263,7 @@ export const updateUserRole = async (uid: string, role: 'admin' | 'user'): Promi
   }
 };
 
-export const updateUserLevel = async (uid: string, level: 'secondary' | 'secondary-ss2' | 'undergraduate' | 'pending'): Promise<void> => {
+export const updateUserLevel = async (uid: string, level: 'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate' | 'pending'): Promise<void> => {
   const path = `users/${uid}`;
   try {
      await updateDoc(doc(db, 'users', uid), { level });
@@ -337,11 +337,24 @@ export const getAdminStats = async () => {
       .slice(0, 5)
       .map(([id, count]) => ({ id, count }));
       
+    const levelCounts: Record<string, number> = {
+      'secondary': 0,
+      'secondary-ss2': 0,
+      'secondary-ss3': 0,
+      'undergraduate': 0,
+      'pending': 0
+    };
+    users.forEach((u: any) => {
+      const lvl = u.level || 'secondary';
+      levelCounts[lvl] = (levelCounts[lvl] || 0) + 1;
+    });
+
     return {
       totalUsers: users.length,
       totalQuestions: qsSnap.size,
       totalPoints,
       popularTopics,
+      levelCounts,
       topUsers: users.sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 5)
     };
   } catch (e) {
@@ -393,10 +406,15 @@ export const getRecentDuels = async (limitCount: number = 10) => {
   }
 };
 
-export const getLeaderboard = async (limitCount: number = 10): Promise<UserProfile[]> => {
+export const getLeaderboard = async (limitCount: number = 10, mainPath: 'secondary' | 'undergraduate' = 'secondary'): Promise<UserProfile[]> => {
   const path = 'users';
   try {
-    const q = query(collection(db, 'users'), orderBy('points', 'desc'), limit(limitCount));
+    let q;
+    if (mainPath === 'undergraduate') {
+      q = query(collection(db, 'users'), where('level', '==', 'undergraduate'), orderBy('points', 'desc'), limit(limitCount));
+    } else {
+      q = query(collection(db, 'users'), where('level', 'in', ['secondary', 'secondary-ss2', 'secondary-ss3']), orderBy('points', 'desc'), limit(limitCount));
+    }
     const snap = await getDocs(q);
     return snap.docs.map(d => d.data() as UserProfile);
   } catch(e) {

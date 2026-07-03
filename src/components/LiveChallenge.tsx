@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
 import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, timeoutMatchTurn, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
-import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, SECONDARY_SS3_ROADMAP } from '../constants';
+import { useRoadmap } from '../hooks/useRoadmap';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -14,6 +14,10 @@ function cn(...inputs: ClassValue[]) {
 
 export const LiveChallenge: React.FC = () => {
   const { user, profile } = useAuth();
+  
+  const level = profile?.level || 'secondary';
+  const { roadmap } = useRoadmap(level);
+
   const [lobbyUsers, setLobbyUsers] = useState<any[]>([]);
   const [allUsersData, setAllUsersData] = useState<any[]>([]);
   const [incomingChallenge, setIncomingChallenge] = useState<any>(null);
@@ -451,7 +455,7 @@ export const LiveChallenge: React.FC = () => {
     if (!matchData?.matchId || !profile) return;
     setLoading(true);
     setDuelStarted(true);
-    const topics = SECONDARY_ROADMAP;
+    const topics = roadmap.length > 0 ? roadmap : [{ id: matchData.topicId, title: "Custom Topic" } as any];
     const topic = topics.find(t => t.id === matchData.topicId) || topics[0];
     
     const questions = await getQuestions(topic.id);
@@ -625,7 +629,7 @@ export const LiveChallenge: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen bg-[#161512] pb-24 md:pb-0 text-[#f1f1f1] flex flex-col md:flex-row font-sans md:overflow-auto">
+      <div className="min-h-screen bg-paper pb-24 md:pb-0 text-ink flex flex-col md:flex-row font-sans md:overflow-auto">
         {toastOptions && (
           <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-[11px] uppercase tracking-widest shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300" 
                style={{ backgroundColor: toastOptions.type === 'error' ? '#ef4444' : '#10b981', color: '#fff' }}>
@@ -633,7 +637,7 @@ export const LiveChallenge: React.FC = () => {
           </div>
         )}
         {firestoreError && (
-          <div className="fixed top-0 left-0 right-0 z-[100] bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest py-1 text-center animate-pulse">
+          <div className="fixed top-0 left-0 right-0 z-[100] bg-rose-500 text-on-surface text-[10px] font-black uppercase tracking-widest py-1 text-center animate-pulse">
             Firestore Connection error - App may be out of sync
           </div>
         )}
@@ -647,9 +651,9 @@ export const LiveChallenge: React.FC = () => {
             {/* Top Bar: Mode Indicator + Quick Quits */}
             <div className="flex items-center justify-between mb-2">
                <div className="w-16"></div> {/* Spacer for alignment */}
-               <div className="bg-[#262421] border border-white/5 px-4 py-1.5 rounded-full flex items-center gap-3 shadow-xl">
+               <div className="bg-surface-container-low border border-outline-variant/30 px-4 py-1.5 rounded-full flex items-center gap-3 shadow-xl">
                   {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.icon}
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hidden md:inline">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant hidden md:inline">
                      {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
                   </span>
                   <div className="w-1 h-1 rounded-full bg-sky-500 animate-pulse" />
@@ -663,22 +667,22 @@ export const LiveChallenge: React.FC = () => {
 
             {/* Opponent Panel */}
             <div className={cn(
-              "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border transition-all",
-              (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-white/5"
+              "flex items-center justify-between bg-surface-container-low rounded-lg p-2 md:p-3 shadow-lg border transition-all",
+              (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "border-outline-variant/30"
             )}>
               <div className="flex items-center gap-3 md:gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border border-white/10 shrink-0">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-surface-container-high rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-on-surface border border-outline-variant/50 shrink-0">
                   {opponent?.displayName?.[0] || 'O'}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm md:text-lg font-bold truncate">{opponent?.displayName || 'Opponent'}</p>
                     {(matchData.currentTurnUid !== user?.uid || waitingForOpponent) && (
-                      <span className="text-[8px] md:text-[10px] bg-emerald-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
+                      <span className="text-[8px] md:text-[10px] bg-emerald-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] md:text-xs text-white/40 flex items-center gap-1">
+                    <span className="text-[10px] md:text-xs text-on-surface-variant flex items-center gap-1">
                       <Swords size={10} />
                       Score: {opponent?.score || 0}
                     </span>
@@ -687,14 +691,14 @@ export const LiveChallenge: React.FC = () => {
               </div>
               <div className={cn(
                 "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
-                (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "bg-emerald-500/10 border-emerald-500 text-white" : "bg-white/5 border-white/10 text-white/40"
+                (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? "bg-emerald-500/10 border-emerald-500 text-on-surface" : "bg-surface-container border-outline-variant/50 text-on-surface-variant"
               )}>
                 {(matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
               </div>
             </div>
 
             {/* Question Area (The "Board") */}
-            <div className="relative aspect-square md:aspect-[4/3] w-full bg-[#262421] rounded-xl md:rounded-2xl border-2 md:border-4 border-[#3c3a37] shadow-2xl flex flex-col overflow-hidden">
+            <div className="relative aspect-square md:aspect-[4/3] w-full bg-surface-container-low rounded-xl md:rounded-2xl border-2 md:border-4 border-outline-variant/50 shadow-2xl flex flex-col overflow-hidden">
                {/* Background grid pattern like chess board */}
                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                     style={{ backgroundImage: 'radial-gradient(circle, #f1f1f1 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -721,7 +725,7 @@ export const LiveChallenge: React.FC = () => {
                          )}>
                            {showAnswerFeedback === 'correct' ? "Brilliant!" : "Blunder!"}
                          </h3>
-                         <p className="text-white/40 font-mono text-sm">SWITCHING TURNS...</p>
+                         <p className="text-on-surface-variant font-mono text-sm">SWITCHING TURNS...</p>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -750,18 +754,18 @@ export const LiveChallenge: React.FC = () => {
                               className={cn(
                                 "group relative h-16 md:h-20 rounded-xl border-l-[4px] md:border-l-[6px] transition-all text-left px-4 md:px-6 flex items-center gap-3 md:gap-4 overflow-hidden",
                                 waitingForOpponent 
-                                  ? "bg-[#3c3a37] border-[#312e2b] opacity-60 cursor-not-allowed"
-                                  : "bg-[#3c3a37] hover:bg-[#484643] border-[#312e2b] hover:border-sky-500 cursor-pointer"
+                                  ? "bg-surface-container-highest border-outline-variant/30 opacity-60 cursor-not-allowed"
+                                  : "bg-surface-container-highest hover:bg-surface-container-highest border-outline-variant/30 hover:border-sky-500 cursor-pointer"
                               )}
                             >
-                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-black/20 flex items-center justify-center font-mono font-bold text-sm md:text-lg text-white/20 transition-colors shrink-0 group-hover:text-sky-500/50">
+                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-surface-container-highest flex items-center justify-center font-mono font-bold text-sm md:text-lg text-on-surface-variant/50 transition-colors shrink-0 group-hover:text-sky-500/50">
                                  {String.fromCharCode(65 + i)}
                                </div>
                                <span className={cn(
-                                 "text-sm md:text-lg font-medium tracking-tight text-white transition-transform line-clamp-2",
+                                 "text-sm md:text-lg font-medium tracking-tight text-on-surface transition-transform line-clamp-2",
                                  !waitingForOpponent && "group-hover:translate-x-1"
                                )}>{option}</span>
-                               {!waitingForOpponent && <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                               {!waitingForOpponent && <div className="absolute right-0 top-0 bottom-0 w-1 bg-surface-container opacity-0 group-hover:opacity-100 transition-opacity" />}
                             </button>
                           ))}
                         </div>
@@ -771,7 +775,7 @@ export const LiveChallenge: React.FC = () => {
                </div>
 
                {/* Game Progress Bar */}
-               <div className="h-1.5 md:h-2 bg-black/40 flex">
+               <div className="h-1.5 md:h-2 bg-surface-container-lowest flex">
                   {matchData.questions.map((_: any, i: number) => {
                     const myProgress = me?.currentQuestion || 0;
                     const oppProgress = opponent?.currentQuestion || 0;
@@ -779,7 +783,7 @@ export const LiveChallenge: React.FC = () => {
                       <div 
                         key={i}
                         className={cn(
-                          "flex-1 h-full border-r border-black/20 transition-all flex",
+                          "flex-1 h-full border-r border-outline-variant/30 transition-all flex",
                           i < Math.min(myProgress, oppProgress) ? "bg-emerald-500" : "bg-transparent"
                         )}
                       >
@@ -793,13 +797,13 @@ export const LiveChallenge: React.FC = () => {
 
             {/* My Panel */}
             <div className={cn(
-              "flex items-center justify-between bg-[#262421] rounded-lg p-2 md:p-3 shadow-lg border-2 transition-all",
-              (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "border-sky-500" : "border-white/5"
+              "flex items-center justify-between bg-surface-container-low rounded-lg p-2 md:p-3 shadow-lg border-2 transition-all",
+              (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "border-sky-500" : "border-outline-variant/30"
             )}>
               <div className="flex items-center gap-3 md:gap-4">
                 <div className={cn(
-                  "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-white border shrink-0",
-                  (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "bg-sky-500 border-sky-400" : "bg-white/10 border-white/10"
+                  "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center font-bold text-lg md:text-xl text-on-surface border shrink-0",
+                  (matchData.currentTurnUid === user?.uid && !waitingForOpponent) ? "bg-sky-500 border-sky-400" : "bg-surface-container-high border-outline-variant/50"
                 )}>
                   {profile?.displayName?.[0] || 'U'}
                 </div>
@@ -807,7 +811,7 @@ export const LiveChallenge: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <p className="text-sm md:text-lg font-bold truncate">You</p>
                     {matchData.currentTurnUid === user?.uid && !waitingForOpponent && (
-                      <span className="text-[8px] md:text-[10px] bg-sky-500 text-white px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
+                      <span className="text-[8px] md:text-[10px] bg-sky-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -827,8 +831,8 @@ export const LiveChallenge: React.FC = () => {
               <div className={cn(
                 "px-4 py-2 md:px-6 md:py-3 rounded-lg font-mono text-xl md:text-3xl font-bold border-2 transition-all shrink-0",
                 matchData.currentTurnUid === user?.uid && !waitingForOpponent
-                  ? timeLeft <= 5 ? "bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse" : "bg-sky-500/10 border-sky-500 text-white" 
-                  : "bg-white/5 border-white/10 text-white/40"
+                  ? timeLeft <= 5 ? "bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse" : "bg-sky-500/10 border-sky-500 text-on-surface" 
+                  : "bg-surface-container border-outline-variant/50 text-on-surface-variant"
               )}>
                 {matchData.currentTurnUid === user?.uid && !waitingForOpponent ? `00:${timeLeft.toString().padStart(2, '0')}` : '--:--'}
               </div>
@@ -839,14 +843,14 @@ export const LiveChallenge: React.FC = () => {
 
         {/* Sidebar (Analysis/Chat) */}
         <div className={cn(
-          "flex-1 md:flex-none w-full md:w-[320px] bg-[#262421] border-l border-black/20 flex flex-col transition-all duration-300",
+          "flex-1 md:flex-none w-full md:w-[320px] bg-surface-container-low border-l border-outline-variant/30 flex flex-col transition-all duration-300",
           mobileTab !== 'analysis' && "hidden md:flex"
         )}>
            {/* Header tabs */}
-           <div className="flex border-b border-black/20 p-1">
-              <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-[#f1f1f1] border-b-2 border-sky-500 transition-all">Move History</button>
-              <button onClick={() => setIsChatOpen(!isChatOpen)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">Analysis</button>
-              <button onClick={handleQuit} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-all border-l border-white/5 flex items-center gap-2">
+           <div className="flex border-b border-outline-variant/30 p-1">
+              <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-ink border-b-2 border-sky-500 transition-all">Move History</button>
+              <button onClick={() => setIsChatOpen(!isChatOpen)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-all">Analysis</button>
+              <button onClick={handleQuit} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-all border-l border-outline-variant/30 flex items-center gap-2">
                 <XCircle size={12} />
                 Resign
               </button>
@@ -866,15 +870,15 @@ export const LiveChallenge: React.FC = () => {
                 return (
                   <div key={i} className={cn(
                     "flex items-center gap-4 p-2 rounded transition-colors group",
-                    (i === me?.currentQuestion || i === opponent?.currentQuestion) ? "bg-white/5 border-l-2 border-sky-500/50" : ""
+                    (i === me?.currentQuestion || i === opponent?.currentQuestion) ? "bg-surface-container border-l-2 border-sky-500/50" : ""
                   )}>
-                    <span className="text-white/20 text-[10px] w-6">{i + 1}.</span>
+                    <span className="text-on-surface-variant/50 text-[10px] w-6">{i + 1}.</span>
                     <div className="flex-1 grid grid-cols-2 gap-2">
                        <div className={cn(
                          "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
                          myAnswer !== undefined
                           ? myAnswer ? "bg-emerald-500/20 text-emerald-500 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]" : "bg-rose-500/20 text-rose-500"
-                          : "bg-black/40 text-white/5"
+                          : "bg-surface-container-lowest text-outline-variant"
                        )}>
                          {myRes}
                        </div>
@@ -882,7 +886,7 @@ export const LiveChallenge: React.FC = () => {
                          "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all opacity-60",
                          opponentAnswer !== undefined
                           ? opponentAnswer ? "bg-emerald-500/10 text-emerald-500/60" : "bg-rose-500/10 text-rose-500/60"
-                          : "bg-black/40 text-white/5"
+                          : "bg-surface-container-lowest text-outline-variant"
                        )}>
                          {oppRes}
                        </div>
@@ -893,48 +897,48 @@ export const LiveChallenge: React.FC = () => {
            </div>
 
            {/* Chat Section */}
-           <div className="h-[250px] md:h-[250px] border-t border-black/20 flex flex-col bg-black/10">
+           <div className="h-[250px] md:h-[250px] border-t border-outline-variant/30 flex flex-col bg-black/10">
               <div className="p-3 border-b border-black/10 flex items-center justify-between">
-                <span className="text-[9px] font-black uppercase tracking-widest text-white/40 flex items-center gap-2">
+                <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                    Live Chat
                 </span>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                  {messages.length === 0 ? (
-                   <p className="text-[10px] text-white/20 text-center mt-4 italic">No messages yet...</p>
+                   <p className="text-[10px] text-on-surface-variant/50 text-center mt-4 italic">No messages yet...</p>
                  ) : (
                    messages.map((m, i) => (
                      <div key={i} className="flex gap-2 text-xs leading-relaxed">
                         <span className="font-bold text-sky-400 shrink-0">{m.senderName}:</span>
-                        <span className="text-white/80">{m.message}</span>
+                        <span className="text-on-surface/80">{m.message}</span>
                      </div>
                    ))
                  )}
                  <div ref={chatEndRef} />
               </div>
               <form onSubmit={sendMessage} className="p-3">
-                 <div className="bg-black/20 rounded border border-white/5 p-1 flex items-center gap-2">
+                 <div className="bg-surface-container-highest rounded border border-outline-variant/30 p-1 flex items-center gap-2">
                     <input 
                       type="text" 
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 bg-transparent border-none outline-none text-xs px-2 py-1 placeholder:text-white/10"
+                      className="flex-1 bg-transparent border-none outline-none text-xs px-2 py-1 placeholder:text-outline"
                     />
-                    <button type="submit" className="p-1 px-3 bg-[#3c3a37] text-white/40 hover:text-white rounded text-[10px] font-black uppercase tracking-widest transition-colors">Send</button>
+                    <button type="submit" className="p-1 px-3 bg-surface-container-highest text-on-surface-variant hover:text-on-surface rounded text-[10px] font-black uppercase tracking-widest transition-colors">Send</button>
                  </div>
               </form>
            </div>
         </div>
 
         {/* Mobile Bottom Nav */}
-        <div className="md:hidden flex h-16 bg-[#161512] border-t border-white/5 pb-2 shrink-0">
+        <div className="md:hidden flex h-16 bg-paper border-t border-outline-variant/30 pb-2 shrink-0">
            <button 
              onClick={() => setMobileTab('board')}
              className={cn(
                "flex-1 flex flex-col items-center justify-center gap-1 transition-all",
-               mobileTab === 'board' ? "text-sky-400" : "text-white/40"
+               mobileTab === 'board' ? "text-sky-400" : "text-on-surface-variant"
              )}
            >
              <Swords size={20} className={cn("transition-transform", mobileTab === 'board' && "scale-110")} />
@@ -945,7 +949,7 @@ export const LiveChallenge: React.FC = () => {
              onClick={() => setMobileTab('analysis')}
              className={cn(
                "flex-1 flex flex-col items-center justify-center gap-1 transition-all",
-               mobileTab === 'analysis' ? "text-sky-400" : "text-white/40"
+               mobileTab === 'analysis' ? "text-sky-400" : "text-on-surface-variant"
              )}
            >
              <div className="relative">
@@ -972,7 +976,7 @@ export const LiveChallenge: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-slate-900/98 dark:bg-slate-950/98 backdrop-blur-3xl flex items-center justify-center p-8 overflow-hidden"
+              className="fixed inset-0 z-50 bg-surface/98 backdrop-blur-3xl flex items-center justify-center p-8 overflow-hidden"
             >
               {/* Atmospheric Background Gradients */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -995,12 +999,12 @@ export const LiveChallenge: React.FC = () => {
                         className="absolute inset-0 bg-sky-500/20 rounded-full blur-3xl"
                       />
                       <div className="w-48 h-48 bg-sky-500 rounded-[3.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(14,165,233,0.3)] border border-sky-400 relative z-10">
-                        <Swords size={96} className="text-white animate-bounce" />
+                        <Swords size={96} className="text-on-primary animate-bounce" />
                       </div>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tighter uppercase font-display italic">Match Found!</h2>
+                      <h2 className="text-5xl md:text-7xl font-bold text-on-surface mb-4 tracking-tighter uppercase font-display italic">Match Found!</h2>
                       <div className="flex items-center justify-center gap-3 mb-8">
                         <div className="w-12 h-[1px] bg-sky-500/30" />
                         <p className="text-sky-400 font-bold uppercase tracking-[0.5em] text-[10px]">
@@ -1018,7 +1022,7 @@ export const LiveChallenge: React.FC = () => {
                         </button>
                         <button 
                           onClick={cancelMatchFound}
-                          className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white/60 transition-all"
+                          className="text-[10px] font-black uppercase tracking-widest text-on-surface/30 hover:text-on-surface/60 transition-all"
                         >
                           Cancel & Return to Lobby
                         </button>
@@ -1027,7 +1031,7 @@ export const LiveChallenge: React.FC = () => {
 
                     <div className="flex items-center justify-center gap-6 md:gap-16">
                       <div className="text-center group">
-                        <div className="w-28 h-28 bg-white/5 rounded-[2.5rem] flex items-center justify-center text-white mb-6 font-bold text-4xl border border-white/10 shadow-2xl backdrop-blur-md group-hover:border-sky-500/50 transition-colors">
+                        <div className="w-28 h-28 bg-surface-container rounded-[2.5rem] flex items-center justify-center text-on-surface mb-6 font-bold text-4xl border border-outline-variant/50 shadow-2xl backdrop-blur-md group-hover:border-sky-500/50 transition-colors">
                           {profile?.displayName?.[0]}
                         </div>
                         <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em]">{profile?.displayName}</p>
@@ -1035,7 +1039,7 @@ export const LiveChallenge: React.FC = () => {
                       </div>
 
                       <div className="relative">
-                        <div className="text-5xl font-black text-white/5 italic font-display select-none">VS</div>
+                        <div className="text-5xl font-black text-outline-variant italic font-display select-none">VS</div>
                         <motion.div 
                           animate={{ height: ['0%', '100%', '0%'] }}
                           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -1044,10 +1048,10 @@ export const LiveChallenge: React.FC = () => {
                       </div>
 
                       <div className="text-center group">
-                        <div className="w-28 h-28 bg-white/5 rounded-[2.5rem] flex items-center justify-center text-white mb-6 font-bold text-4xl border border-white/10 shadow-2xl backdrop-blur-md group-hover:border-rose-500/50 transition-colors">
+                        <div className="w-28 h-28 bg-surface-container rounded-[2.5rem] flex items-center justify-center text-on-surface mb-6 font-bold text-4xl border border-outline-variant/50 shadow-2xl backdrop-blur-md group-hover:border-rose-500/50 transition-colors">
                           {players.find((p: any) => p.id !== user?.uid)?.displayName?.[0] || '?'}
                         </div>
-                        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em]">{players.find((p: any) => p.id !== user?.uid)?.displayName || 'Opponent'}</p>
+                        <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-[0.2em]">{players.find((p: any) => p.id !== user?.uid)?.displayName || 'Opponent'}</p>
                         <p className="text-[8px] text-rose-500/50 font-bold uppercase tracking-widest mt-1">Player 2</p>
                       </div>
                     </div>
@@ -1082,25 +1086,25 @@ export const LiveChallenge: React.FC = () => {
                       </div>
                     </div>
 
-                    <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tighter uppercase font-display italic">Searching...</h2>
+                    <h2 className="text-4xl md:text-6xl font-bold text-on-surface mb-6 tracking-tighter uppercase font-display italic">Searching...</h2>
                     
-                    <div className="inline-flex items-center gap-4 px-8 py-3 bg-white/5 border border-white/10 rounded-full mb-12 backdrop-blur-md">
+                    <div className="inline-flex items-center gap-4 px-8 py-3 bg-surface-container-high border border-outline-variant/30 rounded-full mb-12 backdrop-blur-md">
                       <Timer size={16} className="text-sky-400" />
                       <p className="text-sky-400 font-mono text-2xl font-bold tracking-tighter">
                         {Math.floor(searchTime / 60)}:{(searchTime % 60).toString().padStart(2, '0')}
                       </p>
                     </div>
 
-                    <p className="text-slate-500 text-sm mb-20 font-medium leading-relaxed max-w-xs mx-auto">
+                    <p className="text-on-surface-variant text-sm mb-20 font-medium leading-relaxed max-w-xs mx-auto">
                       Scanning the arena for a worthy opponent in <br />
-                      <span className="text-white font-bold text-lg block mt-2 tracking-tight">
+                      <span className="text-on-surface font-bold text-lg block mt-2 tracking-tight">
                         {selectedTopicId === 'ss1' ? 'SS1 Curriculum' : selectedTopicId === 'ss2' ? 'SS2 Curriculum' : selectedTopicId === 'ug' ? 'SS3 Curriculum' : 'Selected Curriculum'}
                       </span>
                     </p>
 
                     <button
                       onClick={toggleSearching}
-                      className="w-full py-6 bg-white/5 text-white font-bold rounded-[2rem] hover:bg-white/10 transition-all border border-white/10 uppercase tracking-[0.4em] text-[10px] hover:border-rose-500/30 hover:text-rose-400 group"
+                      className="w-full py-6 bg-surface-container-high text-on-surface font-bold rounded-[2rem] hover:bg-surface-container-highest transition-all border border-outline-variant/30 uppercase tracking-[0.4em] text-[10px] hover:border-error/30 hover:text-error group"
                     >
                       <span className="group-hover:scale-110 transition-transform inline-block">Abstain from Combat</span>
                     </button>
@@ -1116,7 +1120,7 @@ export const LiveChallenge: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-8"
+              className="fixed inset-0 z-[60] bg-surface/80 backdrop-blur-sm flex items-center justify-center p-8"
             >
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -1213,9 +1217,15 @@ export const LiveChallenge: React.FC = () => {
                 className="w-full bg-surface-container-low border border-outline-variant/50 px-8 py-5 rounded-2xl text-sm font-bold text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
               >
                 <option value="">Choose a curriculum...</option>
-                <option value="ss1">SS1 Curriculum</option>
-                <option value="ss2">SS2 Curriculum</option>
-                <option value="ug">SS3 Curriculum</option>
+                {profile?.level === 'undergraduate' ? (
+                  <option value="uni">Undergraduate Curriculum</option>
+                ) : (
+                  <>
+                    <option value="ss1">SS1 Curriculum</option>
+                    <option value="ss2">SS2 Curriculum</option>
+                    <option value="ug">SS3 Curriculum</option>
+                  </>
+                )}
               </select>
               <ChevronRight size={20} className="absolute right-8 top-1/2 -translate-y-1/2 rotate-90 text-outline pointer-events-none" />
             </div>
@@ -1351,8 +1361,8 @@ export const LiveChallenge: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-8 rounded-[3rem] text-white shadow-xl relative overflow-hidden group">
-               <Zap className="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform" />
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-8 rounded-[3rem] text-on-surface shadow-xl relative overflow-hidden group">
+               <Zap className="absolute -right-4 -bottom-4 w-32 h-32 text-on-surface/10 rotate-12 group-hover:scale-110 transition-transform" />
                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 relative z-10 text-indigo-100">Live Status</h3>
                <p className="text-2xl font-bold tracking-tight mb-8 relative z-10">Arena Heat Map</p>
                <div className="space-y-4 relative z-10">

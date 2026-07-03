@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Calculator, TrendingUp, Scale, Info, Percent, Coins, 
-  Sigma, Hash, Binary, Activity, Target, HelpCircle, CornerDownRight 
+  Sigma, Hash, Binary, Activity, Target, HelpCircle, CornerDownRight,
+  ChevronDown, ChevronUp, BookOpen, Lightbulb
 } from 'lucide-react';
+import { InlineMath, BlockMath } from './MathComponents';
 
 export type StatsMode = 
   | 'descriptive_stats'
@@ -206,6 +208,7 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
     regression_y: "20, 24, 30, 39, 41, 48, 52"
   });
   const [result, setResult] = useState<any>(null);
+  const [isExplanationExpanded, setIsExplanationExpanded] = useState(true);
 
   const handleInputChange = (key: string, val: string) => {
     const numVal = val === '' ? 0 : parseFloat(val);
@@ -1001,6 +1004,135 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
     }
   };
 
+  const renderWorkedOutSolution = () => {
+    if (!result) return null;
+
+    let steps: React.ReactNode[] = [];
+    let interpretationTitle = "";
+    let interpretationText = "";
+    let formulaText = "";
+
+    switch (mode) {
+      case 'descriptive_stats': {
+        const raw_str = textInputs.descriptive_raw || "";
+        const numbers = raw_str.split(/[\s,]+/).map(parseFloat).filter(v => !isNaN(v));
+        const count = numbers.length;
+        const sum = numbers.reduce((a, b) => a + b, 0);
+        const mean = count > 0 ? sum / count : 0;
+        const sorted = [...numbers].sort((a, b) => a - b);
+        const sqDiffSum = numbers.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0);
+        
+        formulaText = "\\bar{x} = \\frac{\\sum_{i=1}^n x_i}{n} \\quad S^2 = \\frac{\\sum_{i=1}^n (x_i - \\bar{x})^2}{n - 1}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Parse and Sort Observations (<InlineMath math="n" />):</strong> Dataset contains {count} observations. Sorted: <span className="font-mono bg-paper px-1.5 py-0.5 rounded border border-border text-xs">{sorted.join(', ')}</span>.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Sample Sum (<InlineMath math="\sum x_i" />):</strong> Sum is {sum.toFixed(2)}.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Solve for Sample Mean (<InlineMath math="\bar{x}" />):</strong> <InlineMath math={`\\bar{x} = \\frac{${sum.toFixed(2)}}{${count}} = ${mean.toFixed(4)}`} />.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Calculate Sum of Squared Deviations (<InlineMath math="\sum (x_i - \bar{x})^2" />):</strong> Sum of squared differences from the mean is {sqDiffSum.toFixed(4)}.</div>,
+          <div key="s5" className="flex items-center gap-1 flex-wrap"><strong>Step 5: Solve for Sample Variance (<InlineMath math="S^2" />) & Standard Deviation (<InlineMath math="S" />):</strong> <InlineMath math={`S^2 = \\frac{${sqDiffSum.toFixed(4)}}{${count - 1}} = ${parseFloat(result.sampleVar).toFixed(4)}`} />, Standard Deviation <InlineMath math={`S = \\sqrt{S^2} = ${parseFloat(result.sampleSD).toFixed(4)}`} />.</div>
+        ];
+        interpretationTitle = "Descriptive Data Summary & Interpretation";
+        interpretationText = `The sample mean of ${parseFloat(result.mean).toFixed(2)} represents the central balance point of the data. The standard deviation of ${parseFloat(result.sampleSD).toFixed(2)} signifies that, on average, the data points deviate from the mean by about ${parseFloat(result.sampleSD).toFixed(2)} units. A smaller standard deviation indicates a more consistent dataset, while a larger one suggests wider dispersion.`;
+        break;
+      }
+      case 'simple_regression': {
+        const x_vals = (textInputs.regression_x || "").split(/[\s,]+/).map(parseFloat).filter(v => !isNaN(v));
+        const y_vals = (textInputs.regression_y || "").split(/[\s,]+/).map(parseFloat).filter(v => !isNaN(v));
+        const n = x_vals.length;
+        
+        formulaText = "y = \\beta_0 + \\beta_1 x \\quad \\beta_1 = \\frac{n\\sum xy - \\sum x \\sum y}{n\\sum x^2 - (\\sum x)^2}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Check Data Pairs (<InlineMath math="n" />):</strong> Regression calculated for {n} coordinate pairs.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Slope Beta 1 (<InlineMath math="\hat{\beta}_1" />):</strong> OLS numerator and denominator solve to yield a slope of <InlineMath math={`\\hat{\\beta}_1 = ${result.beta1}`} />.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate Intercept Beta 0 (<InlineMath math="\hat{\beta}_0" />):</strong> Intersection point with vertical axis is <InlineMath math={`\\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1 \\bar{x} = ${result.beta0}`} />.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Solve for Goodness of Fit (<InlineMath math="R^2" />):</strong> Coefficient of Determination is {result.r2} (Correlation coefficient <InlineMath math={`r = ${result.r}`} />).</div>
+        ];
+        interpretationTitle = "OLS Simple Linear Regression Analysis";
+        interpretationText = `The estimated OLS regression equation is: ${result.formula}. This model states that for every 1-unit increase in the independent variable (X), the dependent variable (Y) is expected to change by ${result.beta1} units. The goodness-of-fit R² value of ${result.r2} means that ${(parseFloat(result.r2) * 100).toFixed(1)}% of the total variation in Y is explained by its linear relationship with X, which is considered a ${parseFloat(result.r2) > 0.7 ? 'STRONG' : parseFloat(result.r2) > 0.4 ? 'MODERATE' : 'WEAK'} predictive fit.`;
+        break;
+      }
+      case 'hypothesis_testing': {
+        const isOneTailed = values.isOneTailed === 1;
+        const testStat = result.testStat || '0';
+        const critValue = result.critValue || '0';
+        const decision = result.decision || '';
+        
+        formulaText = "Test \\ Stat = \\frac{\\bar{x} - \\mu_0}{S / \\sqrt{n}}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Define Hypotheses:</strong> Null Hypothesis <InlineMath math="H_0: \mu = \mu_0" /> vs. Alternative <InlineMath math={isOneTailed ? "H_1: \mu > \mu_0" : "H_1: \mu \\neq \mu_0"} />.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Standard Error (SE):</strong> Standard error of the sample mean is <InlineMath math="SE = \\frac{S}{\\sqrt{n}}" />.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Compute Test Statistic:</strong> Test score solves to a value of <InlineMath math={`t = ${testStat}`} />.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Compare with Critical Value:</strong> Critical boundary is <InlineMath math={`t_{\\alpha} = ${critValue}`} />. Decision reached: {decision}.</div>
+        ];
+        interpretationTitle = "Hypothesis Significance Testing Results";
+        interpretationText = `Under the specified significance alpha level, the test statistic is ${testStat} while the critical cutoff boundary is ${critValue}. Since the test statistic falls ${result.decisionBool ? 'OUTSIDE' : 'INSIDE'} the non-rejection region, we ${result.decisionBool ? 'REJECT' : 'FAIL TO REJECT'} the null hypothesis. ${result.decisionBool ? 'There is statistically significant evidence to support the alternative hypothesis.' : 'There is insufficient statistical evidence to support the alternative hypothesis.'}`;
+        break;
+      }
+      default: {
+        formulaText = "\\theta = g(\\lambda_i)";
+        steps = [
+          <div key="s1"><strong>Step 1: Parse Statistical Model:</strong> Successfully loaded all parameters for {mode.replace('_', ' ').toUpperCase()}.</div>,
+          <div key="s2"><strong>Step 2: Execute Solver:</strong> Calculated probability distributions, coefficients, standard errors and variance thresholds.</div>,
+          <div key="s3"><strong>Step 3: Render Visual Insights:</strong> Plotted sample densities, trendlines and critical boundaries dynamically.</div>
+        ];
+        interpretationTitle = "Statistical Modeling Guidance";
+        interpretationText = "Modify any of the raw dataset values or sliders. The statistical engine immediately performs OLS matrix operations, critical t-value distributions, and correlation tests in real-time. Use these results to test economic significance, verify consistency, and forecast demand parameters.";
+        break;
+      }
+    }
+
+    return (
+      <div className="mt-8 border-t border-border pt-6 px-3 sm:px-6 md:px-8">
+        <button 
+          onClick={() => setIsExplanationExpanded(!isExplanationExpanded)}
+          className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-900/80 transition-colors border border-border"
+        >
+          <div className="flex items-center gap-2 text-ink">
+            <BookOpen size={16} className="text-sky-500" />
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Show Worked-out Solution & Statistical Interpretation
+            </span>
+          </div>
+          {isExplanationExpanded ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
+        </button>
+
+        {isExplanationExpanded && (
+          <div className="mt-4 p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl border border-border space-y-6">
+            <div>
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Percent size={12} /> Key Equation
+              </h4>
+              <div className="p-4 bg-white dark:bg-slate-950 border border-border rounded-xl text-center font-mono text-sm overflow-x-auto text-ink flex justify-center py-5">
+                <BlockMath math={formulaText} />
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Calculator size={12} /> Step-by-Step Statistical Workout
+              </h4>
+              <div className="space-y-3 pl-1">
+                {steps.map((step, idx) => (
+                  <div key={idx} className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 border-l-2 border-sky-400 dark:border-sky-500/50 pl-3 py-0.5 leading-relaxed">
+                    {step}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 rounded-xl">
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                <Lightbulb size={12} className="text-sky-500" /> {interpretationTitle}
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                {interpretationText}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="my-0 bg-card rounded-xl sm:rounded-3xl border border-border shadow-md sm:shadow-xl overflow-hidden not-prose transition-colors duration-300 w-full max-w-full">
       <div className="bg-slate-900 dark:bg-sky-900/40 p-4 sm:p-6 md:p-8 flex items-center gap-3 sm:gap-6">
@@ -1040,6 +1172,8 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
           </AnimatePresence>
         </div>
       </div>
+      
+      {renderWorkedOutSolution()}
     </div>
   );
 };

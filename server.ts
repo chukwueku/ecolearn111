@@ -32,7 +32,7 @@ async function startServer() {
       try {
         return await fn();
       } catch (error: any) {
-        const isRetryable = error?.status === 503 || error?.status === 429 || error?.code === 503 || error?.code === 429;
+        const isRetryable = error?.status === 503 || error?.status === 429 || error?.code === 503 || error?.code === 429 || error?.status === "UNAVAILABLE" || error?.status === "RESOURCE_EXHAUSTED";
         if (isRetryable && i < maxRetries - 1) {
           console.log(`Retrying API call (attempt ${i + 1})...`);
           await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
@@ -70,7 +70,9 @@ Make it educational, engaging, and easy to understand for a ${level} level.`;
       res.json({ result: response.text });
     } catch (error: any) {
       console.error("Gemini Error:", error);
-      const status = error?.status || 500;
+      let status = typeof error?.status === 'number' ? error.status : 500;
+      if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
+      if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
       const message = status === 503 ? "Gemini API is currently overloaded. Please try again in a moment." : "Failed to generate study guide";
       res.status(status).json({ error: message });
     }
@@ -112,9 +114,56 @@ Ensure the questions are challenging but appropriate for the ${level} level.`;
       res.json({ questions: JSON.parse(response.text || "[]") });
     } catch (error: any) {
       console.error("Gemini Error:", error);
-      const status = error?.status || 500;
+      let status = typeof error?.status === 'number' ? error.status : 500;
+      if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
+      if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
       const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to generate questions";
       res.status(status).json({ questions: [], error: message });
+    }
+  });
+
+  app.post("/api/parsePdf", async (req, res) => {
+    const { pdfBase64, prompt } = req.body;
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
+    
+    try {
+      const response = await withRetry(() => ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: [
+          prompt || "Extract and summarize the educational content of this PDF into a detailed markdown study guide.",
+          {
+            inlineData: {
+              data: pdfBase64,
+              mimeType: "application/pdf"
+            }
+          }
+        ]
+      }));
+      res.json({ markdown: response.text });
+    } catch (error: any) {
+      console.error("Gemini Error:", error);
+      let status = typeof error?.status === 'number' ? error.status : 500;
+      if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
+      if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
+      res.status(status).json({ error: "Failed to parse PDF" });
+    }
+  });
+
+  app.post("/api/restoreAdvancedStudy", async (req, res) => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'development_economics.md');
+      if (fs.existsSync(filePath)) {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        res.json({ content });
+      } else {
+        res.status(404).json({ error: 'File not found' });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to read file' });
     }
   });
 
@@ -161,7 +210,9 @@ Return the response in JSON format as an array of objects with the following sch
       res.json({ questions: JSON.parse(response.text || "[]") });
     } catch (error: any) {
       console.error("Gemini PDF Extract Error:", error);
-      const status = error?.status || 500;
+      let status = typeof error?.status === 'number' ? error.status : 500;
+      if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
+      if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
       const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to extract questions from PDF";
       res.status(status).json({ questions: [], error: message });
     }

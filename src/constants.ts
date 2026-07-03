@@ -484,7 +484,106 @@ export const SECONDARY_SS3_ROADMAP: RoadmapTopic[] = [
   }
 ];
 
-export const UNDERGRADUATE_ROADMAP = SECONDARY_SS3_ROADMAP;
+export const UNDERGRADUATE_REAL_ROADMAP: RoadmapTopic[] = [
+  {
+    id: 'ug-micro',
+    title: 'Advanced Microeconomics',
+    description: 'Advanced consumer theory, indifference curves, producer theory, perfect and imperfect market structures, and general equilibrium.',
+    category: 'Course 1',
+    subtopics: [
+      'Consumer Utility & Indifference Curves',
+      'Theory of Production & Cost Functions',
+      'Perfect Competition vs. Pure Monopoly',
+      'Oligopoly Models & Game Theory'
+    ]
+  },
+  {
+    id: 'ug-macro',
+    title: 'Advanced Macroeconomics',
+    description: 'Aggregate output determination, IS-LM model framework, inflation dynamics, unemployment, and long-run economic growth theories.',
+    category: 'Course 2',
+    subtopics: [
+      'National Income Determination',
+      'The IS-LM Equilibrium Framework',
+      'Aggregate Demand & Aggregate Supply (AD-AS)',
+      'The Phillips Curve and Inflation Expectations',
+      'Solow-Swan and Endogenous Growth Models'
+    ]
+  },
+  {
+    id: 'ug-statistical',
+    title: 'Statistical Economics',
+    description: 'Descriptive and inferential statistics, probability distributions, sampling techniques, estimation, and hypothesis testing.',
+    category: 'Course 3',
+    subtopics: [
+      'Measures of Central Tendency & Dispersion',
+      'Probability Theory and Conditional Probability',
+      'Discrete & Continuous Probability Distributions',
+      'Point and Interval Estimation Techniques',
+      'Null Hypothesis Testing, t-tests, & Chi-Square'
+    ]
+  },
+  {
+    id: 'ug-econometrics',
+    title: 'Basic Econometrics',
+    description: 'Single-equation regression models, Ordinary Least Squares (OLS) estimation, multiple regression analysis, and diagnostic testing.',
+    category: 'Course 4',
+    subtopics: [
+      'The Methodology and Goals of Econometrics',
+      'Two-Variable Linear Regression Model (OLS)',
+      'Multiple Regression Analysis & Matrix Form',
+      'Multicollinearity, Heteroscedasticity, & Autocorrelation'
+    ]
+  },
+  {
+    id: 'ug-monetary',
+    title: 'Monetary Economics',
+    description: 'Money supply creation, central banking instruments, money demand theories, interest rates, and transmission channels.',
+    category: 'Course 5',
+    subtopics: [
+      'Functions, Evolution, and Definitions of Money',
+      'The Credit Creation Money Multiplier Process',
+      'Classical, Keynesian, and Monetarist Demand for Money',
+      'Central Bank Policy Instruments & Interest Rates'
+    ]
+  },
+  {
+    id: 'ug-development',
+    title: 'Advanced Development Economics',
+    description: 'Multidimensional development concepts, income disparities, economic traps, capability theories, and structural transformations.',
+    category: 'Course 6',
+    subtopics: [
+      'Economic Growth vs. Multidimensional Development',
+      'Income Disparities and Danny Quah Twin Peaks',
+      'Amartya Sen Capability Approach & Functionings',
+      'Occupational Structures, Urbanization, and Debt Traps'
+    ]
+  },
+  {
+    id: 'ug-financial',
+    title: 'Financial Economics',
+    description: 'Financial markets, asset valuation, risk and returns, the Capital Asset Pricing Model (CAPM), and portfolio optimization.',
+    category: 'Course 7',
+    subtopics: [
+      'Financial System Functions & Market Types',
+      'Present Value, Bond Valuation, and Yields',
+      'Portfolio Theory: Variance & Diversification of Risk',
+      'Capital Asset Pricing Model (CAPM) & Beta Calculation'
+    ]
+  },
+  {
+    id: 'ug-international',
+    title: 'International Economics',
+    description: 'Pure theories of trade, protectionist tariffs, foreign exchange markets, and balance of payments disequilibrium adjustments.',
+    category: 'Course 8',
+    subtopics: [
+      'Classical & Heckscher-Ohlin Trade Theories',
+      'Commercial Policy: Tariffs, Quotas, and Welfare Effects',
+      'Foreign Exchange Rate Determination Models',
+      'Balance of Payments (BOP) Accounts & Devaluation'
+    ]
+  }
+];
 
 export const CHALLENGES: Record<string, { question: string, options: string[], answer: number }[]> = {
   'ss1-intro': [

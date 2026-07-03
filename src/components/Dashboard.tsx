@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { updateUserLevel } from '../firebase';
+import { useRoadmap } from '../hooks/useRoadmap';
 
 export const Dashboard = () => {
     const { user, profile, setProfile } = useAuth();
@@ -10,7 +10,7 @@ export const Dashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const level = profile?.level || 'secondary';
-    const roadmap = level === 'secondary-ss2' ? SECONDARY_SS2_ROADMAP : (level === 'undergraduate' ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
+    const { roadmap } = useRoadmap(level);
     const progress = profile?.progress || {};
 
     const filteredRoadmap = roadmap.filter(topic => 
@@ -18,9 +18,9 @@ export const Dashboard = () => {
         topic.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
-    const levelTitle = level === 'secondary-ss2' ? 'Economics SS2 Curriculum' : (level === 'undergraduate' ? 'Economics SS3 Curriculum' : 'Economics Curriculum');
-    const levelSubtitle = level === 'secondary-ss2' ? 'Advanced Senior Secondary School 2 WAEC/NECO curriculum.' : (level === 'undergraduate' ? 'Comprehensive Senior Secondary School 3 WAEC/NECO syllabus including comparative economics, human capital development, international trade, and public finance.' : 'This syllabus is designed to assess candidates’ knowledge of basic economic principles needed for rational decision making relating to individuals, businesses, government and society. Such knowledge is necessary in enhancing their appreciation of government economic policies, problems of implementation and how they impact on the economy. This will help candidates to understand that economics is not only an academic field of study but also a practical subject.');
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'secondary-ss3' ? 'SS3' : (level === 'undergraduate' ? 'Undergraduate' : 'SS1'));
+    const levelTitle = level === 'secondary-ss2' ? 'Economics SS2 Curriculum' : (level === 'secondary-ss3' ? 'Economics SS3 Curriculum' : (level === 'undergraduate' ? 'Undergraduate Economics' : 'Economics Curriculum'));
+    const levelSubtitle = level === 'secondary-ss2' ? 'Advanced Senior Secondary School 2 WAEC/NECO curriculum.' : (level === 'secondary-ss3' ? 'Comprehensive Senior Secondary School 3 WAEC/NECO syllabus including comparative economics, human capital development, international trade, and public finance.' : (level === 'undergraduate' ? 'Advanced undergraduate level curriculum focusing on macro/micro theories and empirical analysis.' : 'This syllabus is designed to assess candidates’ knowledge of basic economic principles needed for rational decision making relating to individuals, businesses, government and society. Such knowledge is necessary in enhancing their appreciation of government economic policies, problems of implementation and how they impact on the economy. This will help candidates to understand that economics is not only an academic field of study but also a practical subject.'));
 
     return (
         <div className="bg-surface font-body-md text-on-surface min-h-screen pb-24 font-['Hanken_Grotesk']">
@@ -78,13 +78,15 @@ export const Dashboard = () => {
                                 {levelSubtitle}
                             </p>
                         </div>
-                        <button 
-                            onClick={() => navigate('/select-level')}
-                            className="shrink-0 self-start md:self-center flex items-center gap-2 px-5 py-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 rounded-full font-bold text-xs transition-all active:scale-[0.98] shadow-sm"
-                        >
-                            <span className="material-symbols-outlined text-[16px] font-bold">school</span>
-                            Switch Level
-                        </button>
+                        {level !== 'undergraduate' && (
+                            <button 
+                                onClick={() => navigate('/select-level')}
+                                className="shrink-0 self-start md:self-center flex items-center gap-2 px-5 py-2.5 bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 rounded-full font-bold text-xs transition-all active:scale-[0.98] shadow-sm"
+                            >
+                                <span className="material-symbols-outlined text-[16px] font-bold">school</span>
+                                Switch Level
+                            </button>
+                        )}
                     </div>
 
                     <div className="relative group mt-6">
@@ -164,7 +166,7 @@ export const Dashboard = () => {
                                         <div className="flex-1 pr-4">
                                             <div className="flex items-center gap-3 mb-1.5">
                                                 <span className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">
-                                                    {topic.category || `Chapter ${index + 1}`}
+                                                    {level === "undergraduate" ? `Course ${index + 1}` : (topic.category || `Chapter ${index + 1}`)}
                                                 </span>
                                                 {isChCompleted && (
                                                     <span className="bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">

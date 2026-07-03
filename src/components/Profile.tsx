@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { logout, updateUserLevel, updateUserProfile, deleteUserAccount } from '../firebase';
+import { logout, updateUserLevel, updateUserProfile, deleteUserAccount, UserProfile } from '../firebase';
 import { useDarkMode } from '../DarkModeContext';
 
 export const Profile = () => {
@@ -25,12 +25,34 @@ export const Profile = () => {
     // Fallback counts or real data calculation
     const progress = profile?.progress || {};
     const level = profile?.level || 'secondary';
-    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'secondary-ss3' ? 'SS3' : (level === 'undergraduate' ? 'Undergraduate' : 'SS1'));
     const completedCount = Object.values(progress).filter(Boolean).length;
     const wins = 0;
 
-    const handleSwitchLevel = () => {
-        navigate('/select-level');
+    const handleSwitchLevel = async () => {
+        if (level === 'undergraduate' && user) {
+            try {
+                await updateUserLevel(user.uid, 'secondary');
+                setProfile({ ...profile, level: 'secondary' } as UserProfile);
+                navigate('/dashboard');
+            } catch (e) {
+                console.error("Error switching level:", e);
+            }
+        } else {
+            navigate('/select-level');
+        }
+    };
+
+    const handleSwitchToUndergraduate = async () => {
+        if (user) {
+            try {
+                await updateUserLevel(user.uid, 'undergraduate');
+                setProfile({ ...profile, level: 'undergraduate' } as UserProfile);
+                navigate('/dashboard');
+            } catch (e) {
+                console.error("Error switching to undergraduate:", e);
+            }
+        }
     };
 
     const handleLogout = async () => {
@@ -300,12 +322,27 @@ export const Profile = () => {
                                     <span className="material-symbols-outlined">school</span>
                                 </div>
                                 <div>
-                                    <p className="font-label-md font-bold text-primary">Change Learning Path</p>
-                                    <p className="font-label-sm text-on-surface-variant">Switch between SS1 and SS2</p>
+                                    <p className="font-label-md font-bold text-primary">{level === 'undergraduate' ? 'Switch to Secondary' : 'Switch Level'}</p>
+                                    <p className="font-label-sm text-on-surface-variant">{level === 'undergraduate' ? 'Return to secondary school curriculum' : 'Switch between SS1 to SS3'}</p>
                                 </div>
                             </div>
                             <span className="material-symbols-outlined text-outline">chevron_right</span>
                         </div>
+
+                        {level !== 'undergraduate' && (
+                            <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchToUndergraduate}>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-indigo-500">
+                                        <span className="material-symbols-outlined">account_balance</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-label-md font-bold text-indigo-500">Switch to Undergraduate</p>
+                                        <p className="font-label-sm text-on-surface-variant">Access advanced university-level curriculum</p>
+                                    </div>
+                                </div>
+                                <span className="material-symbols-outlined text-outline">chevron_right</span>
+                            </div>
+                        )}
 
                         {/* Profile Settings */}
                         <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setIsEditing(true)}>

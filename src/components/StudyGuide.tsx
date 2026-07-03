@@ -13,7 +13,6 @@ import {
 import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles, Copy, Check } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../useAuth';
-import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { MICRO_STUDY_GUIDE } from '../lib/studyData';
 import { ADVANCED_STUDY_GUIDE } from '../lib/advancedStudyData';
 import { SS2_STUDY_GUIDE } from '../lib/ss2StudyData';
@@ -22,10 +21,46 @@ import { generateStudyGuide } from '../gemini';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'motion/react';
+import { useRoadmap } from '../hooks/useRoadmap';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+const cleanMarkdownContent = (text: string): string => {
+  if (!text) return text;
+  
+  // 1. Fix control character backslash escaping issues
+  let cleaned = text
+    .replace(/\x08/g, '\\b')
+    .replace(/\x0c/g, '\\f')
+    .replace(/\x09/g, '\\t');
+    
+  // 2. Ensure a blank line before markdown tables (lines starting with '|')
+  const lines = cleaned.split('\n');
+  const processedLines: string[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    if (trimmed.startsWith('|')) {
+      // If previous line exists, is not empty, and does not start with '|', insert a blank line
+      if (i > 0) {
+        const prevLine = processedLines[processedLines.length - 1];
+        const prevTrimmed = prevLine.trim();
+        if (prevTrimmed !== '' && !prevTrimmed.startsWith('|') && !prevTrimmed.startsWith('<!--')) {
+          processedLines.push('');
+        }
+      }
+    }
+    processedLines.push(line);
+  }
+  
+  return processedLines.join('\n');
+};
 
 // Lazy load the EconomicsSimulator component
 const LazyEconomicsSimulator = React.lazy(() => 
@@ -92,13 +127,16 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   const { profile } = useAuth();
   const navigate = useNavigate();
   
-  const roadmap = useMemo(() => {
-    if (topicId.startsWith('ss2-')) return SECONDARY_SS2_ROADMAP;
-    if (topicId.startsWith('ug-')) return UNDERGRADUATE_ROADMAP;
-    return SECONDARY_ROADMAP;
+  const level = useMemo(() => {
+    if (topicId.startsWith('ss2-')) return 'secondary-ss2';
+    if (topicId.startsWith('ug-ch')) return 'secondary-ss3';
+    if (topicId.startsWith('ug-') || topicId.startsWith('uni-')) return 'undergraduate';
+    return 'secondary';
   }, [topicId]);
+  
+  const { roadmap } = useRoadmap(level);
 
-  const topic = roadmap.find(t => t.id === topicId);
+  const topic = roadmap.find(t => t.id === topicId) || { id: topicId, title: 'Loading...', description: '', category: '' };
   
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -111,25 +149,67 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
 
   useEffect(() => {
     const fetchGuide = async () => {
-      const currentRoadmap = topicId.startsWith('ss2-') ? SECONDARY_SS2_ROADMAP : (topicId.startsWith('ug-') ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
-      const currentTopic = currentRoadmap.find(t => t.id === topicId);
-      if (!currentTopic) return;
+      if (!topic || topic.title === 'Loading...') return;
       setLoading(true);
 
-      const localContent = topicId.startsWith('ss2-') ? SS2_STUDY_GUIDE[topicId] : (topicId.startsWith('ug-') ? SS3_STUDY_GUIDE[topicId] : MICRO_STUDY_GUIDE[topicId]);
+      try {
+        // Try to fetch from Firebase first
+        const docRef = doc(db, 'study_materials', topicId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists() && docSnap.data().content) {
+          setContent(cleanMarkdownContent(docSnap.data().content));
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch study material from db", err);
+      }
+
+      // Fallback to local
+      let localContent = topicId.startsWith('ss2-') 
+        ? SS2_STUDY_GUIDE[topicId] 
+        : (topicId in ADVANCED_STUDY_GUIDE 
+          ? ADVANCED_STUDY_GUIDE[topicId as keyof typeof ADVANCED_STUDY_GUIDE] 
+          : (topicId === 'ug-micro'
+            ? MICRO_STUDY_GUIDE['ug-micro']
+            : (topicId.startsWith('ug-ch') 
+              ? SS3_STUDY_GUIDE[topicId] 
+              : MICRO_STUDY_GUIDE[topicId])));
+      
+      // Special case: uni-ch1 or ug-development (restore missing Development Economics guide)
+      if (!localContent && (topicId === 'uni-ch1' || topicId === 'ug-development')) {
+        try {
+          const res = await fetch('/api/restoreAdvancedStudy', { method: 'POST' });
+          if (res.ok) {
+            const data = await res.json();
+            localContent = data.content;
+          }
+        } catch (restoreErr) {
+          console.error("Failed to restore advanced study guide", restoreErr);
+        }
+      }
+
       let guideContent = "";
 
       if (localContent) {
         guideContent = localContent;
+        // Write back to Firestore so that it is in the database!
+        try {
+          await setDoc(doc(db, 'study_materials', topicId), { content: localContent });
+        } catch (writeErr) {
+          console.warn("Failed to seed study material to db", writeErr);
+        }
       } else {
-        guideContent = await generateStudyGuide(currentTopic.title, topicId.startsWith('ug-') ? 'undergraduate' : 'secondary', currentTopic.description);
+        const genLevel = level === 'undergraduate' ? 'undergraduate' : 'secondary';
+        guideContent = await generateStudyGuide(topic.title, genLevel, topic.description);
       }
 
-      setContent(guideContent);
+      setContent(cleanMarkdownContent(guideContent));
       setLoading(false);
     };
-    fetchGuide();
-  }, [topicId]);
+    if (roadmap.length > 0) fetchGuide();
+  }, [topicId, roadmap, topic]);
 
   // Reset to first page when topicId changes
   useEffect(() => {
@@ -493,7 +573,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         {/* Sidebar TOC & Chapter Filter */}
         <aside className="hidden lg:block w-64 shrink-0 sticky top-32 h-fit space-y-12">
           <div className="border-l border-slate-200 dark:border-slate-800 pl-8">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 mb-8">Topics</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 mb-8">{profile?.level === "undergraduate" ? "Switch Course" : "Switch Topic"}</p>
             <nav className="space-y-4">
               {roadmap.map((ch) => (
                 <Link
@@ -504,7 +584,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                     topicId === ch.id ? "text-sky-600 dark:text-sky-400" : "text-slate-500 dark:text-slate-700"
                   )}
                 >
-                  {ch.category}
+                  {profile?.level === "undergraduate" ? ch.title : ch.category}
                 </Link>
               ))}
             </nav>
@@ -536,14 +616,14 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         {/* Mobile Chapter Filter */}
         <div className="lg:hidden px-0 mb-4 space-y-4">
           <div className="bg-white dark:bg-slate-950 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 mb-4">Select Topic</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 mb-4">{profile?.level === "undergraduate" ? "Switch Course" : "Select Topic"}</p>
             <select 
               value={topicId}
               onChange={(e) => navigate(`/study-guide/${e.target.value}`)}
               className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-xs font-bold text-slate-900 dark:text-white focus:outline-none appearance-none"
             >
               {roadmap.map((ch) => (
-                <option key={ch.id} value={ch.id}>{ch.category}: {ch.title}</option>
+                <option key={ch.id} value={ch.id}>{profile?.level === "undergraduate" ? ch.title : `${ch.category}: ${ch.title}`}</option>
               ))}
             </select>
           </div>

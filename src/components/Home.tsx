@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
-import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
 import { AuthModal } from './AuthModal';
+import { useRoadmap } from '../hooks/useRoadmap';
 
 export const Home = () => {
     const { user, profile } = useAuth();
@@ -13,8 +13,8 @@ export const Home = () => {
     const [animatedPercentage, setAnimatedPercentage] = useState(0);
 
     const level = profile?.level || 'secondary';
-    const roadmap = level === 'secondary-ss2' ? SECONDARY_SS2_ROADMAP : (level === 'undergraduate' ? UNDERGRADUATE_ROADMAP : SECONDARY_ROADMAP);
-    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'undergraduate' ? 'SS3' : 'SS1');
+    const { roadmap } = useRoadmap(level);
+    const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'secondary-ss3' ? 'SS3' : (level === 'undergraduate' ? 'Undergraduate' : 'SS1'));
     const progress = profile?.progress || {};
     const completedCount = Object.values(progress).filter(Boolean).length;
     const totalCount = roadmap ? roadmap.length : 0;
@@ -237,7 +237,8 @@ export const Home = () => {
                             const defaultChapters: Record<string, string> = {
                                 'secondary': 'ss1-ch1',
                                 'secondary-ss2': 'ss2-ch1',
-                                'undergraduate': 'ug-ch1'
+                                'secondary-ss3': 'ug-ch1',
+                                'undergraduate': 'ug-micro'
                             };
                             const defaultId = defaultChapters[level] || 'ss1-ch1';
                             navigate(activeCourse ? `/study-guide/${activeCourse.id}` : `/study-guide/${defaultId}`);

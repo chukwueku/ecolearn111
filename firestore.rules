@@ -34,11 +34,28 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
+    // Test Collection
+    match /test/{documentId} {
+      allow read: if true;
+    }
+    
     // Questions Collection
     match /questions/{questionId} {
       // Any signed-in user can read questions
       allow read: if isSignedIn();
       // Only admins can write questions
+      allow write: if isAdmin();
+    }
+    
+    // Roadmaps Collection
+    match /roadmaps/{level} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Study Materials Collection
+    match /study_materials/{topicId} {
+      allow read: if true;
       allow write: if isAdmin();
     }
     

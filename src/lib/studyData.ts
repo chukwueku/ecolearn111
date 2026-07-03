@@ -334,6 +334,7 @@ These are measures of values which show the degree or extent to which any given 
 ### Mean (Arithmetic mean)
 The arithmetic mean is the sum total of all the items divided by the number of items in the group.
 
+#### Ungrouped Mean
 **Formula**:
 $$\\bar{x} = \\frac{\\sum X}{N}$$
 Where:
@@ -341,32 +342,132 @@ Where:
 *   $\\sum X$ = sum of the different scores
 *   $N$ = number of scores
 
-#### Mean of grouped data
-The formula used is:
+**Worked-Out Example**:
+Suppose the daily profits (in thousands of Naira) of 6 small traders in a market are: **12, 15, 8, 20, 10, 15**. Let's compute their mean daily profit:
+$$\\sum X = 12 + 15 + 8 + 20 + 10 + 15 = 80$$
+$$N = 6$$
+$$\\bar{x} = \\frac{80}{6} \\approx 13.33$$
+The mean daily profit is approximately **₦13,330**.
+
+#### Grouped Mean
+**Formula**:
 $$\\bar{x} = \\frac{\\sum fx}{\\sum f}$$
 Where:
 *   $\\bar{x}$ = required mean
 *   $\\sum f$ = sum of the frequencies
-*   $\\sum fx$ = sum of the product of the scores and frequencies
+*   $\\sum fx$ = sum of the product of class marks ($x$) and their frequencies ($f$)
+
+**Worked-Out Example**:
+The table below represents the marks of 40 students in an Economics test:
+| Mark Class | Frequency ($f$) | Class Mark ($x$) | $fx$ |
+| :---: | :---: | :---: | :---: |
+| 10 - 19 | 4 | 14.5 | 58 |
+| 20 - 29 | 6 | 24.5 | 147 |
+| 30 - 39 | 10 | 34.5 | 345 |
+| 40 - 49 | 12 | 44.5 | 534 |
+| 50 - 59 | 8 | 54.5 | 436 |
+| **Sum** | **$\\sum f = 40$** | - | **$\\sum fx = 1,520$** |
+
+*Note: Class Mark ($x$) is calculated as the average of the lower and upper limits of each class (e.g., $\\frac{10+19}{2} = 14.5$).*
+
+Applying the formula:
+$$\\bar{x} = \\frac{1520}{40} = 38.0$$
+The mean score of the students is **38.0 marks**.
+
+---
 
 ### Median
-The median represents the middle value of a set of distribution when arranged either in descending or ascending order.
+The median represents the middle value of a set of distribution when arranged in ascending or descending order.
 
-**Formula for odd number of items**:
-$$M = \\left(\\frac{N + 1}{2}\\right)^{th} \\text{ number}$$
+#### Ungrouped Median
+1. **Odd number of items ($N$)**:
+   The median is the exact middle term at position:
+   $$M = \\left(\\frac{N + 1}{2}\\right)^{th} \\text{ item}$$
+   *Example*: For the scores **3, 8, 5, 12, 10**, arrange them first: **3, 5, 8, 10, 12**.
+   $N = 5$. Position is $\\frac{5+1}{2} = 3^{rd}$ item, which is **8**.
 
-**Median of grouped data**:
-$$M = \\left[ \\frac{\\frac{N}{2} - F}{f_m} \\right] W + L_m$$
+2. **Even number of items ($N$)**:
+   The median is the average of the two middle terms:
+   $$M = \\frac{\\text{Item at } (N/2) + \\text{Item at } (N/2 + 1)}{2}$$
+   *Example*: For the scores **14, 10, 18, 12, 15, 9**, arrange them first: **9, 10, 12, 14, 15, 18**.
+   $N = 6$. The middle terms are the $3^{rd}$ (12) and $4^{th}$ (14).
+   $$M = \\frac{12 + 14}{2} = 13.0$$
+
+#### Grouped Median
+**Formula**:
+$$M = L_m + \\left[ \\frac{\\frac{N}{2} - F}{f_m} \\right] W$$
 Where:
 *   $M$ = required median
-*   $N$ = total number of items
-*   $F$ = the greatest cumulative frequency less than $N/2$
-*   $W$ = class interval width
-*   $f_m$ = class frequency of interval containing median
-*   $L_m$ = lower boundary of class interval containing median
+*   $N$ = total frequency ($\\sum f$)
+*   $L_m$ = lower class boundary of the median class
+*   $F$ = cumulative frequency of the class preceding the median class
+*   $f_m$ = frequency of the median class
+*   $W$ = class width / interval size
+
+**Worked-Out Example**:
+Using the same dataset of 40 students, let's find the median:
+| Mark Class | Class Boundaries | Frequency ($f$) | Cumulative Frequency ($CF$) |
+| :---: | :---: | :---: | :---: |
+| 10 - 19 | 9.5 - 19.5 | 4 | 4 |
+| 20 - 29 | 19.5 - 29.5 | 6 | 10 |
+| 30 - 39 | 29.5 - 39.5 | 10 | 20 |
+| 40 - 49 | 39.5 - 49.5 | 12 | 32 |
+| 50 - 59 | 49.5 - 59.5 | 8 | 40 |
+
+*Step 1: Locate the Median Class.*
+The median is at position $N/2 = 40/2 = 20^{th}$ student.
+Looking at the Cumulative Frequency ($CF$) column:
+- Up to 19.5, there are 10 students.
+- Up to 29.5, there are 10 students.
+- Up to 39.5, there are 20 students.
+Thus, the $20^{th}$ student falls within the class **30 - 39** (boundaries **29.5 - 39.5**).
+*   Median class = **30 - 39** (boundaries 29.5 - 39.5)
+*   $L_m = 29.5$
+*   $N/2 = 20$
+*   $F$ (CF of preceding class) = $10$
+*   $f_m$ (frequency of median class) = $10$
+*   $W$ (class width) = $39.5 - 29.5 = 10$
+
+*Step 2: Apply the Formula.*
+$$M = 29.5 + \\left[ \\frac{20 - 10}{10} \\right] \\times 10$$
+$$M = 29.5 + \\left[ \\frac{10}{10} \\right] \\times 10 = 29.5 + 10 = 39.5$$
+The median score is **39.5 marks**.
+
+---
 
 ### Mode
-The mode is the number that appears or occurs the most in a set of data. It is the number with the highest frequency.
+The mode is the value that appears or occurs most frequently in a set of data.
+
+#### Ungrouped Mode
+Simply identify the score with the highest occurrence.
+*Example*: In the set **4, 9, 4, 7, 12, 4, 9**, the number **4** occurs three times. Thus, Mode = **4**.
+*(If two values have the same highest frequency, the distribution is bimodal).*
+
+#### Grouped Mode
+**Formula**:
+$$\\text{Mode} = L_0 + \\left[ \\frac{d_1}{d_1 + d_2} \\right] W$$
+Where:
+*   $L_0$ = lower class boundary of the modal class (the class with the highest frequency)
+*   $d_1$ = difference between the modal class frequency and the frequency of the preceding class ($f_0 - f_{\\text{prev}}$)
+*   $d_2$ = difference between the modal class frequency and the frequency of the succeeding class ($f_0 - f_{\\text{succ}}$)
+*   $W$ = class width
+
+**Worked-Out Example**:
+Using our 40-student dataset:
+*   The class with the highest frequency is **40 - 49** (frequency = 12).
+*   Modal class boundaries = **39.5 - 49.5**
+*   $L_0 = 39.5$
+*   Modal frequency $f_0 = 12$
+*   Preceding frequency $f_{\\text{prev}} = 10$ (from class 30-39)
+*   Succeeding frequency $f_{\\text{succ}} = 8$ (from class 50-59)
+*   $d_1 = 12 - 10 = 2$
+*   $d_2 = 12 - 8 = 4$
+*   $W = 10$
+
+Applying the formula:
+$$\\text{Mode} = 39.5 + \\left[ \\frac{2}{2 + 4} \\right] \\times 10$$
+$$\\text{Mode} = 39.5 + \\left[ \\frac{2}{6} \\right] \\times 10 = 39.5 + 3.33 = 42.83$$
+The modal score is **42.83 marks**.
 
 #### Measures of Central Tendency Solver
 \`\`\`simulator
@@ -508,9 +609,9 @@ Equilibrium is reached at $10 where demand and supply both equal 20kg.
 ## Concept of Revenue
 Revenue refers to all the money income accruing to a firm from the sale of goods and services, assets or investments.
 
-1. **Total Revenue (TR)**: The sum of all money incomes from the sale of products. $TR = P \times Q$.
+1. **Total Revenue (TR)**: The sum of all money incomes from the sale of products. $TR = P \\times Q$.
 2. **Average Revenue (AR)**: The average money income per unit of product sold. $AR = TR / Q$.
-3. **Marginal Revenue (MR)**: The additional money income from the sale of one extra unit. $MR = \Delta TR / \Delta Q$.
+3. **Marginal Revenue (MR)**: The additional money income from the sale of one extra unit. $MR = \\Delta TR / \\Delta Q$.
 
 #### Price Elasticity of Demand (PED) Simulator
 \`\`\`simulator

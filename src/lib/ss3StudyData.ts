@@ -112,7 +112,7 @@ To escape the single-product "oil resource trap," Nigeria must adopt these struc
 ## 2.1 Concept of Human Capital
 In economics, **Human Capital** represents the aggregate stock of personal knowledge, technical expertise, physical dexterity, creativity, and moral capabilities embodied in a nation's workforce. Unlike physical capital (factories, machinery), human capital resides entirely within the individual and is the primary driver of **Total Factor Productivity (TFP)**.
 
-$$\text{Aggregate Production Function: } Y = A \cdot F(K, L, H)$$
+$$\\text{Aggregate Production Function: } Y = A \\cdot F(K, L, H)$$
 
 Where:
 *   $Y$ = National Output (GDP)
@@ -380,9 +380,9 @@ Suppose the Central Bank sets a cash reserve ratio of **10%** ($r = 0.10$).
 4.  Bank B holds $10\%$ (₦4,500) and lends out **₦40,500**.
 5.  This geometric progression continues indefinitely.
 
-$$\text{The Money Multiplier (M)} = \frac{1}{r} = \frac{1}{0.10} = 10$$
+$$\\text{The Money Multiplier (M)} = \\frac{1}{r} = \\frac{1}{0.10} = 10$$
 
-$$\text{Total Credit Created} = \text{Initial Deposit} \times \text{M} = 50,000 \times 10 = \mathbf{₦500,000}$$
+$$\\text{Total Credit Created} = \\text{Initial Deposit} \\times \\text{M} = 50,000 \\times 10 = \\mathbf{₦500,000}$$
 
 ### Dynamic Credit Multiplier Simulator
 Test how different reserve ratios ($rr$), cash holding drain rates ($c$), and excess bank reserves ($e$) affect the total currency in circulation using the simulator below:
@@ -467,7 +467,7 @@ Economic cooperation typically progresses through several distinct structural ph
 ## 8.1 Structure of the Balance of Payments
 The **Balance of Payments (BOP)** is a structured double-entry statistical ledger recording all economic transactions between the residents of a nation and the rest of the world over a one-year cycle.
 
-$$\text{Accounting Identity: } \text{Current Account} + \text{Capital Account} + \text{Financial Account} + \text{Errors & Omissions} \equiv 0$$
+$$\\text{Accounting Identity: } \\text{Current Account} + \\text{Capital Account} + \\text{Financial Account} + \\text{Errors \\& Omissions} \\equiv 0$$
 
 ### Balance of Payments Ledger Structure
 
@@ -569,17 +569,37 @@ Launched in **June 1986** under military administration, SAP was a comprehensive
 
 ### 1. International Monetary Fund (IMF)
 Set up in 1944 at the Bretton Woods Conference. The IMF's core mandate is to secure international financial stability and foster global monetary cooperation.
-*   **Primary Tool**: Direct Balance of Payments stabilization loans.
-*   **Conditionality**: IMF loans often require strict macroeconomic reforms, such as fiscal spending cuts, currency devaluations, and market deregulation.
+*   **Primary Tool**: Direct Balance of Payments (BOP) stabilization loans.
+*   **Conditionality**: IMF loans often require strict macroeconomic reforms (Structural Adjustment), such as fiscal spending cuts, currency devaluations, and market deregulation.
 
 ### 2. The World Bank Group (IBRD)
 Focuses on long-term poverty alleviation and structural reconstruction.
 *   **Primary Tool**: Extending low-interest loans for physical infrastructure initiatives (dams, highways, electrical grids).
-*   **Focus**: Promoting sustainable economic development, social safety nets, and institutional reforms.
+*   **Focus**: Promoting sustainable economic development, social safety nets, and institutional reforms in developing nations.
 
 ### 3. World Trade Organisation (WTO)
-Vested with regulating multilateral trade policies and resolving international trade disputes.
-*   **Key Goal**: Lowering global trade barriers, cutting tariffs, and eliminating discriminatory quotas to expand international commerce.
+Vested with regulating multilateral trade policies and resolving international trade disputes. It succeeded the **General Agreement on Tariffs and Trade (GATT)** in 1995 after the Uruguay Round of negotiations.
+*   **Key Goal**: Lowering global trade barriers, cutting tariffs, and eliminating discriminatory quotas to expand international commerce based on the Most Favoured Nation (MFN) principle.
+
+### 4. Organisation of Petroleum Exporting Countries (OPEC)
+An intergovernmental organization founded in **September 1960** at the Baghdad Conference by Iran, Iraq, Kuwait, Saudi Arabia, and Venezuela. **Nigeria joined in 1971**.
+*   **Core Mandate**: Co-ordinate and unify petroleum policies of member countries to secure fair and stable crude oil prices, ensure efficient supply to consuming nations, and secure steady investor returns.
+*   **Production Quotas**: OPEC sets aggregate production limits to prevent global supply gluts and price collapses.
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 10.1: Estimated Percentage of Global Proven Crude Oil Reserves",
+  "xAxis": "group",
+  "data": [
+    {"group": "OPEC Members", "percentage": 79.4},
+    {"group": "Non-OPEC Countries", "percentage": 20.6}
+  ],
+  "series": [
+    {"key": "percentage", "name": "% of Global Reserves", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
 
 ---
 
@@ -594,9 +614,23 @@ Vested with regulating multilateral trade policies and resolving international t
 ---
 
 ## 10.3 Regional Organisations and Their Impact on Africa
-1.  **African Development Bank (AfDB)**: Established in 1964. Mobilizes resources to support economic development and social progress across African nations.
-2.  **United Nations Economic Commission for Africa (ECA)**: Vested with strengthening institutional capacity, designing regional policies, and compiling economic and social data to assist African governments.
-3.  **West African Clearing House (WACH)**: Formed in 1975 to facilitate trade payments, promote the use of local currencies in regional transactions, and conserve foreign exchange reserves among West African states.
+
+### 1. Economic Community of West African States (ECOWAS)
+Established on **May 28, 1975**, via the Treaty of Lagos, with 15 West African member states.
+*   **Core Aims**: Promote economic integration, cooperation, and development in all fields of economic activity, particularly industry, transport, telecommunications, energy, agriculture, and commerce.
+*   **Integration Stages**: Progressing from a Free Trade Area to a Customs Union (common external tariffs), a Common Market (free movement of labor and capital), and ultimately an Economic and Monetary Union (common currency, the Eco).
+
+### 2. African Development Bank (AfDB)
+Established in 1964. Mobilizes resources to support economic development and social progress across African nations through loans, equity investments, and technical assistance.
+
+### 3. United Nations Economic Commission for Africa (ECA)
+Established in 1958 by the UN Economic and Social Council. It assists African governments in strengthening institutional capacity, designing regional policies, and compiling economic data to support national planning.
+
+### 4. United Nations Conference on Trade and Development (UNCTAD)
+Established in 1964 as a permanent intergovernmental body. It helps developing countries access the benefits of a globalized economy more fairly and effectively through trade, investment, and finance analysis.
+
+### 5. West African Clearing House (WACH)
+Formed in 1975 to facilitate trade payments, promote the use of local currencies in regional transactions, and conserve foreign exchange reserves among West African states. It was later modernized into the **West African Monetary Agency (WAMA)** in 1996.
 `,
 
   "ug-ch11": `
@@ -616,7 +650,40 @@ Established by the United Nations in 2000, the MDGs were **8 time-bound developm
 
 ---
 
-## 11.2 National Economic Empowerment and Development Strategy (NEEDS)
+## 11.2 Sustainable Development Goals (SDGs)
+In September 2015, as the MDGs reached their target year, the United Nations adopted the **2030 Agenda for Sustainable Development**, featuring **17 Sustainable Development Goals (SDGs)** with 169 targets to build on the MDGs and complete what they did not achieve.
+
+### The 17 SDGs ("Global Goals") to be achieved by 2030:
+1.  **No Poverty**: End poverty in all its forms everywhere.
+2.  **Zero Hunger**: End hunger, achieve food security, and promote sustainable agriculture.
+3.  **Good Health and Well-being**: Ensure healthy lives and promote well-being for all at all ages.
+4.  **Quality Education**: Ensure inclusive and equitable quality education and promote lifelong learning.
+5.  **Gender Equality**: Achieve gender equality and empower all women and girls.
+6.  **Clean Water and Sanitation**: Ensure availability and sustainable management of water and sanitation.
+7.  **Affordable and Clean Energy**: Ensure access to affordable, reliable, sustainable, and modern energy.
+8.  **Decent Work and Economic Growth**: Promote sustained, inclusive, and sustainable economic growth.
+9.  **Industry, Innovation and Infrastructure**: Build resilient infrastructure, promote inclusive industrialization.
+10. **Reduced Inequality**: Reduce inequality within and among countries.
+11. **Sustainable Cities and Communities**: Make cities and human settlements inclusive, safe, and resilient.
+12. **Responsible Consumption and Production**: Ensure sustainable consumption and production patterns.
+13. **Climate Action**: Take urgent action to combat climate change and its impacts.
+14. **Life Below Water**: Conserve and sustainably use the oceans, seas, and marine resources.
+15. **Life on Land**: Protect, restore, and promote sustainable use of terrestrial ecosystems.
+16. **Peace, Justice and Strong Institutions**: Promote peaceful and inclusive societies, provide access to justice.
+17. **Partnerships for the Goals**: Strengthen the means of implementation and revitalize the global partnership.
+
+### Comparative Summary: MDGs vs. SDGs
+| Attribute | Millennium Development Goals (MDGs) | Sustainable Development Goals (SDGs) |
+| :--- | :--- | :--- |
+| **Number of Goals** | 8 goals (18 targets) | 17 goals (169 targets) |
+| **Time Frame** | 2000 - 2015 | 2015 - 2030 |
+| **Scope / Target** | Primarily directed at developing nations | Universal (applies to both rich and poor nations) |
+| **Key Pillars** | Social focus (poverty, education, health) | Comprehensive (Social, Economic, Environmental) |
+| **Formulation** | Created by a small team of experts | Broad, participatory global consultations |
+
+---
+
+## 11.3 National Economic Empowerment and Development Strategy (NEEDS)
 Launched in **2004**, NEEDS was Nigeria's coordinate, home-grown macroeconomic plan aimed at reducing poverty and modernizing state structures.
 
 ### Pillars of the NEEDS Reform
@@ -627,7 +694,7 @@ Launched in **2004**, NEEDS was Nigeria's coordinate, home-grown macroeconomic p
 
 ---
 
-## 11.3 Vision 2020: Targets versus Actual Realization
+## 11.4 Vision 2020: Targets versus Actual Realization
 Vision 2020 was an ambitious macroeconomic policy framework designed to place Nigeria among the world's top 20 economies by the year 2020. 
 
 Let's evaluate its ambitious targets against the actual outcomes in 2020:
@@ -659,10 +726,57 @@ Let's evaluate its ambitious targets against the actual outcomes in 2020:
   "ug-ch12": `
 # Chapter 12: Economic Development Challenges
 
-## 12.1 The External Debt Burden
-During the late 1970s and 1980s, Nigeria's external debt grew rapidly, rising from $1.8 billion to over **$30 billion**, owed primarily to **Paris Club** and **London Club** creditors.
-*   **The Debt Trap**: High compound interest rates meant that a large share of Nigeria's oil revenues went toward servicing debt interest rather than investing in healthcare, education, and infrastructure.
-*   **The 2005 Debt Relief**: Under President Olusegun Obasanjo and Finance Minister Ngozi Okonjo-Iweala, Nigeria negotiated a landmark agreement buy-back, securing the write-off of **$18 billion** in debt after paying an outstanding $12 billion settlement.
+## 12.1 The External Debt Burden & Sustainability
+During the late 1970s and 1980s, Nigeria's external debt grew rapidly, rising from under $1 billion to over **$30 billion**, owed primarily to **Paris Club** (bilateral) and **London Club** (commercial) creditors.
+
+### 1. The Debt Trap
+High compound interest rates and penalties meant that a massive share of Nigeria's annual oil revenues went toward servicing debt interest rather than investing in healthcare, education, and infrastructure. This is known as **Debt Overhang**—where a country's debt burden is so large that it discourages new domestic and foreign investments.
+
+### 2. Debt Sustainability Metrics
+Economists assess a nation's debt burden using two primary mathematical ratios:
+*   **Debt-to-GDP Ratio**: Measures the size of a country's total debt relative to its overall economic output. A high ratio indicates that the country may struggle to pay off its debt.
+    $$\text{Debt-to-GDP Ratio} = \frac{\text{Total External Debt}}{\text{Nominal GDP}} \times 100$$
+*   **Debt Service-to-Revenue Ratio**: Measures the proportion of government revenue that goes into paying annual principal and interest (debt service). A high ratio indicates severe fiscal stress.
+    $$\text{Debt Service-to-Revenue Ratio} = \frac{\text{Annual Debt Service Payments}}{\text{Total Government Revenue}} \times 100$$
+
+### 3. Solved Example: Debt Ratio Calculations
+Suppose Country N has a Nominal GDP of **$50 billion** and total government revenue of **$8 billion**. Its total outstanding external debt is **$15 billion**, and its annual debt service payment is **$2.4 billion**. 
+
+Let's calculate and interpret Country N's debt sustainability metrics:
+*   **Step 1: Calculate the Debt-to-GDP Ratio**
+    $$\text{Debt-to-GDP} = \frac{\$15\text{ billion}}{\$50\text{ billion}} \times 100 = 30\%$$
+    *   *Interpretation*: A ratio of 30% is generally considered moderate and within safe sustainable thresholds (usually under 40% for developing economies).
+*   **Step 2: Calculate the Debt Service-to-Revenue Ratio**
+    $$\text{Debt Service-to-Revenue} = \frac{\$2.4\text{ billion}}{\$8\text{ billion}} \times 100 = 30\%$$
+    *   *Interpretation*: Spending 30% of all government revenue just to service debt interest and principal represents a heavy fiscal burden, leaving only 70% of revenue for security, healthcare, and infrastructure. This indicates potential fiscal distress.
+
+### 4. Nigeria's Historical Debt Rise and Relief
+To understand the dramatic nature of Nigeria's debt crisis, we look at the historical trajectory of Nigeria's external debt from the 1970s oil boom, through the 1980s debt trap, to the historic 2005 debt relief buyback.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 12.1: Nigeria's External Debt Trajectory ($ Billions)",
+  "xAxis": "year",
+  "yAxis": "debt",
+  "data": [
+    {"year": "1970", "debt": 0.6},
+    {"year": "1975", "debt": 1.2},
+    {"year": "1980", "debt": 8.9},
+    {"year": "1985", "debt": 19.0},
+    {"year": "1990", "debt": 33.1},
+    {"year": "1995", "debt": 32.6},
+    {"year": "2000", "debt": 31.0},
+    {"year": "2004", "debt": 35.9},
+    {"year": "2005 (Relief)", "debt": 5.0}
+  ],
+  "series": [
+    {"key": "debt", "name": "External Debt ($ Billion)", "color": "#ef4444"}
+  ]
+}
+\`\`\`
+
+*   **The 2005 Debt Relief**: Under President Olusegun Obasanjo and Finance Minister Ngozi Okonjo-Iweala, Nigeria negotiated a landmark agreement, securing the write-off of **$18 billion** in debt from the Paris Club after paying an outstanding $12 billion settlement. This cleared the debt trap and freed up fiscal revenues for poverty reduction programs.
 
 ---
 
@@ -703,12 +817,12 @@ With an installed capital capacity of under 13,000 MW, actual transmission in Ni
 # Chapter 13: Economic Reform Programmes
 
 ## 13.1 Soludo's 2004 Banking Consolidation Reform
-Prior to 2004, the Nigerian banking sector was highly fragmented, featuring **89 small, weak commercial banks** characterized by low capital bases, high operational costs, and heavy reliance on government deposits.
+Prior to 2004, the Nigerian banking sector was highly fragmented, featuring **89 small, weak commercial banks** characterized by low capital bases (often under ₦1 billion), high operational costs, and heavy reliance on public sector deposits.
 
-In 2004, Central Bank Governor **Charles Soludo** implemented a landmark reform:
-*   Raised the minimum capital base for commercial banks from ₦2 billion to **₦25 billion**.
-*   Gave banks a strict 18-month deadline to comply, forcing mergers and acquisitions.
-*   Reduced the number of operating banks from **89 weak entities to 25 highly capitalized bank groups**.
+In July 2004, Central Bank Governor **Charles Soludo** announced a groundbreaking reform package:
+*   **The Mandate**: Raised the minimum paid-up capital base for commercial banks from ₦2 billion to **₦25 billion** (a 1,150% increase).
+*   **The Deadline**: Gave banks a strict **18-month deadline** (ending December 31, 2005) to meet the target, prompting aggressive mergers, acquisitions, and capital market floatation.
+*   **The Outcome**: Reduced the number of active banks from **89 weak entities to 25 highly capitalized bank groups**, completely restructuring the sector's financial capacity.
 
 Let's visualize this structural consolidation below:
 
@@ -728,18 +842,52 @@ Let's visualize this structural consolidation below:
 }
 \`\`\`
 
-### Analytical Interpretation:
-> **The Outcome of Banking Consolidation**:
-> 1.  **Enhanced Solvency**: Consolidating 89 weak banks into 25 highly capitalized groups significantly reduced the risk of bank failures, boosting public confidence.
-> 2.  **Sovereign Lending Power**: Larger capital bases allowed Nigerian banks to safely finance massive, long-term infrastructure projects (such as airports and telecommunication networks) without relying solely on foreign lenders.
-> 3.  **Financial Sector Modernization**: Compliance triggered rapid digitalization, laying the groundwork for ATM networks, online banking, and robust payment systems.
+### Analytical Interpretation of Consolidation:
+> 1.  **Enhanced Solvency**: Consolidating 89 weak banks into 25 highly capitalized groups significantly reduced systemic bank run risks, restored public depositor confidence, and stopped bank distress cycles.
+> 2.  **Sovereign Lending Capacity**: Larger capital reserves allowed Nigerian banks to safely finance massive, long-term national projects (such as independent power plants, airports, and major telecommunication networks) without relying solely on foreign syndicates.
+> 3.  **Financial Sector Modernization**: Increased capital triggered rapid digitalization, laying the groundwork for ATM networks, online banking, and robust payment gateways.
 
 ---
 
 ## 13.2 Privatisation, Commercialisation, and Deregulation
-*   **Privatisation**: Complete transfer of ownership and equity of state-run enterprises to private investors (e.g., selling state hotels or electricity assets).
-*   **Commercialisation**: Re-organizing state agencies to run on strict profit-making principles, removing public subsidies and charging cost-reflective prices (e.g., transforming post offices or airways).
-*   **Deregulation**: Eliminating state price-fixing controls and licensing barriers, allowing natural demand and supply forces to determine pricing. A notable example is the Telecom deregulation in 2001, which paved the way for massive private sector investments and rapid mobile access expansion.
+
+### 1. Privatisation
+The complete transfer of ownership, control, and equity of state-run enterprises to private investors (e.g., selling state hotels, manufacturing plants, or unbundling and selling electricity assets to private operators).
+
+### 2. Commercialisation
+Re-organizing state-run agencies to operate strictly on profit-making principles, removing state budget subsidies and charging cost-reflective prices (e.g., transforming state postal services or national airways to run commercially).
+
+### 3. Deregulation
+The deliberate elimination of state-mandated pricing controls, licensing barriers, and artificial monopolies, allowing free market demand and supply forces to determine pricing and entry.
+
+### Case Study: The 2001 Telecom Deregulation
+Prior to 2001, telecommunication in Nigeria was a state-run monopoly managed by **NITEL** (Nigerian Telecommunications Limited). Obtaining a fixed telephone line was extremely expensive, slow, and restricted to a tiny elite. 
+
+In **2001**, the Nigerian Communications Commission (NCC) deregulated the sector, launching the Digital Mobile Licence (DML) auction. Private firms (MTN, Econet/Airtel, and later Globacom) entered the market, introducing Global System for Mobile Communications (GSM) services.
+
+Let's analyze the dramatic increase in active telephone lines following deregulation:
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 13.1: Active Mobile Phone Lines in Nigeria (Millions)",
+  "xAxis": "year",
+  "data": [
+    {"year": "2000 (Monopoly)", "lines": 0.4},
+    {"year": "2002 (Private)", "lines": 2.2},
+    {"year": "2004", "lines": 10.2},
+    {"year": "2006", "lines": 32.3},
+    {"year": "2008", "lines": 63.0},
+    {"year": "2010 (Success)", "lines": 88.3},
+    {"year": "2020", "lines": 204.6}
+  ],
+  "series": [
+    {"key": "lines", "name": "Active Lines (Millions)", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
+
+*   **Impact of Deregulation**: Active lines grew from a mere **400,000 fixed lines** in 2000 to over **88 million GSM lines** by 2010, and crossed **200 million** in 2020. This triggered massive job creation, boosted GDP growth, and spawned Nigeria's vibrant digital economy (fintech, e-commerce, and ride-hailing).
 
 ---
 
@@ -749,7 +897,7 @@ Let's visualize this structural consolidation below:
 | :--- | :--- | :--- | :--- |
 | **EFCC** (Economic & Financial Crimes Commission) | 2003 | Investigating and prosecuting financial crimes, tax evasion, and political money laundering. | Assets seizure, criminal prosecutions, and bank account freezes. |
 | **ICPC** (Independent Corrupt Practices Commission) | 2000 | Investigating and prosecuting regulatory bribery and systemic corruption in public ministries. | Compliance auditing and anti-bribery investigations. |
-| **NAFDAC** (National Agency for Food & Drug Administration) | 1993 | Regulating and testing food products, drugs, and chemicals to eliminate counter-feiting. | Product registration codes (NAFDAC Numbers) and laboratory validation. |
+| **NAFDAC** (National Agency for Food & Drug Administration) | 1993 | Regulating and testing food products, drugs, and chemicals to eliminate counterfeiting. | Product registration codes (NAFDAC Numbers) and laboratory validation. |
 | **SON** (Standards Organisation of Nigeria) | 1971 | Setting, testing, and confirming the quality of manufactured goods in Nigeria. | SONCAP certification conformity testing and factory safety audits. |
 `
 };

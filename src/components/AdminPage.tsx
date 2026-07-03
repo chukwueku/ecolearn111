@@ -3,9 +3,10 @@ import { generateQuestions, extractQuestionsFromPdf } from '../gemini';
 import { 
   saveQuestions, Question, getAllUsers, UserProfile, deleteUserAccount, 
   updateUserRole, getAdminStats, getAllQuestionsAdmin, updateQuestion, 
-  deleteQuestion, getRecentDuels, setGlobalAnnouncement, getGlobalAnnouncement 
+  deleteQuestion, getRecentDuels, setGlobalAnnouncement, getGlobalAnnouncement,
+  updateUserProfile
 } from '../firebase';
-import { SECONDARY_ROADMAP, UNDERGRADUATE_ROADMAP } from '../constants';
+import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, SECONDARY_SS3_ROADMAP, UNDERGRADUATE_REAL_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Database, Plus, Save, Loader2, CheckCircle2, Users, Search, Mail, 
@@ -23,6 +24,8 @@ import { cn } from '../lib/utils';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../DarkModeContext';
+import { StudyMaterialsManager } from './admin/StudyMaterialsManager';
+import { useRoadmap } from '../hooks/useRoadmap';
 
 export const AdminPage: React.FC = () => {
   const { isDarkMode } = useDarkMode();
@@ -37,14 +40,15 @@ export const AdminPage: React.FC = () => {
      }
   }, [authLoading, isAdmin, navigate]);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'questions' | 'users' | 'activity' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'study-materials' | 'questions' | 'users' | 'activity' | 'settings'>('overview');
   const [subTab, setSubTab] = useState<'generate' | 'extract' | 'bank' | 'create'>('generate');
   
   // Stats State
   const [stats, setStats] = useState<any>(null);
   
   // Questions State
-  const [level, setLevel] = useState<'secondary' | 'undergraduate'>('secondary');
+  const [level, setLevel] = useState<'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate'>('secondary');
+  const { roadmap: topics } = useRoadmap(level);
   const [topicId, setTopicId] = useState('');
   const [count, setCount] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -60,9 +64,16 @@ export const AdminPage: React.FC = () => {
   const emptyQuestion = { question: '', options: ['', '', '', ''], correctAnswer: 0, topicId: '', level: 'secondary' as const, explanation: '', createdAt: new Date() };
   const [newQuestion, setNewQuestion] = useState<Question>(emptyQuestion);
   
+  // Question Bank Filter & Pagination State
+  const [qSearchQuery, setQSearchQuery] = useState('');
+  const [qLevelFilter, setQLevelFilter] = useState<string>('all');
+  const [qTopicFilter, setQTopicFilter] = useState<string>('all');
+  const [qPage, setQPage] = useState(1);
+  
   // Users State
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingScholar, setEditingScholar] = useState<UserProfile | null>(null);
   
   // Activity State
   const [recentDuels, setRecentDuels] = useState<any[]>([]);
@@ -73,8 +84,6 @@ export const AdminPage: React.FC = () => {
 
   const [confirmAction, setConfirmAction] = useState<{ type: string, id: string, message: string } | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  const topics = level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP;
 
   useEffect(() => {
     if (activeTab === 'overview') fetchStats();
@@ -286,6 +295,36 @@ export const AdminPage: React.FC = () => {
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
+  const handleUpdateScholar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingScholar) return;
+    setLoading(true);
+    await updateUserProfile(editingScholar.uid, {
+      displayName: editingScholar.displayName,
+      level: editingScholar.level,
+      points: Number(editingScholar.points) || 0,
+      role: editingScholar.role
+    });
+    setEditingScholar(null);
+    fetchUsers();
+    setLoading(false);
+    setSuccessMessage('Scholar profile updated.');
+    setTimeout(() => setSuccessMessage(null), 2000);
+  };
+
+  const filteredQuestions = bankQuestions.filter(q => {
+    const matchesSearch = q.question.toLowerCase().includes(qSearchQuery.toLowerCase()) || 
+      (q.explanation && q.explanation.toLowerCase().includes(qSearchQuery.toLowerCase())) ||
+      q.options.some(opt => opt.toLowerCase().includes(qSearchQuery.toLowerCase()));
+    const matchesLevel = qLevelFilter === 'all' || q.level === qLevelFilter;
+    const matchesTopic = qTopicFilter === 'all' || q.topicId === qTopicFilter;
+    return matchesSearch && matchesLevel && matchesTopic;
+  });
+
+  const qPageSize = 10;
+  const totalQPages = Math.ceil(filteredQuestions.length / qPageSize);
+  const paginatedQuestions = filteredQuestions.slice((qPage - 1) * qPageSize, qPage * qPageSize);
+
   const filteredUsers = users.filter(u => 
     u.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -312,6 +351,7 @@ export const AdminPage: React.FC = () => {
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm w-full lg:w-auto">
           {[
             { id: 'overview', icon: BarChart3, label: 'Overview' },
+            { id: 'study-materials', icon: FileText, label: 'Roadmaps' },
             { id: 'questions', icon: BookOpen, label: 'Content' },
             { id: 'users', icon: Users, label: 'Users' },
             { id: 'activity', icon: Activity, label: 'Activity' },
@@ -322,7 +362,7 @@ export const AdminPage: React.FC = () => {
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
                 "flex items-center justify-center gap-2 px-3 sm:px-5 py-3 sm:py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all",
-                idx === 4 ? "col-span-2 sm:col-span-1" : "col-span-1",
+                idx >= 4 ? "col-span-2 sm:col-span-1" : "col-span-1",
                 activeTab === tab.id 
                   ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md sm:shadow-lg shadow-slate-900/10" 
                   : "text-slate-600 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -434,6 +474,69 @@ export const AdminPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Scholar Level Distribution */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
+              <div className="mb-6 sm:mb-8">
+                <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest mb-1">Segmentation</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  Academic Level Distribution
+                </h3>
+                <p className="text-slate-500 text-xs mt-1">Real-time statistics of students registered across different study plans.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                {[
+                  { levelId: 'secondary', label: 'SS1 (Secondary)', color: 'bg-sky-500', barColor: 'from-sky-400 to-sky-600', text: 'text-sky-600' },
+                  { levelId: 'secondary-ss2', label: 'SS2 (Secondary)', color: 'bg-indigo-500', barColor: 'from-indigo-400 to-indigo-600', text: 'text-indigo-600' },
+                  { levelId: 'secondary-ss3', label: 'SS3 (Secondary)', color: 'bg-violet-500', barColor: 'from-violet-400 to-violet-600', text: 'text-violet-600' },
+                  { levelId: 'undergraduate', label: 'Undergraduate', color: 'bg-emerald-500', barColor: 'from-emerald-400 to-emerald-600', text: 'text-emerald-600' },
+                  { levelId: 'pending', label: 'Unassigned/Pending', color: 'bg-amber-500', barColor: 'from-amber-400 to-amber-600', text: 'text-amber-600' },
+                ].map((item) => {
+                  const countValue = stats?.levelCounts?.[item.levelId] || 0;
+                  const total = stats?.totalUsers || 1;
+                  const percentage = Math.round((countValue / total) * 100);
+
+                  return (
+                    <div key={item.levelId} className="bg-slate-50 dark:bg-slate-950 p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                          <p className="font-bold text-xs text-slate-900 dark:text-white">{item.label}</p>
+                        </div>
+                        <div className="flex items-baseline gap-2 mb-4">
+                          <span className="text-3xl font-extrabold text-slate-900 dark:text-white">{countValue}</span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">scholars</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="text-slate-500 uppercase">Share</span>
+                          <span className={item.text}>{percentage}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full bg-gradient-to-r ${item.barColor} rounded-full`} 
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'study-materials' && (
+          <motion.div
+            key="study-materials"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <StudyMaterialsManager />
           </motion.div>
         )}
 
@@ -772,7 +875,7 @@ export const AdminPage: React.FC = () => {
                         required
                       >
                         <option value="">Select a topic</option>
-                        {(newQuestion.level === 'secondary' ? SECONDARY_ROADMAP : UNDERGRADUATE_ROADMAP).map(t => (
+                        {(newQuestion.level === 'undergraduate' ? UNDERGRADUATE_REAL_ROADMAP : [...SECONDARY_ROADMAP, ...SECONDARY_SS2_ROADMAP, ...SECONDARY_SS3_ROADMAP]).map(t => (
                           <option key={t.id} value={t.id}>{t.title}</option>
                         ))}
                       </select>
@@ -842,43 +945,178 @@ export const AdminPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-6 sm:space-y-8">
-                <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex items-center gap-4">
-                  <Search className="text-slate-400 dark:text-slate-600 flex-shrink-0" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Search question bank..."
-                    className="flex-1 bg-transparent border-none focus:ring-0 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                  />
-                </div>
-                <div className="grid gap-4 sm:gap-6">
-                  {bankQuestions.map((q, i) => (
-                    <div key={q.id} className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm hover:shadow-xl transition-all group">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-8">
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
-                            <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 px-2.5 py-1 rounded-full">{q.level}</span>
-                            <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600">{q.topicId}</span>
-                          </div>
-                          <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
-                        </div>
-                        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-slate-800">
-                          <button 
-                            onClick={() => setEditingQuestion(q)}
-                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl text-slate-400 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-                          >
-                            <Edit3 size={16} />
-                          </button>
-                          <button 
-                            onClick={() => handleDeleteQuestion(q.id!)}
-                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl text-slate-400 dark:text-slate-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 transition-all flex items-center justify-center border border-transparent hover:border-rose-200 dark:hover:border-rose-900/30"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
+                {/* Search & Filters Row */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+                  <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-950 px-4 py-3 rounded-xl border border-slate-200/50 dark:border-slate-800">
+                    <Search className="text-slate-400 dark:text-slate-600 flex-shrink-0" size={18} />
+                    <input 
+                      type="text" 
+                      placeholder="Search question bank by text, options, or explanation..."
+                      value={qSearchQuery}
+                      onChange={(e) => {
+                        setQSearchQuery(e.target.value);
+                        setQPage(1);
+                      }}
+                      className="flex-1 bg-transparent border-none outline-none focus:ring-0 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                    />
+                    {qSearchQuery && (
+                      <button 
+                        onClick={() => { setQSearchQuery(''); setQPage(1); }}
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Filter by Level</label>
+                      <select
+                        value={qLevelFilter}
+                        onChange={(e) => {
+                          setQLevelFilter(e.target.value);
+                          setQTopicFilter('all');
+                          setQPage(1);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-sky-500"
+                      >
+                        <option value="all">All Academic Levels</option>
+                        <option value="secondary">Secondary SS1</option>
+                        <option value="secondary-ss2">Secondary SS2</option>
+                        <option value="secondary-ss3">Secondary SS3</option>
+                        <option value="undergraduate">Undergraduate</option>
+                      </select>
                     </div>
-                  ))}
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Filter by Topic ID</label>
+                      <select
+                        value={qTopicFilter}
+                        onChange={(e) => {
+                          setQTopicFilter(e.target.value);
+                          setQPage(1);
+                        }}
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-sky-500"
+                      >
+                        <option value="all">All Topics</option>
+                        {Array.from(new Set(bankQuestions.map(q => q.topicId))).filter(Boolean).sort().map(tid => (
+                          <option key={tid} value={tid}>{tid}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>Filtered Count: {filteredQuestions.length} of {bankQuestions.length} Questions</span>
+                    {(qSearchQuery || qLevelFilter !== 'all' || qTopicFilter !== 'all') && (
+                      <button 
+                        onClick={() => {
+                          setQSearchQuery('');
+                          setQLevelFilter('all');
+                          setQTopicFilter('all');
+                          setQPage(1);
+                        }}
+                        className="text-sky-500 hover:text-sky-600 hover:underline animate-none"
+                      >
+                        Reset All Filters
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {filteredQuestions.length === 0 ? (
+                  <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
+                    <AlertTriangle className="mx-auto mb-3 text-slate-400" size={32} />
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No matching questions found.</p>
+                    <p className="text-xs text-slate-400 mt-1">Try relaxing your search terms or filter constraints.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid gap-4 sm:gap-6">
+                      {paginatedQuestions.map((q, i) => {
+                        const globalIndex = (qPage - 1) * qPageSize + i + 1;
+                        return (
+                          <div key={q.id} className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm hover:shadow-xl transition-all group">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 sm:gap-8">
+                              <div className="flex-1">
+                                <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
+                                  <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 px-2.5 py-1 rounded-full">{q.level}</span>
+                                  <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-600 bg-slate-50 dark:bg-slate-800 px-2.5 py-1 rounded-full">{q.topicId}</span>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                  <span className="text-xs font-bold text-slate-400 mt-1">#{globalIndex}</span>
+                                  <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
+                                </div>
+                                
+                                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 pl-6">
+                                  {q.options.map((opt, oIdx) => (
+                                    <div 
+                                      key={oIdx} 
+                                      className={`p-2.5 rounded-lg border text-xs font-semibold ${
+                                        oIdx === q.correctAnswer 
+                                          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400' 
+                                          : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                                      }`}
+                                    >
+                                      <span className="mr-1.5 opacity-50 font-bold">{String.fromCharCode(65 + oIdx)}.</span> {opt}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {q.explanation && (
+                                  <div className="mt-4 pl-6 border-l-2 border-slate-200 dark:border-slate-800">
+                                    <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Explanation</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{q.explanation}</p>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100 dark:border-slate-800 flex-shrink-0">
+                                <button 
+                                  onClick={() => setEditingQuestion(q)}
+                                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl text-slate-400 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm"
+                                  title="Edit Question"
+                                >
+                                  <Edit3 size={16} />
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteQuestion(q.id!)}
+                                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl text-slate-400 dark:text-slate-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 dark:hover:text-rose-400 transition-all flex items-center justify-center border border-transparent hover:border-rose-200 dark:hover:border-rose-900/30 shadow-sm"
+                                  title="Delete Question"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalQPages > 1 && (
+                      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 py-4 rounded-2xl shadow-sm">
+                        <button
+                          onClick={() => setQPage(prev => Math.max(1, prev - 1))}
+                          disabled={qPage === 1}
+                          className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 transition-all"
+                        >
+                          Previous
+                        </button>
+                        <span className="text-xs font-bold text-slate-500">
+                          Page {qPage} of {totalQPages}
+                        </span>
+                        <button
+                          onClick={() => setQPage(prev => Math.min(totalQPages, prev + 1))}
+                          disabled={qPage === totalQPages}
+                          className="px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 transition-all"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </motion.div>
@@ -948,6 +1186,14 @@ export const AdminPage: React.FC = () => {
                       </td>
                       <td className="px-5 sm:px-8 md:px-10 py-4 sm:py-6 text-right">
                         <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                          <button 
+                            onClick={() => setEditingScholar(user)}
+                            className="px-2.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all flex items-center justify-center border border-transparent hover:border-slate-200 dark:hover:border-slate-700 gap-1 shadow-sm"
+                            title="Edit Scholar Profile"
+                          >
+                            <Edit3 size={12} />
+                            <span className="hidden sm:inline">Edit Profile</span>
+                          </button>
                           {user.role === 'admin' ? (
                             <button 
                               onClick={() => handleUpdateRole(user.uid, user.role || 'user')}
@@ -1112,6 +1358,33 @@ export const AdminPage: React.FC = () => {
               </button>
             </div>
             <form onSubmit={handleUpdateQuestion} className="p-6 sm:p-10 space-y-6 sm:space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
+                  <select
+                    value={editingQuestion.level}
+                    onChange={(e) => setEditingQuestion({ ...editingQuestion, level: e.target.value as any })}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500"
+                  >
+                    <option value="secondary">Economics SS1</option>
+                    <option value="secondary-ss2">Economics SS2</option>
+                    <option value="secondary-ss3">Economics SS3</option>
+                    <option value="undergraduate">Undergraduate</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Topic ID</label>
+                  <input
+                    type="text"
+                    value={editingQuestion.topicId}
+                    onChange={(e) => setEditingQuestion({ ...editingQuestion, topicId: e.target.value })}
+                    placeholder="e.g. intro-to-economics"
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500"
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Question Text</label>
                 <textarea
@@ -1173,6 +1446,94 @@ export const AdminPage: React.FC = () => {
                   className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 uppercase tracking-widest text-[10px] text-center"
                 >
                   {loading ? <Loader2 className="animate-spin mx-auto" size={18} /> : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Edit Scholar Profile Modal */}
+      {editingScholar && (
+        <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-[2.5rem] border border-slate-100 dark:border-slate-800 w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh] font-sans"
+          >
+            <div className="px-6 py-5 sm:px-10 sm:py-8 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-800/30">
+              <div>
+                <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">Scholar Config</p>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Edit Scholar Profile</h3>
+              </div>
+              <button onClick={() => setEditingScholar(null)} className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 dark:text-slate-500 transition-all flex items-center justify-center">
+                <X size={18} />
+              </button>
+            </div>
+            <form onSubmit={handleUpdateScholar} className="p-6 sm:p-10 space-y-6 animate-none">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                <input
+                  type="text"
+                  value={editingScholar.displayName}
+                  onChange={(e) => setEditingScholar({ ...editingScholar, displayName: e.target.value })}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
+                <select
+                  value={editingScholar.level || 'secondary'}
+                  onChange={(e) => setEditingScholar({ ...editingScholar, level: e.target.value as any })}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 font-sans"
+                >
+                  <option value="secondary">SS1 (Secondary)</option>
+                  <option value="secondary-ss2">SS2 (Secondary)</option>
+                  <option value="secondary-ss3">SS3 (Secondary)</option>
+                  <option value="undergraduate">Undergraduate</option>
+                  <option value="pending">Pending/Unassigned</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Scholar Points</label>
+                <input
+                  type="number"
+                  value={editingScholar.points === undefined ? 0 : editingScholar.points}
+                  onChange={(e) => setEditingScholar({ ...editingScholar, points: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">System Role</label>
+                <select
+                  value={editingScholar.role || 'user'}
+                  onChange={(e) => setEditingScholar({ ...editingScholar, role: e.target.value as any })}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-sky-500 font-sans"
+                >
+                  <option value="user">User (Standard Scholar)</option>
+                  <option value="admin">Administrator (Control Center Access)</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-6">
+                <button
+                  type="button"
+                  onClick={() => setEditingScholar(null)}
+                  className="flex-1 px-6 py-3.5 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 uppercase tracking-widest text-[10px] text-center"
+                >
+                  {loading ? <Loader2 className="animate-spin mx-auto" size={18} /> : 'Save Scholar'}
                 </button>
               </div>
             </form>

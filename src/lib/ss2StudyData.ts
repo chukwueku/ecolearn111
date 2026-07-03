@@ -72,8 +72,8 @@ While measures of central tendency (mean, median, mode) tell us the center of a 
 
 ### 1. Mean Deviation
 The average of the absolute differences between each value and the mean.
-$$\\text{Ungrouped Mean Deviation } d = \\frac{\\sum |x - \\bar{x}|}{n}$$
-$$\\text{Grouped Mean Deviation } d = \\frac{\\sum f|x - \\bar{x}|}{\\sum f}$$
+$$\\text{Ungrouped Mean Deviation } d = \\frac{\\sum \\lvert x - \\bar{x} \\rvert}{n}$$
+$$\\text{Grouped Mean Deviation } d = \\frac{\\sum f\\lvert x - \\bar{x} \\rvert}{\\sum f}$$
 
 ### 2. Standard Deviation
 The square root of the arithmetic mean of the squared deviations from the mean. It is the most reliable measure of dispersion.
@@ -93,18 +93,62 @@ $$V = S^2 = \\frac{\\sum f(x - \\bar{x})^2}{\\sum f}$$
 1. It is difficult and tedious to calculate manually.
 2. It gives more weight to extreme outliers due to squaring.
 
+### Worked-Out Example 1: Ungrouped Data Dispersion
+Given the scores of 5 students in an Economics test: **10, 12, 14, 16, 18**. Let's calculate the Mean, Mean Deviation, Variance, and Standard Deviation.
+
+#### Step 1: Calculate the Mean ($\\bar{x}$)
+$$\\bar{x} = \\frac{10 + 12 + 14 + 16 + 18}{5} = \\frac{70}{5} = 14$$
+
+#### Step 2: Calculate Deviations and Squared Deviations
+| Score ($x$) | Deviation ($x - \\bar{x}$) | Absolute Deviation ($\\lvert x - \\bar{x} \\rvert$) | Squared Deviation ($(x - \\bar{x})^2$) |
+| :---: | :---: | :---: | :---: |
+| 10 | $10 - 14 = -4$ | 4 | 16 |
+| 12 | $12 - 14 = -2$ | 2 | 4 |
+| 14 | $14 - 14 = 0$ | 0 | 0 |
+| 16 | $16 - 14 = 2$ | 2 | 4 |
+| 18 | $18 - 14 = 4$ | 4 | 16 |
+| **Sum** | **0** | **12** | **40** |
+
+#### Step 3: Mean Deviation
+$$MD = \\frac{\\sum \\lvert x - \\bar{x} \\rvert}{n} = \\frac{12}{5} = 2.4$$
+
+#### Step 4: Variance ($S^2$)
+$$Variance = \\frac{\\sum (x - \\bar{x})^2}{n} = \\frac{40}{5} = 8$$
+
+#### Step 5: Standard Deviation ($S$)
+$$SD = \\sqrt{8} \\approx 2.83$$
+
+### Worked-Out Example 2: Grouped Data Dispersion
+The table below represents the marks of 20 students in a Senior Secondary Economics quiz, grouped into classes. Let's calculate the Mean, Mean Deviation, Variance, and Standard Deviation.
+
+| Mark Class | Frequency ($f$) | Midpoint ($x$) | $fx$ | Deviation ($x - \\bar{x}$) | Absolute Deviation ($\\lvert x - \\bar{x} \\rvert$) | $f\\lvert x - \\bar{x} \\rvert$ | Squared Deviation ($(x - \\bar{x})^2$) | $f(x - \\bar{x})^2$ |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 - 5 | 2 | 3 | 6 | $3 - 13 = -10$ | 10 | 20 | 100 | 200 |
+| 6 - 10 | 4 | 8 | 32 | $8 - 13 = -5$ | 5 | 20 | 25 | 100 |
+| 11 - 15 | 6 | 13 | 78 | $13 - 13 = 0$ | 0 | 0 | 0 | 0 |
+| 16 - 20 | 8 | 18 | 144 | $18 - 13 = 5$ | 5 | 40 | 25 | 200 |
+| **Sum** | **$\\sum f = 20$** | - | **$\\sum fx = 260$** | - | - | **$\\sum f\\lvert x - \\bar{x} \\rvert = 80$** | - | **$\\sum f(x - \\bar{x})^2 = 500$** |
+
+#### Step 1: Calculate the Grouped Mean ($\\bar{x}$)
+$$\\bar{x} = \\frac{\\sum fx}{\\sum f} = \\frac{260}{20} = 13.0$$
+
+#### Step 2: Calculate Grouped Mean Deviation (MD)
+Using the sum of $f\\lvert x - \\bar{x} \\rvert$:
+$$MD = \\frac{\\sum f\\lvert x - \\bar{x} \\rvert}{\\sum f} = \\frac{80}{20} = 4.0$$
+
+#### Step 3: Calculate Grouped Variance ($S^2$)
+Using the sum of $f(x - \\bar{x})^2$:
+$$S^2 = \\frac{\\sum f(x - \\bar{x})^2}{\\sum f} = \\frac{500}{20} = 25.0$$
+
+#### Step 4: Calculate Grouped Standard Deviation ($S$)
+Take the square root of the variance:
+$$S = \\sqrt{25.0} = 5.0$$
+
 #### Interactive Dispersion & Stats Simulator
 \`\`\`simulator
 {
-  "mode": "equilibrium",
-  "title": "Descriptive Statistics & Dispersion Calculator",
-  "initialValues": {
-    "num1": 10,
-    "num2": 15,
-    "num3": 20,
-    "num4": 25,
-    "num5": 30
-  }
+  "mode": "descriptive_stats",
+  "title": "Descriptive Statistics & Dispersion Calculator"
 }
 \`\`\`
 `,
@@ -397,17 +441,36 @@ Revenue is the income earned from sales of products.
 3.  **Marginal Revenue (MR)**: Incremental revenue from selling one more unit.
     $$MR = \\frac{\\Delta TR}{\\Delta Q}$$
 
+### Solved Example: Finding the Optimum Output Level
+A firm has a Fixed Cost ($FC$) of **₦50** and its Variable Cost ($VC$) function is $VC = 2Q + Q^2$. Let's compute the costs and find the Average Cost ($AC$) and Marginal Cost ($MC$) for output levels $Q = 4$ and $Q = 5$.
+
+#### 1. For Output Level $Q = 4$:
+*   $FC = 50$
+*   $VC = 2(4) + 4^2 = 8 + 16 = 24$
+*   $TC = FC + VC = 50 + 24 = ₦74$
+*   $AC = \\frac{TC}{Q} = \\frac{74}{4} = ₦18.50$
+*   $MC = TC(4) - TC(3) = 74 - [50 + 2(3) + 3^2] = 74 - 65 = ₦9.00$
+
+#### 2. For Output Level $Q = 5$:
+*   $FC = 50$
+*   $VC = 2(5) + 5^2 = 10 + 25 = 35$
+*   $TC = FC + VC = 50 + 35 = ₦85$
+*   $AC = \\frac{TC}{Q} = \\frac{85}{5} = ₦17.00$ (falling!)
+*   $MC = TC(5) - TC(4) = 85 - 74 = ₦11.00$
+
+Notice that as long as $MC < AC$ ($11.00 < 17.00$), Average Cost continues to fall!
+
 #### Interactive Cost & Revenue Simulator
 \`\`\`simulator
 {
-  "mode": "production",
+  "mode": "cost_revenue",
   "title": "Interactive AC-MC Cost Curve Simulator",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "fc": 50,
+    "a": 2,
+    "b": 1,
+    "price": 20,
+    "q": 5
   }
 }
 \`\`\`
@@ -446,7 +509,7 @@ The ease with which workers can switch jobs. We distinguish:
 ### 4. Demand for Labour
 Demand for labor is a **derived demand**, meaning it depends on the demand for the final goods the labor helps produce. An entrepreneur employs labor up to the point where the cost of the last worker (wage) equals the **Marginal Revenue Product of Labour (MRPL)**:
 
-$$MRP_L = MP_L \times MR$$
+$$MRP_L = MP_L \\times MR$$
 
 ---
 
@@ -576,17 +639,28 @@ The consumer is in equilibrium at the point of **tangency**, where the slope of 
 }
 \`\`\`
 
+### Solved Example: Utility Optimization
+Suppose a consumer enjoys eating plantain chips. The table below represents their satisfaction:
+*   1st chip: Total Utility ($TU$) = 10 Utils. Marginal Utility ($MU$) = 10.
+*   2nd chip: $TU = 16$. $MU = 16 - 10 = 6$.
+*   3rd chip: $TU = 20$. $MU = 20 - 16 = 4$.
+*   4th chip: $TU = 23$. $MU = 23 - 20 = 3$.
+*   5th chip: $TU = 25$. $MU = 25 - 23 = 2$.
+*   6th chip (Satiety Point): $TU = 25$. $MU = 25 - 25 = 0$.
+*   7th chip (Overconsumption): $TU = 22$. $MU = 22 - 25 = -3$.
+
+Notice how marginal utility drops from 10 to -3, illustrating the **Law of Diminishing Marginal Utility**.
+
 #### Interactive Utility Simulator
 \`\`\`simulator
 {
   "mode": "utility",
   "title": "Interactive Consumer Utility Simulator",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "tu1": 15,
+    "tu2": 25,
+    "q1": 1,
+    "q2": 2
   }
 }
 \`\`\`
@@ -661,17 +735,86 @@ The government fixes the highest legal price below equilibrium to protect low-in
 The government fixes the lowest legal price above equilibrium to protect farm incomes (crop floors) or workers (minimum wages).
 *   **Effects**: Excess supply / surplus, illegal price discounting by desperate sellers.
 
+### Solved Example 1: Calculating Price Elasticity of Demand (PED)
+Suppose the price of a loaf of bread in Lagos increases from **₦10 to ₦12**, and the quantity demanded falls from **100 loaves to 80 loaves** daily. Let's compute the Price Elasticity of Demand.
+
+#### Step 1: Compute Percentage Change in Quantity
+*   Change in Quantity ($\\Delta Q$) = $80 - 100 = -20$
+*   Percentage Change = $\\frac{-20}{100} \\times 100 = -20\\%$
+
+#### Step 2: Compute Percentage Change in Price
+*   Change in Price ($\\Delta P$) = $12 - 10 = 2$
+*   Percentage Change = $\\frac{2}{10} \\times 100 = 20\\%$
+
+#### Step 3: Calculate PED ($E_p$)
+$$E_p = \\frac{\\% \\Delta Q_d}{\\% \\Delta P} = \\frac{-20\\%}{20\\%} = -1.0$$
+
+Taking the absolute value, $|E_p| = 1.0$. This represents a case of **Unitary Elastic** demand, where the change in price results in an exactly proportional change in quantity.
+
+---
+
+### Solved Example 2: Calculating Income Elasticity of Demand (YED)
+Suppose a civil servant's monthly income increases from **₦100,000 to ₦150,000**, and their weekly demand for chicken meat increases from **2kg to 4kg**. Let's compute their Income Elasticity of Demand ($E_y$).
+
+#### Step 1: Compute Percentage Change in Quantity Demanded
+*   Change in Quantity Demanded ($\\Delta Q_d$) = $4 - 2 = 2\\text{kg}$
+*   Percentage Change = $\\frac{2}{2} \\times 100\\% = 100\\%$
+
+#### Step 2: Compute Percentage Change in Income
+*   Change in Income ($\\Delta Y$) = $150,000 - 100,000 = 50,000$
+*   Percentage Change = $\\frac{50,000}{100,000} \\times 100\\% = 50\\%$
+
+#### Step 3: Calculate YED ($E_y$)
+$$E_y = \\frac{\\% \\Delta Q_d}{\\% \\Delta Y} = \\frac{100\\%}{50\\%} = 2.0$$
+
+**Interpretation**: Since $E_y > 1$, demand is highly income-elastic. Because $E_y$ is positive ($E_y > 0$), chicken meat is a **normal/luxury good** for this consumer (demand increases as income increases).
+
+---
+
+### Solved Example 3: Calculating Cross Elasticity of Demand (XED)
+Suppose the price of cocoa beverage (Milo) increases from **₦500 to ₦600** per sachet, causing the quantity demanded of tea (a substitute beverage) to increase from **1,000 boxes to 1,500 boxes** daily. Let's compute the Cross Elasticity of Demand ($E_{xy}$).
+
+#### Step 1: Compute Percentage Change in Quantity Demanded of Tea (Good X)
+*   Change in Quantity ($\\Delta Q_x$) = $1,500 - 1,000 = 500$
+*   Percentage Change = $\\frac{500}{1,000} \\times 100\\% = 50\\%$
+
+#### Step 2: Compute Percentage Change in Price of Cocoa (Good Y)
+*   Change in Price ($\\Delta P_y$) = $600 - 500 = 100$
+*   Percentage Change = $\\frac{100}{500} \\times 100\\% = 20\\%$
+
+#### Step 3: Calculate Cross Elasticity ($E_{xy}$)
+$$E_{xy} = \\frac{\\% \\Delta Q_x}{\\% \\Delta P_y} = \\frac{50\\%}{20\\%} = +2.5$$
+
+**Interpretation**: Since $E_{xy} > 0$ (positive), Cocoa and Tea are **substitute goods** (an increase in the price of one leads to an increase in the demand for the other as consumers switch).
+
+---
+
+### Solved Example 4: Calculating Price Elasticity of Supply (PES)
+A farmer in Ondo state supplies cocoa beans. When the price of cocoa beans increases from **₦200,000 to ₦240,000** per ton, their quantity supplied increases from **50 tons to 55 tons**. Let's compute the Price Elasticity of Supply ($E_s$).
+
+#### Step 1: Compute Percentage Change in Quantity Supplied
+*   Change in Quantity Supplied ($\\Delta Q_s$) = $55 - 50 = 5\\text{ tons}$
+*   Percentage Change = $\\frac{5}{50} \\times 100\\% = 10\\%$
+
+#### Step 2: Compute Percentage Change in Price
+*   Change in Price ($\\Delta P$) = $240,000 - 200,000 = 40,000$
+*   Percentage Change = $\\frac{40,000}{200,000} \\times 100\\% = 20\\%$
+
+#### Step 3: Calculate PES ($E_s$)
+$$E_s = \\frac{\\% \\Delta Q_s}{\\% \\Delta P} = \\frac{10\\%}{20\\%} = 0.5$$
+
+**Interpretation**: Since $E_s < 1$ ($E_s = 0.5$), the supply of cocoa beans is **price-inelastic**. This indicates that a change in price results in a less-than-proportional change in quantity supplied (typical of agricultural goods due to long gestation periods).
+
 #### Interactive Elasticity Simulator
 \`\`\`simulator
 {
   "mode": "elasticity",
   "title": "Price Elasticity of Demand Calculator",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "p1": 10,
+    "p2": 12,
+    "q1": 100,
+    "q2": 80
   }
 }
 \`\`\`
@@ -720,7 +863,7 @@ $$P = AR = MR$$
 }
 \`\`\`
 
-*   **Short-Run Supernormal (Abnormal) Profits**: Firms maximize profits where $MC = MR$. When $AC < AR$, the firm reaps supernormal profits (area of $(AR - AC) \times Q$).
+*   **Short-Run Supernormal (Abnormal) Profits**: Firms maximize profits where $MC = MR$. When $AC < AR$, the firm reaps supernormal profits (area of $(AR - AC) \\times Q$).
 *   **Long-Run Normal Profits**: The presence of abnormal profits attracts new firms in the long run. Market supply expands, driving prices down until $P = AR = MR = MC = AC$. All supernormal profits are competed away, leaving only normal profits.
 
 ---
@@ -763,7 +906,7 @@ Many firms selling **differentiated products** that are close substitutes (e.g.,
 # Chapter 9: Industry and Industrialisation in Nigeria
 
 ## 9.1 Concept Definitions
-In discusses production and secondary sectors, we define specific categories:
+In discussing production and secondary sectors, we define specific categories:
 1.  **Plant**: An assembly of machinery, apparatus, and equipment placed in a location to execute industrial processing.
 2.  **Factory**: The actual building housing the productive plant and labor resources.
 3.  **Firm**: An independent business or productive unit under a distinct management (e.g., Zenith Bank is a firm, whereas banking is the industry).
@@ -772,18 +915,29 @@ In discusses production and secondary sectors, we define specific categories:
 
 ---
 
-## 9.2 Siting (Location) of Industries
+## 9.2 What is Industrialisation?
+**Industrialisation** is the systematic process by which an economy transitions from a primarily agrarian society based on manual labor to an industrial society based on mechanised, large-scale manufacturing and service provision. It involves the extensive application of technology and capital equipment to boost labor productivity and expand output.
+
+### Classification of Industries
+Industries can be broadly classified based on their primary activities:
+1.  **Primary (Extractive) Industries**: Involved in extracting raw natural resources directly from the earth or water. Examples: mining, quarrying, crude oil extraction, forestry, and fishing.
+2.  **Secondary (Manufacturing & Construction) Industries**: Transform raw materials into finished or semi-finished goods. Examples: cement manufacturing, textile weaving, car assembly, and building construction.
+3.  **Tertiary (Service) Industries**: Do not produce physical goods but render essential services to facilitate trade and production. Examples: banking, tourism, transport, and warehousing.
+
+---
+
+## 9.3 Siting (Location) of Industries
 **Location of Industry** refers to where an industry is established. Rational entrepreneurs consider these major location factors:
 
 1.  **Availability of Raw Materials**: Industries involving heavy and bulky raw inputs (which lose significant weight in processing) are always located near the source to reduce transport costs (e.g., Nkalagu Cement Company situated near limestone deposits in Enugu State).
 2.  **Proximity to Markets**: Industries producing perishable or fragile items are situated near markets (e.g., bakeries, brewery bottling, and plastic mat factories near urban centers).
 3.  **Availability of Labour**: Industries need pools of skilled and unskilled workers.
 4.  **Nearness to Power Supply**: Siting factories close to stable national grid hubs.
-5.  **Government Policy**: Siting factories in specific backward areas through tax tax concessions (tax holidays) to disperse industrial clusters.
+5.  **Government Policy**: Siting factories in specific backward areas through tax concessions (tax holidays) to disperse industrial clusters.
 
 ---
 
-## 9.3 Localisation of Industry
+## 9.4 Localisation of Industry
 **Localisation** is the concentration of many related industrial firms in a single geographical location (e.g., Broad Street, Lagos for finance; or Kaduna for textiles).
 
 ### Advantages of Localisation (External Economies):
@@ -797,6 +951,65 @@ In discusses production and secondary sectors, we define specific categories:
 2.  **Frictional Unemployment**: Extreme specialization makes labor structurally immobile if that specific industry encounters decline.
 3.  **Overcrowding**: Raises city rents, causing congestion, poor sanitation, and slums.
 4.  **Environmental Pollution**: Concentrates heavy smoke and biological effluents.
+
+---
+
+## 9.5 Industrialisation Strategies
+Developing countries like Nigeria adopt different strategic paths to achieve industrialization:
+
+### 1. Import Substitution Industrialisation (ISI)
+An inward-looking strategy aiming to replace foreign imports with domestically produced manufactured goods. It uses protectionist policies (tariffs, quotas) to shield domestic infant industries.
+*   **Aims**: Conserve scarce foreign exchange reserves, achieve self-reliance, and create local jobs.
+*   **Examples in Nigeria**: Setting up local breweries, assembly plants, and textile mills to replace imported items.
+*   **Formulas of Protectionism**: The **Effective Rate of Protection ($g$)** measures the percentage increase in value-added made possible by the tariff structure:
+    $$g = \frac{t_f - a \cdot t_m}{1 - a}$$
+    Where $t_f$ is the tariff rate on finished imports, $t_m$ is the tariff on imported raw inputs, and $a$ is the ratio of imported input value to finished product value.
+
+### 2. Export Promotion Industrialisation (EPI)
+An outward-looking strategy focused on producing manufactured goods specifically for export to global markets.
+*   **Aims**: Leverage international markets to achieve economies of scale, earn foreign exchange, and integrate with the global supply chain.
+*   **Examples**: East Asian Tigers (South Korea, Taiwan) focused heavily on EPI (electronics, ships, automobiles).
+
+### Comparative Summary: ISI vs. EPI
+| Feature | Import Substitution (ISI) | Export Promotion (EPI) |
+| :--- | :--- | :--- |
+| **Market Focus** | Inward-looking (Domestic consumers) | Outward-looking (Global consumers) |
+| **Trade Policy** | High protectionism (tariffs, quotas) | Free-market or subsidized exports |
+| **Exchange Rate** | Often overvalued (cheap imported machinery) | Competitive or undervalued (cheap exports) |
+| **Core Advantage** | Easy to start; conserves forex initially | High efficiency, scale economies, global standards |
+| **Core Limitation** | Inefficient monopolies; lack of competition | Susceptible to global recessions & protectionism |
+
+---
+
+## 9.6 Nigeria's Manufacturing Landscape
+To understand the structural significance of industrialization, we look at the share of manufacturing in Nigeria's nominal GDP. Despite policy efforts, manufacturing's contribution has hovered under 10% due to power deficits and high exchange rate volatility.
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 9.1: Estimated Manufacturing Sector Share of Nigeria's GDP (Percentage)",
+  "xAxis": "year",
+  "data": [
+    {"year": "1960", "share": 4.8},
+    {"year": "1970", "share": 7.2},
+    {"year": "1980", "share": 8.4},
+    {"year": "1990", "share": 8.1},
+    {"year": "2000", "share": 6.2},
+    {"year": "2010", "share": 6.8},
+    {"year": "2020", "share": 8.9},
+    {"year": "2024", "share": 8.5}
+  ],
+  "series": [
+    {"key": "share", "name": "Manufacturing % of GDP", "color": "#0ea5e9"}
+  ]
+}
+\`\`\`
+
+### Example Calculation: Rate of Industrial Growth
+Suppose Nigeria's industrial output was valued at **₦4.2 trillion** in 2022 and grew to **₦4.5 trillion** in 2023. Let's calculate the annual industrial growth rate ($G_{ind}$):
+$$G_{ind} = \frac{\text{Output}_{2023} - \text{Output}_{2022}}{\text{Output}_{2022}} \times 100$$
+$$G_{ind} = \frac{4.5 - 4.2}{4.2} \times 100 = \frac{0.3}{4.2} \times 100 = 7.14\%$$
+This represents a healthy rate of industrial expansion for that period.
 `,
 
   "ss2-ch10": `
@@ -811,9 +1024,18 @@ Agriculture refers to the cultivation of soil for crop production, livestock bre
 
 ---
 
-## 10.2 Agricultural Challenges in West Africa
+## 10.2 Systems of Agriculture
+Agricultural practices vary according to land tenure, level of capital, and target markets:
+*   **Subsistence Farming**: Smallholder peasants cultivating tiny, fragmented plots using crude implements (hoes and cutlasses). Labor is primarily family-based, and output is almost entirely consumed locally with little or no surplus.
+*   **Plantation Farming**: Large-scale monoculture dedicated to growing single cash crops (e.g., cocoa, rubber, oil palm, coffee) for commercial exports. It is highly capital-intensive, requiring specialized managers and wage laborers.
+*   **Cooperative Farming**: A system where small farmers pool their land, labor, and capital resources to enjoy economies of scale in purchasing inputs (fertilizers, tractors) and marketing their crops collectively.
+*   **Settlement Schemes**: Government-sponsored agricultural communities established to settle young farmers, providing them with modern housing, extension training, credit, and farm machinery to boost food production.
+
+---
+
+## 10.3 Agricultural Challenges in West Africa
 West African agricultural output faces core systemic blockages:
-1.  **Land Tenure / Fragmentation**: Customary laws subdivide family land into small, scattered, uneconomic segments, discouraging mechanised tractor farming.
+1.  **Land Tenure / Fragmentation**: Customary inheritance laws subdivide family land into small, scattered, uneconomic segments, discouraging mechanised tractor farming.
 2.  **Traditional Tools**: Dominated by energy-sapping cutlasses and hoes.
 3.  **Erratic Climate**: Extreme desertification droughts in Sahel zones (e.g., Bornu, Sokoto) kill crops and livestock. Crucial irrigation models remain scarce.
 4.  **Pests and Diseases**: Termite, locust, and tsetse fly infestations.
@@ -822,16 +1044,53 @@ West African agricultural output faces core systemic blockages:
 
 ---
 
-## 10.3 Agricultural Policies & Marketing Boards
+## 10.4 Agricultural Policies & Marketing Boards
 
-### Policies in Nigeria
-To solve these problems, various Nigerian administrations launched specific campaigns:
-1.  **Buhari's Import Exemptions (1984)**: Abolished import duties on animal feed.
-2.  **Land Use Decree (1978)**: Promulgated to vesting land custody in the state, facilitating large-scale allocation.
-3.  **River Basin Authorities**: Initiated to construct dams and irrigation canals.
+### Historical & Contemporary Policies in Nigeria
+To resolve these structural bottlenecks, various Nigerian administrations launched specific campaigns:
+1.  **Operation Feed the Nation (OFN, 1976)**: Launched under Gen. Olusegun Obasanjo to raise public consciousness on agricultural self-sufficiency by distributing subsidized inputs to urban and rural backyard farmers.
+2.  **The Green Revolution (1980)**: Initiated under President Shehu Shagari, focusing on massive credit injection, establishing river basin authorities, and importing tractors to achieve mechanised food security.
+3.  **Directorate of Food, Roads and Rural Infrastructure (DFRRI, 1986)**: Formed under Gen. Ibrahim Babangida to open up rural agricultural hinterlands by constructing feeder roads, boreholes, and rustic electricity grids.
+4.  **Agricultural Credit Guarantee Scheme Fund (ACGSF)**: Managed by the CBN to guarantee up to 75% of bank loans extended to local farmers, shielding commercial banks from default risks.
+5.  **Anchor Borrowers' Programme (ABP, 2015)**: Initiated by the CBN to connect smallholder farmers of key crops (rice, maize, cassava) with large-scale processors (anchors), providing loans in kind (inputs) and securing guaranteed buyback off-takers.
 
 ### Commodity Marketing Boards
-Statutory organizations created by the government to stabilize agricultural export earnings (cocoa, groundnuts, cotton) and streamline evacuation. They accumulate surplus funds during price booms to guarantee a stable price (price stabilization) to farmers during poor market seasons.
+Statutory organizations created by the government to stabilize agricultural export earnings (cocoa, groundnuts, cotton) and streamline evacuation. They accumulate surplus funds during price booms by buying from farmers at a fixed guaranteed price, and then using these accumulated reserves to stabilize farmers' incomes during global price crashes.
+
+---
+
+## 10.5 Economic Significance of Agriculture
+To understand the macroeconomic role of agriculture in Nigeria, we analyze its share of nominal GDP. While its share declined dramatically from over 60% in 1960 due to the crude oil boom, agriculture remains the single largest employer of labor and contributes a stable 20-25% of modern GDP.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 10.1: Agriculture Sector Share of Nigeria's Nominal GDP (1960 - 2024)",
+  "xAxis": "year",
+  "yAxis": "percentage",
+  "data": [
+    {"year": "1960", "percentage": 64.0},
+    {"year": "1970", "percentage": 48.8},
+    {"year": "1980", "percentage": 20.6},
+    {"year": "1990", "percentage": 32.5},
+    {"year": "2000", "percentage": 26.1},
+    {"year": "2010", "percentage": 23.9},
+    {"year": "2020", "percentage": 24.1},
+    {"year": "2024", "percentage": 22.8}
+  ],
+  "series": [
+    {"key": "percentage", "name": "Agriculture % of GDP", "color": "#10b981"}
+  ]
+}
+\`\`\`
+
+### Example Calculation: Crop Productivity Index
+A cooperative farmer cultivating cassava harvested **15 tonnes per hectare** in Year 1 using traditional inputs. After joining the Anchor Borrowers' Programme and adopting high-yielding stems and fertilizer, the yield rose to **22 tonnes per hectare** in Year 2.
+
+Let's calculate the percentage increase in cassava land productivity ($P_{land}$):
+$$P_{land} = \frac{\text{Yield}_{\text{Year 2}} - \text{Yield}_{\text{Year 1}}}{\text{Yield}_{\text{Year 1}}} \times 100$$
+$$P_{land} = \frac{22 - 15}{15} \times 100 = \frac{7}{15} \times 100 = 46.67\%$$
+Thus, adopting improved inputs raised agricultural land productivity by **46.67%**!
 `,
 
   "ss2-ch11": `
@@ -845,11 +1104,20 @@ Statutory organizations created by the government to stabilize agricultural expo
 
 ## 11.2 Concepts of Taxation
 A **tax** is a compulsory financial contribution levied on individuals, firms, and properties by the state.
-*   **Tax Base**: The object, asset, transaction, or income upon which a tax rate is applied (e.g., property, company profits, salary).
-*   **Tax Rate**: The percentage proportion of the tax base paid to the state.
-*   **Tax Burden**: The absolute financial weight borne by the taxpayer.
-*   **Tax Avoidance**: The use of legal loopholes to minimize tax liabilities.
-*   **Tax Evasion**: The deliberate, illegal non-payment or falsification of records to escape tax.
+
+### 1. Direct Taxes
+Taxes levied directly on the income, wealth, or profit of individuals and corporations. The tax burden cannot be shifted to another person.
+*   **Examples**:
+    *   **Personal Income Tax (PAYE)**: Deducted directly from salaries of workers.
+    *   **Company Income Tax (CIT)**: Levied on the net profits of registered corporations.
+    *   **Capital Gains Tax (CGT)**: Levied on the profit made from selling capital assets like shares or real estate.
+
+### 2. Indirect Taxes
+Taxes levied on goods and services. The tax burden can be shifted partially or fully to the final consumer in the form of higher prices.
+*   **Examples**:
+    *   **Value Added Tax (VAT)**: Multi-stage sales tax levied on the value added at each stage of production and distribution.
+    *   **Customs Duties (Tariffs)**: Levied on goods imported (Import Duty) or exported (Export Duty).
+    *   **Excise Duties**: Levied on locally manufactured goods (especially luxury or harmful items like cigarettes and alcohol) to discourage consumption.
 
 ### Systems of Taxation
 1.  **Progressive Tax**: The tax rate increases as the tax base (income) rises. It acts as an equitable wealth distribution tool.
@@ -881,30 +1149,88 @@ A **tax** is a compulsory financial contribution levied on individuals, firms, a
 *   **Convenience**: Collected at a time and manner most convenient to consumers (e.g., PAYE pay deduction).
 *   **Economy**: The collection cost must be minor relative to the total tax revenue.
 
-### Incidence of Taxation
-The final resting point of the tax burden. It is determined by the elasticity of demand:
-*   **When demand is perfectly inelastic ($E = 0$)**: The entire tax burden is shifted to the buyer (price increases by the full tax amount).
-*   **When demand is perfectly elastic ($E = \infty$)**: The entire tax burden falls on the seller.
+---
+
+## 11.3 Incidence and Sharing of Indirect Taxes
+**Incidence of Taxation** refers to the final resting point of the tax burden—who actually pays the tax in the end. When the government levies an indirect tax $t$ on a product, the burden is split between the buyer and the seller depending on the **price elasticity of demand ($E_d$)** and **price elasticity of supply ($E_s$)**:
+
+1.  **Perfectly Inelastic Demand ($E_d = 0$)**: The entire tax is shifted to the buyer; price rises by the full tax amount.
+2.  **Perfectly Elastic Demand ($E_d = \infty$)**: The seller bears the entire tax burden; price does not change.
+3.  **Perfectly Inelastic Supply ($E_s = 0$)**: The seller bears the entire tax burden.
+4.  **Perfectly Elastic Supply ($E_s = \infty$)**: The buyer bears the entire tax burden.
+
+### Mathematical Incidence Formulas
+The share of a unit tax $t$ borne by the buyer ($T_{buyer}$) and the seller ($T_{seller}$) can be calculated as:
+$$T_{buyer} = t \times \frac{E_s}{E_d + E_s}$$
+$$T_{seller} = t \times \frac{E_d}{E_d + E_s}$$
+
+### Solved Example: Tax Incidence Calculation
+Suppose the government levies an indirect tax of **₦50** per bag on cement. The price elasticity of demand for cement is **$0.4$** (inelastic) and the price elasticity of supply is **$1.6$** (elastic). Let's calculate how the tax burden is shared:
+
+*   **Step 1: Calculate the Buyer's Share ($T_{buyer}$)**
+    $$T_{buyer} = ₦50 \times \frac{1.6}{0.4 + 1.6} = ₦50 \times \frac{1.6}{2.0} = ₦50 \times 0.8 = ₦40$$
+*   **Step 2: Calculate the Seller's Share ($T_{seller}$)**
+    $$T_{seller} = ₦50 \times \frac{0.4}{0.4 + 1.6} = ₦50 \times \frac{0.4}{2.0} = ₦50 \times 0.2 = ₦10$$
+
+Therefore, the **buyer bears ₦40** (in the form of a ₦40 price increase), while the **seller bears ₦10** (in the form of lower net margins). This shows that because demand is more inelastic than supply, the buyer bears the greater share of the tax!
 
 ---
 
-## 11.3 Government Budgets & Public Expenditure
-A **budget** is estimated projected revenues and expenditures of a governments over a fiscal year.
+## 11.4 The Laffer Curve Concept
+Arthur Laffer proposed that as tax rates rise from 0%, tax revenue increases up to an optimum tax rate ($t^*$). However, raising tax rates beyond $t^*$ discourages productivity, encourages tax evasion, and ultimately **reduces** total tax revenue. At a 100% tax rate, revenue would fall to zero because there would be no incentive to work.
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 11.2: The Laffer Curve (Tax Rate % vs. Estimated Revenue ₦ Billion)",
+  "xAxis": "rate",
+  "yAxis": "revenue",
+  "data": [
+    {"rate": "0%", "revenue": 0},
+    {"rate": "15%", "revenue": 120},
+    {"rate": "30%", "revenue": 220},
+    {"rate": "45%", "revenue": 280},
+    {"rate": "50% (Optimum)", "revenue": 300},
+    {"rate": "65%", "revenue": 250},
+    {"rate": "80%", "revenue": 140},
+    {"rate": "100%", "revenue": 0}
+  ],
+  "series": [
+    {"key": "revenue", "name": "Tax Revenue", "color": "#6366f1"}
+  ]
+}
+\`\`\`
+
+---
+
+## 11.5 Government Budgets & Public Expenditure
+A **budget** is estimated projected revenues and expenditures of a government over a fiscal year.
 *   **Balanced Budget**: Expected revenues = Expected expenditures (neutral effect).
 *   **Deficit Budget**: Expenditures exceed revenues (expansionary, used to reflate depressed economies, but risks inflation).
 *   **Surplus Budget**: Revenues exceed expenditures (contractionary, used to mop up excess demand inflation).
 
+### Solved Example: The Fiscal Spending Multiplier
+The government of Nigeria decides to spend **₦500 billion** on road construction. If the citizens have a Marginal Propensity to Consume (MPC) of **0.75**, let's calculate the total increase in national income.
+
+#### Step 1: Calculate the Keynesian Multiplier ($k$)
+$$Multiplier \ k = \frac{1}{1 - MPC} = \frac{1}{1 - 0.75} = \frac{1}{0.25} = 4.0$$
+
+#### Step 2: Calculate the Total Increase in Income ($\Delta Y$)
+$$\Delta Y = k \times \Delta G = 4.0 \times ₦500\text{ billion} = ₦2,000\text{ billion}$$
+
+Therefore, injecting ₦500 billion of government spending re-circulates to generate **₦2 trillion** in total national income!
+
 #### Interactive Fiscal Policy Simulator
 \`\`\`simulator
 {
-  "mode": "taylor_rule",
-  "title": "Interactive Fiscal Policy Strategy Simulator",
+  "mode": "fiscal_policy",
+  "title": "Interactive Keynesian Fiscal Multiplier Board",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "g": 500,
+    "t": 400,
+    "c0": 200,
+    "i": 300,
+    "mpc": 0.75
   }
 }
 \`\`\`
@@ -1033,17 +1359,22 @@ To be listed on the trading floor, companies must satisfy strict standards:
 *   **First-Tier Market**: Must be a public company, have 5 years of audit records, minimum of 300 shareholders, and at least 25% of issued capital must go to the public.
 *   **Second-Tier Securities Market (SSM)**: Created to assist mid-sized local firms. Requires only 3 years of records, at least 10% of capital must go to the public, and has a minimum of 100 shareholders.
 
+### Solved Example: Credit Multiplier Action
+Let's see how commercial banks expand a deposit of **₦1,000,000** with a **20%** Cash Reserve Ratio ($rr = 0.20$):
+*   **Step 1**: Multiplier ($M$) = $\\frac{1}{0.20} = 5.0$
+*   **Step 2**: Total Credit Created = $₦1,000,000 \\times 5.0 = ₦5,000,000$
+*   The banking system has generated **₦4,000,000** of new credit/money in circulation beyond the original deposit!
+
 #### Interactive Credit Multiplier Simulator
 \`\`\`simulator
 {
   "mode": "money_multiplier",
   "title": "Iterative Credit Creation & Money Multiplier Tracker",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "mb": 1000000,
+    "rr": 20,
+    "c": 10,
+    "e": 5
   }
 }
 \`\`\`
@@ -1105,7 +1436,7 @@ A consumer spends money on Rice and Beans.
 *   Beans: $\\frac{12}{8} \\times 100 = 150$
 
 #### Step 2: Apply weights using Weighted Price Index formula
-$$\\text{Weighted Index} = \\frac{\\sum P_{idx} \times W}{\\sum W}$$
+$$\\text{Weighted Index} = \\frac{\\sum P_{idx} \\times W}{\\sum W}$$
 $$\\text{Weighted Index} = \\frac{(160 \\times 2) + (150 \\times 1)}{2 + 1} = \\frac{470}{3} = 156.67\\%$$
 
 This implies the cost of living raised by **56.67%** between 1980 and 1987.
@@ -1116,11 +1447,8 @@ This implies the cost of living raised by **56.67%** between 1980 and 1987.
   "mode": "inflation",
   "title": "Weighted Retail Price Index (Cost of Living) Calculator",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "p1": 100,
+    "p2": 156.67
   }
 }
 \`\`\`
@@ -1172,11 +1500,12 @@ This implies the cost of living raised by **56.67%** between 1980 and 1987.
   "mode": "taylor_rule",
   "title": "Interactive Policy Deflation Strategy Board",
   "initialValues": {
-    "num1": 1500,
-    "num2": 1600,
-    "num3": 40,
-    "num4": 20,
-    "num5": 10
+    "r_star": 3,
+    "target_inf": 2,
+    "current_inf": 12,
+    "output_gap": -4,
+    "alpha": 0.5,
+    "beta": 0.5
   }
 }
 \`\`\`

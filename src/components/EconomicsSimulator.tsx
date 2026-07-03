@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, TrendingUp, Scale, Factory, Zap, Info, Percent, Coins } from 'lucide-react';
+import { Calculator, TrendingUp, Scale, Factory, Zap, Info, Percent, Coins, ChevronDown, ChevronUp, BookOpen, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { InlineMath, BlockMath } from './MathComponents';
 import { StatsSimulator } from './StatsSimulator';
 import {
   ResponsiveContainer,
@@ -45,7 +46,9 @@ type SimulatorMode =
   | 'population'
   | 'labour_market'
   | 'nigerian_economy'
-  | 'distributive_trade';
+  | 'distributive_trade'
+  | 'cost_revenue'
+  | 'fiscal_policy';
 
 interface SimulatorProps {
   mode: SimulatorMode;
@@ -199,6 +202,18 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
       defaults.wholesaler_markup = 15;
       defaults.retailer_markup = 25;
       defaults.logistics_cost = 200;
+    } else if (mode === 'cost_revenue') {
+      defaults.fc = 50;
+      defaults.a = 2;
+      defaults.b = 1;
+      defaults.price = 20;
+      defaults.q = 5;
+    } else if (mode === 'fiscal_policy') {
+      defaults.g = 500;
+      defaults.t = 400;
+      defaults.mpc = 0.75;
+      defaults.c0 = 200;
+      defaults.i = 300;
     }
     return { ...defaults, ...initialValues };
   });
@@ -654,6 +669,63 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
         });
         break;
       }
+      case 'cost_revenue': {
+        const fc = values.fc !== undefined ? values.fc : 50;
+        const a = values.a !== undefined ? values.a : 2;
+        const b = values.b !== undefined ? values.b : 1;
+        const price = values.price !== undefined ? values.price : 20;
+        const q = values.q !== undefined ? values.q : 5;
+
+        const vc = a * q + b * q * q;
+        const tc = fc + vc;
+        const ac = q > 0 ? tc / q : 0;
+        const avc = q > 0 ? vc / q : 0;
+        const afc = q > 0 ? fc / q : 0;
+        const mc = q > 0 ? a + b * (2 * q - 1) : 0;
+        const tr = price * q;
+        const profit = tr - tc;
+
+        setResult({
+          fc: fc.toFixed(2),
+          vc: vc.toFixed(2),
+          tc: tc.toFixed(2),
+          ac: ac.toFixed(2),
+          avc: avc.toFixed(2),
+          afc: afc.toFixed(2),
+          mc: mc.toFixed(2),
+          tr: tr.toFixed(2),
+          profit: profit.toFixed(2)
+        });
+        break;
+      }
+      case 'fiscal_policy': {
+        const g = values.g !== undefined ? values.g : 500;
+        const t = values.t !== undefined ? values.t : 400;
+        const mpc = values.mpc !== undefined ? values.mpc : 0.75;
+        const c0 = values.c0 !== undefined ? values.c0 : 200;
+        const i = values.i !== undefined ? values.i : 300;
+
+        const multiplier = mpc < 1 ? 1 / (1 - mpc) : 100;
+        const taxMultiplier = mpc < 1 ? -mpc / (1 - mpc) : -100;
+        const budgetBalance = t - g;
+
+        const autonomousSpending = c0 - mpc * t + i + g;
+        const equilibriumY = multiplier * autonomousSpending;
+
+        const disposableIncome = equilibriumY - t;
+        const consumption = c0 + mpc * disposableIncome;
+
+        setResult({
+          multiplier: multiplier.toFixed(2),
+          taxMultiplier: taxMultiplier.toFixed(2),
+          budgetBalance: budgetBalance.toFixed(2),
+          autonomousSpending: autonomousSpending.toFixed(2),
+          equilibriumY: equilibriumY.toFixed(2),
+          disposableIncome: disposableIncome.toFixed(2),
+          consumption: consumption.toFixed(2)
+        });
+        break;
+      }
     }
   };
 
@@ -915,6 +987,36 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
               <Input label="Wholesaler Mark-up (%)" value={values.wholesaler_markup} onChange={v => handleInputChange('wholesaler_markup', v)} />
               <Input label="Retailer Mark-up (%)" value={values.retailer_markup} onChange={v => handleInputChange('retailer_markup', v)} />
             </div>
+          </div>
+        );
+      case 'cost_revenue':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Fixed Cost (FC ₦)" value={values.fc} onChange={v => handleInputChange('fc', v)} />
+              <Input label="Unit Price (P ₦)" value={values.price} onChange={v => handleInputChange('price', v)} />
+              <Input label="Linear Variable Cost (a)" value={values.a} onChange={v => handleInputChange('a', v)} />
+              <Input label="Quadratic Cost (b)" value={values.b} onChange={v => handleInputChange('b', v)} />
+            </div>
+            <Input label="Target Output Level (Q)" value={values.q} onChange={v => handleInputChange('q', v)} />
+            <p className="text-[10px] text-muted italic">
+              Adjust parameters to shift Fixed Costs and scale Variable Costs ($VC = aQ + bQ^2$).
+            </p>
+          </div>
+        );
+      case 'fiscal_policy':
+        return (
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+              <Input label="Govt Spending (G ₦b)" value={values.g} onChange={v => handleInputChange('g', v)} />
+              <Input label="Tax Revenues (T ₦b)" value={values.t} onChange={v => handleInputChange('t', v)} />
+              <Input label="Autonomous Cons (C0 ₦b)" value={values.c0} onChange={v => handleInputChange('c0', v)} />
+              <Input label="Investment (I ₦b)" value={values.i} onChange={v => handleInputChange('i', v)} />
+            </div>
+            <Input label="Marginal Propensity to Consume (MPC)" value={values.mpc} onChange={v => handleInputChange('mpc', v)} />
+            <p className="text-[10px] text-muted italic">
+              Change MPC to see multiplier acceleration: Multiplier = 1 / (1 - MPC). MPC must be less than 1.0.
+            </p>
           </div>
         );
     }
@@ -2084,7 +2186,371 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
           </div>
         );
       }
+      case 'cost_revenue': {
+        const fc = values.fc !== undefined ? values.fc : 50;
+        const a = values.a !== undefined ? values.a : 2;
+        const b = values.b !== undefined ? values.b : 1;
+        const price = values.price !== undefined ? values.price : 20;
+
+        const chartData = [];
+        for (let i = 1; i <= 10; i++) {
+          const ivc = a * i + b * i * i;
+          const itc = fc + ivc;
+          const iac = itc / i;
+          const iavc = ivc / i;
+          const imc = a + b * (2 * i - 1);
+          chartData.push({
+            output: i,
+            'Average Cost (AC)': parseFloat(iac.toFixed(2)),
+            'Average Variable Cost (AVC)': parseFloat(iavc.toFixed(2)),
+            'Marginal Cost (MC)': parseFloat(imc.toFixed(2)),
+            'Price (P)': price
+          });
+        }
+
+        const isProfitable = parseFloat(result.profit) >= 0;
+
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              <ResultCard label="Total Cost (TC)" value={`₦${result.tc}`} icon={<Scale className="text-amber-500" />} description={`FC (₦${result.fc}) + VC (₦${result.vc})`} />
+              <ResultCard label="Net Profit" value={`₦${result.profit}`} icon={<Coins className={isProfitable ? "text-emerald-500" : "text-rose-500"} />} description={isProfitable ? "Firm is making excess profits!" : "Firm is operating at a loss."} />
+            </div>
+            
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-border text-center">
+                <span className="text-[8px] font-bold text-muted uppercase tracking-wider block">Average Cost (AC)</span>
+                <span className="text-xs font-bold text-ink">₦{result.ac}</span>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-border text-center">
+                <span className="text-[8px] font-bold text-muted uppercase tracking-wider block">Marginal Cost (MC)</span>
+                <span className="text-xs font-bold text-ink">₦{result.mc}</span>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-border text-center">
+                <span className="text-[8px] font-bold text-muted uppercase tracking-wider block">Avg Var Cost (AVC)</span>
+                <span className="text-xs font-bold text-ink">₦{result.avc}</span>
+              </div>
+            </div>
+
+            {/* Cost Curves Chart */}
+            <div className="h-48 w-full bg-slate-50/50 dark:bg-slate-900/30 p-2 border border-border rounded-xl">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} />
+                  <XAxis dataKey="output" tick={{ fontSize: 9 }} label={{ value: 'Output (Q)', position: 'insideBottom', offset: -5, style: { fontSize: 8, fill: '#64748b' } }} />
+                  <YAxis tick={{ fontSize: 9 }} label={{ value: 'Cost / Price (₦)', angle: -90, position: 'insideLeft', style: { fontSize: 8, fill: '#64748b' } }} />
+                  <Tooltip contentStyle={{ fontSize: '11px', borderRadius: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '9px' }} />
+                  <Line type="monotone" dataKey="Average Cost (AC)" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Average Variable Cost (AVC)" stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="3 3" dot={{ r: 2 }} />
+                  <Line type="monotone" dataKey="Marginal Cost (MC)" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="Price (P)" stroke="#10b981" strokeWidth={1.5} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <p className="text-[10px] text-muted leading-relaxed text-center italic">
+              Profit Maximization Rule: Optimal production is at $MC = MR$ (Price). Check if $MC$ is close to Price (₦{price}).
+            </p>
+          </div>
+        );
+      }
+      case 'fiscal_policy': {
+        const g = values.g !== undefined ? values.g : 500;
+        const t = values.t !== undefined ? values.t : 400;
+        const mpc = values.mpc !== undefined ? values.mpc : 0.75;
+        const c0 = values.c0 !== undefined ? values.c0 : 200;
+        const i = values.i !== undefined ? values.i : 300;
+
+        const isSurplus = parseFloat(result.budgetBalance) >= 0;
+        const absBalance = Math.abs(parseFloat(result.budgetBalance)).toFixed(2);
+
+        const cVal = parseFloat(result.consumption);
+        const totalExp = cVal + i + g;
+        const shares = [
+          { name: 'Consumption (C)', value: cVal, color: '#3b82f6' },
+          { name: 'Investment (I)', value: i, color: '#f59e0b' },
+          { name: 'Govt Spending (G)', value: g, color: '#10b981' }
+        ];
+
+        return (
+          <div className="space-y-4">
+            <ResultCard 
+              label="Equilibrium National Income (Y)" 
+              value={`₦${result.equilibriumY}b`} 
+              icon={<Coins className="text-emerald-500" />} 
+              description={`Y = Multiplier (${result.multiplier}x) × Autonomous Spending (₦${result.autonomousSpending}b)`} 
+            />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ResultCard 
+                label="Fiscal Budget Balance" 
+                value={isSurplus ? `+₦${absBalance}b` : `-₦${absBalance}b`} 
+                icon={<Scale className={isSurplus ? "text-emerald-500" : "text-rose-500"} />} 
+                description={isSurplus ? "Fiscal Surplus (Taxes > Spending)" : "Fiscal Deficit (Spending > Taxes)"} 
+              />
+              <div className="bg-card border border-border p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-paper dark:bg-slate-800 flex items-center justify-center shrink-0">
+                    <TrendingUp className="text-sky-500" size={14} />
+                  </div>
+                  <span className="text-[8px] sm:text-[9px] font-bold text-muted uppercase tracking-wider text-right">Keynesian Multiplier</span>
+                </div>
+                <div className="text-base sm:text-xl md:text-2xl font-bold text-ink mb-0.5 tracking-tight">{result.multiplier}x</div>
+                <p className="text-[9px] sm:text-[10px] text-muted leading-relaxed font-semibold">Every ₦1 of govt spending creates ₦{result.multiplier} of national income.</p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-border space-y-2">
+              <h4 className="text-[10px] font-bold text-muted uppercase tracking-wider">Aggregate Demand Composition (C + I + G)</h4>
+              <div className="w-full h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex">
+                {shares.map((part, idx) => {
+                  const pct = totalExp > 0 ? (part.value / totalExp) * 100 : 0;
+                  return (
+                    <div 
+                      key={idx} 
+                      className="h-full transition-all" 
+                      style={{ width: `${pct}%`, backgroundColor: part.color }}
+                      title={`${part.name}: ${pct.toFixed(1)}%`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 text-[9px] font-semibold text-muted">
+                {shares.map((part, idx) => {
+                  const pct = totalExp > 0 ? (part.value / totalExp) * 100 : 0;
+                  return (
+                    <div key={idx} className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: part.color }}></span>
+                      <span className="truncate">{part.name}: {pct.toFixed(0)}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <p className="text-[10px] text-muted leading-relaxed text-center italic">
+              Disposable Income: ₦{result.disposableIncome}b | Autonomous Consumption (C0): ₦{c0}b | Tax Multiplier: {result.taxMultiplier}x
+            </p>
+          </div>
+        );
+      }
     }
+  };
+
+  const [isExplanationExpanded, setIsExplanationExpanded] = useState(true);
+
+  const renderWorkedOutSolution = () => {
+    if (!result) return null;
+
+    let steps: React.ReactNode[] = [];
+    let interpretationTitle = "";
+    let interpretationText = "";
+    let formulaText = "";
+
+    switch (mode) {
+      case 'utility': {
+        const tu1 = values.tu1 !== undefined ? values.tu1 : 15;
+        const tu2 = values.tu2 !== undefined ? values.tu2 : 25;
+        const q1 = values.q1 !== undefined ? values.q1 : 1;
+        const q2 = values.q2 !== undefined ? values.q2 : 2;
+        const deltaTU = tu2 - tu1;
+        const deltaQ = q2 - q1;
+        const mu = deltaQ !== 0 ? deltaTU / deltaQ : 0;
+
+        formulaText = "MU = \\frac{\\Delta TU}{\\Delta Q} = \\frac{TU_2 - TU_1}{Q_2 - Q_1}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Identify Initial and Final States:</strong> Initial Satisfaction (<InlineMath math="TU_1" />) = ₦{tu1} at Quantity (<InlineMath math="Q_1" />) = {q1}. Final Satisfaction (<InlineMath math="TU_2" />) = ₦{tu2} at Quantity (<InlineMath math="Q_2" />) = {q2}.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate the change in Total Utility (<InlineMath math="\Delta TU" />):</strong> <InlineMath math="\Delta TU = TU_2 - TU_1" /> = {tu2} - {tu1} = {deltaTU} units.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate the change in Quantity Consumed (<InlineMath math="\Delta Q" />):</strong> <InlineMath math="\Delta Q = Q_2 - Q_1" /> = {q2} - {q1} = {deltaQ} units.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Solve for Marginal Utility (<InlineMath math="MU" />):</strong> <InlineMath math="MU = \frac{\Delta TU}{\Delta Q} = \frac{deltaTU}{deltaQ}" /> = {mu.toFixed(2)} units.</div>
+        ];
+        interpretationTitle = "Law of Diminishing Marginal Utility";
+        interpretationText = mu > 0 
+          ? `Consuming this additional unit increases your total utility by ${mu.toFixed(2)} units. Since Marginal Utility is positive, you have not yet reached oversaturation, but typically, each additional unit consumed will yield less extra satisfaction than the one before it.`
+          : `Marginal Utility is ${mu.toFixed(2)}. Since it is non-positive, additional consumption does not increase your total satisfaction. You have reached or passed your point of satiation (disutility).`;
+        break;
+      }
+      case 'elasticity': {
+        const p1 = values.p1 !== undefined ? values.p1 : 10;
+        const p2 = values.p2 !== undefined ? values.p2 : 12;
+        const q1 = values.q1 !== undefined ? values.q1 : 100;
+        const q2 = values.q2 !== undefined ? values.q2 : 80;
+
+        const changeQ = q2 - q1;
+        const pctChangeQ = ((q2 - q1) / q1) * 100;
+        const changeP = p2 - p1;
+        const pctChangeP = ((p2 - p1) / p1) * 100;
+        const pedVal = Math.abs(pctChangeQ / (pctChangeP || 1));
+
+        formulaText = "PED = \\left| \\frac{\\% \\Delta Q_d}{\\% \\Delta P} \\right| = \\left| \\frac{(Q_2 - Q_1)/Q_1}{(P_2 - P_1)/P_1} \\right|";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Calculate the Percentage Change in Quantity Demanded (<InlineMath math="\% \Delta Q_d" />):</strong> <InlineMath math="\% \Delta Q_d = \frac{Q_2 - Q_1}{Q_1} \times 100\%" /> = <InlineMath math={`\\frac{${changeQ}}{${q1}} \\times 100\\% = ${pctChangeQ.toFixed(2)}\\%`} /></div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate the Percentage Change in Price (<InlineMath math="\% \Delta P" />):</strong> <InlineMath math="\% \Delta P = \frac{P_2 - P_1}{P_1} \times 100\%" /> = <InlineMath math={`\\frac{${changeP}}{${p1}} \\times 100\\% = ${pctChangeP.toFixed(2)}\\%`} /></div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Solve for Price Elasticity of Demand (PED):</strong> <InlineMath math={`PED = \\left| \\frac{${pctChangeQ.toFixed(2)}\\%}{${pctChangeP.toFixed(2)}\\%} \\right| = ${pedVal.toFixed(2)}`} /></div>
+        ];
+        interpretationTitle = `Elasticity Interpretation: ${result.type || 'N/A'}`;
+        interpretationText = pedVal > 1
+          ? `Demand is ELASTIC (PED = ${pedVal.toFixed(2)} > 1). Consumers are highly responsive to price adjustments. A 1% increase in price leads to a ${pedVal.toFixed(2)}% drop in quantity demanded. In this case, raising prices is counterproductive because it will reduce Total Revenue (TR decreases from ₦${p1*q1} to ₦${p2*q2}).`
+          : pedVal < 1
+          ? `Demand is INELASTIC (PED = ${pedVal.toFixed(2)} < 1). Consumers are relatively unresponsive to price changes (likely due to necessity or lack of close substitutes). A 1% increase in price leads to only a ${pedVal.toFixed(2)}% decrease in quantity demanded. Raising prices here is profitable because it increases Total Revenue (TR rises from ₦${p1*q1} to ₦${p2*q2}).`
+          : `Demand is UNITARY (PED = 1). The percentage change in quantity demanded exactly matches the percentage change in price. Total Revenue remains identical.`;
+        break;
+      }
+      case 'equilibrium': {
+        const a = values.a !== undefined ? values.a : 100;
+        const b = values.b !== undefined ? values.b : 2;
+        const c = values.c !== undefined ? values.c : 20;
+        const d = values.d !== undefined ? values.d : 3;
+
+        const eqP = (a - c) / (b + d);
+        const eqQ = a - b * eqP;
+
+        formulaText = "Q_d = Q_s \\implies a - bP = c + dP \\implies P^* = \\frac{a - c}{b + d}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Set Demand Equal to Supply:</strong> <InlineMath math="Q_d = Q_s \implies a - bP = c + dP" /> which is <InlineMath math={`${a} - ${b}P = ${c} + ${d}P`} /></div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Collect like terms:</strong> <InlineMath math={`${a} - ${c} = ${b}P + ${d}P \implies ${a - c} = ${b + d}P`} /></div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Solve for Equilibrium Price (<InlineMath math="P^*" />):</strong> <InlineMath math={`P^* = \\frac{${a - c}}{${b + d}} = ₦${eqP.toFixed(2)}`} /></div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Substitute <InlineMath math="P^*" /> back to get Equilibrium Quantity (<InlineMath math="Q^*" />):</strong> <InlineMath math={`Q^* = ${a} - ${b}(${eqP.toFixed(2)}) = ${eqQ.toFixed(2)}`} /> units</div>
+        ];
+        interpretationTitle = "Market Equilibrium Analysis";
+        interpretationText = `At the equilibrium price of ₦${eqP.toFixed(2)}, the market is in balance. The quantity that consumers are willing and able to buy (${eqQ.toFixed(2)} units) matches perfectly with the quantity producers are willing and able to supply. There is neither excess demand (shortage) nor excess supply (surplus) in the market.`;
+        break;
+      }
+      case 'production': {
+        const tp1 = values.tp1 !== undefined ? values.tp1 : 150;
+        const tp2 = values.tp2 !== undefined ? values.tp2 : 180;
+        const l1 = values.l1 !== undefined ? values.l1 : 5;
+        const l2 = values.l2 !== undefined ? values.l2 : 6;
+        const ap = l2 > 0 ? tp2 / l2 : 0;
+        const mp = l2 !== l1 ? (tp2 - tp1) / (l2 - l1) : 0;
+
+        formulaText = "AP = \\frac{TP_2}{L_2} \\quad \\text{and} \\quad MP = \\frac{\\Delta TP}{\\Delta L} = \\frac{TP_2 - TP_1}{L_2 - L_1}";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Calculate Average Product (AP) at final labor level:</strong> <InlineMath math={`AP = \\frac{TP_2}{L_2} = \\frac{${tp2}}{${l2}} = ${ap.toFixed(2)}`} /> units per worker.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate the change in Total Product (<InlineMath math="\Delta TP" />):</strong> <InlineMath math={`\\Delta TP = TP_2 - TP_1 = ${tp2} - ${tp1} = ${tp2 - tp1}`} /> units.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate the change in Labor (<InlineMath math="\Delta L" />):</strong> <InlineMath math={`\\Delta L = L_2 - L_1 = ${l2} - ${l1} = ${l2 - l1}`} /> workers.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Solve for Marginal Product (MP) of the last worker:</strong> <InlineMath math={`MP = \\frac{\\Delta TP}{\\Delta L} = \\frac{${tp2 - tp1}}{${l2 - l1}} = ${mp.toFixed(2)}`} /> units.</div>
+        ];
+        interpretationTitle = "Law of Variable Proportions & Returns";
+        interpretationText = mp > ap
+          ? `Marginal Product (${mp.toFixed(2)}) is greater than Average Product (${ap.toFixed(2)}). This represents increasing returns. Adding workers increases productivity of previous workers due to synergy and specialization.`
+          : `Marginal Product (${mp.toFixed(2)}) is less than Average Product (${ap.toFixed(2)}). This is the classic stage of Diminishing Marginal Returns. Although total output is still rising, each added worker contributes less than the previous one because the fixed capital assets are shared.`;
+        break;
+      }
+      case 'cost_revenue': {
+        const fc = values.fc !== undefined ? values.fc : 50;
+        const a = values.a !== undefined ? values.a : 2;
+        const b = values.b !== undefined ? values.b : 1;
+        const price = values.price !== undefined ? values.price : 20;
+        const q = values.q !== undefined ? values.q : 5;
+
+        const vc = a * q + b * q * q;
+        const tc = fc + vc;
+        const ac = q > 0 ? tc / q : 0;
+        const mc = q > 0 ? a + b * (2 * q - 1) : 0;
+        const tr = price * q;
+        const profit = tr - tc;
+
+        formulaText = "TC = FC + VC(Q) = FC + (aQ + bQ^2) \\quad AC = \\frac{TC}{Q} \\quad MC \\approx a + b(2Q - 1)";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Calculate Variable Cost (VC) at Q = {q}:</strong> <InlineMath math={`VC = aQ + bQ^2 = ${a}(${q}) + ${b}(${q}^2) = ₦${vc}`} /></div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Total Cost (TC):</strong> <InlineMath math={`TC = FC + VC = ${fc} + ${vc} = ₦${tc}`} /></div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate Average Cost (AC):</strong> <InlineMath math={`AC = \\frac{TC}{Q} = \\frac{${tc}}{${q}} = ₦${ac.toFixed(2)}`} /></div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Solve for Marginal Cost (MC) at Q = {q}:</strong> <InlineMath math={`MC = a + b(2Q-1) = ${a} + ${b}(2(${q})-1) = ₦${mc.toFixed(2)}`} /></div>,
+          <div key="s5" className="flex items-center gap-1 flex-wrap"><strong>Step 5: Calculate Revenues and Profit:</strong> <InlineMath math={`TR = P \\times Q = ${price} \\times ${q} = ₦${tr}`} />. <InlineMath math={`\\text{Profit} = TR - TC = ${tr} - ${tc} = ₦${profit.toFixed(2)}`} /></div>
+        ];
+        interpretationTitle = "Cost-Volume-Profit Optimization Analysis";
+        interpretationText = profit >= 0
+          ? `The firm is highly profitable, earning a net positive economic profit of ₦${profit.toFixed(2)}. Since Price (₦${price}) exceeds Average Cost (₦${ac.toFixed(2)}), you are covering all explicit and implicit costs. If Marginal Cost (₦${mc.toFixed(2)}) is close to Price, you are near your profit-maximizing output level.`
+          : `The firm is operating at a loss of ₦${Math.abs(profit).toFixed(2)}. Since Price (₦${price}) is less than Average Cost (₦${ac.toFixed(2)}), you are not covering your full production costs. Check if Price is greater than Average Variable Cost (AVC) to decide if you should continue producing in the short run to offset fixed costs, or shut down.`;
+        break;
+      }
+      case 'fiscal_policy': {
+        const g = values.g !== undefined ? values.g : 500;
+        const t = values.t !== undefined ? values.t : 400;
+        const mpc = values.mpc !== undefined ? values.mpc : 0.75;
+        const c0 = values.c0 !== undefined ? values.c0 : 200;
+        const i = values.i !== undefined ? values.i : 300;
+
+        const multiplier = 1 / (1 - mpc);
+        const autoSpend = c0 - mpc * t + i + g;
+        const eqY = multiplier * autoSpend;
+
+        formulaText = "k = \\frac{1}{1 - mpc} \\quad Y = k \\times [C_0 - mpc(T) + I + G]";
+        steps = [
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Calculate the Keynesian Spending Multiplier (<InlineMath math="k" />):</strong> <InlineMath math={`k = \\frac{1}{1 - mpc} = \\frac{1}{1 - ${mpc}} = ${multiplier.toFixed(2)}`} />x</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate total autonomous spending (<InlineMath math="A" />):</strong> <InlineMath math={`A = C_0 - mpc(T) + I + G = ${c0} - ${mpc}(${t}) + ${i} + ${g} = ₦${autoSpend.toFixed(2)}`} />b</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Multiply to find Equilibrium National Income (<InlineMath math="Y" />):</strong> <InlineMath math={`Y = k \\times A = ${multiplier.toFixed(2)} \\times ${autoSpend.toFixed(2)} = ₦${eqY.toFixed(2)}`} />b</div>
+        ];
+        interpretationTitle = "Macroeconomic Multiplier and Fiscal Stance";
+        interpretationText = `The Keynesian multiplier of ${multiplier.toFixed(2)}x indicates that any change in government spending, autonomous investment, or consumption will be magnified ${multiplier.toFixed(2)} times in the national economy. With Govt Spending at ₦${g}b and Taxes at ₦${t}b, the government has a budget ${t - g >= 0 ? 'SURPLUS' : 'DEFICIT'} of ₦${Math.abs(t - g).toFixed(2)}b. To stimulate a stagnant economy, policy makers can leverage the multiplier by raising government spending or cutting taxes.`;
+        break;
+      }
+      default: {
+        formulaText = "Value_{computed} = f(Parameters_{input})";
+        steps = [
+          <div key="s1"><strong>Step 1: Parse Inputs:</strong> Successfully captured all parameters and values: {Object.entries(values).map(([k, v]) => `${k.toUpperCase()} = ${v}`).join(', ')}.</div>,
+          <div key="s2"><strong>Step 2: Apply Economic Formula:</strong> Calculated the mathematical output using standard theoretical modeling algorithms.</div>,
+          <div key="s3"><strong>Step 3: Live Output Updated:</strong> Refreshed the live charts and analytics tables to match your custom parameters.</div>
+        ];
+        interpretationTitle = "Educational Insights";
+        interpretationText = "Adjust any slider or input value on the left panel. The live graph and table values on the right panel will immediately update in real-time, allowing you to observe direct mathematical correlations, sensitivity thresholds, and optimal economic clearing points.";
+        break;
+      }
+    }
+
+    return (
+      <div className="mt-8 border-t border-border pt-6 px-3 sm:px-6 md:px-8">
+        <button 
+          onClick={() => setIsExplanationExpanded(!isExplanationExpanded)}
+          className="w-full flex items-center justify-between py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-900/80 transition-colors border border-border"
+        >
+          <div className="flex items-center gap-2 text-ink">
+            <BookOpen size={16} className="text-sky-500" />
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Show Worked-out Solution & Economic Interpretation
+            </span>
+          </div>
+          {isExplanationExpanded ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
+        </button>
+
+        {isExplanationExpanded && (
+          <div className="mt-4 p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl border border-border space-y-6">
+            <div>
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Percent size={12} /> Core Formula Used
+              </h4>
+              <div className="p-4 bg-white dark:bg-slate-950 border border-border rounded-xl text-center font-mono text-sm overflow-x-auto text-ink flex justify-center py-5">
+                <BlockMath math={formulaText} />
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Calculator size={12} /> Step-by-Step Mathematical Workout
+              </h4>
+              <div className="space-y-3 pl-1">
+                {steps.map((step, idx) => (
+                  <div key={idx} className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 border-l-2 border-sky-400 dark:border-sky-500/50 pl-3 py-0.5 leading-relaxed">
+                    {step}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 rounded-xl">
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                <Lightbulb size={12} className="text-sky-500" /> {interpretationTitle}
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+                {interpretationText}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -2126,6 +2592,8 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
           </AnimatePresence>
         </div>
       </div>
+      
+      {renderWorkedOutSolution()}
     </div>
   );
 };
