@@ -1,82 +1,153 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ChevronLeft, Lightbulb, Zap, ShieldAlert, ArrowRight, Activity, TrendingUp, DollarSign, Award, BarChart3, CheckCircle } from 'lucide-react';
+import { Trophy, ChevronLeft, Lightbulb, Zap, ShieldAlert, ArrowRight, Activity, TrendingUp, DollarSign, Award, BarChart3, CheckCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../useAuth';
-import { updatePoints } from '../firebase';
+import { updatePoints, getTodayDailyChallenge, saveDailyChallengeAttempt, getUserDailyChallengeAttempt } from '../firebase';
+import { MathText } from './MathComponents';
 
 // Mocked massive pool generator for 1000 puzzles
 const generatePuzzleScenarios = () => {
     const scenarios = [
         {
-            title: "The Inflation Spike",
-            topic: "Monetary Policy",
-            scenario: "You are the head of the Central Bank. Inflation has unexpectedly hit 8%, up from 2%. Unemployment is steady at 4%. Real wages are declining. Citizens are protesting the cost of living.",
-            question: "What is the most orthodox monetary policy response to curb this inflation?",
+            title: "Law of Diminishing Returns",
+            topic: "Production Theory (Micro)",
+            scenario: "A bakery keeps adding workers to a fixed kitchen with a single oven. Initially, output rises rapidly, but eventually, each additional worker adds less output than the previous one.",
+            question: "Which economic principle explains this phenomenon, assuming constant technology?",
             options: [
-                "Decrease the reserve requirement for banks",
-                "Increase the benchmark interest rate",
-                "Print more money to pay for citizen subsidies",
-                "Lower taxes on essential goods"
-            ],
-            answer: 1,
-            explanation: "Increasing interest rates cools down the economy by making borrowing more expensive, which reduces consumer spending and business investment, ultimately lowering demand-pull inflation."
-        },
-        {
-            title: "The Supply Chain Shock",
-            topic: "Macroeconomics",
-            scenario: "A global pandemic has disrupted global shipping lines. The cost of shipping a container has quintupled. Local manufacturers cannot get raw parts.",
-            question: "What type of inflation is this scenario most likely to cause in the short term?",
-            options: [
-                "Demand-pull inflation",
-                "Cost-push inflation",
-                "Built-in inflation",
-                "Hyperinflation"
-            ],
-            answer: 1,
-            explanation: "Cost-push inflation occurs when overall prices increase (inflation) due to increases in the cost of wages and raw materials."
-        },
-        {
-            title: "Tech Startup Dilemma",
-            topic: "Microeconomics",
-            scenario: "You run a software startup. You've noticed that as you hire more developers beyond your 50th hire, the additional output per developer is decreasing, even though pay remains constant.",
-            question: "Which economic principle does this situation best illustrate?",
-            options: [
-                "Economies of scale",
-                "The law of diminishing marginal returns",
-                "Opportunity cost",
-                "Comparative advantage"
-            ],
-            answer: 1,
-            explanation: "The law of diminishing marginal returns states that adding an additional factor of production results in smaller increases in output."
-        },
-        {
-            title: "The Gig Economy Shift",
-            topic: "Labor Economics",
-            scenario: "A new law requires all ride-sharing apps to classify drivers as full employees with benefits rather than independent contractors.",
-            question: "According to standard microeconomic theory, what is the most likely immediate effect on the ride-sharing market?",
-            options: [
-                "Supply of rides decreases, prices increase",
-                "Supply of rides increases, prices decrease",
-                "Demand for rides increases, prices increase",
-                "Demand for rides decreases, prices decrease"
+                "Law of Diminishing Marginal Returns",
+                "Decreasing Returns to Scale",
+                "Negative Income Elasticity of Labor",
+                "Price Elasticity of Supply"
             ],
             answer: 0,
-            explanation: "Classifying drivers as employees increases the cost of labor for platforms. This shifts the supply curve to the left, resulting in fewer rides offered and higher prices for consumers."
+            explanation: "The Law of Diminishing Marginal Returns states that as equal increments of a variable input (labor) are added to a fixed input (kitchen/oven), the marginal product of the variable input will eventually decrease."
         },
         {
-            title: "The Currency Crisis",
-            topic: "International Trade",
-            scenario: "Your developing nation heavily relies on importing oil, priced in USD. Your local currency has just depreciated 20% against the dollar due to capital flight.",
-            question: "What is the immediate domestic impact of this currency depreciation?",
+            title: "The Liquidity Trap",
+            topic: "Monetary Policy (Macro)",
+            scenario: "An economy is in a deep recession, and the central bank has lowered the nominal interest rate \\(r\\) to near zero. Despite this, consumers and businesses prefer to hold cash rather than invest or spend.",
+            question: "Which macroeconomic condition does this scenario describe, where conventional monetary policy becomes ineffective?",
             options: [
-                "Imported inflation and higher domestic fuel prices",
-                "Decreased export competitiveness",
-                "Lower interest rates automatically",
-                "A decrease in the national debt (if held in USD)"
+                "Liquidity Trap",
+                "Stagflation",
+                "Fiscal Dominance",
+                "Crowding-In"
             ],
             answer: 0,
-            explanation: "A weaker domestic currency makes imports (like oil priced in USD) more expensive, leading to imported inflation."
+            explanation: "In a liquidity trap, the nominal interest rate is near zero, and the public holds cash because they expect interest rates to rise. Under these conditions, injections of monetary reserves fail to stimulate aggregate demand or private investment."
+        },
+        {
+            title: "Theory of Comparative Advantage",
+            topic: "Trade Theory (International)",
+            scenario: "Country A can produce both agricultural goods and high-tech software more efficiently in absolute terms than Country B.",
+            question: "According to David Ricardo's trade theory, why should Country A still engage in trade with Country B?",
+            options: [
+                "Country A should specialize in the product in which it has a lower opportunity cost (comparative advantage)",
+                "Country A should impose protective tariffs to avoid wages being depressed by Country B",
+                "Trade is only beneficial if both countries possess an absolute advantage in at least one good",
+                "Country A should specialize entirely in high-tech software and export everything to balance its currency value"
+            ],
+            answer: 0,
+            explanation: "The Law of Comparative Advantage states that trade is mutually beneficial if countries specialize in producing goods for which they have the lowest relative opportunity cost, even if one country has an absolute advantage in all goods."
+        },
+        {
+            title: "Omitted Variable Bias",
+            topic: "Regression Analysis (Econometrics)",
+            scenario: "A researcher regresses student test scores on classroom size but fails to control for socioeconomic status, which is positively correlated with smaller classrooms and higher scores.",
+            question: "What econometric issue does the estimated coefficient on classroom size suffer from?",
+            options: [
+                "Omitted Variable Bias",
+                "High Multicollinearity",
+                "Heteroscedasticity",
+                "Simultaneity Bias"
+            ],
+            answer: 0,
+            explanation: "Failing to include a variable that correlates with both the key independent variable (classroom size) and the dependent variable (test scores) introduces Omitted Variable Bias."
+        },
+        {
+            title: "Public Goods Characteristics",
+            topic: "Market Failure (Micro)",
+            scenario: "A coastal lighthouse provides warning signals to all passing ships. One ship utilizing the light does not reduce the light available to others, and the lighthouse owner cannot exclude any ship from seeing the light.",
+            question: "Which two key properties define this type of public good?",
+            options: [
+                "Non-rivalry and Non-excludability",
+                "Rivalry and Excludability",
+                "High Income Elasticity and Low Cost",
+                "Asymmetric Information and External Diseconomies"
+            ],
+            answer: 0,
+            explanation: "Public goods are defined by two main characteristics: Non-rivalry (one person's consumption does not diminish another's) and Non-excludability (it is impossible or extremely costly to prevent non-payers from consuming it)."
+        },
+        {
+            title: "The Phillips Curve Trade-off",
+            topic: "Monetary Policy (Macro)",
+            scenario: "In the short run, there is an inverse relationship between inflation and unemployment. In the long run, this trade-off disappears.",
+            question: "Why does the long-run Phillips curve become a vertical line at the natural rate of unemployment?",
+            options: [
+                "Inflation expectations fully adjust, causing nominal wages to rise in step with prices",
+                "Governments balance budgets in the long run",
+                "Central banks always peg nominal interest rates to zero",
+                "Aggregate demand becomes completely horizontal"
+            ],
+            answer: 0,
+            explanation: "In the long run, expected inflation equals actual inflation. Nominal wages adjust to price changes, leaving the real wage and natural rate of unemployment unchanged."
+        },
+        {
+            title: "The Mundell-Fleming Trilemma",
+            topic: "Open Economy Macroeconomics",
+            scenario: "The Impossible Trinity states that an open economy cannot simultaneously achieve three major policy goals.",
+            question: "Which three policy objectives are mutually exclusive under the Trilemma framework?",
+            options: [
+                "Fixed exchange rates, free capital flow, and independent monetary policy",
+                "Low inflation, high employment, and balanced government budgets",
+                "Floating exchange rates, trade surpluses, and gold standard adherence",
+                "High interest rates, low tariffs, and direct foreign investment"
+            ],
+            answer: 0,
+            explanation: "The Trilemma dictates that a nation must choose any two out of a fixed exchange rate, free capital mobility, and an independent monetary policy. It cannot have all three."
+        },
+        {
+            title: "Multicollinearity in OLS",
+            topic: "Regression Diagnostics (Econometrics)",
+            scenario: "In a multiple linear regression model \\(Y = \\beta_0 + \\beta_1 X_1 + \\beta_2 X_2 + u\\), the independent variables \\(X_1\\) and \\(X_2\\) are highly correlated with each other.",
+            question: "What is the primary consequence of this multicollinearity on the OLS estimators?",
+            options: [
+                "The standard errors of the coefficients become very large, making it difficult to establish individual statistical significance",
+                "The OLS estimators become biased and lose their linear properties",
+                "The R-squared value drops to zero regardless of the actual relationship",
+                "The error term \\(u\\) is guaranteed to suffer from heteroscedasticity"
+            ],
+            answer: 0,
+            explanation: "Multicollinearity does not induce bias in the OLS coefficient estimates, but it dramatically increases the variance (and standard errors) of the estimates, making individual coefficients statistically insignificant and highly sensitive to small model changes."
+        },
+        {
+            title: "Nash Equilibrium in Prisoners' Dilemma",
+            topic: "Game Theory (Micro)",
+            scenario: "Two rival firms choose to 'Cooperate' (keep prices high) or 'Cheat' (undercut). If both cooperate, each earns \\(\\$50\\). If one cheats, they earn \\(\\$80\\) while the cooperator earns \\(\\$10\\). If both cheat, each earns \\(\\$20\\).",
+            question: "Determine the dominant strategy and resulting Nash Equilibrium.",
+            options: [
+                "Dominant strategy is 'Cheat'; Nash Equilibrium is both cheat (\\(\\$20\\), \\(\\$20\\))",
+                "Dominant strategy is 'Cooperate'; Nash Equilibrium is both cooperate (\\(\\$50\\), \\(\\$50\\))",
+                "No dominant strategy exists; equilibrium is unstable",
+                "Firms will alternate between Cooperating and Cheating"
+            ],
+            answer: 0,
+            explanation: "Cheating is dominant because it yields a higher payoff regardless of what the rival does (\\(80 > 50\\) if they cooperate, \\(20 > 10\\) if they cheat). Thus, both cheat is the unique Nash Equilibrium."
+        },
+        {
+            title: "The Crowding-Out Effect",
+            topic: "Fiscal Policy (Macro)",
+            scenario: "A government engages in massive deficit spending to fund projects, issuing a high volume of treasury bonds to borrow from domestic credit markets.",
+            question: "How does this heavy borrowing affect domestic interest rates and private investment?",
+            options: [
+                "It drives interest rates up, which reduces (crowds out) private investment",
+                "It lowers interest rates, boosting private investment",
+                "It leaves interest rates unchanged but increases private consumption",
+                "It forces the central bank to raise the required reserve ratio"
+            ],
+            answer: 0,
+            explanation: "Heavy government borrowing increases the demand for loanable funds, driving up interest rates. Higher interest rates make borrowing more expensive for businesses, reducing private investment."
         }
     ];
     
@@ -106,22 +177,77 @@ export const DailyPuzzle = () => {
     const [isSessionComplete, setIsSessionComplete] = useState(false);
     const [performance, setPerformance] = useState<Record<string, { total: number, correct: number }>>({});
 
-    const [botScore, setBotScore] = useState(0);
+    // Live daily challenge states
+    const [challenge, setChallenge] = useState<any | null>(null);
+    const [challengeQuestions, setChallengeQuestions] = useState<any[]>([]);
+    const [alreadyCompleted, setAlreadyCompleted] = useState<any | null>(null);
+    const [loadingChallenge, setLoadingChallenge] = useState(true);
 
     useEffect(() => {
-        if (!isSessionComplete && !isAnswered) {
-            const timer = setTimeout(() => {
-                // The bot answers. 70% chance to get it right.
-                const gotCorrect = Math.random() > 0.3;
-                if (gotCorrect) {
-                     setBotScore(prev => prev + 10);
+        const fetchChallenge = async () => {
+            try {
+                // Try to find for user's level. Fallback to undergraduate.
+                const userLevel = profile?.level || 'undergraduate';
+                const todayChallenge = await getTodayDailyChallenge(userLevel);
+                if (todayChallenge) {
+                    setChallenge(todayChallenge);
+                    setChallengeQuestions(todayChallenge.questions || []);
+                    
+                    if (user) {
+                        const previousAttempt = await getUserDailyChallengeAttempt(user.uid, todayChallenge.id!);
+                        if (previousAttempt) {
+                            setAlreadyCompleted(previousAttempt);
+                        }
+                    }
                 }
-            }, 3000 + Math.random() * 6000); // Between 3 and 9 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [currentPuzzleIdx, isSessionComplete, isAnswered]);
+            } catch (e) {
+                console.error("Error loading daily challenge:", e);
+            } finally {
+                setLoadingChallenge(false);
+            }
+        };
+        fetchChallenge();
+    }, [user, profile]);
 
-    const puzzle = PUZZLE_POOL[currentPuzzleIdx];
+    const [activePool, setActivePool] = useState<any[]>([]);
+    const isRealChallenge = challengeQuestions.length > 0;
+
+    useEffect(() => {
+        if (!loadingChallenge) {
+            let poolToUse = [];
+            if (challengeQuestions.length > 0) {
+                poolToUse = [...challengeQuestions];
+            } else {
+                poolToUse = [...PUZZLE_POOL.slice(0, 10)];
+            }
+            
+            // Perform Fisher-Yates shuffle
+            for (let i = poolToUse.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [poolToUse[i], poolToUse[j]] = [poolToUse[j], poolToUse[i]];
+            }
+            
+            setActivePool(poolToUse);
+        }
+    }, [challengeQuestions, loadingChallenge]);
+
+    const totalQuestions = activePool.length > 0 ? activePool.length : 10;
+
+    // Map active puzzle to standard format
+    const puzzleRaw = activePool[currentPuzzleIdx] || activePool[0];
+    const puzzle = isRealChallenge && puzzleRaw
+        ? {
+            title: puzzleRaw.course || "Advanced Economics",
+            topic: puzzleRaw.course || "Theory & Application",
+            scenario: puzzleRaw.scenario || puzzleRaw.question,
+            question: puzzleRaw.scenario ? puzzleRaw.question : "Analyze the options carefully and select the single most rigorous economic outcome:",
+            options: puzzleRaw.options,
+            answer: puzzleRaw.correctAnswer !== undefined ? puzzleRaw.correctAnswer : puzzleRaw.answer,
+            explanation: puzzleRaw.explanation || "This answer is derived using standard micro/macro equilibrium models, utility functions, or econometric formulas.",
+            level: challenge?.level || "Advanced Undergrad",
+            id: currentPuzzleIdx + 1
+          }
+        : puzzleRaw;
 
     const handleOptionSelect = (idx: number) => {
         if (isAnswered) return;
@@ -150,15 +276,88 @@ export const DailyPuzzle = () => {
     };
 
     const handleNext = () => {
-        if (questionsAnswered + 1 >= 5) {
+        if (questionsAnswered + 1 >= totalQuestions) {
             setIsSessionComplete(true);
+            if (isRealChallenge && user && challenge) {
+                // Save the completion attempt to Firestore so they don't have to repeat it
+                saveDailyChallengeAttempt({
+                    userId: user.uid,
+                    userDisplayName: profile?.displayName || user.email || 'Anonymous Scholar',
+                    challengeId: challenge.id!,
+                    challengeTitle: challenge.title,
+                    score: score,
+                    questionsCount: totalQuestions,
+                    correctAnswers: score / 10,
+                    answers: {},
+                    completedAt: new Date()
+                });
+            }
         } else {
             setQuestionsAnswered(prev => prev + 1);
             setIsAnswered(false);
             setSelectedOption(null);
-            setCurrentPuzzleIdx((prev) => (prev + 1) % PUZZLE_POOL.length);
+            setCurrentPuzzleIdx((prev) => (prev + 1) % activePool.length);
         }
     };
+
+    if (loadingChallenge || activePool.length === 0) {
+        return (
+            <div className="min-h-screen bg-surface dark:bg-surface-container flex flex-col items-center justify-center p-4">
+                <Loader2 className="animate-spin text-primary mb-3" size={40} />
+                <p className="text-sm font-bold text-on-surface-variant uppercase tracking-widest animate-pulse">Syncing Daily Challenge...</p>
+            </div>
+        );
+    }
+
+    if (alreadyCompleted) {
+        return (
+            <div className="min-h-screen bg-surface dark:bg-surface-container pb-24 font-['Hanken_Grotesk'] text-on-surface">
+                <header className="w-full sticky top-0 z-40 bg-surface dark:bg-surface-container shadow-sm flex items-center px-4 py-3 border-b border-outline-variant/30">
+                    <button onClick={() => navigate('/dashboard')} className="p-2 mr-2 active:scale-95 transition-transform hover:bg-surface-container-high rounded-full text-on-surface-variant text-sm">
+                        <ChevronLeft size={24} />
+                    </button>
+                    <div className="flex-1">
+                        <h1 className="font-headline-sm font-bold tracking-tight">Challenge Already Completed</h1>
+                    </div>
+                </header>
+
+                <main className="max-w-2xl mx-auto px-4 py-12 flex flex-col gap-8">
+                    <div className="bg-surface-container-lowest rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-outline-variant/50 text-center relative overflow-hidden">
+                        <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-950 text-emerald-500 flex items-center justify-center rounded-2xl mx-auto mb-6 shadow-inner">
+                            <CheckCircle size={40} />
+                        </div>
+                        
+                        <h2 className="text-3xl font-bold font-headline-md text-emerald-600 dark:text-emerald-400 mb-2">
+                            Challenge Completed!
+                        </h2>
+                        <p className="text-on-surface-variant mb-6 text-lg">
+                            You have already answered today's Daily Challenge "<strong>{alreadyCompleted.challengeTitle}</strong>". Great job!
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-10">
+                          <div className="bg-surface p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Your Score</span>
+                            <span className="text-2xl font-black text-on-surface">{alreadyCompleted.score} XP</span>
+                          </div>
+                          <div className="bg-surface p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
+                            <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Accuracy</span>
+                            <span className="text-2xl font-black text-on-surface">
+                              {Math.round((alreadyCompleted.correctAnswers / alreadyCompleted.questionsCount) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+
+                        <button 
+                            onClick={() => navigate('/dashboard')}
+                            className="inline-flex w-full md:w-auto items-center justify-center gap-2 bg-primary text-on-primary px-10 py-4 rounded-xl font-label-lg font-bold shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
+                        >
+                            Return to Dashboard <ArrowRight size={18} />
+                        </button>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     if (isSessionComplete) {
         const totalCorrect = Object.values(performance).reduce((acc, val) => acc + val.correct, 0);
@@ -188,24 +387,22 @@ export const DailyPuzzle = () => {
                         </div>
                         
                         <h2 className="text-3xl font-bold font-headline-md text-primary mb-2">
-                            {score > botScore ? 'Great Work, Scholar!' : score === botScore ? 'It\'s a Tie!' : 'Auto-Bot Won!'}
+                            {totalCorrect === totalQuestions ? 'Perfect Score, Scholar!' : totalCorrect >= totalQuestions / 2 ? 'Great Work, Scholar!' : 'Keep Practicing!'}
                         </h2>
                         <p className="text-on-surface-variant mb-10 text-lg">
-                            {score > botScore ? 'You outsmarted the Auto-Bot.' : score === botScore ? 'You matched the Auto-Bot\'s efficiency.' : 'The Auto-Bot calculated faster this time.'}
+                            {totalCorrect === totalQuestions 
+                                ? 'You analyzed every single economic case study with absolute precision.' 
+                                : 'You have successfully completed today\'s economic challenge.'}
                         </p>
 
-                        <div className="grid grid-cols-3 gap-4 mb-10">
+                        <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-10">
                             <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
                                 <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-1"><CheckCircle size={14} className="text-emerald-500" /> Accuracy</span>
-                                <span className="text-3xl font-black text-on-surface">{Math.round((totalCorrect / 5) * 100)}%</span>
+                                <span className="text-3xl font-black text-on-surface">{Math.round((totalCorrect / totalQuestions) * 100)}%</span>
                             </div>
                             <div className="bg-secondary-container/20 p-4 rounded-2xl border border-secondary/30 flex flex-col items-center justify-center">
-                                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-1"><Zap size={14} className="text-secondary" /> You</span>
-                                <span className="text-3xl font-black text-secondary">{score}</span>
-                            </div>
-                            <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/30 flex flex-col items-center justify-center">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">Bot</span>
-                                <span className="text-3xl font-black text-slate-500">{botScore}</span>
+                                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 flex items-center gap-1"><Zap size={14} className="text-secondary" /> Score</span>
+                                <span className="text-3xl font-black text-secondary">{score} XP</span>
                             </div>
                         </div>
 
@@ -262,13 +459,6 @@ export const DailyPuzzle = () => {
                 </div>
                 
                 <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest leading-none">Auto-Bot</span>
-                        <div className="flex items-center gap-1 text-slate-500">
-                            <span className="font-mono text-sm font-black">{botScore} XP</span>
-                        </div>
-                    </div>
-                    <div className="h-6 w-px bg-outline-variant/50 hidden md:block" />
                     <div className="flex items-center gap-2 bg-secondary-container/50 px-3 py-1.5 rounded-full border border-secondary/20">
                         <Zap size={14} className="text-secondary" />
                         <span className="text-sm font-bold font-label-md text-secondary-on-container">{score} XP</span>
@@ -300,16 +490,16 @@ export const DailyPuzzle = () => {
                         </div>
                         
                         <div className="bg-surface-container-low p-5 md:p-6 rounded-2xl border-l-4 border-l-secondary shadow-inner">
-                            <p className="text-base md:text-lg text-on-surface leading-relaxed font-body-lg">
-                                {puzzle.scenario}
-                            </p>
+                            <div className="text-base md:text-lg text-on-surface leading-relaxed font-body-lg">
+                                <MathText text={puzzle.scenario} />
+                            </div>
                         </div>
 
                         <div className="mt-4 border-t border-outline-variant/30 pt-6">
-                            <p className="text-lg font-bold font-headline-sm text-on-surface mb-6 flex items-start gap-2">
-                                <span className="text-secondary opacity-70">Q.</span>
-                                {puzzle.question}
-                            </p>
+                            <div className="text-lg font-bold font-headline-sm text-on-surface mb-6 flex items-start gap-2">
+                                <span className="text-secondary opacity-70 shrink-0">Q.</span>
+                                <span className="flex-1"><MathText text={puzzle.question} /></span>
+                            </div>
 
                             <div className="grid gap-3">
                                 {puzzle.options.map((opt, idx) => {
@@ -342,7 +532,7 @@ export const DailyPuzzle = () => {
                                             <div className={`w-6 h-6 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors text-[10px] font-black ${indicatorStyle}`}>
                                                 {String.fromCharCode(65 + idx)}
                                             </div>
-                                            <span className="flex-1 font-medium">{opt}</span>
+                                            <span className="flex-1 font-medium"><MathText text={opt} /></span>
                                         </button>
                                     );
                                 })}
@@ -368,9 +558,9 @@ export const DailyPuzzle = () => {
                                     <h3 className={`text-xl font-bold mb-2 font-headline-sm ${selectedOption === puzzle.answer ? 'text-secondary-on-container dark:text-emerald-400' : 'text-error-on-container dark:text-error'}`}>
                                         {selectedOption === puzzle.answer ? 'Masterful Logic!' : 'Market Correction!'}
                                     </h3>
-                                    <p className="text-on-surface-variant font-body-md leading-relaxed text-sm md:text-base mb-6">
-                                        <strong className="text-on-surface">Economic Reasoning:</strong> {puzzle.explanation}
-                                    </p>
+                                    <div className="text-on-surface-variant font-body-md leading-relaxed text-sm md:text-base mb-6">
+                                        <strong className="text-on-surface">Economic Reasoning:</strong> <MathText text={puzzle.explanation} />
+                                    </div>
                                     
                                     <button 
                                         onClick={handleNext}

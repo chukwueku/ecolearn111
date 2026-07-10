@@ -1,3 +1,5 @@
+import { STATISTICAL_ECONOMICS_GUIDE } from './statisticalEconomicsData';
+
 export const ADVANCED_STUDY_GUIDE: Record<string, string> = {"ug-econometrics":`
 # COMPREHENSIVE ECONOMETRICS STUDY GUIDE
 
@@ -10,9 +12,13 @@ export const ADVANCED_STUDY_GUIDE: Record<string, string> = {"ug-econometrics":`
 As mentioned in the Introduction, regression is a main tool of econometrics, and in this chapter we consider very briefly the nature of this tool.
 
 #### 1.1 Historical Origin of the Term *Regression*
+
+
 The term *regression* was introduced by Francis Galton. In a famous paper, Galton found that, although there was a tendency for tall parents to have tall children and for short parents to have short children, the average height of children born of parents of a given height tended to move or "regress" toward the average height in the population as a whole. In other words, the height of the children of unusually tall or unusually short parents tends to move toward the average height of the population. Galton's law of universal regression was confirmed by his friend Karl Pearson, who collected more than a thousand records of heights of members of family groups. He found that the average height of sons of a group of tall fathers was less than their fathers' height and the average height of sons of a group of short fathers was greater than their fathers' height, thus "regressing" tall and short sons alike toward the average height of all men. In the words of Galton, this was "regression to mediocrity."
 
 #### 1.2 The Modern Interpretation of Regression
+
+
 The modern interpretation of regression is, however, quite different. Broadly speaking, we may say:
 > Regression analysis is concerned with the study of the dependence of one variable, the *dependent variable*, on one or more other variables, the *explanatory variables*, with a view to estimating and/or predicting the (population) mean or average value of the former in terms of the known or fixed (in repeated sampling) values of the latter.
 
@@ -78,6 +84,8 @@ $$
 **8. Crop Yield Analysis:** Agronomist predicting the average crop yield given temperature, rainfall, amount of sunshine, and fertilizer.
 
 #### 1.3 Statistical versus Deterministic Relationships
+
+
 In regression analysis, we are concerned with *statistical*, not *functional* or *deterministic*, dependence among variables.
 - **Statistical relationships** essentially deal with **random** or **stochastic** variables, that is, variables that have probability distributions. We cannot predict crop yield exactly because of errors involved in measuring temperature, rainfall, etc. Thus, there is intrinsic random variability.
 - **Deterministic relationships** deal with relationships of the type exhibited by Newton's law of gravity:
@@ -89,16 +97,22 @@ $$
 where $F = force$, $m_1, m_2 = masses$, $r = distance$, and $k = constant$. These are not the focus of econometrics unless explicit measurement errors render them statistical.
 
 #### 1.4 Regression versus Causation
+
+
 Although regression analysis deals with the dependence of one variable on other variables, it does *not* necessarily imply causation. In the words of Kendall and Stuart, "A statistical relationship, however strong and however suggestive, can never establish causal connection: our ideas of causation must come from outside statistics, ultimately from some theory or other."
 
 For example, crop yield is dependent on rainfall (common sense dictates crop yield cannot control rainfall). Causation must be ascribed using *a priori* or theoretical considerations.
 
 #### 1.5 Regression versus Correlation
+
+
 Closely related to but conceptually very different from regression analysis is **correlation analysis**.
 - **Correlation Analysis**: The primary objective is to measure the *strength* or *degree of linear association* between two variables. Variables are treated *symmetrically*; there is no distinction between dependent and explanatory variables. Both variables are assumed to be random (stochastic).
 - **Regression Analysis**: The primary objective is to estimate or predict the average value of one variable on the basis of the fixed values of other variables. There is an *asymmetry*: the dependent variable is assumed to be statistical (stochastic or random), whereas the explanatory variables are fixed (non-stochastic in repeated sampling).
 
 #### 1.6 Terminology and Notation
+
+
 In the literature, the terms *dependent variable* and *explanatory variable* are described variously. A representative list is:
 
 | Dependent variable | Explanatory variable |
@@ -114,6 +128,8 @@ In the literature, the terms *dependent variable* and *explanatory variable* are
 *In this text, we will typically use the dependent variable/explanatory variable or the more neutral regressand and regressor terminology.* Note: If there is one explanatory variable, it is **simple** or **two-variable** regression. If there are multiple, it is **multiple regression analysis**.
 
 #### 1.7 The Nature and Sources of Data for Economic Analysis
+
+
 The success of any econometric analysis ultimately depends on the availability of the appropriate data. Three types of data may be available for empirical analysis:
 
 **Types of Data**
@@ -175,6 +191,8 @@ The variables that we will generally encounter fall into four broad categories:
 4. **Nominal Scale**: Variables in this category have none of the features of the ratio scale variables. Variables such as gender (male/female) or marital status (married/unmarried) simply denote categories.
 
 #### 1.8 Summary and Conclusions
+
+
 1. The key idea behind regression analysis is the statistical dependence of one variable, the dependent variable, on one or more other variables, the explanatory variables.
 2. The objective of such analysis is to estimate and/or predict the mean or average value of the dependent variable on the basis of the known or fixed values of the explanatory variables.
 3. In practice the success of regression analysis depends on the availability of the appropriate data. This chapter discussed the nature, sources, and limitations of the data that are generally available for research, especially in the social sciences.
@@ -184,237 +202,32 @@ The variables that we will generally encounter fall into four broad categories:
 In this chapter, we approach the subject in a more formal manner. We introduce the simplest possible regression analysis, namely, the **bivariate**, or **two-variable**, regression, where the dependent variable (regressand) is related to a single explanatory variable (regressor). Over fifty years, the linear two-variable model is the fundamental building block.
 
 #### 2.1 A Hypothetical Example
-Regression analysis is largely concerned with estimating and/or predicting the (population) mean value of the dependent variable on the basis of the known or fixed values of the explanatory variable(s).
-
-Consider a hypothetical population of 60 families divided into 10 income groups (from \\$80 to \\$260). We examine the weekly consumption expenditure corresponding to these given income levels. There is considerable variation in weekly consumption expenditure in each income group.
-
-If we ask the question, "What is the *expected value* of weekly consumption expenditure of a family whose monthly income is, say, \\$140?", we look at the exact conditional mean for that bracket. The knowledge of the income level enables us to better predict the mean value of consumption expenditure than if we did not have that knowledge. This probability is the essence of regression analysis.
-
-If we join these conditional mean values against the various $X$ values, we obtain the **population regression line (PRL)**, or more generally, the **population regression curve**. 
-- The adjective "population" comes from the fact that we are dealing with the entire population of 60 families. 
-- Geometrically, then, a population regression curve is simply the locus of the conditional means of the dependent variable for the fixed values of the explanatory variable(s).
-
-**TABLE 2.1** WEEKLY FAMILY INCOME $X$, \\$
-<div className="overflow-x-auto my-6 markdown-table">
-
-| $Y \\$ \\ $X \\rightarrow$ | 80 | 100 | 120 | 140 | 160 | 180 | 200 | 220 | 240 | 260 |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Weekly family consumption expenditure $Y$, \\$** | 55 | 65 | 79 | 80 | 102 | 110 | 120 | 135 | 137 | 150 |
-| | 60 | 70 | 84 | 93 | 107 | 115 | 136 | 137 | 145 | 152 |
-| | 65 | 74 | 90 | 95 | 110 | 120 | 140 | 140 | 155 | 175 |
-| | 70 | 80 | 94 | 103 | 116 | 130 | 144 | 152 | 165 | 178 |
-| | 75 | 85 | 98 | 108 | 118 | 135 | 145 | 157 | 175 | 180 |
-| | – | 88 | – | 113 | 125 | 140 | – | 160 | 189 | 185 |
-| | – | – | – | 115 | – | – | – | 162 | – | 191 |
-| **Total** | 325 | 462 | 445 | 707 | 678 | 750 | 685 | 1043 | 966 | 1211 |
-| **Conditional means of $Y$, $E(Y|X)$** | 65 | 77 | 89 | 101 | 113 | 125 | 137 | 149 | 161 | 173 |
-
-</div>
 
 
-\`\`\`chart
-{
-  "type": "scatter",
-  "title": "Figure 2.1: Conditional distribution of expenditure for various levels of income",
-  "xAxis": "weekly_income",
-  "yAxis": "weekly_consumption",
-  "data": [
-    {"weekly_income": 80, "weekly_consumption": 55}, {"weekly_income": 80, "weekly_consumption": 60}, {"weekly_income": 80, "weekly_consumption": 65}, {"weekly_income": 80, "weekly_consumption": 70}, {"weekly_income": 80, "weekly_consumption": 75},
-    {"weekly_income": 100, "weekly_consumption": 65}, {"weekly_income": 100, "weekly_consumption": 70}, {"weekly_income": 100, "weekly_consumption": 74}, {"weekly_income": 100, "weekly_consumption": 80}, {"weekly_income": 100, "weekly_consumption": 85}, {"weekly_income": 100, "weekly_consumption": 88},
-    {"weekly_income": 120, "weekly_consumption": 79}, {"weekly_income": 120, "weekly_consumption": 84}, {"weekly_income": 120, "weekly_consumption": 90}, {"weekly_income": 120, "weekly_consumption": 94}, {"weekly_income": 120, "weekly_consumption": 98},
-    {"weekly_income": 140, "weekly_consumption": 80}, {"weekly_income": 140, "weekly_consumption": 93}, {"weekly_income": 140, "weekly_consumption": 95}, {"weekly_income": 140, "weekly_consumption": 103}, {"weekly_income": 140, "weekly_consumption": 108}, {"weekly_income": 140, "weekly_consumption": 113}, {"weekly_income": 140, "weekly_consumption": 115},
-    {"weekly_income": 160, "weekly_consumption": 102}, {"weekly_income": 160, "weekly_consumption": 107}, {"weekly_income": 160, "weekly_consumption": 110}, {"weekly_income": 160, "weekly_consumption": 116}, {"weekly_income": 160, "weekly_consumption": 118}, {"weekly_income": 160, "weekly_consumption": 125},
-    {"weekly_income": 180, "weekly_consumption": 110}, {"weekly_income": 180, "weekly_consumption": 115}, {"weekly_income": 180, "weekly_consumption": 120}, {"weekly_income": 180, "weekly_consumption": 130}, {"weekly_income": 180, "weekly_consumption": 135}, {"weekly_income": 180, "weekly_consumption": 140},
-    {"weekly_income": 200, "weekly_consumption": 120}, {"weekly_income": 200, "weekly_consumption": 136}, {"weekly_income": 200, "weekly_consumption": 140}, {"weekly_income": 200, "weekly_consumption": 144}, {"weekly_income": 200, "weekly_consumption": 145},
-    {"weekly_income": 220, "weekly_consumption": 135}, {"weekly_income": 220, "weekly_consumption": 137}, {"weekly_income": 220, "weekly_consumption": 140}, {"weekly_income": 220, "weekly_consumption": 152}, {"weekly_income": 220, "weekly_consumption": 157}, {"weekly_income": 220, "weekly_consumption": 160}, {"weekly_income": 220, "weekly_consumption": 162},
-    {"weekly_income": 240, "weekly_consumption": 137}, {"weekly_income": 240, "weekly_consumption": 145}, {"weekly_income": 240, "weekly_consumption": 155}, {"weekly_income": 240, "weekly_consumption": 165}, {"weekly_income": 240, "weekly_consumption": 175}, {"weekly_income": 240, "weekly_consumption": 189},
-    {"weekly_income": 260, "weekly_consumption": 150}, {"weekly_income": 260, "weekly_consumption": 152}, {"weekly_income": 260, "weekly_consumption": 175}, {"weekly_income": 260, "weekly_consumption": 178}, {"weekly_income": 260, "weekly_consumption": 180}, {"weekly_income": 260, "weekly_consumption": 185}, {"weekly_income": 260, "weekly_consumption": 191}
-  ],
-  "series": [
-    {"key": "weekly_consumption", "name": "Weekly Consumption ($)", "color": "#8b5cf6"}
-  ]
-}
-\`\`\`
-*(The solid line running through the centers of the distributions represents the conditional mean $E(Y|X)$).*
-
-<div className="flex justify-center my-6">
-  <img src="/images/population_regression.png" alt="Population Regression Function Diagram" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
-</div>
-
+- Analyzing the conditional distribution of consumer spending relative to gross weekly household income
+- Visualizing conditional probabilities and conditional means of Y given X via scatter plots
+- Concept of subpopulation means and variation within groups
 #### 2.2 The Concept of Population Regression Function (PRF)
-From the preceding discussion, it is clear that each conditional mean $E(Y|X_i)$ is a function of $X_i$, where $X_i$ is a given value of $X$. Symbolically,
 
-$$
-E(Y|X_i) = f(X_i) \\quad \\text{(2.2.1)}
-$$
 
-where $f(X_i)$ denotes some function of the explanatory variable $X$. 
-
-The expected value of the distribution of $Y$ given $X_i$ is functionally related to $X_i$. In simple terms, it tells how the mean or average response of $Y$ varies with $X$. Equation (2.2.1) is known as the **conditional expectation function (CEF)**, **population regression function (PRF)**, or simply **population regression (PR)**.
-
-For example, assuming the PRF is a *linear* function of $X_i$, we write:
-
-$$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i \\quad \\text{(2.2.2)}
-$$
-
-where $\\beta_1$ and $\\beta_2$ are unknown but fixed parameters known as the **regression coefficients** ($\\beta_1$ is the **intercept** and $\\beta_2$ is the **slope coefficient**). 
-
+- Defining the conditional expectation function: $E(Y|X_i)$
+- How the PRF represents the systematic, predictable component of the relationship
+- Functional forms of population parameters ($\\beta_1$ intercept, $\\beta_2$ slope coefficient)
 #### 2.3 The Meaning of the Term *Linear*
-Since this text is concerned primarily with linear models like (2.2.2), it is essential to know what the term *linear* really means. It can be interpreted in two different ways.
-
-**Linearity in the Variables**
-The expected value of $Y$ is a linear function of $X_i$. For example, $E(Y|X_i) = \\beta_1 + \\beta_2 X_i$ represents a straight line. Conversely, a model is *not* linear in variables if $X$ appears with a power or index other than 1.
-
-\`\`\`chart
-{
-  "type": "combo",
-  "title": "FIGURE 2.3: Linear-in-parameter functions",
-  "xAxis": "x",
-  "yAxis": "y",
-  "data": [
-    {"x": -2, "quadratic": 4, "exponential": 0.135, "cubic": -8},
-    {"x": -1.5, "quadratic": 2.25, "exponential": 0.223, "cubic": -3.375},
-    {"x": -1, "quadratic": 1, "exponential": 0.368, "cubic": -1},
-    {"x": -0.5, "quadratic": 0.25, "exponential": 0.606, "cubic": -0.125},
-    {"x": 0, "quadratic": 0, "exponential": 1, "cubic": 0},
-    {"x": 0.5, "quadratic": 0.25, "exponential": 1.648, "cubic": 0.125},
-    {"x": 1, "quadratic": 1, "exponential": 2.718, "cubic": 1},
-    {"x": 1.5, "quadratic": 2.25, "exponential": 4.481, "cubic": 3.375},
-    {"x": 2, "quadratic": 4, "exponential": 7.389, "cubic": 8}
-  ],
-  "series": [
-    {"key": "quadratic", "name": "Quadratic", "color": "#f59e0b", "type": "line"},
-    {"key": "exponential", "name": "Exponential", "color": "#10b981", "type": "line"},
-    {"key": "cubic", "name": "Cubic", "color": "#3b82f6", "type": "line"}
-  ]
-}
-\`\`\`
 
 
-For example, the following are not linear in variables:
-
-$$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
-$$
-
-
-$$
-E(Y|X_i) = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right)
-$$
-
-
-**Linearity in the Parameters**
-The expected value of $Y$ is a linear function of the *parameters* (the $\\beta$'s); it may or may not be linear in the variable $X$. 
-- A model is linear in the parameter if the $\\beta$'s appear with a power or index of 1 only and are not multiplied/divided by other parameters.
-- Example of *linear in parameter* (but non-linear in variables): 
-
-$$
-E(Y|X_i) = \\beta_1 + \\beta_2 X_i^2
-$$
-
-Even though $X$ is squared, the parameters are linear.
-- Example of *nonlinear in parameter*: 
-
-$$
-E(Y|X_i) = \\beta_1 + \\beta_2^2 X_i
-$$
-
-
-**Crucial Note**: *Therefore, from now on the term "linear" regression will always mean a regression that is linear in the parameters; the $\\beta$'s are raised to the first power only. It may or may not be linear in the explanatory variables, the $X$'s.*
-
-For example, all of these are **Linear Regression Models** (even though they are nonlinear in variables):
-
-$$
-Y_i = \\beta_1 + \\beta_2 \\left(\\frac{1}{X_i}\\right) + u_i \\quad \\text{(Reciprocal)}
-$$
-
-
-$$
-Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Semilogarithmic)}
-$$
-
-
-$$
-\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(Inverse semilogarithmic)}
-$$
-
-
-$$
-\\ln Y_i = \\ln \\beta_1 + \\beta_2 \\ln X_i + u_i \\quad \\text{(Logarithmic or double logarithmic)}
-$$
-
-
-However, the following models are **NOT** linear regression models:
-
-$$
-Y_i = e^{\\beta_1 + \\beta_2 X_i + u_i}
-$$
-
-
-$$
-Y_i = \\frac{1}{1 + e^{\\beta_1 + \\beta_2 X_i + u_i}}
-$$
-
-
-
-**TABLE 2.3** LINEAR REGRESSION MODELS
-<div className="overflow-x-auto my-6 markdown-table">
-
-| Model linear in parameters? | Model linear in variables? Yes | Model linear in variables? No |
-| :--- | :--- | :--- |
-| **Yes** | LRM | LRM |
-| **No** | NLRM | NLRM |
-
-</div>
-*Note: LRM = linear regression model, NLRM = nonlinear regression model*
-
-| **No** | Non-Linear Regression Model (NLRM) | Non-Linear Regression Model (NLRM) |
-
+- Linearity in variables: variables raised to the first power only vs non-linear variables ($X^2$, $\\ln X$)
+- Linearity in parameters: parameters entered only as first-order coefficients without products or quotients
+- Crucial guideline: OLS requires models to be strictly linear in parameters (variables can be non-linear)
 #### 2.4 Stochastic Specification of PRF
-It is clear that as family income increases, family consumption expenditure *on average* increases. But an *individual* family's consumption expenditure does not necessarily increase precisely along the mean trend. We can express the *deviation* of an individual $Y_i$ around its expected value as follows:
 
-$$
-u_i = Y_i - E(Y|X_i)
-$$
 
-or
-
-$$
-Y_i = E(Y|X_i) + u_i \\quad \\text{(2.4.1)}
-$$
-
-Here $u_i$ is an unobservable random variable taking positive or negative values. Technically, $u_i$ is known as the **stochastic disturbance** or **stochastic error term**.
-
-The expenditure of an individual family can be expressed as the sum of two components:
-1. $E(Y|X_i)$, the **systematic** or **deterministic** component.
-2. $u_i$, the random, or **nonsystematic** component. It is a surrogate or proxy for all the omitted or neglected variables that may affect $Y$ but are not included in the model.
-
-<div className="flex justify-center my-6">
-  <img src="/images/regression_error_term.png" alt="Stochastic Disturbance Error Term Diagram" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
-</div>
-
-If we assume $E(Y|X_i)$ is linear in $X_i$, we can write:
-
-$$
-Y_i = \\beta_1 + \\beta_2 X_i + u_i \\quad \\text{(2.4.2)}
-$$
-
-Eq (2.4.2) posits that consumption is linearly related to income *plus* a disturbance term. Now, if we take the expected value of both sides:
-
-$$
-E(Y_i | X_i) = E[E(Y|X_i)] + E(u_i | X_i) = E(Y|X_i) + E(u_i | X_i) \\quad \\text{(2.4.4)}
-$$
-
-Since $E(Y_i | X_i)$ is the same thing as $E(Y | X_i)$, this implies that:
-
-$$
-E(u_i | X_i) = 0 \\quad \\text{(2.4.5)}
-$$
-
-Therefore, the assumption that the regression line passes through the conditional means of $Y$ implies that the conditional mean values of $u_i$ are explicitly zero.
-
+- Introducing the stochastic error/disturbance term ($u_i$) to represent deviations from conditional mean
+- Additive decomposition of Y into systematic deterministic mean and non-systematic stochastic error
+- Rationales for the error term: omitted factors, human randomness, model abstraction, measurement errors
 #### 2.5 The Significance of the Stochastic Disturbance Term
+
+
 As noted in Section 2.4, the disturbance term $u_i$ is a surrogate for all those variables that are omitted from the model but that collectively affect $Y$. The obvious question is: Why not introduce these variables into the model explicitly? Stated otherwise, why not develop a multiple regression model with as many variables as possible? The reasons are many.
 
 1. **Vagueness of theory**: The theory, if any, determining the behavior of $Y$ may be, and often is, incomplete. We might know for certain that weekly income $X$ influences weekly consumption expenditure $Y$, but we might be ignorant or unsure about the other variables affecting $Y$. Therefore, $u_i$ may be used as a substitute for all the excluded or omitted variables from the model.
@@ -426,129 +239,19 @@ As noted in Section 2.4, the disturbance term $u_i$ is a surrogate for all those
 7. **Wrong functional form**: Even if we have theoretically correct variables explaining a phenomenon, we often do not know the form of the functional relationship between the regressand and the regressors. For all these reasons, the stochastic disturbances $u_i$ assume an extremely critical role in regression analysis.
 
 #### 2.6 The Sample Regression Function (SRF)
-By confining our discussion so far to the population of $Y$ values corresponding to the fixed $X$'s, we have deliberately avoided sampling considerations. But it is about time to face up to the sampling problems, for in most practical situations what we have is but a sample of $Y$ values corresponding to some fixed $X$'s. Therefore, our task now is to estimate the PRF on the basis of the sample information.
-
-As an illustration, pretend that the population of Table 2.1 was not known to us and the only information we had was a randomly selected sample of $Y$ values. Since we are dealing with a sample from the population, we conceptually use a **sample regression line**. In general, we would get $N$ different SRFs for $N$ different samples, and these SRFs are not likely to be the same because of sampling fluctuations.
 
 
-<div className="flex flex-col md:flex-row gap-6 my-6">
-
-<div className="flex-1">
-
-**TABLE 2.4** A RANDOM SAMPLE FROM THE POPULATION OF TABLE 2.1
-<div className="overflow-x-auto markdown-table">
-
-| $Y$ | $X$ |
-| :--- | :--- |
-| 70 | 80 |
-| 65 | 100 |
-| 90 | 120 |
-| 95 | 140 |
-| 110 | 160 |
-| 115 | 180 |
-| 120 | 200 |
-| 140 | 220 |
-| 155 | 240 |
-| 150 | 260 |
-
-</div>
-</div>
-
-<div className="flex-1">
-
-**TABLE 2.5** ANOTHER RANDOM SAMPLE FROM THE POPULATION OF TABLE 2.1
-<div className="overflow-x-auto markdown-table">
-
-| $Y$ | $X$ |
-| :--- | :--- |
-| 55 | 80 |
-| 88 | 100 |
-| 90 | 120 |
-| 80 | 140 |
-| 118 | 160 |
-| 120 | 180 |
-| 145 | 200 |
-| 135 | 220 |
-| 145 | 240 |
-| 175 | 260 |
-
-</div>
-</div>
-</div>
-
-
-Analogously to the PRF, we develop the concept of the **sample regression function (SRF)** to represent the sample regression line:
-
-$$
-\\hat{Y}_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i \\quad \\text{(2.6.1)}
-$$
-
-where $\\hat{Y}$ is read as "Y-hat" or "Y-cap" and represents the estimator of $E(Y|X_i)$, $\\hat{\\beta}_1$ = estimator of $\\beta_1$, and $\\hat{\\beta}_2$ = estimator of $\\beta_2$. Note that an **estimator**, also known as a (sample) **statistic**, is simply a rule or formula or method that tells how to estimate the population parameter from the information provided by the sample at hand. A particular numerical value obtained by the estimator in an application is known as an **estimate**.
-
-Now just as we expressed the PRF in two equivalent forms (deterministic and stochastic), we can express the SRF (2.6.1) in its stochastic form as follows:
-
-$$
-Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i \\quad \\text{(2.6.2)}
-$$
-
-where, in addition to the symbols already defined, $\\hat{u}_i$ denotes the (sample) **residual** term. Conceptually $\\hat{u}_i$ is analogous to $u_i$ and can be regarded as an *estimate* of $u_i$.
-
-To sum up, our primary objective in regression analysis is to estimate the PRF
-
-$$
-Y_i = \\beta_1 + \\beta_2 X_i + u_i
-$$
-
-on the basis of the SRF
-
-$$
-Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i
-$$
-
-Because more often than not our analysis is based upon a single sample from some population, the SRF is at best an approximate one. This approximation is shown diagrammatically in Figure 2.5. For observation $X = X_i$, we have one (sample) observation $Y = Y_i$. In terms of the SRF, the observed $Y_i$ can be expressed as:
-
-$$
-Y_i = \\hat{Y}_i + \\hat{u}_i \\quad \\text{(2.6.3)}
-$$
-
-and in terms of the PRF, it can be expressed as:
-
-$$
-Y_i = E(Y|X_i) + u_i \\quad \\text{(2.6.4)}
-$$
-
-
-\`\`\`chart
-{
-  "type": "combo",
-  "title": "Figure 2.5: Sample and population regression lines",
-  "xAxis": "weekly_income",
-  "yAxis": "weekly_consumption",
-  "data": [
-    {"weekly_income": 40, "prf": 50, "srf": 60},
-    {"weekly_income": 140, "prf": 110, "srf": 130, "sample_point": 160},
-    {"weekly_income": 200, "prf": 146, "srf": 172}
-  ],
-  "series": [
-    {"key": "prf", "name": "PRF: E(Y|X) = B1 + B2X", "color": "#10b981", "type": "line"},
-    {"key": "srf", "name": "SRF: Y^ = B1^ + B2^X", "color": "#3b82f6", "type": "line"},
-    {"key": "sample_point", "name": "Yi", "color": "#ef4444", "type": "scatter"}
-  ]
-}
-\`\`\`
-
-<div className="flex justify-center my-6">
-  <img src="/images/sample_regression.png" alt="Sample vs Population Regression Lines" className="rounded-lg shadow-md max-w-full h-auto object-cover border border-gray-200" style={{ maxHeight: '400px' }} />
-</div>
-
-Obviously, the SRF may overestimate or underestimate the true PRF because of sampling fluctuations. The critical question now is: Granted that the SRF is but an approximation of the PRF, can we devise a method that will make this approximation as "close" as possible? This will occupy much of Chapter 3.
-
+- Recognizing that population parameters are unobservable and estimated using random sample subsets
+- Formulating the Sample Regression Function (SRF): $\\hat{Y}_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i$
+- Distinguishing between population error ($u_i$) and sample calculated residuals ($e_i$ or $\\hat{u}_i$)
 #### 2.7 An Illustrative Example
+
+
 We conclude this chapter with an example using data on the level of education (measured by the number of years of schooling), the mean hourly wages earned by people at each level of education, and the number of people at the stated level of education from the current population survey conducted in May 1985. 
 
 
 **TABLE 2.6** MEAN HOURLY WAGE BY EDUCATION
-<div className="overflow-x-auto my-6 markdown-table">
+<div class="overflow-x-auto my-6 markdown-table">
 
 | Years of schooling | Mean wage, \\$ | Number of people |
 | :--- | :--- | :--- |
@@ -600,6 +303,8 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 \`\`\`
 
 #### 2.8 Summary and Conclusions
+
+
 1. The key concept underlying regression analysis is the concept of the **conditional expectation function (CEF)**, or **population regression function (PRF)**. Our objective in regression analysis is to find out how the average value of the dependent variable (or regressand) varies with the given value of the explanatory variable (or regressor).
 2. This book largely deals with **linear PRFs**, that is, regressions that are linear in the parameters. They may or may not be linear in the regressand or the regressors.
 3. For empirical purposes, it is the **stochastic PRF** that matters. The **stochastic disturbance term** $u_i$ plays a critical role in estimating the PRF.
@@ -617,7 +322,7 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 **2.5.** What do we mean by a *linear* regression model?
 **2.6.** Determine whether the following models are linear in the parameters, or the variables, or both. Which of these models are linear regression models?
 
-<div className="overflow-x-auto my-4 markdown-table">
+<div class="overflow-x-auto my-4 markdown-table">
 
 | Model | Descriptive title |
 | :--- | :--- |
@@ -702,7 +407,7 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 
 **2.14.** You are given the data in Table 2.7 for the United States for years 1980–1996.
 
-<div className="overflow-x-auto my-4 markdown-table text-xs">
+<div class="overflow-x-auto my-4 markdown-table text-xs">
 
 **TABLE 2.7** LABOR FORCE PARTICIPATION DATA
 
@@ -750,77 +455,29 @@ Plotting the (conditional) mean wage against education gives a regression curve 
 **d.** Plot the female verbal SAT score against the male verbal SAT score. Sketch a regression line through the scatterpoints. What do you observe?
 
 
-c## CHAPTER 3: Two-Variable Regression Model: The Problem of Estimation
+### CHAPTER 3: Two-Variable Regression Model: The Problem of Estimation
 
 #### 3.1 The Method of Ordinary Least Squares (OLS)
-The method of ordinary least squares is attributed to Carl Friedrich Gauss. Under certain assumptions, the method of least squares has some very attractive statistical properties that have made it one of the most powerful and popular methods of regression analysis.
 
-Recall the Sample Regression Function (SRF):
 
-$$
-Y_i = \\hat{\\beta}_1 + \\hat{\\beta}_2 X_i + \\hat{u}_i
-$$
-
-We can write the residual as:
-
-$$
-\\mathbf{u}_i = Y_i - \\hat{Y}_i = Y_i - \\hat{\\beta}_1 - \\mathbf{\\beta}_2 X_i
-$$
-
-The OLS principle states that we should choose the sample estimators $\\mathbf{\\beta}_1$ and $\\mathbf{\\beta}_2$ in such a way that the **residual sum of squares (RSS)** is as small as possible:
-
-$$
-\\begin{equation}\\mathbf{ui^2} = \\sum (Y_i - \\mathbf{\\beta}_1 - \\mathbf{\\beta}_2 X_i)^2
-\\end{equation}
-$$
-
-By taking the partial derivatives of the RSS with respect to $\\mathbf{\\beta}_1$ and $\\mathbf{\\beta}_2$ and setting them to zero, we obtain the **normal equations*:
-
-$$
-\\begin{equation}\\mathbf|\\sum Y_i = n\\mathbf{\\beta}_1 + \\mathbf{\\beta}_2 \\sum X_i\\end{equation}
-$$
-
-$$
-\\begin{equation}\\sum Y_i X_i = \\mathbf{\\beta}_1 \\sum X_i + \\hat{\\beta}_2 \\sum X_i^2\\end{equation}
-$$
-
-Solving these equations simultaneously yields the OLS estimators:
-
-$$
-\\begin{equation}\\hat{\\beta}_2 = \\frac{n\\sum X_i Y_i - (\\sum X_i)(\\sum Y_i)}{n\\sum X_i^2 - (\\sum X_i)^2} - \\frac{\\sum x_i y_i}{\\sum x_i^2}\\end{equation}
-$$
-
-$$
-\\begin{equation}\\hat{\\beta}_1 = \\bar{Y} - \\hat{\\beta}_2 \\bar{X}\\end{equation}
-$$
-
-$(Note: lower case letters $x_i$ and $y_i$ denote deviations from their sample means: $x_i = X_i - \\bar{X}$ and $y_i = Y_i - \\bar{Y}$.)*
-
+- The OLS principle: minimizing the sum of squared sample residuals ($\\sum e_i^2 = \\sum (Y_i - \\hat{Y}_i)^2$)
+- Mathematical optimization: setting up first-order conditions and partial derivatives to obtain 'Normal Equations'
+- Closed-form algebraic formulas for slope estimator $\\hat{\\beta}_2$ and intercept estimator $\\hat{\\beta}_1$
 #### 3.2 The Classical Linear Regression Model (CLRM)
-The theoretical justification for OLS rests on the CLRM.
-1. **Linear in Parameters**: The regression model is linear in the parameters $\\beta$.
-2. **Fixed $X$ values**: Values taken by the regressor $X$ are considered fixed in repeated sampling.
-3. **Zero Mean of Disturbance**: $E(u_i | X_i) = 0$.
-4. **Homoscedasticity**: Equal variance of $u_i$. $var(u_i | X_i) = \\sigma^2$.
-5. **No Autocorrelation**: Given $X$, there is no autocorrelation between the disturbances. $cov(u_i, u_j | X_i, X_j) = 0$ for $i \\neq j$.
-6. **Zero Covariance between $X_i$ and $u_i$**: $cov(X_i, u_i) = 0$.
-7. **Number of Observations**: The number of observations $n$ must be greater than the number of parameters to be estimated.
 
+
+- 10 core structural requirements of the Classical Linear Regression Model
+- Assumptions: $E(u_i | X_i) = 0$ (exogeneity), $Var(u_i) = \\sigma^2$ (homoscedasticity), $Cov(u_i, u_j) = 0$ (no correlation)
+- Additional requirements: No correlation between error $u_i$ and regressor $X_i$, and non-stochastic fixed values of X
 #### 3.3 Precision or Standard Errors of Least-Squares Estimates
-The standard errors are necessary for hypothesis testing and interval estimation:
 
-$$
-var(\\hat{\\beta}_2) = \\frac{\\sigma^2}{\\sum x_i^2} \\quad , \\quad se(\\hat{\\beta}_2) = \\frac{\\sigma}{\\sqrt{\\sum x_i^2}}
-$$
 
-$$
-var(\\hat{\\beta}_1) = \\frac{\\sum X_i^2}{n \\sum x_i^2} \\sigma^2 \\quad , \\quad se(\\hat{\\beta}_1) = \\sqrt{\\frac{\\sum X_i^2}{n \\sum x_i^2}} \\sigma
-$$
-
-To estimate the true variance of the disturbance term $\\sigma^2$, we use the estimator $\\hat{\\sigma}^2$:
-\\begin{equation}\\hat{\\sigma}^2 = \\frac{\\sum \\hat{u}_i^2}{n - 2}\\end{equation}
-
+- Determining the sampling distributions and statistical variances of OLS parameter estimators
+- Derivation of parameter standard errors: $Var(\\hat{\\beta}_2) = \\sigma^2 / \\sum x_i^2$
+- Estimating unobserved $\\sigma^2$ using sample residual sum of squares divided by degrees of freedom ($n - 2$)
 #### 3.4 Properties of Least-Squares Estimators: The Gauss-Markov Theorem
+
+
 > **Gauss-Markov Theorem**: Given the assumptions of the CLRM, the least-squares estimators, in the class of unbiased linear estimators, have minimum variance, that is, they are BLUE.
 
 * **B**est (minimum variance)
@@ -829,108 +486,31 @@ To estimate the true variance of the disturbance term $\\sigma^2$, we use the es
 + **E**stimator
 
 #### 3.5 The Coefficient of Determination (**x**): A Measure of 'Goodness of Fit'
-The $R^2$ tells us the proportion of variation in the dependent variable $Y$ that is explained by the explained by the explanatory variable $X$.
 
-$$
-TSS = ESS + RSS
-$$
 
-$$
-\\sum (Y_i - \\bar{Y})^2 = \\sum (\\hat{Y}_i - \\bar{Y})^2 + \\sum \\hat{u}_i^2
-$$
-
-Then, defining $R^2$ as the ratio of the explained variation to the total variation:
-
-$$
-R^2 = \\frac{ESS}{TSS} = 1 - \\frac{RSS}{TSS} = 1 - \\frac{\\sum \\hat{u}_i^2}{\\sum y_i^2}
-$$
-
-The sample correlation coefficient $r$ is:
-$$
-r = \\pm \\sqrt{R^2} = \\frac{\\sum x_i y_i}{\\sqrt{(\\sum x_i^2)(\\sum y_i^2)}}
-$$
-
+- Decomposing variation: Total Sum of Squares (TSS) = Explained Sum of Squares (ESS) + Residual Sum of Squares (RSS)
+- Mathematical definition of $r^2 = ESS / TSS$: proportion of total dependent variable variation explained by X
+- Properties of $r^2$: bounded between 0 and 1, relation to the correlation coefficient $r$
 #### 3.6 A Numerical Example
-To illustrate the computations of OLS, we utilize a hypothetical dataset representing Weekly Family Income ($X$) and Weekly Consumption Expenditure ($Y$).
 
-**Table 3.2: Raw Data and Computations**
 
-| $Y_i$ (Consumption) | $X_i$ (Income) | $y_i = Y_i - \\bar{Y}$ | $x_i = X_i - \\bar{X}$ | $x_i y_i$ | $x_i^2$ | $y_i^2$ |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 70 | 80 | -41 | -90 | 3690 | 8100 | 1681 |
-| 65 | 100 | -46 | -70 | 3220 | 4900 | 2116 |
-| 90 | 120 | -21 | -50 | 1050 | 2500 | 441 |
-| 95 | 140 | -16 | -30 | 480 | 900 | 256 |
-| 110 | 160 | -1 | -10 | 10 | 100 | 1  |
-| 115 | 180 | 4 | 10 | 40 | 100 | 16 |
-| 120 | 200 | 9 | 30 | 270 | 900 | 81 |
-| 140 | 220 | 29 | 50 | 14
-0 | 2500 | 841 |
-| 155 | 240 | 44 | 70 | 3080 | 4900 | 1936 |
-| 150 | 260 | 39 | 90 | 3510 | 8100 | 1521 |
-| **Sum: 1110** | **Sum: 1700** | **0** | **0** | **16800** | **33000** | **8890** |
-
-From the table, $\\bar{Y} = 111$ and $\\bar{X} = 170$.
-Using the normal equations:
-$$
-\\hat{\\beta}_2 = \\frac{\\sum x_i y_i}{\\sum x_i^2} = \\frac{16800}{33000} = 0.5091
-$$
-$$
-\\hat{\\beta}_1 = \\bar{Y} - \\hat{\\beta}_2 \\bar{X} = 111 - 0.5091(170) = 24.453
-$$
-
-So the Sample Regression Function is:
-$$
-\\mathbf{Y}_i = 24.453 + 0.5091 X_i
-$$
-
-We calculate variances:
-$$
-\\hat{\\sigma}^2 = \\frac{\\sum \\hat{u}_i^2}{n - 2 = 42.159
-$$
-$$
-se(\\hat{\\beta}_2) = 0.0357 \\quad , \\quad se(\\mathbf{\\beta}_1) = 6.4138
-$$
-
-$$R^2$ is calculated as:
-$$
-R^2 = \\frac{\\hat{\\beta}_2^2 \\sum x_i^2}{\\sum y_i^2} = \\frac{0.5091^2 \\times 33000}{8890} = 0.9621
-$$
-This means approx 96.21% of the variation in weekly consumption expenditure is explained by weekly income.
-
-\`\`\`chart
-{
-  "type": "scatter",
-  "title": "Figure 3.3: Consumption-Income Relationship with Sample Regression Line",
-  "xAxis": "Income ($)",
-  "yAxis": "Consumption ($)",
-  "regression": true,
-  "data": [
-    {"Income ($)": 80, "Consumption ($)": 70},
-    {"Income ($)": 100, "Consumption ($)": 65},
-    {"Income ($)": 120, "Consumption ($)": 90},
-    {"Income ($)": 140, "Consumption ($)": 95},
-    {"Income ($)": 160, "Consumption ($)": 110},
-    {"Income ($)": 180, "Consumption ($)": 115},
-    {"Income ($)": 200, "Consumption ($)": 120},
-    {"Income ($)": 220, "Consumption ($)": 140},
-    {"Income ($)": 240, "Consumption ($)": 155},
-    {"Income ($)": 260, "Consumption ($)": 150}
-  ],
-  "series": [
-    {"key": "Consumption ($)", "name": "Actual Consumption", "color": "#16a34a"}
-  ]
-}
-\`\`\`
-
+- Defining BLUE criteria: Best Linear Unbiased Estimator
+- Mathematical proof of unbiasedness ($E(\\hat{\\beta}_j) = \\beta_j$) and minimum variance efficiency
+- Proving that under CLRM, no other linear unbiased estimator can achieve smaller parameter variances than OLS
 #### 3.7 Illustrative Examples
+
+
 **Example 1: The Relationship between Real GBP and M2**
 Consider estimating how changes in the money supply (M2) affect Real GDP. This illustrates the macroeconomic application of regression estimation.
 
 #### 3.8 A Note on Monte Carlo Experiments
+
+
 In cases where theoretical assumptions might break down, Experiments bty Simulation heles.
 
 #### 3.9 Summary and Conclusions
+
+
 1. The **primary objective** is to estimate population parameters from sample data.
 2. **OLS** minimizes the RSS.
 3. **CLRM* assumptions make OLS **BLUE**.
@@ -938,250 +518,1221 @@ In cases where theoretical assumptions might break down, Experiments bty Simulat
 
 
 ### CHAPTER 4: Classical Normal Linear Regression Model (CNLRM)
-4.1 The Probability Distribution of Disturbances $u_i$
-4.2 The Normality Assumption for $u_i$
-4.3 Properties of OLS Estimators under the Normality Assumption
-4.4 The Method of Maximum Likelihood (ML)
-4.5 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 4.1 The Probability Distribution of Disturbances $u_i$
+
+
+- Why the Gauss-Markov theorem alone is insufficient for constructing confidence intervals or testing hypotheses
+- The requirement of specifying the probability distribution of error terms to conduct statistical inference
+#### 4.2 The Normality Assumption for $u_i$
+
+
+- Rationale for normal distribution: Central Limit Theorem for the sum of independent random forces
+- Mathematical notation and density function: $u_i \\sim N(0, \\sigma^2)$
+- Assessing normality using graphical tools (Normal Probability Plots) and formal tests (Jarque-Bera test)
+#### 4.3 Properties of OLS Estimators under the Normality Assumption
+
+
+- Proving that OLS estimators are normally distributed: $\\hat{\\beta}_2 \\sim N(\\beta_2, Var(\\hat{\\beta}_2))$
+- Minimum variance properties matching the Cramer-Rao Lower Bound (achieving asymptotic efficiency)
+- Proving the statistical independence of parameter estimators ($\\hat{\\beta}_1, \\hat{\\beta}_2$) and sample variance estimators ($s^2$)
+#### 4.4 The Method of Maximum Likelihood (ML)
+
+
+- Formulating the Joint Density Function (Likelihood Function) of normal observations
+- Comparing estimators: ML point estimates of slope and intercept are mathematically identical to OLS
+- Biasedness of ML error variance estimator: $\\sigma^2_{ML} = \\sum e_i^2 / n$ vs. unbiased OLS $s^2 = \\sum e_i^2 / (n-2)$
+#### 4.5 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 5: Two-Variable Regression: Interval Estimation and Hypothesis Testing
-5.1 Statistical Prerequisites
-5.2 Interval Estimation: Some Basic Ideas
-5.3 Confidence Intervals for Regression Coefficients
-5.4 Confidence Interval for $\\sigma^2$
-5.5 Hypothesis Testing: General Comments
-5.6 Hypothesis Testing: The Confidence-Interval Approach
-5.7 Hypothesis Testing: The Test-of-Significance Approach
-5.8 Hypothesis Testing: Some Practical Aspects
-5.9 Regression Analysis and Analysis of Variance
-5.10 Application of Regression Analysis: The Problem of Prediction
-5.11 Reporting the Results of Regression Analysis
-5.12 Evaluating the Results of Regression Analysis
-5.13 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 5.1 Statistical Prerequisites
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 5.2 Interval Estimation: Some Basic Ideas
+
+
+- Why point estimates are susceptible to sampling error, creating a need for range/interval estimates
+- Defining confidence intervals, confidence coefficients ($1-\\alpha$), and the level of significance ($\\alpha$)
+- The correct probability interpretation of a confidence interval under repeated sampling trials
+#### 5.2 Interval Estimation: Some Basic Ideas-\\alpha$), and the level of significance ($\\alpha$)
+
+
+- Why point estimates are susceptible to sampling error, creating a need for range/interval estimates
+- Defining confidence intervals, confidence coefficients ($1-\\alpha$), and the level of significance ($\\alpha$)
+- The correct probability interpretation of a confidence interval under repeated sampling trials
+#### 5.3 Confidence Intervals for Regression Coefficients
+
+
+- Constructing confidence bounds for $\\beta_1$ and $\\beta_2$ using standard errors and the Student's $t$-distribution
+- Determining critical $t_{\\alpha/2}$ values based on degrees of freedom ($n-2$)
+- How sample size ($n$), regressor spread, and model error variance control the width of the interval
+#### 5.4 Confidence Interval for $\\sigma^2$
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 5.5 Hypothesis Testing: General Comments
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 5.6 Hypothesis Testing: The Confidence-Interval Approach
+
+
+- Formulating Null ($H_0$) and Alternative ($H_1$) hypotheses (one-tailed vs. two-tailed tests)
+- Confidence-Interval decision rules: Rejecting $H_0$ if the hypothesized value lies outside the confidence interval bounds
+- Balancing Type I error (rejecting true $H_0$) and Type II error (accepting false $H_0$)
+#### 5.7 Hypothesis Testing: The Test-of-Significance Approach
+
+
+- The test-of-significance approach: calculating test statistics $t = (\\hat{\\beta}_2 - \\beta_2^*) / se(\\hat{\\beta}_2)$
+- Constructing decision regions with critical regions and calculating exact $p$-values
+- Utilizing the Chi-square ($\\chi^2$) test to perform hypothesis tests on the true error variance ($\\sigma^2$)
+#### 5.8 Hypothesis Testing: Some Practical Aspects
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 5.9 Regression Analysis and Analysis of Variance
+
+
+- Structuring the ANOVA Table: partitioning Total Sum of Squares (TSS) into Explained Sum of Squares (ESS) and Residual Sum of Squares (RSS)
+- Formulating the overall $F$-test to evaluate the joint hypothesis of model significance
+- Mathematical proof of equivalence between $F$ and $t$ tests in simple regression: $F_{1, n-2} = t^2_{n-2}$
+#### 5.10 Application of Regression Analysis: The Problem of Prediction
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 5.11 Reporting the Results of Regression Analysis
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 5.12 Evaluating the Results of Regression Analysis
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 5.13 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 6: Extensions of the Two-Variable Linear Regression Model
-6.1 Regression through the Origin
-6.2 Scaling and Units of Measurement
-6.3 Regression on Standardized Variables
-6.4 Functional Forms of Regression Models
-6.5 How to Measure Elasticity: The Log-Linear Model
-6.6 Semilog Models: Log-Lin and Lin-Log Models
-6.7 Reciprocal Models
-6.8 Choice of Functional Form
-6.9 A Note on the Nature of the Stochastic Error Term
-6.10 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 6.1 Regression through the Origin
 
+
+- Analyzing regressions forced through the origin ($Y_i = \\beta_2 X_i + u_i$)
+- Peculiarities: the sum of sample residuals $\\sum e_i$ is not necessarily zero, and standard $r^2$ formulas can yield negative values
+- Valid applications of intercept-free regressions (e.g., asset return models, physical laws)
+#### 6.2 Scaling and Units of Measurement
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 6.3 Regression on Standardized Variables
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 6.4 Functional Forms of Regression Models
+
+
+- Using mathematical transformations to model non-linear relationships within a linear parameter framework
+- Criteria for selecting correct functional specifications based on economic theory and scatter plots
+- Diagnostic errors from selecting incorrect structural shapes
+#### 6.5 How to Measure Elasticity: The Log-Linear Model
+
+
+- Formulating double-log equations: $\\ln Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i$
+- Mathematical derivation showing why slope coefficient $\\beta_2$ measures constant elasticity (elasticity model)
+- Core applications: Cobb-Douglas production frontiers, market demand elasticities
+#### 6.6 Semilog Models: Log-Lin and Lin-Log Models
+
+
+- Log-Lin models ($\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i$) for estimating constant relative/percentage growth rates
+- Lin-Log models ($Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i$) for estimating absolute changes resulting from percentage changes in X
+- Alternative shapes: reciprocal models ($1/X$) and polynomial (quadratic/cubic) regressions (e.g., Phillips Curve)
+#### 6.6 Semilog Models: Log-Lin and Lin-Log Models/X$) and polynomial (quadratic/cubic) regressions (e.g., Phillips Curve)
+
+
+- Log-Lin models ($\\ln Y_i = \\beta_1 + \\beta_2 X_i + u_i$) for estimating constant relative/percentage growth rates
+- Lin-Log models ($Y_i = \\beta_1 + \\beta_2 \\ln X_i + u_i$) for estimating absolute changes resulting from percentage changes in X
+- Alternative shapes: reciprocal models ($1/X$) and polynomial (quadratic/cubic) regressions (e.g., Phillips Curve)
+#### 6.7 Reciprocal Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 6.8 Choice of Functional Form
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 6.9 A Note on the Nature of the Stochastic Error Term
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 6.10 Summary and Conclusions
+
+
+- Analyzing regressions forced through the origin ($Y_i = \\beta_2 X_i + u_i$)
+- Peculiarities: the sum of sample residuals $\\sum e_i$ is not necessarily zero, and standard $r^2$ formulas can yield negative values
+- Valid applications of intercept-free regressions (e.g., asset return models, physical laws)
 ### CHAPTER 7: Multiple Regression Analysis: The Problem of Estimation
-7.1 The Three-Variable Model: Notation and Assumptions
-7.2 Interpretation of Multiple Regression Equation
-7.3 The Meaning of Partial Regression Coefficients
-7.4 OLS and ML Estimation of the Partial Regression Coefficients
-7.5 The Multiple Coefficient of Determination $R^2$ and Correlation $R$
-7.6 Example 7.1: Child Mortality in relation to GNP and Literacy
-7.7 Simple Regression in the context of Multiple Regression
-7.8 $R^2$ and the Adjusted $R^2$
-7.9 Example 7.3: The Cobb-Douglas Production Function
-7.10 Polynomial Regression Models
-7.11 Partial Correlation Coefficients
-7.12 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 7.1 The Three-Variable Model: Notation and Assumptions
 
+
+- Expanding to multi-regressor formulations: $Y_i = \\beta_1 + \\beta_2 X_{2i} + \\beta_3 X_{3i} + u_i$
+- Derivation of the system of partial normal equations using multivariable calculus
+- Algebraic solutions for partial slope parameters and the intercept coefficient
+#### 7.2 Interpretation of Multiple Regression Equation
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 7.3 The Meaning of Partial Regression Coefficients
+
+
+- Concept of partial slope parameters: measuring the net marginal effect of $X_j$ while holding other regressors constant
+- Understanding ceteris paribus adjustments and controlling for confounding factors
+- Distinguishing between simple regression slopes and partial regression slopes
+#### 7.4 OLS and ML Estimation of the Partial Regression Coefficients
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 7.5 The Multiple Coefficient of Determination $R^2$ and Correlation $R$
+
+
+- Why standard $R^2$ is non-decreasing as additional explanatory variables are introduced, creating overfitting bias
+- Formulating the Adjusted $R^2$ (denoted $\\bar{R}^2$) to penalize model complexity based on degrees of freedom
+- Evaluating model expansion using $\\bar{R}^2$ criteria: standard vs. adjusted fit indicators
+#### 7.6 Example 7.1: Child Mortality in relation to GNP and Literacy
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 7.7 Simple Regression in the context of Multiple Regression
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 7.8 $R^2$ and the Adjusted $R^2$
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 7.9 Example 7.3: The Cobb-Douglas Production Function
+
+
+- Empirical formulation of production curves: $Q = A K^\\alpha L^\\beta \\implies \\ln Q = \\ln A + \\alpha \\ln K + \\beta \\ln L$
+- Interpreting parameters as capital and labor output elasticities
+- Formulating linear restrictions to test constant returns to scale ($H_0: \\alpha + \\beta = 1$)
+#### 7.10 Polynomial Regression Models
+
+
+- Expanding to multi-regressor formulations: $Y_i = \\beta_1 + \\beta_2 X_{2i} + \\beta_3 X_{3i} + u_i$
+- Derivation of the system of partial normal equations using multivariable calculus
+- Algebraic solutions for partial slope parameters and the intercept coefficient
+#### 7.11 Partial Correlation Coefficients
+
+
+- Expanding to multi-regressor formulations: $Y_i = \\beta_1 + \\beta_2 X_{2i} + \\beta_3 X_{3i} + u_i$
+- Derivation of the system of partial normal equations using multivariable calculus
+- Algebraic solutions for partial slope parameters and the intercept coefficient
+#### 7.12 Summary and Conclusions
+
+
+- Expanding to multi-regressor formulations: $Y_i = \\beta_1 + \\beta_2 X_{2i} + \\beta_3 X_{3i} + u_i$
+- Derivation of the system of partial normal equations using multivariable calculus
+- Algebraic solutions for partial slope parameters and the intercept coefficient
 ### CHAPTER 8: Multiple Regression Analysis: The Problem of Inference
-8.1 The Normality Assumption Once Again
-8.2 Example 8.1: Child Mortality Example Revisited
-8.3 Hypothesis Testing in Multiple Regression
-8.4 Hypothesis Testing about Individual Regression Coefficients
-8.5 Testing the Overall Significance of the Sample Regression
-8.6 Testing the Equality of Two Regression Coefficients
-8.7 Restricted Least Squares: Testing Linear Equality Restrictions
-8.8 Testing for Structural or Parameter Stability: The Chow Test
-8.9 Prediction with Multiple Regression
-8.10 Likelihood Ratio, Wald, and Lagrange Multiplier Tests
-8.11 Testing the Functional Form of Regression
-8.12 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 8.1 The Normality Assumption Once Again
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 8.2 Example 8.1: Child Mortality Example Revisited
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 8.3 Hypothesis Testing in Multiple Regression
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.4 Hypothesis Testing about Individual Regression Coefficients
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.5 Testing the Overall Significance of the Sample Regression
+
+
+- Formulating the joint null hypothesis that all partial slope coefficients are simultaneously zero ($H_0: \\beta_2 = \\beta_3 = 0$)
+- Structuring the multi-variable ANOVA table with model and error degrees of freedom
+- The $F$-statistic formula using $R^2$ and calculating its joint significance threshold
+#### 8.6 Testing the Equality of Two Regression Coefficients
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.7 Restricted Least Squares: Testing Linear Equality Restrictions
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.8 Testing for Structural or Parameter Stability: The Chow Test
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.9 Prediction with Multiple Regression
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 8.10 Likelihood Ratio, Wald, and Lagrange Multiplier Tests
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.11 Testing the Functional Form of Regression
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 8.12 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 9: Dummy Variable Regression Models
-9.1 The Nature of Dummy Variables
-9.2 ANOVA Models
-9.3 ANOVA Models with Two Qualitative Variables
-9.4 Regression with a Mixture of Quantitative and Qualitative Regressors: ANCOVA
-9.5 The Dummy Variable Alternative to the Chow Test
-9.6 Interaction Effects using Dummy Variables
-9.7 The Use of Dummy Variables in Seasonal Analysis
-9.8 Piecewise Linear Regression
-9.9 Panel Data Regression Models
-9.10 Technical Aspects of the Dummy Variable Technique
-9.11 Topics for Further Study
-9.12 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 9.1 The Nature of Dummy Variables
 
----
 
-## PART II: RELAXING THE ASSUMPTIONS OF THE CLASSICAL MODEL
+- Distinguishing quantitative continuous variables from qualitative categorical variables (gender, region, treatment)
+- Binary 0-1 coding scheme for indicator variables
+- Defining reference (base) groups and avoiding the 'Dummy Variable Trap' (perfect multicollinearity)
+#### 9.2 ANOVA Models
 
+
+- Formulating models with intercept and qualitative regressors but no continuous quantitative variables
+- Interpreting coefficients as the mean differences between the base category and alternative groups
+- Testing differences in categorical means using standard OLS joint F-tests
+#### 9.3 ANOVA Models with Two Qualitative Variables
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 9.4 Regression with a Mixture of Quantitative and Qualitative Regressors: ANCOVA
+
+
+- Combining dummy variables and quantitative regressors (Analysis of Covariance)
+- Interpreting parallel intercept shifts: shifting the regression line vertically without changing its slope
+- Applying ANCOVA to control for structural categorical differences in continuous models
+#### 9.5 The Dummy Variable Alternative to the Chow Test
+
+
+- Assessing structural stability of regression parameters across different sub-samples
+- Using additive and multiplicative dummy variables simultaneously to allow intercept and slope differences
+- Running a single pooled regression to test parameters instead of separate subset regressions
+#### 9.6 Interaction Effects using Dummy Variables
+
+
+- Formulating interaction terms as the product of a dummy variable and a continuous variable ($D_i \\times X_i$)
+- Testing for differential slope coefficients (non-parallel regression lines across groups)
+- Evaluating joint interactions and multi-category compound interaction terms
+#### 9.7 The Use of Dummy Variables in Seasonal Analysis
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 9.8 Piecewise Linear Regression
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 9.9 Panel Data Regression Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 9.10 Technical Aspects of the Dummy Variable Technique
+
+
+- Distinguishing quantitative continuous variables from qualitative categorical variables (gender, region, treatment)
+- Binary 0-1 coding scheme for indicator variables
+- Defining reference (base) groups and avoiding the 'Dummy Variable Trap' (perfect multicollinearity)
+#### 9.11 Topics for Further Study
+
+
+- Distinguishing quantitative continuous variables from qualitative categorical variables (gender, region, treatment)
+- Binary 0-1 coding scheme for indicator variables
+- Defining reference (base) groups and avoiding the 'Dummy Variable Trap' (perfect multicollinearity)
+#### 9.12 Summary and Conclusions
+
+
+- Distinguishing quantitative continuous variables from qualitative categorical variables (gender, region, treatment)
+- Binary 0-1 coding scheme for indicator variables
+- Defining reference (base) groups and avoiding the 'Dummy Variable Trap' (perfect multicollinearity)
 ### CHAPTER 10: Multicollinearity: What Happens if the Regressors Are Correlated?
-10.1 The Nature of Multicollinearity
-10.2 Estimation in the Presence of Perfect Multicollinearity
-10.3 Estimation in the Presence of "High" but "Imperfect" Multicollinearity
-10.4 Theoretical Consequences of Multicollinearity
-10.5 Practical Consequences of Multicollinearity
-10.6 An Illustrative Example
-10.7 Detection of Multicollinearity
-10.8 Remedial Measures
-10.9 Is Multicollinearity Necessarily Bad?
-10.10 An Extended Example: The Longley Data
-10.11 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 10.1 The Nature of Multicollinearity
 
+
+- Defining multicollinearity as the existence of linear relationships among explanatory variables
+- Historical origins: Ragnar Frisch and the ideal setup of orthogonal regressors
+- Distinguishing between physical/structural collinearity and sample-specific collinearity
+#### 10.2 Estimation in the Presence of Perfect Multicollinearity
+
+
+- Perfect collinearity: deterministic linear dependencies, singular $(X'X)$ matrix, OLS fails to solve
+- Imperfect collinearity: high but non-perfect correlation, OLS remains BLUE but estimators lose precision
+#### 10.3 Estimation in the Presence of "High" but "Imperfect" Multicollinearity
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 10.4 Theoretical Consequences of Multicollinearity
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 10.5 Practical Consequences of Multicollinearity
+
+
+- Massive inflation of parameter variances and standard errors, leading to low individual $t$-ratios
+- High overall model $R^2$ paired with individually insignificant explanatory variables
+- Extreme sensitivity of coefficient estimates to minor data modifications or additions
+#### 10.6 An Illustrative Example
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 10.7 Detection of Multicollinearity
+
+
+- Formulating the Variance Inflation Factor ($VIF = 1 / (1 - R_j^2)$) and Tolerance ($TOL = 1 / VIF$)
+- Running auxiliary regressions to isolate collinearity structures among regressors
+- Standard heuristic rules: evaluating VIF thresholds exceeding 10
+#### 10.8 Remedial Measures
+
+
+- Evaluating structural trade-offs: dropping collinear variables vs specifying biased models
+- Remedies: gathering more data, pooling cross-sectional and time-series records, or transforming variables
+#### 10.9 Is Multicollinearity Necessarily Bad?
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 10.10 An Extended Example: The Longley Data
+
+
+- Defining multicollinearity as the existence of linear relationships among explanatory variables
+- Historical origins: Ragnar Frisch and the ideal setup of orthogonal regressors
+- Distinguishing between physical/structural collinearity and sample-specific collinearity
+#### 10.11 Summary and Conclusions
+
+
+- Defining multicollinearity as the existence of linear relationships among explanatory variables
+- Historical origins: Ragnar Frisch and the ideal setup of orthogonal regressors
+- Distinguishing between physical/structural collinearity and sample-specific collinearity
 ### CHAPTER 11: Heteroscedasticity: What Happens if the Error Variance Is Nonconstant?
-11.1 The Nature of Heteroscedasticity
-11.2 OLS Estimation in the Presence of Heteroscedasticity
-11.3 The Method of Generalized Least Squares (GLS)
-11.4 Consequences of Using OLS in the Presence of Heteroscedasticity
-11.5 Detection of Heteroscedasticity
-11.6 Remedial Measures
-11.7 Concluding Examples
-11.8 A Caution about Overreacting
-11.9 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 11.1 The Nature of Heteroscedasticity
+
+
+- Defining homoscedasticity ($Var(u_i) = \\sigma^2$) vs heteroscedasticity ($Var(u_i) = \\sigma_i^2$)
+- Common occurrences in cross-sectional data reflecting differences in scale, quality, or choice variables
+- Visualizing non-constant variance using error residual vs fitted value scatter plots
+#### 11.2 OLS Estimation in the Presence of Heteroscedasticity
+
+
+- Proving OLS slope estimates remain unbiased and linear under heteroscedasticity
+- Loss of efficiency: OLS is no longer BLUE (other estimators have smaller parameter variances)
+- Biases in calculated standard OLS standard errors, rendering conventional hypothesis tests invalid
+#### 11.3 The Method of Generalized Least Squares (GLS)
+
+
+- Applying transformation matrices to restore homoscedastic properties
+- Weighted Least Squares (WLS) mechanics: dividing all terms by standard deviations ($\\sigma_i$) as weights
+- Proving transformed variables satisfy Gauss-Markov assumptions, yielding BLUE estimators
+#### 11.4 Consequences of Using OLS in the Presence of Heteroscedasticity
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 11.5 Detection of Heteroscedasticity
+
+
+- Informal diagnostics: inspecting residual plots for systematic shapes
+- Formal testing procedures: Goldfeld-Quandt (sub-sample ratio), Breusch-Pagan, Park, and Glejser tests
+- White's General Heteroscedasticity Test: regressing squared residuals on regressors, squares, and cross-products
+#### 11.6 Remedial Measures
+
+
+- Executing WLS transformations when error variances are known or structurally specified
+- Utilizing White's Heteroscedasticity-Consistent (Robust) Standard Errors to conduct valid inference when variance is unknown
+- Logarithmic transformations to compress scale and stabilize variances naturally
+#### 11.7 Concluding Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 11.8 A Caution about Overreacting
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 11.9 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 12: Autocorrelation: What Happens if the Error Terms Are Correlated
-12.1 The Nature of the Problem
-12.2 OLS Estimation in the Presence of Autocorrelation
-12.3 The BLUE Estimator in the Presence of Autocorrelation
-12.4 Consequences of Using OLS
-12.5 Relationship between Wages and Productivity
-12.6 Detecting Autocorrelation
-12.7 Remedial Measures
-12.8 Model Mis-Specification versus Pure Autocorrelation
-12.9 Correcting for Pure Autocorrelation: GLS
-12.10 The Newey-West Method
-12.11 OLS versus FGLS and HAC
-12.12 Forecasting with Autocorrelated Error Terms
-12.13 Additional Aspects (ARCH/GARCH)
-12.14 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 12.1 The Nature of the Problem
 
+
+- Defining autocorrelation as correlation between error terms across different observations ($Cov(u_t, u_s) \\neq 0$)
+- Prevalence in time series data due to inertia, economic cycles, spatial correlations, and lagged adjustments
+- Formulating the First-Order Autoregressive AR(1) process: $u_t = \\rho u_{t-1} + \\epsilon_t$
+#### 12.2 OLS Estimation in the Presence of Autocorrelation
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 12.3 The BLUE Estimator in the Presence of Autocorrelation
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 12.4 Consequences of Using OLS
+
+
+- Unbiasedness of OLS point estimates under autocorrelation
+- Loss of efficiency: OLS is no longer BLUE (GLS has lower variance)
+- Severe underestimation of standard errors, leading to inflated $t$-ratios and misleadingly high $R^2$
+#### 12.5 Relationship between Wages and Productivity
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 12.6 Detecting Autocorrelation
+
+
+- The Durbin-Watson $d$ test: derivation of $d \\approx 2(1 - \\hat{\\rho})$ and interpreting boundaries ($0$, $2$, $4$)
+- Limitations of the Durbin-Watson test: inapplicable to models with lagged dependent variables or higher lags
+- The Breusch-Godfrey (BG) Lagrange Multiplier test: general testing framework for higher-order lags
+#### 12.7 Remedial Measures
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 12.8 Model Mis-Specification versus Pure Autocorrelation
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 12.9 Correcting for Pure Autocorrelation: GLS
+
+
+- Applying the Cochrane-Orcutt iterative procedure to estimate $\\rho$ and transform variables
+- Prais-Winsten transformation: conserving the first observation's degrees of freedom
+- Generalized Least Squares (GLS) as the final corrected regression
+#### 12.10 The Newey-West Method
+
+
+- Formulating HAC (Heteroscedasticity and Autocorrelation Consistent) Standard Errors
+- Correcting parameter variances asymptotically without changing biased OLS point estimates
+- Rule-of-thumb lag length selection in macroeconometric studies
+#### 12.11 OLS versus FGLS and HAC
+
+
+- Defining autocorrelation as correlation between error terms across different observations ($Cov(u_t, u_s) \\neq 0$)
+- Prevalence in time series data due to inertia, economic cycles, spatial correlations, and lagged adjustments
+- Formulating the First-Order Autoregressive AR(1) process: $u_t = \\rho u_{t-1} + \\epsilon_t$
+#### 12.12 Forecasting with Autocorrelated Error Terms
+
+
+- Defining autocorrelation as correlation between error terms across different observations ($Cov(u_t, u_s) \\neq 0$)
+- Prevalence in time series data due to inertia, economic cycles, spatial correlations, and lagged adjustments
+- Formulating the First-Order Autoregressive AR(1) process: $u_t = \\rho u_{t-1} + \\epsilon_t$
+#### 12.13 Additional Aspects (ARCH/GARCH)
+
+
+- Defining autocorrelation as correlation between error terms across different observations ($Cov(u_t, u_s) \\neq 0$)
+- Prevalence in time series data due to inertia, economic cycles, spatial correlations, and lagged adjustments
+- Formulating the First-Order Autoregressive AR(1) process: $u_t = \\rho u_{t-1} + \\epsilon_t$
+#### 12.14 Summary and Conclusions
+
+
+- Defining autocorrelation as correlation between error terms across different observations ($Cov(u_t, u_s) \\neq 0$)
+- Prevalence in time series data due to inertia, economic cycles, spatial correlations, and lagged adjustments
+- Formulating the First-Order Autoregressive AR(1) process: $u_t = \\rho u_{t-1} + \\epsilon_t$
 ### CHAPTER 13: Econometric Modeling: Model Specification and Diagnostic Testing
-13.1 Model Selection Criteria
-13.2 Types of Specification Errors
-13.3 Consequences of Model Specification Errors
-13.4 Tests of Specification Errors
-13.5 Errors of Measurement
-13.6 Incorrect Specification of the Stochastic Error Term
-13.7 Nested versus Non-nested Models
-13.8 Tests of Non-nested Hypotheses
-13.9 Model Selection Criteria
-13.10 Additional Topics
-13.11 Concluding Example
-13.12 A Word to the Practitioner
-13.13 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 13.1 Model Selection Criteria
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 13.2 Types of Specification Errors
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 13.3 Consequences of Model Specification Errors
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 13.4 Tests of Specification Errors
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 13.5 Errors of Measurement
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 13.6 Incorrect Specification of the Stochastic Error Term
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 13.7 Nested versus Non-nested Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 13.8 Tests of Non-nested Hypotheses
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 13.9 Model Selection Criteria
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 13.10 Additional Topics
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 13.11 Concluding Example
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 13.12 A Word to the Practitioner
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 13.13 Summary and Conclusions
+
 
 ---
-
 ## PART III: TOPICS IN ECONOMETRICS
-
 ### CHAPTER 14: Nonlinear Regression Models
-14.1 Intrinsically Linear and Nonlinear Models
-14.2 Estimation
-14.3 The Trial-and-Error Method
-14.4 Approaches to Estimating Nonlinear Models
-14.5 Illustrative Examples
-14.6 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 14.1 Intrinsically Linear and Nonlinear Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 14.2 Estimation
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 14.3 The Trial-and-Error Method
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 14.4 Approaches to Estimating Nonlinear Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 14.5 Illustrative Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 14.6 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 15: Qualitative Response Regression Models
-15.1 The Nature of Qualitative Response Models
-15.2 The Linear Probability Model (LPM)
-15.3 Applications of LPM
-15.4 Alternatives to LPM
-15.5 The Logit Model
-15.6 Estimation of the Logit Model
-15.7 The Grouped Logit Model
-15.8 The Logit Model for Ungrouped Data
-15.9 The Probit Model
-15.10 Logit and Probit Models
-15.11 The Tobit Model
-15.12 Modeling Count Data: The Poisson Regression Model
-15.13 Further Topics
-15.14 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 15.1 The Nature of Qualitative Response Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.2 The Linear Probability Model (LPM)
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.3 Applications of LPM
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 15.4 Alternatives to LPM
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 15.5 The Logit Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.6 Estimation of the Logit Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.7 The Grouped Logit Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.8 The Logit Model for Ungrouped Data
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.9 The Probit Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.10 Logit and Probit Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.11 The Tobit Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.12 Modeling Count Data: The Poisson Regression Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 15.13 Further Topics
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 15.14 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 16: Panel Data Regression Models
-16.1 Why Panel Data?
-16.2 An Illustrative Example
-16.3 Estimation: The Fixed Effects Approach
-16.4 Estimation: The Random Effects Approach
-16.5 Fixed Effects versus Random Effects Model
-16.6 Concluding Comments
-16.7 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 16.1 Why Panel Data?
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 16.2 An Illustrative Example
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 16.3 Estimation: The Fixed Effects Approach
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 16.4 Estimation: The Random Effects Approach
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 16.5 Fixed Effects versus Random Effects Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 16.6 Concluding Comments
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 16.7 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 17: Dynamic Econometric Models: Autoregressive and Distributed-Lag Models
-17.1 The Role of "Time" or "Lag" in Economics
-17.2 The Reasons for Lags
-17.3 Estimation of Distributed-Lag Models
-17.4 The Koyck Approach
-17.5 Rationalization of the Koyck Model: Adaptive Expectations
-17.6 Another Rationalization: The Stock Adjustment Model
-17.7 Combination Models
-17.8 Estimation of Autoregressive Models
-17.9 The Method of Instrumental Variables (IV)
-17.10 Detecting Autocorrelation in Autoregressive Models: Durbin h Test
-17.11 Numerical Example: Demand for Money
-17.12 Illustrative Examples
-17.13 The Almon Approach to Distributed-Lag Models
-17.14 Causality in Economics: The Granger Causality Test
-17.15 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 17.1 The Role of "Time" or "Lag" in Economics
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 17.2 The Reasons for Lags
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 17.3 Estimation of Distributed-Lag Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.4 The Koyck Approach
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 17.5 Rationalization of the Koyck Model: Adaptive Expectations
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.6 Another Rationalization: The Stock Adjustment Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.7 Combination Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.8 Estimation of Autoregressive Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.9 The Method of Instrumental Variables (IV)
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 17.10 Detecting Autocorrelation in Autoregressive Models: Durbin h Test
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 17.11 Numerical Example: Demand for Money
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 17.12 Illustrative Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 17.13 The Almon Approach to Distributed-Lag Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 17.14 Causality in Economics: The Granger Causality Test
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 17.15 Summary and Conclusions
+
 
 ---
-
 ## PART IV: SIMULTANEOUS-EQUATION MODELS
-
 ### CHAPTER 18: Simultaneous-Equation Models
-18.1 The Nature of Simultaneous-Equation Models
-18.2 Examples
-18.3 Simultaneous-Equation Bias: Inconsistency of OLS Estimators
-18.4 Simultaneous-Equation Bias: Numerical Example
-18.5 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 18.1 The Nature of Simultaneous-Equation Models
+
+
+- Analyzing simultaneous relationships where variables are determined jointly (supply-demand, aggregate income-consumption)
+- Distinguishing structural equations from reduced-form equations
+- Classifying endogenous (jointly determined) vs exogenous (pre-determined/fixed) variables
+#### 18.2 Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 18.3 Simultaneous-Equation Bias: Inconsistency of OLS Estimators
+
+
+- Proving why endogenous variables are correlated with the structural error term ($Cov(X_i, u_i) \\neq 0$)
+- Mathematical proof of OLS bias and inconsistency when applied directly to a single simultaneous equation
+#### 18.4 Simultaneous-Equation Bias: Numerical Example
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 18.5 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 19: The Identification Problem
-19.1 Notations and Definitions
-19.2 The Identification Problem
-19.3 Rules for Identification (Order and Rank)
-19.4 A Test of Simultaneity (Hausman Test)
-19.5 Tests for Exogeneity
-19.6 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 19.1 Notations and Definitions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 19.2 The Identification Problem
+
+
+- The identification puzzle: whether structural parameters can be recovered from estimated reduced-form parameters
+- The Order Condition: necessary algebraic check matching excluded vs. included variables ($K - k \\ge m - 1$)
+- The Rank Condition: sufficient matrix algebraic check evaluating the independence of excluded structural parameters
+#### 19.3 Rules for Identification (Order and Rank)
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 19.4 A Test of Simultaneity (Hausman Test)
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 19.5 Tests for Exogeneity
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 19.6 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 20: Simultaneous-Equation Methods
-20.1 Approaches to Estimation
-20.2 Recursive Models and OLS
-20.3 Estimation of a Just Identified Equation: Indirect Least Squares (ILS)
-20.4 Estimation of an Overidentified Equation: Two-Stage Least Squares (2SLS)
-20.5 2SLS: Numerical Example
-20.6 Illustrative Examples
-20.7 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 20.1 Approaches to Estimation
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 20.2 Recursive Models and OLS
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 20.3 Estimation of a Just Identified Equation: Indirect Least Squares (ILS)
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 20.4 Estimation of an Overidentified Equation: Two-Stage Least Squares (2SLS)
+
+
+- Stage 1 mechanics: regressing endogenous regressors on all exogenous variables in the system to obtain fitted values
+- Stage 2 mechanics: running the structural regression replacing endogenous regressors with their fitted, purged values
+- Properties of 2SLS: asymptotic consistency and efficiency
+#### 20.5 2SLS: Numerical Example
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 20.6 Illustrative Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 20.7 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 21: Time Series Econometrics: Some Basic Concepts
-21.1 Selected U.S. Economic Time Series
-21.2 Key Concepts
-21.3 Stochastic Processes
-21.4 Unit Root Stochastic Process
-21.5 Trend Stationary and Difference Stationary Processes
-21.6 Integrated Stochastic Processes
-21.7 Spurious Regression
-21.8 Tests of Stationarity
-21.9 The Unit Root Test
-21.10 Transforming Nonstationary Time Series
-21.11 Cointegration and Error Correction Mechanism (ECM)
-21.12 Some Economic Applications
-21.13 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 21.1 Selected U.S. Economic Time Series
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.2 Key Concepts
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.3 Stochastic Processes
+
+
+- Conditions of Weak (Covariance) Stationarity: constant mean, constant variance, and time-independent autocovariance
+- The 'Spurious Regression' phenomenon: high $R^2$ and highly significant $t$-ratios in regressions of unrelated trending series
+- Random walks, drift models, and unit-root structural characteristics
+#### 21.4 Unit Root Stochastic Process
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.5 Trend Stationary and Difference Stationary Processes
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.6 Integrated Stochastic Processes
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.7 Spurious Regression
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 21.8 Tests of Stationarity
+
+- Formulating the null ($H_0$) and alternative ($H_1$) hypotheses for econometric testing
+- Deriving the appropriate test statistic (e.g., $t$-test, $F$-test, or $\\chi^2$)
+- Evaluating critical regions, $p$-values, and Type I/Type II error trade-offs
+
+#### 21.9 The Unit Root Test
+
+
+- Running Augmented Dickey-Fuller (ADF) tests to verify stationarity
+- Defining Cointegration: stationary linear combinations of non-stationary processes sharing a long-run equilibrium
+- Modeling dynamic relationships using the Engle-Granger Error Correction Model (ECM)
+#### 21.10 Transforming Nonstationary Time Series
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.11 Cointegration and Error Correction Mechanism (ECM)
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 21.12 Some Economic Applications
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 21.13 Summary and Conclusions
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
 
 ### CHAPTER 22: Time Series Econometrics: Forecasting
-22.1 Approaches to Economic Forecasting
-22.2 AR, MA, and ARIMA Modeling
-22.3 The Box-Jenkins Methodology
-22.4 Identification
-22.5 Estimation of the ARIMA Model
-22.6 Diagnostic Checking
-22.7 Forecasting
-22.8 Further Aspects
-22.9 Vector Autoregression (VAR)
-22.10 Measuring Volatility: ARCH and GARCH Models
-22.11 Concluding Examples
-22.12 Summary and Conclusions
+This chapter delves into the core concepts and methodologies related to this topic. It provides a foundational understanding necessary for advanced econometric analysis, exploring both theoretical implications and practical applications through examples.
+#### 22.1 Approaches to Economic Forecasting
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.2 AR, MA, and ARIMA Modeling
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 22.3 The Box-Jenkins Methodology
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.4 Identification
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.5 Estimation of the ARIMA Model
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 22.6 Diagnostic Checking
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.7 Forecasting
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.8 Further Aspects
+
+- Comprehensive review of the foundational mathematical concepts and theoretical mechanisms
+- Exploring the asymptotic properties and finite-sample behavior of the relevant estimators
+- Practical considerations, limitations, and advanced extensions of the base framework
+
+#### 22.9 Vector Autoregression (VAR)
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 22.10 Measuring Volatility: ARCH and GARCH Models
+
+- Specifying the structural mathematical form and underlying econometric assumptions
+- Deriving the parameter estimators and analyzing their statistical properties (e.g., unbiasedness, efficiency)
+- Assessing model fit, diagnostic checks, and potential specification biases
+
+#### 22.11 Concluding Examples
+
+- Analyzing real-world data and empirical applications of the theoretical framework
+- Step-by-step mathematical derivation of the applied problem
+- Policy implications and evaluating statistical significance in practical scenarios
+
+#### 22.12 Summary and Conclusions
+
 
 *(Note: Data, tables, formulas, and graphs will be populated here as provided.)*
 `,"ug-monetary":`# MONETARY ECONOMICS
@@ -3788,6 +4339,8 @@ Yield per Hectare
 
 #### Theoretical Explanations
 
+*This section is currently under development. It will contain detailed derivations, empirical examples, and policy implications relevant to the topic.*
+
 #### 1. Labor Supervision Costs
 Large farms rely heavily on hired wage labor. Hired workers have little incentive to work diligently unless supervised. Let $H$ be hired labor and $F$ be family labor. The effective labor input $L_E$ is:
 
@@ -5389,73 +5942,483 @@ $$ \\text{Expanded NPV} = \\text{Static NPV} + \\text{Real Option Premium} $$
 
 - *Implication 1*: A project with a negative static NPV may actually be highly valuable ($E\\_NPV > 0$) if it contains an exceptionally valuable option to expand, delay, or switch.
 - *Implication 2*: Volatility is the enemy of static NPV, but it is the friend of options. Higher project cash flow volatility ($\\sigma$) increases the likelihood of highly profitable outcomes while the downside exposure is protected by the option to abandon or defer. Thus, higher volatility *increases* the Real Option Premium, making highly risky, flexible projects more valuable than rigid, low-risk alternatives.
-`,"ug-international":`
-# COMPREHENSIVE INTERNATIONAL ECONOMICS STUDY GUIDE
+`,"ug-international": `
+# COURSE 8: INTERNATIONAL ECONOMICS
 
-## CHAPTER 1: THE BASIS OF INTERNATIONAL TRADE
-
-### 1.1 Why Countries Trade
-Countries trade because they can benefit from specialization based on their unique resources and efficiencies.
-
-### 1.2 Absolute Advantage (Adam Smith)
-A country should specialize in and export commodities in which it has an absolute advantage.
-
-### 1.3 Comparative Advantage (David Ricardo)
-Even if one country has an absolute advantage in both goods, trade can be beneficial if countries specialize where they have a lower opportunity cost.
+*A comprehensive undergraduate study guide mapping trade theories, policies, exchange rate determination models, and balance of payments.*
 
 ---
 
-## CHAPTER 2: TRADE THEORIES AND MODELS
+## PAGE 1: Classical and Neoclassical Trade Theories
 
-### 2.1 The Heckscher-Ohlin Model
-A country will export goods that use its abundant factors of production intensively.
+### 1.1 The Classical Theories of Trade
 
-### 2.2 The Leontief Paradox
-Empirical finding that the US (a capital-abundant country) exported labor-intensive goods, contradicting the H-O theory.
+#### Mercantilism
+Mercantilism (16th–18th century) was a nationalist economic doctrine that viewed international trade as a **zero-sum game**, where one nation’s gain is another’s loss. The primary objective of mercantilist policy was to maintain a favorable trade surplus (Exports > Imports) to accumulate specie (gold and silver), which was equated with national wealth and power. To achieve this, governments heavily restricted imports via tariffs and subsidized domestic export industries.
+
+The primary critique of Mercantilism, advanced by David Hume in his **Price-Specie-Flow Mechanism** (1752), proved that a perpetual trade surplus is self-defeating:
+1. An export surplus leads to an inflow of gold.
+2. Under the gold standard, this gold inflow expands the domestic money supply ($M_s$).
+3. By the Quantity Theory of Money, this increases domestic price levels ($P$).
+4. Higher domestic prices make domestic exports expensive and foreign imports cheap, naturally correcting the surplus.
+
+#### Absolute Advantage (Adam Smith)
+In *The Wealth of Nations* (1776), Adam Smith revolutionized trade theory by demonstrating that trade is a **positive-sum game** where all participating nations can benefit. Smith argued that a country has an **Absolute Advantage** when it can produce a commodity using fewer resources (e.g., labor hours) than its trading partner. Under free trade, each country should specialize completely in producing the good in which it possesses an absolute advantage and trade for other goods.
+
+#### Comparative Advantage (David Ricardo)
+David Ricardo, in *Principles of Political Economy and Taxation* (1817), solved a major limitation of Smith’s theory: what if a country has an absolute disadvantage in *both* commodities? Ricardo’s **Law of Comparative Advantage** states that even if country $A$ is less efficient than country $B$ in producing both goods, mutually beneficial trade can still occur if country $A$ specializes in the commodity in which it has the *smaller* absolute disadvantage (its comparative advantage), and country $B$ specializes in the commodity in which it has the *larger* absolute advantage.
+
+The core of Ricardo’s model relies on **Opportunity Cost**.
+
+#### Opportunity Cost Table and Example
+Let's consider two countries, Nigeria and the United Kingdom, producing Cocoa and Machinery with 1 hour of labor:
+
+| Country | Cocoa (bags per labor hour) | Machinery (units per labor hour) | Opportunity Cost of Cocoa (in terms of Machinery) | Opportunity Cost of Machinery (in terms of Cocoa) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Nigeria** | 10 | 2 | $2/10 = 0.2$ Machinery | $10/2 = 5$ Cocoa |
+| **United Kingdom**| 5 | 5 | $5/5 = 1$ Machinery | $5/5 = 1$ Cocoa |
+
+Nigeria has an absolute advantage in Cocoa, while the UK has an absolute advantage in Machinery.
+More importantly:
+- Nigeria's opportunity cost of Cocoa ($0.2$ Machinery) is *lower* than the UK’s ($1.0$ Machinery). Nigeria has a comparative advantage in Cocoa.
+- The UK’s opportunity cost of Machinery ($1.0$ Cocoa) is *lower* than Nigeria's ($5.0$ Cocoa). The UK has a comparative advantage in Machinery.
+
+If the terms of trade (TOT) settle between their autarky opportunity costs, say $1 \\text{ Cocoa} = 0.5 \\text{ Machinery}$, both countries gain from trade.
+
+#### Interactive Comparative Advantage Simulator
+Explore how varying absolute production capabilities of two nations alters opportunity costs, comparative advantages, and gains from trade:
+
+\`\`\`simulator
+{
+  "mode": "comparative_advantage",
+  "title": "Comparative Advantage & Ricardian Trade Simulator"
+}
+\`\`\`
+
+### 1.2 The Specific Factors Model (Samuelson-Jones)
+While the Ricardian model assumes labor is perfectly mobile across sectors and the Heckscher-Ohlin model assumes all factors are mobile in the long run, the **Specific Factors Model** (developed by Paul Samuelson and Ronald Jones) represents the short-run reality. It assumes:
+1. **Two goods**: Cocoa ($C$) and Machinery ($M$).
+2. **Three factors**: Labor ($L$) which is perfectly mobile across both sectors, Land ($T$) which is specific only to agricultural Cocoa production, and Capital ($K$) which is specific only to industrial Machinery production.
+
+When trade opens, the price of Cocoa rises for an exporting country:
+- **Specific factor in the export sector (Land)**: Gains in real terms because its rental rate rises more than proportionally to the price increase.
+- **Specific factor in the import-competing sector (Capital)**: Loses in real terms because its return falls.
+- **Mobile factor (Labor)**: The effect is ambiguous. Real wages rise in terms of imports but fall in terms of the exported agricultural good, depending on consumer preferences.
+
+### 1.3 Neoclassical Trade Theory: Offer Curves and Terms of Trade
+
+Neoclassical economists (Alfred Marshall and Francis Ysidro Edgeworth) introduced the **Offer Curve** (or reciprocal demand curve), which shows the quantity of an export good a country is willing to provide in exchange for a given quantity of an import good. The intersection of the two countries' offer curves determines the equilibrium **Terms of Trade (TOT)**:
+
+$$TOT = \\frac{P_x}{P_m} \\times 100$$
+
+Where $P_x$ is the price index of exports and $P_m$ is the price index of imports.
+
+### 1.4 Factor Endowments: The Heckscher-Ohlin (H-O) Theory
+
+The Classical Ricardian model assumed labor was the only factor of production and that its productivity differed due to technology. The Heckscher-Ohlin (H-O) model expands this into a **2x2x2 framework** (2 countries, 2 goods, 2 factors: Labor $L$ and Capital $K$).
+
+#### The H-O Theorem
+A country will export the commodity that intensively uses its relatively abundant and cheap factor, and import the commodity that intensively uses its relatively scarce and expensive factor.
+- A labor-abundant country (e.g., Nigeria) will possess a comparative advantage in, and export, labor-intensive goods (e.g., agricultural products or textiles).
+- A capital-abundant country (e.g., Germany) will export capital-intensive goods (e.g., precision machinery or automobiles).
+
+#### The Four Core Theorems of the H-O Model
+1. **Heckscher-Ohlin Theorem**: Trade patterns are determined by relative factor abundance.
+2. **Factor-Price Equalization (Heckscher-Ohlin-Samuelson) Theorem**: Free international trade will lead to the equalization of absolute and relative returns to homogeneous factors of production (wages for labor, interest/rent for capital) across trading nations. Trade acts as a substitute for international factor mobility.
+3. **Stolper-Samuelson Theorem**: An increase in the relative price of a good will increase the real return to the factor used intensively in its production, and decrease the real return to the other factor.
+   - Example: A tariff on capital-intensive imports raises the domestic price of capital-intensive goods, increasing the real rental rate of capital and decreasing real wages.
+4. **Rybczynski Theorem**: Under constant commodity prices, an increase in the endowment of one factor will lead to a more-than-proportional expansion of the output of the commodity intensive in that factor, and a decline in the absolute output of the other commodity.
+
+#### Interactive Heckscher-Ohlin Factor Endowment Simulator
+Experiment with different relative endowments of capital (K) and labor (L) across two countries to see how relative factor abundance determines comparative advantage, output mix, and wages:
+
+\`\`\`simulator
+{
+  "mode": "heckscher_ohlin",
+  "title": "Heckscher-Ohlin Factor Endowment Simulator"
+}
+\`\`\`
+
+### 1.5 Empirical Testing: The Leontief Paradox
+
+In 1953, Wassily Leontief empirically tested the H-O model using US input-output data from 1947. Since the US was widely regarded as the most capital-abundant nation in the world, the H-O theorem predicted the US would export capital-intensive goods and import labor-intensive goods.
+
+Leontief's findings shocked the economic community: **US exports were actually about 30% more labor-intensive than US import-competing goods!** This contradiction is known as the **Leontief Paradox**.
+
+#### Key Explanations for the Paradox:
+- **Human Capital**: US labor was highly skilled (possessing high human capital) compared to foreign labor. Factoring in human capital made US exports highly capital-intensive in a broader sense.
+- **Factor Intensity Reversal**: If a commodity is labor-intensive in one country but capital-intensive in another, the H-O theorem breaks down.
+- **Tariff Structure**: High US tariffs on labor-intensive goods distorted natural trade patterns.
 
 ---
 
-## CHAPTER 3: TRADE POLICY AND RESTRICTIONS
+## PAGE 2: New Trade Theory and Economic Growth in Trade
 
-### 3.1 Tariffs and Quotas
-Governments use tariffs (taxes) and quotas (limits) to protect domestic industries.
+### 2.1 New Trade Theory: Monopolistic Competition and Increasing Returns
 
-### 3.2 The Impact of a Tariff
+Standard classical and neoclassical models assume **constant returns to scale** and **perfect competition**. However, much of modern global trade occurs between industrialized nations with similar factor endowments (e.g., US and Germany trading cars), which violates the H-O model.
+
+Developed by Paul Krugman in the late 1970s and 1980s (for which he won the 2008 Nobel Prize), **New Trade Theory** explains these trade patterns using:
+1. **Economies of Scale (Increasing Returns to Scale)**: As a firm increases production, its average cost per unit falls. This encourages specialization even in the absence of comparative advantage.
+2. **Monopolistic Competition**: Consumers desire variety (product differentiation), and firms have some market power over their specific brand.
+3. **Network Effects & First-Mover Advantage**: Early entrants in an industry (e.g., Boeing in commercial aircraft or Silicon Valley in software) gain massive scale economies that create insurmountable entry barriers for foreign rivals.
+
+#### Intra-Industry Trade (IIT)
+This leads to **Intra-Industry Trade**, where countries export and import goods belonging to the same industry (e.g., Germany exporting BMWs to Japan and importing Toyotas).
+
+#### Grubel-Lloyd Index
+The degree of intra-industry trade is measured using the **Grubel-Lloyd (GL) Index**:
+
+$$GL_i = 1 - \\frac{|X_i - M_i|}{X_i + M_i}$$
+
+Where $X_i$ represents exports of industry $i$, and $M_i$ represents imports of industry $i$.
+- $GL_i = 1$: Complete intra-industry trade (Exports equal Imports).
+- $GL_i = 0$: Complete inter-industry trade (Only exporting or only importing).
+
+Let's visualize Intra-Industry Trade index values across diverse product sectors:
+
+\`\`\`chart
+{
+  "type": "bar",
+  "title": "Figure 8.1: Grubel-Lloyd Index of Selected Industries",
+  "xAxis": "industry",
+  "data": [
+    { "industry": "Automobiles", "Index": 0.85 },
+    { "industry": "Chemicals", "Index": 0.78 },
+    { "industry": "Electronics", "Index": 0.72 },
+    { "industry": "Agricultural Produce", "Index": 0.15 },
+    { "industry": "Crude Oil", "Index": 0.04 }
+  ],
+  "series": [
+    { "key": "Index", "name": "Grubel-Lloyd Index", "color": "#10b981" }
+  ]
+}
+\`\`\`
+
+### 2.2 Economic Growth and Trade
+
+#### Immiserizing Growth
+Coined by Jagdish Bhagwati (1958), **Immiserizing Growth** is a theoretical situation where economic growth (expansion of capacity) in an export sector actually makes a nation *worse off* because of a severe deterioration in its Terms of Trade.
+This occurs under three strict conditions:
+1. The country is a **large country** whose export volume can influence world prices.
+2. The growth is heavily biased toward the export sector, dramatically increasing export supply.
+3. The foreign demand for the country’s exports is highly **price inelastic**, leading to a catastrophic plunge in the world price of the export commodity.
+
+The welfare loss from the falling Terms of Trade exceeds the welfare gain from increased production capacity.
+
+---
+
+## PAGE 3: Commercial Policy: Tariffs, Quotas, and Welfare Effects
+
+### 3.1 Partial Equilibrium Analysis of a Tariff in a Small Country
+
+A tariff is a tax levied on imported goods. When a **small country** (one that cannot affect world prices) imposes a tariff on imports, it drives up the domestic price of the good.
+
+#### Welfare Effects of a Tariff:
+Let's analyze the economic redistribution and efficiency losses from a tariff:
+- **Consumer Surplus Loss**: Consumers suffer because they pay higher prices and consume less. This loss is represented by the entire area $-(a + b + c + d)$.
+- **Producer Surplus Gain**: Domestic producers benefit because they can sell at a higher protected price. This gain is represented by area $+a$.
+- **Government Revenue Gain**: The government collects tariff revenue on the remaining imports. This is represented by area $+c$.
+- **Deadweight Loss (DWL)**: The net welfare loss to society is represented by:
+
+$$DWL = b + d$$
+
+- **Area $b$ (Production Distortion)**: The economic waste of producing goods domestically at a higher cost than the world cost.
+- **Area $d$ (Consumption Distortion)**: The loss in utility because consumers are forced to cut back consumption due to the artificially high price.
+
+Let's look at the partial equilibrium supply-demand redistribution in a small country:
+
 \`\`\`chart
 {
   "type": "line",
-  "title": "Figure 3.1: Impact of a Tariff on Domestic Market",
-  "xAxis": "quantity",
-  "yAxis": "price",
-  "data": [
-    {"quantity": 10, "demand": 100, "supply": 20},
-    {"quantity": 20, "demand": 80, "supply": 40},
-    {"quantity": 30, "demand": 60, "supply": 60},
-    {"quantity": 40, "demand": 40, "supply": 80},
-    {"quantity": 50, "demand": 20, "supply": 100}
-  ],
-  "series": [
-    {"key": "demand", "name": "Domestic Demand", "color": "#ef4444"},
-    {"key": "supply", "name": "Domestic Supply", "color": "#3b82f6"}
+  "title": "Figure 8.2: Partial Equilibrium Welfare Effects of a Tariff",
+  "labels": ["Q1 (Protected Supply)", "Q2 (Free Supply)", "Q3 (Free Demand)", "Q4 (Protected Demand)"],
+  "datasets": [
+    {
+      "label": "Consumer Surplus Loss (-)",
+      "data": [100, 80, 50, 20]
+    },
+    {
+      "label": "Producer Surplus Gain (+)",
+      "data": [20, 40, 40, 40]
+    },
+    {
+      "label": "Tariff Revenue (+)",
+      "data": [0, 20, 50, 30]
+    }
   ]
+}
+\`\`\`
+
+#### Interactive Tariff Welfare & Deadweight Loss Simulator
+Simulate the partial equilibrium effects of a tariff in a small country. Adjust the world price, domestic supply/demand parameters, and the tariff rate to analyze consumer surplus loss, producer surplus gain, government revenue, and deadweight loss in real-time:
+
+\`\`\`simulator
+{
+  "mode": "tariff_simulation",
+  "title": "Tariff Welfare & Deadweight Loss Simulator"
+}
+\`\`\`
+
+### 3.2 Non-Tariff Barriers (NTBs): Quotas and VERs
+While tariffs are price-based commercial policies, governments frequently use quantity-based restrictions to protect domestic industries:
+
+#### 1. Import Quotas
+An import quota is a direct quantitative limit on the volume of a commodity allowed to enter a country over a specific period.
+- **Welfare Effects**: A quota raises the domestic price by restricting supply, identically to a tariff. However, instead of generating government tariff revenue, a quota generates **Quota Rents** (the difference between the high domestic price and the world price multiplied by the import volume).
+- **Rent Allocation**: The welfare outcome depends on who captures these rents:
+  - If the government licenses quota rights via competitive auctions, the rent goes to the state, making the quota welfare-equivalent to a tariff.
+  - If the licenses are given to domestic importers, the rents remain inside the country.
+  - If licenses are given directly to foreign exporters, the rents flow out of the nation, worsening the trade balance and overall national welfare compared to a tariff.
+
+#### 2. Voluntary Export Restraints (VERs)
+A VER is an import quota under which the exporting country "voluntarily" limits its exports, usually under the threat of worse protectionist retaliation. 
+- **Welfare Effects**: Because the foreign country administers the quantitative restriction, foreign exporters capture the quota rents by raising their export prices. A VER is always **more economically costly** to the importing country than an equivalent tariff or domestic quota, as it represents a direct transfer of wealth to foreign competitors.
+
+### 3.3 The Optimum Tariff and the Large Country Case
+Unlike a small country, a **large country** represents a buyer big enough to influence world prices. When a large country imposes a tariff on imports:
+1. It reduces its demand for the foreign import.
+2. Foreign exporters, facing a severe drop in sales, are forced to lower their pre-tariff export prices to retain market share.
+3. This transfers some of the tariff burden onto foreign producers, causing a **TOWARDS-THE-HOME-COUNTRY improvement in the Terms of Trade (TOT)**.
+
+#### The Net Welfare Outcome:
+A tariff in a large country has two competing effects:
+- **Welfare Loss**: Deadweight losses (consumption and production distortions) which reduce welfare.
+- **Welfare Gain**: Terms of trade improvement (buying imports cheaper) which increases welfare.
+
+The **Optimum Tariff ($t^*$)** is the nominal rate that maximizes national welfare by maximizing the excess of the TOT gain over the DWL. Under a simplified model, the optimum tariff is inversely related to the price elasticity of foreign export supply ($\\epsilon_s$):
+
+$$t^* = \\frac{1}{\\epsilon_s}$$
+
+If foreign supply is perfectly elastic ($\\epsilon_s = \\infty$), the optimum tariff is zero, matching the small-country case where any tariff strictly reduces national welfare.
+
+### 3.4 The Effective Rate of Protection (ERP)
+
+The **Nominal Tariff Rate** is simply the tariff percentage on the finished product. However, this does not reflect the actual degree of protection given to domestic value-added if imported intermediate inputs are used.
+
+The **Effective Rate of Protection (ERP)** measures the percentage increase in domestic value-added per unit of output made possible by the tariff structure:
+
+$$g = \\frac{t - a_{ij} t_i}{1 - a_{ij}}$$
+
+Where:
+- $g$ = Effective Rate of Protection.
+- $t$ = Nominal tariff rate on the finished product.
+- $t_i$ = Nominal tariff rate on the intermediate input.
+- $a_{ij}$ = Ratio of the cost of the imported intermediate input to the price of the finished product in the absence of tariffs.
+
+#### Numeric Example:
+Suppose a finished leather shoe sells for \$100 in the world market. Under free trade, a domestic shoemaker imports raw leather costing \$60 (thus $a_{ij} = 60/100 = 0.6$). The domestic value-added is \$40 (\$100 - \$60).
+Now, the government imposes a 10% nominal tariff on finished shoes ($t = 0.1$) but allows raw leather imports tariff-free ($t_i = 0$).
+Let's calculate the Effective Rate of Protection:
+
+$$g = \\frac{0.1 - 0.6(0)}{1 - 0.6} = \\frac{0.1}{0.4} = 0.25 \\text{ or } 25\\%$$
+
+The effective protection of 25% is **2.5 times higher** than the nominal tariff of 10%! If the government had placed a 15% tariff on leather imports ($t_i = 0.15$), then:
+
+$$g = \\frac{0.1 - 0.6(0.15)}{1 - 0.6} = \\frac{0.1 - 0.09}{0.4} = \\frac{0.01}{0.4} = 0.025 \\text{ or } 2.5\\%$$
+
+Here, taxing inputs severely reduces the effective protection of the domestic shoemaker.
+
+### 3.5 Regional Economic Integration: Jacob Viner's Trade Creation and Trade Diversion
+
+Regional integration involves the reduction of trade barriers among a group of nations. Jacob Viner (1950) showed that forming a **Customs Union** is not always welfare-enhancing, because it triggers two opposing effects:
+1. **Trade Creation**: Occurs when domestic production in a member nation is replaced by lower-cost imports from another member nation. This increases economic efficiency and raises regional welfare.
+2. **Trade Diversion**: Occurs when lower-cost imports from a non-member nation (which face the external tariff) are replaced by higher-cost imports from a member nation (which enter tariff-free). This misallocates resources and reduces regional welfare.
+
+A customs union is net welfare-enhancing if Trade Creation exceeds Trade Diversion. This is highly relevant for regional blocs such as **ECOWAS** and the **African Continental Free Trade Area (AfCFTA)**.
+
+---
+
+## PAGE 4: Foreign Exchange Rate Determination Models
+
+### 4.1 Purchasing Power Parity (PPP)
+
+Purchasing Power Parity, popularized by Gustav Cassel in 1918, is based on the **Law of One Price**: in the absence of transaction costs and trade barriers, identical goods must sell for the same price worldwide when expressed in a common currency.
+
+#### Absolute PPP
+The exchange rate between two currencies ($E_{d/f}$, domestic price of foreign currency) is simply the ratio of the two countries' general price levels:
+
+$$E_{d/f} = \\frac{P_d}{P_f}$$
+
+Where $P_d$ is the domestic price level and $P_f$ is the foreign price level.
+
+#### Relative PPP
+Relative PPP shifts the focus to *changes* in price levels (inflation rates): the percentage change in the exchange rate is approximately equal to the difference in inflation rates between the two countries:
+
+$$\\frac{E_t - E_{t-1}}{E_{t-1}} \\approx \\pi_d - \\pi_f$$
+
+Where $\\pi_d$ is domestic inflation and $\\pi_f$ is foreign inflation. If Nigeria experiences 25% inflation while the US experiences 5% inflation, the Naira is expected to depreciate by approximately 20% against the US Dollar to restore purchasing power equilibrium.
+
+### 4.2 Interest Rate Parity (IRP)
+
+Interest Rate Parity is an arbitrage condition stating that the returns on comparable financial assets in two different countries must be equal once adjusted for exchange rate risk.
+
+#### Covered Interest Parity (CIP)
+CIP applies when exchange rate risk is eliminated using a forward contract. The forward premium or discount must equal the nominal interest rate differential:
+
+$$\\frac{F - S}{S} \\approx i_d - i_f$$
+
+Where:
+- $S$ = Spot exchange rate (domestic/foreign).
+- $F$ = Forward exchange rate.
+- $i_d$ = Domestic nominal interest rate.
+- $i_f$ = Foreign nominal interest rate.
+
+#### Uncovered Interest Parity (UIP)
+UIP applies when exchange rate risk is unhedged. Investors rely on the expected future spot exchange rate ($E(S_{t+1})$). The expected rate of domestic currency depreciation/appreciation must equal the interest rate differential:
+
+$$\\frac{E(S_{t+1}) - S_t}{S_t} \\approx i_d - i_f$$
+
+If the domestic interest rate ($i_d = 12\\%$) exceeds the foreign interest rate ($i_f = 6\\%$), the domestic currency must be expected to depreciate by 6% over the investment period. Otherwise, capital would flow infinitely to the domestic country to capture risk-free excess returns.
+
+### 4.3 The Monetary Approach to Exchange Rates
+The **Monetary Approach** views the exchange rate as a relative asset price, determined by the supply and demand for money in both countries. In the long run, assuming perfect price flexibility, we combine the domestic and foreign money demand equations:
+
+$$M_d = P \\cdot L(Y, i) \\quad \\text{and} \\quad M_f = P_f \\cdot L(Y_f, i_f)$$
+
+Equating money supply to money demand and applying Absolute PPP ($E = P/P_f$), we solve for the nominal exchange rate:
+
+$$E = \\left( \\frac{M_s}{M_{s,f}} \\right) \\cdot \\left( \\frac{L(Y_f, i_f)}{L(Y, i)} \\right)$$
+
+#### Key Predictions of the Monetary Approach:
+1. **Money Supply Increase**: A 10% increase in the domestic money supply ($M_s$) causes a proportional 10% depreciation of the domestic currency (raises $E$).
+2. **Real Income Increase**: A rise in domestic real income ($Y$) increases domestic money demand, requiring domestic prices to fall to clear the money market, which appreciates the domestic currency (lowers $E$).
+3. **Interest Rate Increase**: A rise in domestic nominal interest rates ($i$) reduces domestic money demand, raising domestic price levels and depreciating the domestic currency (raises $E$). Note this is the opposite of the short-run portfolio/asset model.
+
+### 4.4 Dornbusch's Exchange Rate Overshooting Model
+Developed by Rudiger Dornbusch in his seminal 1976 paper, **Overshooting** explains why exchange rates are highly volatile in the short run. It reconciles the short-run Keynesian world (sticky prices) with the long-run Classical world (fully flexible prices).
+
+#### The Overshooting Mechanism (Step-by-Step):
+Suppose the central bank unexpectedly increases the domestic money supply:
+1. **Short Run (Sticky Prices)**: 
+   - Because price levels ($P$) are sticky, the real money supply increases.
+   - To clear the domestic money market, the domestic nominal interest rate ($i$) must drop.
+   - By Uncovered Interest Parity (UIP), since $i$ is now lower than the foreign interest rate ($i_f$), investors expect the domestic currency to appreciate over time.
+   - For investors to expect appreciation, the spot exchange rate ($E$) must immediately depreciate *beyond* its long-run equilibrium level. This is the **Overshooting** effect.
+2. **Transition Period**: 
+   - The depreciated currency makes domestic goods cheap, stimulating Aggregate Demand and gradually driving up domestic prices ($P$).
+   - As prices rise, the real money supply shrinks, causing the domestic interest rate ($i$) to rise back toward its initial level.
+   - The currency gradually appreciates from its overshot trough back to its long-run equilibrium depreciated level.
+
+#### Interactive Exchange Rate Determination Tool
+Use the interactive simulator below to calculate and visualize exchange rate movements under both PPP and UIP models:
+
+\`\`\`simulator
+{
+  "mode": "exchange_rate",
+  "title": "Interactive PPP vs UIP Exchange Rate Determination Model"
 }
 \`\`\`
 
 ---
 
-## CHAPTER 4: BALANCE OF PAYMENTS
+## PAGE 5: Balance of Payments, Devaluation, and Macro Policy (Mundell-Fleming)
 
-### 4.1 Current Account and Capital Account
-- **Current Account**: Trade in goods/services, primary/secondary income.
-- **Capital Account**: Financial transactions, direct/portfolio investment.
+### 5.1 Structure of the Balance of Payments (BOP)
+
+The Balance of Payments is a double-entry bookkeeping system recording all economic transactions between residents of a country and the rest of the world over a year.
+
+$$BOP = Current\ Account + Capital\ Account + Financial\ Account + Net\ Errors\ \&\ Omissions = 0$$
+
+- **Current Account ($CA$)**: Records trade in goods (merchandise), services, primary income (earnings on investments), and secondary income (unilateral transfers such as diaspora remittances).
+- **Capital Account**: Records capital transfers (e.g., debt forgiveness) and acquisition of non-financial assets.
+- **Financial Account ($FA$)**: Records transactions in financial assets, split into:
+  - **Foreign Direct Investment (FDI)**: Purchasing physical assets or taking control of a domestic firm.
+  - **Foreign Portfolio Investment (FPI)**: Purchasing stocks, bonds, or short-term liquid securities (often called "hot money").
+  - **Official Reserve Assets**: Transactions by the central bank involving foreign currencies, gold, and Special Drawing Rights (SDRs).
+
+### 5.2 Currency Devaluation: Marshall-Lerner Condition and J-Curve
+
+Under a fixed or managed exchange rate system, the government can deliberately lower the value of its currency against foreign currencies (**Devaluation**). This is intended to correct a trade deficit by making exports cheaper and imports expensive.
+
+#### The Marshall-Lerner Condition
+A currency devaluation will only improve the trade balance if the sum of the price elasticities of demand for exports ($\\eta_x$) and imports ($\\eta_m$) is greater than 1:
+
+$$\\eta_x + \\eta_m > 1$$
+
+If $\\eta_x + \\eta_m < 1$, devaluation will actually worsen the trade deficit.
+
+#### The J-Curve Effect
+Even if the Marshall-Lerner condition holds in the long run, devaluation usually **worsens** the trade balance in the short run before improving it, producing a J-shaped curve over time.
+
+This occurs because:
+1. **Short-run inelasticity**: Contracts are pre-signed. The volume of exports and imports remains fixed, but the domestic price of pre-existing imports immediately shoots up. The trade deficit widens.
+2. **Long-run adjustment**: Over time, consumers adjust to higher import prices, domestic export industries expand capacity, and the trade balance moves into surplus.
+
+Let's visualize the transition of the J-Curve over time:
+
+\`\`\`chart
+{
+  "type": "line",
+  "title": "Figure 8.3: The J-Curve Effect of Devaluation over Time",
+  "labels": ["t=0 (Devaluation)", "t=1 (Contracts Fixed)", "t=2 (Short-Run Worsening)", "t=3 (Marshall-Lerner kick-in)", "t=4 (Surplus)", "t=5 (Long-Run Equilibrium)"],
+  "datasets": [
+    {
+      "label": "Trade Balance ($)",
+      "data": [0, -50, -80, -20, 40, 90]
+    }
+  ]
+}
+\`\`\`
+
+#### Interactive Dynamic J-Curve & Marshall-Lerner Simulator
+See how devaluation dynamically affects the trade balance over time. Adjust exchange rate devaluation percentage, and the export/import price elasticities to see if the Marshall-Lerner condition holds and trace the dynamic short-run to long-run J-Curve adjustment path:
+
+\`\`\`simulator
+{
+  "mode": "j_curve",
+  "title": "Dynamic J-Curve & Marshall-Lerner Simulator"
+}
+\`\`\`
+
+### 5.3 The Absorption Approach to the Balance of Payments
+While the Marshall-Lerner condition focuses on price elasticities (the microeconomic elasticities approach), the **Absorption Approach** (formulated by Sidney Alexander in 1952) is a macroeconomic framework. It starts with the national income identity:
+
+$$Y = C + I + G + (X - M)$$
+
+Define **domestic absorption ($A$)** as total domestic spending by residents:
+
+$$A = C + I + G$$
+
+And define the **trade balance ($B$)** as net exports:
+
+$$B = X - M$$
+
+Substituting these, we get:
+
+$$Y = A + B \\quad \\rightarrow \\quad B = Y - A$$
+
+#### Key Lessons of the Absorption Approach:
+The trade balance is simply the difference between what the nation produces ($Y$) and what it absorbs/spends ($A$). For devaluation to improve the trade balance ($B$):
+1. **If the economy is at full employment ($Y = Y_p$)**: Output $Y$ cannot rise. Therefore, the trade balance can *only* improve if domestic absorption ($A$) is reduced. Devaluation must be paired with restrictive fiscal or monetary policy (expenditure-reducing policies) to compress domestic consumption and investment.
+2. **If the economy has excess capacity ($Y < Y_p$)**: Devaluation shifts demand from foreign goods to domestic goods, causing output $Y$ to expand. This improves $B$ as long as the marginal propensity to absorb ($a = \\Delta A/\\Delta Y$) is less than 1.
+
+### 5.4 Macroeconomic Policy in an Open Economy: The Mundell-Fleming Model
+
+The Mundell-Fleming model (IS-LM-BP) extends the closed-economy Keynesian model to an open economy with international capital flows. It demonstrates how policy effectiveness depends on the country's **Exchange Rate Regime** and its degree of **Capital Mobility**.
+
+The table below summarizes policy effectiveness under **Perfect Capital Mobility**:
+
+| Policy Type | Fixed Exchange Rate Regime | Flexible Exchange Rate Regime |
+| :--- | :--- | :--- |
+| **Monetary Expansion** | **Completely Ineffective**: Expanding the money supply lowers interest rates, triggering massive capital outflow. To defend the peg, the Central Bank must sell foreign reserves and buy domestic currency, shrinking the money supply back to its initial level. | **Highly Effective**: Lowering interest rates triggers capital outflow, which depreciates the domestic currency. This depreciation boosts exports and suppresses imports, shifting the IS curve outward and increasing real GDP. |
+| **Fiscal Expansion** | **Highly Effective**: Increasing government spending shifts the IS curve outward, raising domestic interest rates. This attracts massive capital inflow. To prevent appreciation, the Central Bank must print domestic currency and buy foreign reserves, expanding the money supply and reinforcing the fiscal stimulus. | **Completely Ineffective**: Increasing government spending raises interest rates, attracting capital inflow. This appreciates the currency, causing exports to fall and imports to rise. This net-export contraction completely offsets the fiscal expansion (**crowding out via exchange rates**). |
+
+### 5.5 The Impossible Trinity (The Policy Trilemma)
+
+An open-economy macroeconomic policy framework can achieve, at most, **two** of the following three objectives:
+1. **Perfect Capital Mobility** (Free capital flows).
+2. **Independent Monetary Policy** (Setting own interest rates to manage inflation/growth).
+3. **Fixed Exchange Rate** (Exchange rate stability).
+
+A country must choose its policy side:
+- **US / Eurozone**: Free Capital Flows + Independent Monetary Policy $\\rightarrow$ Flexible Exchange Rate.
+- **Hong Kong / Saudi Arabia**: Free Capital Flows + Fixed Exchange Rate $\\rightarrow$ Lost Monetary Autonomy (must match US interest rates).
+- **China (historically)**: Fixed Exchange Rate + Independent Monetary Policy $\\rightarrow$ Capital Controls (restricted capital flows).
 
 ---
 
-## CHAPTER 5: EXCHANGE RATES
-
-### 5.1 Purchasing Power Parity (PPP)
-The exchange rate between two currencies should equal the ratio of the two countries' price levels.
-$$E = \\frac{P_1}{P_2}$$
+This is beautiful!
 `,"ug-macro":`
 # Macroeconomics: Eleventh Edition - Chapter by Chapter Summary
 
@@ -5910,823 +6873,5 @@ Explores the modern frontier of macroeconomics: Rational Expectations, Real Busi
 ---
 *End of Summary*
 
-`,"ug-statistical":`
-# SCHAUM'S STUDY GUIDE SPECIFIC COMPANION FOR STATISTICAL ECONOMICS
-**Perfect Alignment with Salvatore & Reagle's Theory and Problems of Statistics and Econometrics**
-
----
-
-## Chapter 1: Introduction to Econometrics
-
-### 1.1 The Nature of Statistics and Econometrics
-Statistics is the mathematical science concerned with the collection, presentation, analysis, and interpretation of numerical data. It is fundamentally divided into:
-- **Descriptive Statistics**: Summarizes and visualizes the key characteristics of a dataset (e.g., mean, median, standard deviation, and graphical plots).
-- **Inferential Statistics**: Draws analytical conclusions about a broader population based on representative sample evidence.
-
-**Econometrics** goes a step further by integrating economic theory, mathematical economics, and statistical methods:
-- **Economic Theory** provides the qualitative hypotheses about human and market behaviors.
-- **Mathematical Economics** formalizes these hypotheses into deterministic mathematical equations.
-- **Econometrics** adds a stochastic dimension to these equations, allowing us to estimate, test, and forecast economic models with real-world, noisy data.
-
-\`\`\`
-                      +-----------------------------+
-                      |   Economic Theory           |
-                      |   (Qualitative Hypotheses)  |
-                      +--------------+--------------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      |   Mathematical Model        |
-                      |   (Deterministic Equations) |
-                      +--------------+--------------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      |   Econometric Model         |
-                      |   (Stochastic Equations)    |
-                      +--------------+--------------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      |   Empirical Analysis        |
-                      |   (Estimation and Testing)  |
-                      +-----------------------------+
-\`\`\`
-
-### 1.2 The Stochastic Disturbance Term
-A deterministic model (such as $Y = \\beta_1 + \\beta_2 X$) assumes that the dependent variable $Y$ is completely determined by the explanatory variable $X$. However, real-world economic relationships are never exact. To model this uncertainty, we specify a stochastic model:
-$$Y = \\beta_1 + \\beta_2 X + u$$
-Where $u$ is the **stochastic disturbance (or error) term**. It represents:
-1. **Omitted Variables**: Influences on $Y$ that are not explicitly included in the model.
-2. **Measurement Errors**: Imperfections in how the variables are recorded.
-3. **Human Indeterminacy**: Purely random or erratic elements intrinsic to human behavior.
-4. **Proxy Imperfections**: Discrepancies between theoretical concepts and their empirical approximations.
-
-### 1.3 Step-by-Step Methodology of Econometrics
-Economic modeling follows a highly structured, iterative workflow:
-1. **Formulating the Hypothesis**: Specifying a behavioral assertion (e.g., Keynesian consumption law where MPC is positive but less than 1).
-2. **Mathematical Specification**: Expressing the hypothesis as a deterministic relation:
-   $$Y = \\beta_1 + \\beta_2 X$$
-3. **Stochastic Specification**: Adding the disturbance term to make the model empirically viable:
-   $$Y = \\beta_1 + \\beta_2 X + u$$
-4. **Data Acquisition**: Gathering representative data (cross-sectional, time-series, or panel).
-5. **Parameter Estimation**: Computing numerical estimates (such as $\\hat{\\beta}_1$ and $\\hat{\\beta}_2$) using econometric techniques.
-6. **Hypothesis Testing**: Performing statistical tests (e.g., t-tests) to verify if the estimates support the original theory.
-7. **Forecasting**: Predicting future values of $Y$ given assumed configurations of $X$.
-8. **Policy Recommendations**: Formulating structural recommendations or policy designs based on parameter elasticities.
-
-### 1.4 Empirical Examples in Practice
-1. **Keynesian Consumption Relation**: Over a 10-year period, a national government observes household income ($X$) and consumption expenditure ($Y$). If autonomous consumption is \\$400 and the MPC is 0.75, the estimated model is:
-   $$Y = 400 + 0.75X + u$$
-2. **Agricultural Supply Function**: A study regresses agricultural crop yield ($Y$ in bushels) against rainfall amount ($X$ in inches):
-   $$Y = 15.2 + 2.4X + u$$
-3. **Earnings and Education**: A cross-sectional survey of 500 professionals estimates the returns to schooling by regressing hourly wage ($Y$) on years of education ($X$):
-   $$\\text{Wage} = 5.3 + 1.8 \\text{Education} + u$$
-4. **Investment Capital Asset Pricing**: An analyst relates the expected returns of a mutual fund ($Y$) to the systemic market risk index Beta ($X$):
-   $$R_i = 0.04 + 0.08 \\beta_i + u$$
-5. **Real-Estate Valuation**: A study of 200 metropolitan apartments computes home prices ($Y$) based on living area size ($X$ in square meters):
-   $$\\text{Price} = 50000 + 1200 \\text{Area} + u$$
-6. **Advertising Impact on Sales**: A consumer goods company tracks its monthly marketing expenditure ($X$) and total product sales revenue ($Y$):
-   $$\\text{Sales} = 12000 + 5.5 \\text{AdSpend} + u$$
-7. **Marshallian Demand for Coffee**: A retail group estimates the quantity of coffee demanded ($Y$ in bags) in relation to its retail price ($X$ in dollars):
-   $$\\text{Quantity} = 850 - 45 \\text{Price} + u$$
-8. **Phillips Curve Trade-Off**: An economic institute relates annual wage inflation ($Y$) to the national unemployment rate ($X$):
-   $$\\text{Inflation} = 6.2 - 0.8 \\text{Unemployment} + u$$
-
-\`\`\`chart
-{
-  "type": "scatter",
-  "title": "Figure 1.1: Empirical Scattering and OLS Fit (Income vs. Consumption)",
-  "xAxis": "Income",
-  "yAxis": "Consumption",
-  "data": [
-    {"Income": 1000, "Consumption": 1150},
-    {"Income": 1500, "Consumption": 1520},
-    {"Income": 2000, "Consumption": 1880},
-    {"Income": 2500, "Consumption": 2300},
-    {"Income": 3000, "Consumption": 2680},
-    {"Income": 3500, "Consumption": 3020}
-  ],
-  "series": [
-    {"key": "Consumption", "name": "Observed Consumption (Y)", "color": "#0ea5e9"}
-  ]
-}
-\`\`\`
-
----
-
-## Chapter 2: Descriptive Statistics
-
-### 2.1 Organizing Raw Data
-Raw statistical observations are unstructured. To analyze them, we construct:
-- **Frequency Distributions**: Grouping raw data into mutually exclusive classes or intervals.
-- **Histograms & Polygons**: Graphically displaying class intervals on the horizontal axis and frequencies on the vertical axis.
-- **Ogive Curves**: Mapping cumulative relative frequencies to identify percentile boundaries.
-
-### 2.2 Mathematical Measures of Central Tendency
-Central tendency metrics identify the "center" or representative value of a dataset:
-- **Arithmetic Mean ($\\bar{X}$)**:
-  $$\\bar{X} = \\frac{\\sum_{i=1}^n {X_i}}{n}$$
-- **Median** (for grouped data):
-  $$\\text{Median} = L + \\left( \\frac{\\frac{n}{2} - F}{f_m} \\right) c$$
-  Where $L$ is the lower limit of the median class, $F$ is the cumulative frequency of the preceding class, $f_m$ is the frequency of the median class, and $c$ is the class interval width.
-- **Mode** (for grouped data):
-  $$\\text{Mode} = L + \\left( \\frac{d_1}{d_1 + d_2} \\right) c$$
-  Where $d_1$ is the difference in frequency between the modal class and the preceding class, and $d_2$ is the difference between the modal class and the succeeding class.
-- **Weighted Mean ($\\bar{X}_w$)**: Used when observations carry unequal importance:
-  $$\\bar{X}_w = \\frac{\\sum_{i=1}^n w_i X_i}{\\sum_{i=1}^n w_i}$$
-- **Geometric Mean ($G$)**: Ideal for calculating average relative changes or compounding returns over time:
-  $$G = \\sqrt[n]{X_1 \\cdot X_2 \\cdots X_n}$$
-- **Harmonic Mean ($H$)**: Crucial for averaging ratios, rates, or multiples (like price-to-earnings ratios):
-  $$H = \\frac{n}{\\sum_{i=1}^n \\frac{1}{X_i}}$$
-
-### 2.3 Mathematical Measures of Dispersion
-Dispersion metrics quantify the spread of observations around their central value:
-- **Sample Variance ($s^2$)**: Computed with a degrees-of-freedom correction ($n-1$) to ensure unbiasedness:
-  $$s^2 = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})^2}{n - 1}$$
-- **Sample Standard Deviation ($s$)**: Expressed in the original units of measurement:
-  $$s = \\sqrt{s^2}$$
-- **Coefficient of Variation ($V$)**: A unit-free, relative measure of dispersion, useful for comparing datasets with different scales:
-  $$V = \\frac{s}{\\bar{X}} \\times 100\\%$$
-
-### 2.4 Shape of Frequency Distributions
-- **Skewness**: Quantifies the asymmetry of a distribution. Pearson's coefficient of skewness is given by:
-  $$SK = \\frac{3(\\bar{X} - \\text{Median})}{s}$$
-  - $SK = 0 \\implies \\text{Symmetric (Normal)}$
-  - $SK > 0 \\implies \\text{Positive (Skewed to the right)}$
-  - $SK < 0 \\implies \\text{Negative (Skewed to the left)}$
-- **Kurtosis**: Measures the peakedness and tail weight of a distribution:
-  - **Leptokurtic**: Highly peaked with thick tails (kurtosis $> 3$).
-  - **Mesokurtic**: Normal distribution peak (kurtosis $= 3$).
-  - **Platykurtic**: Flat peak with thin tails (kurtosis $< 3$).
-
-### 2.5 Covariance and Correlation
-- **Sample Covariance ($s_{XY}$)**: Evaluates the direction of joint movement between two variables:
-  $$s_{XY} = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})(Y_i - \\bar{Y})}{n - 1}$$
-- **Pearson's Correlation Coefficient ($r$)**: Standardizes covariance to a value bounded between $-1$ and $+1$:
-  $$r = \\frac{s_{XY}}{s_X s_Y}$$
-
-### 2.6 Empirical Examples in Practice
-1. **Weighted Average Cost of Capital (WACC)**: A firm is funded by 30% bank debt (interest rate $= 6\\%$) and 70% equity market capital (expected return $= 12\\%$). The weighted mean cost of capital is:
-   $$\\bar{X}_w = 0.30(6\\%) + 0.70(12\\%) = 10.2\\%$$
-2. **Compound Stock Returns (Geometric Mean)**: An equity portfolio achieves annual returns of $+10\\%$, $+25\\%$, and $-15\\%$ over 3 consecutive years. The average compounded growth multiplier is:
-   $$G = \\sqrt[3]{1.10 \\times 1.25 \\times 0.85} - 1 \\approx 4.04\\%$$
-3. **Portfolio PE Ratio (Harmonic Mean)**: An investor allocates equal amounts to two stocks. Stock A has a PE ratio of 10, and Stock B has a PE ratio of 30. The average PE ratio is:
-   $$H = \\frac{2}{\\frac{1}{10} + \\frac{1}{30}} = 15$$
-4. **Comparing Volatility (CV)**: Stock A (mean return $= 8\\%$, $s = 2\\%$) has a CV of $25\\%$. Stock B (mean return $= 18\\%$, $s = 3.6\\%$) has a CV of $20\\%$. Stock B offers a lower relative dispersion.
-5. **Pearson Skewness of Earnings**: A national logistics sector has an average wage of \\$28/hour, a median wage of \\$24/hour, and a standard deviation of \\$8. The coefficient of skewness is:
-   $$SK = \\frac{3(28 - 24)}{8} = +1.5 \\quad \\text{(highly right-skewed)}$$
-6. **Grouped Median Inflation**: A study organizes price indices into intervals (0-2%, 2-4%, 4-6%) with frequencies of $[5, 12, 3]$. The median class is 2-4%. The grouped median is:
-   $$\\text{Median} = 2.0 + \\left( \\frac{10 - 5}{12} \\right) \\times 2.0 \\approx 2.83\\%$$
-7. **Bivariate Covariance of Stock Moves**: Over 5 trading days, we calculate the covariance between Stock X and Stock Y:
-   $$s_{XY} = \\frac{(2-4)(3-5) + (6-4)(7-5) + (4-4)(5-5) + (3-4)(4-5) + (5-4)(6-5)}{4} = \\frac{4 + 4 + 0 + 1 + 1}{4} = 2.5$$
-8. **Bivariate Pearson Correlation**: Given $s_{XY} = 2.5$, $s_X = 1.58$, and $s_Y = 1.58$:
-   $$r = \\frac{2.5}{1.58 \\times 1.58} = \\frac{2.5}{2.5} = +1.0 \\quad \\text{(perfect positive correlation)}$$
-
-\`\`\`chart
-{
-  "type": "bar",
-  "title": "Figure 2.1: Stock Market Relative Return Frequencies (Right-Skewed)",
-  "labels": ["-20% to -10%", "-10% to 0%", "0% to 10%", "10% to 20%", "20% to 30%"],
-  "datasets": [
-    {
-      "label": "Number of Trading Weeks",
-      "data": [3, 11, 32, 14, 5]
-    }
-  ]
-}
-\`\`\`
-
-#### Interactive Descriptive Statistics Tool
-\`\`\`simulator
-{
-  "mode": "descriptive_stats",
-  "title": "Interactive Descriptive Statistics Calculator"
-}
-\`\`\`
-
----
-
-## Chapter 3: Probability and Probability Distributions
-
-### 3.1 Fundamental Rules of Probability
-Probability measures the likelihood of occurrence of a random event, bounded by $0 \\le P(A) \\le 1$.
-- **Addition Rule (Union)**:
-  $$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$$
-- **Multiplication Rule (Intersection)**:
-  $$P(A \\cap B) = P(A) \\cdot P(B \\mid A)$$
-- **Bayes' Theorem**: Updates a priori probabilities using empirical evidence:
-  $$P(A_i \\mid B) = \\frac{P(B \\mid A_i) \\cdot P(A_i)}{\\sum_{j=1}^k P(B \\mid A_j) \\cdot P(A_j)}$$
-
-### 3.2 Discrete Probability Distributions: The Binomial Distribution
-Used for independent Bernoulli trials with binary outcomes (success probability $p$, failure probability $q = 1-p$):
-$$P(X = x) = \\binom{n}{x} p^x q^{n-x}$$
-Where the mean is $\\mu = np$ and the variance is $\\sigma^2 = npq$.
-
-### 3.3 The Poisson Distribution
-Models the frequency of discrete occurrences over a continuous interval of time or space:
-$$P(X = x) = \\frac{e^{-\\lambda} \\lambda^x}{x!}$$
-Where $\\lambda$ represents both the mean and the variance of the distribution.
-
-### 3.4 Continuous Probability Distributions: The Normal Distribution
-The standard normal distribution is symmetric and bell-shaped, fully characterized by its mean $\\mu$ and standard deviation $\\sigma$:
-$$Z = \\frac{X - \\mu}{\\sigma} \\sim N(0, 1)$$
-
-### 3.5 Empirical Examples in Practice
-1. **Bayesian Auditing of Credit Risks**: A bank's historical data shows that 4% of corporate clients default on loans ($P(D) = 0.04$). An early-warning system correctly flags defaulting clients 90% of the time ($P(W \\mid D) = 0.90$), and falsely flags non-defaulting clients 15% of the time ($P(W \\mid ND) = 0.15$). The probability that a flagged client will actually default is:
-   $$P(D \\mid W) = \\frac{P(W \\mid D)P(D)}{P(W \\mid D)P(D) + P(W \\mid ND)P(ND)} = \\frac{0.90 \\times 0.04}{(0.90 \\times 0.04) + (0.15 \\times 0.96)} = \\frac{0.036}{0.036 + 0.144} = 20.0\\%$$
-2. **Binomial Loan Portfolio Failures**: In a portfolio of 8 independent loans, each with a default probability of $p = 0.05$. The probability of exactly 2 loan failures is:
-   $$P(X = 2) = \\binom{8}{2} (0.05)^2 (0.95)^6 = 28 \\times 0.0025 \\times 0.7351 \\approx 5.15\\%$$
-3. **Poisson Customer Service Workload**: A brokerage firm receives an average of $\\lambda = 2.0$ trading applications per minute. The probability of receiving exactly 4 applications in any given minute is:
-   $$P(X = 4) = \\frac{e^{-2} 2^4}{4!} = \\frac{0.1353 \\times 16}{24} \\approx 9.02\\%$$
-4. **Z-Score of Energy Costs**: Monthly industrial energy costs are normally distributed with a mean of \\$1200 and a standard deviation of \\$150. The probability that a factory's energy costs will exceed \\$1500 is found by computing the Z-score:
-   $$Z = \\frac{1500 - 1200}{150} = 2.0 \\implies P(Z > 2.0) = 1 - 0.9772 = 2.28\\%$$
-5. **Addition Risk for Sovereign Bond Sales**: A country estimates a 10% chance of a currency devaluation ($P(A) = 0.10$) and a 15% chance of a sovereign rating downgrade ($P(B) = 0.15$). The joint probability of both occurring is 5% ($P(A \\cap B) = 0.05$). The probability that either event occurs is:
-   $$P(A \\cup B) = 0.10 + 0.15 - 0.05 = 20.0\\%$$
-6. **Binomial Probability of Stock Gains**: An active trader selects 4 uncorrelated growth stocks, each with a 60% probability of gaining value in next trading quarter. The probability that all 4 stocks gain value is:
-   $$P(X = 4) = (0.60)^4 = 12.96\\%$$
-7. **Poisson Rate of System Crashes**: A digital clearing desk experiences an average of 0.5 database crashes per quarter ($\\lambda = 0.5$). The probability of a crash-free quarter is:
-   $$P(X = 0) = \\frac{e^{-0.5} 0.5^0}{0!} = e^{-0.5} \\approx 60.65\\%$$
-8. **Normalized Portfolio Risk Boundaries**: A portfolio's annual returns are centered at 10% with a standard deviation of 8%. The probability of receiving negative returns ($X < 0$) is:
-   $$Z = \\frac{0 - 10}{8} = -1.25 \\implies P(Z < -1.25) \\approx 10.56\\%$$
-
-\`\`\`simulator
-{
-  "mode": "probability",
-  "title": "Interactive Probability Rules & Distributions Engine"
-}
-\`\`\`
-
----
-
-## Chapter 4: Statistical Inference and Estimation
-
-### 4.1 Classical Sampling Distributions
-Statistical inference uses sample statistics to estimate unknown population parameters.
-- **Simple Random Sampling**: Every individual in the population has an equal probability of selection.
-- **Sampling Distribution of the Mean ($\\bar{X}$)**: For a sample of size $n$:
-  $$\\mu_{\\bar{X}} = \\mu$$
-  $$\\sigma_{\\bar{X}} = \\frac{\\sigma}{\\sqrt{n}} \\times \\sqrt{\\frac{N - n}{N - 1}} \\quad \\text{(FPC adjustment used if } \\frac{n}{N} > 0.05\\text{)}$$
-
-### 4.2 Properties of Point Estimators
-An estimator $\\hat{\\theta}$ is a rule or formula used to approximate a population parameter $\\theta$:
-- **Unbiasedness ($E[\\hat{\\theta}] = \\theta$)**: On average, the estimator equals the true parameter value.
-- **Efficiency**: Among all unbiased estimators, the one with the smallest variance is the most efficient.
-- **Consistency ($\\text{plim } \\hat{\\theta}_n = \\theta$)**: As the sample size $n$ approaches infinity, the estimated value converges in probability to the true parameter value.
-- **Mean Squared Error (MSE)**: Balances variance and bias:
-  $$\\text{MSE}(\\hat{\\theta}) = \\text{Var}(\\hat{\\theta}) + \\left[ \\text{Bias}(\\hat{\\theta}) \\right]^2$$
-
-### 4.3 Confidence Intervals
-A confidence interval defines a range of values that is likely to contain the population parameter:
-- **Large-Sample Confidence Interval ($n \\ge 30$)**: Uses the standard normal $Z$-distribution:
-  $$CI = \\bar{X} \\pm Z_{\\alpha/2} \\left( \\frac{s}{\\sqrt{n}} \\right)$$
-- **Small-Sample Confidence Interval ($n < 30$, $\\sigma$ unknown)**: Uses the Student's t-distribution:
-  $$CI = \\bar{X} \\pm t_{\\alpha/2, n-1} \\left( \\frac{s}{\\sqrt{n}} \\right)$$
-
-### 4.4 Empirical Examples in Practice
-1. **Audit Standard Error of Revenue**: A large retail firm has $N = 10,000$ invoice transactions with a population standard deviation of $\\sigma =$ \\$80. A random audit sample of $n = 400$ invoices is drawn. The standard error of the mean is:
-   $$\\sigma_{\\bar{X}} = \\frac{80}{\\sqrt{400}} = \\text{USD } 4$$
-2. **Large-Sample Wage Confidence Bounds**: A survey of $n = 64$ database developers finds an average hourly wage of $\\bar{X} =$ \\$45 with a sample standard deviation of $s =$ \\$8. The 95% confidence interval ($Z_{0.025} = 1.96$) is:
-   $$CI = 45 \\pm 1.96 \\left( \\frac{8}{\\sqrt{64}} \\right) = 45 \\pm 1.96 = [43.04, 46.96]$$
-3. **Small-Sample Bond Valuation Intervals**: A fund manager analyzes $n = 16$ municipal bonds, finding a mean yield-to-maturity of $\\bar{X} = 6.5\\%$ and a sample standard deviation of $s = 1.2\\%$. The 95% confidence interval ($t_{0.025, 15} = 2.131$) is:
-   $$CI = 6.5 \\pm 2.131 \\left( \\frac{1.2}{\\sqrt{16}} \\right) = 6.5 \\pm 0.639 = [5.86\\%, 7.14\\%]$$
-4. **Estimating Population Proportions**: A market survey of $n = 500$ consumers finds that 300 prefer Brand A ($\\hat{p} = 0.60$). The 99% confidence interval ($Z_{0.005} = 2.576$) is:
-   $$CI = 0.60 \\pm 2.576 \\sqrt{\\frac{0.60 \\times 0.40}{500}} = 0.60 \\pm 0.056 = [54.4\\%, 65.6\\%]$$
-5. **Finite Population Correction (FPC)**: A regional bank has $N = 500$ credit accounts. A sample of $n = 100$ accounts is evaluated. Since the sampling ratio exceeds 5% ($100/500 = 20\\%$), we apply the FPC:
-   $$\\text{FPC} = \\sqrt{\\frac{500 - 100}{500 - 1}} = \\sqrt{0.8016} \\approx 0.895 \\implies \\text{Standard error is reduced by 10.5\\%}$$
-6. **Efficiency Evaluation**: A statistician compares two unbiased estimators of the population mean, finding $\\text{Var}(\\hat{\\theta}_1) = 1.2$ and $\\text{Var}(\\hat{\\theta}_2) = 1.5$. The relative efficiency of $\\hat{\\theta}_1$ to $\\hat{\\theta}_2$ is:
-   $$\\text{RE} = \\frac{1.5}{1.2} = 1.25 \\quad \\text{(estimator 1 is 25\\% more efficient)}$$
-7. **Consistent Mean Convergence**: An academic study models the standard error of the sample mean for different sample sizes, showing how the interval shrinks from $\\$10$ at $n=100$ to $\\$3.16$ at $n=1000$.
-8. **Point Estimation of Firm Liquidity**: A random sample of 5 physical retail branches finds current asset ratios of $[1.5, 2.0, 1.8, 1.4, 2.3]$. The unbiased point estimate of the population mean current ratio is:
-   $$\\bar{X} = \\frac{1.5 + 2.0+ 1.8 + 1.4 + 2.3}{5} = 1.8$$
-
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Figure 4.1: Shrinking Interval Bounds (Margin of Error vs. Sample Size)",
-  "labels": ["n=10", "n=25", "n=50", "n=100", "n=200", "n=500"],
-  "datasets": [
-    {
-      "label": "Margin of Error Size",
-      "data": [3.16, 2.00, 1.41, 1.00, 0.71, 0.45]
-    }
-  ]
-}
-\`\`\`
-
-#### Interactive Statistical Estimation Tool
-\`\`\`simulator
-{
-  "mode": "statistical_inference",
-  "title": "Interactive Confidence Intervals (Estimation) Simulator"
-}
-\`\`\`
-
----
-
-## Chapter 5: Statistical Inference and Hypothesis Testing
-
-### 5.1 Hypothesis Testing Principles
-Hypothesis testing is a systematic framework used to evaluate statements about population parameters:
-- **Null Hypothesis ($H_0$)**: Represents the status quo or assertion of no effect (e.g., $H_0: \\mu = \\mu_0$).
-- **Alternative Hypothesis ($H_1$)**: Evaluates the research statement ofinterest (e.g., $H_1: \\mu \\neq \\mu_0$).
-
-Every test is subject to two types of statistical error:
-- **Type I Error ($\\alpha$)**: Rejecting $H_0$ when it is actually true (the significance level of the test).
-- **Type II Error ($\\beta$)**: Failing to reject $H_0$ when it is actually false. The power of the test is defined as $1 - \\beta$.
-
-### 5.2 Test Statistics and Decision Rules
-We use specific test statistics to evaluate the null hypothesis:
-- **One-Sample $Z$-Test for the Mean** (when $\\sigma$ is known):
-  $$Z = \\frac{\\bar{X} - \\mu_0}{\\frac{\\sigma}{\\sqrt{n}}}$$
-- **One-Sample $t$-Test for the Mean** (when $\\sigma$ is unknown):
-  $$t = \\frac{\\bar{X} - \\mu_0}{\\frac{s}{\\sqrt{n}}} \\quad \\text{with df} = n-1$$
-- **Two-Sample $t$-Test for the Difference of Means** (assuming equal variances):
-  $$t = \\frac{\\bar{X}_1 - \\bar{X}_2}{s_p \\sqrt{\\frac{1}{n_1} + \\frac{1}{n_2}}} \\quad \\text{where } s_p^2 = \\frac{(n_1-1)s_1^2 + (n_2-1)s_2^2}{n_1 + n_2 - 2}$$
-- **Chi-Square Goodness-of-Fit Test**:
-  $$\\chi^2 = \\sum \\frac{(O_i - E_i)^2}{E_i} \\quad \\text{with df} = k - 1$$
-- **Analysis of Variance (ANOVA) $F$-Test**: Compares means across multiple groups:
-  $$F = \\frac{\\text{MS}_{Between}}{\\text{MS}_{Within}} = \\frac{\\frac{\\text{SS}_{Between}}{c-1}}{\\frac{\\text{SS}_{Within}}{n-c}}$$
-
-### 5.3 Nonparametric Testing Methods
-Nonparametric tests are used when data does not meet parametric normality assumptions:
-- **Wilcoxon Signed-Rank Test**: The nonparametric alternative to the paired t-test, assessing differences in ranks.
-- **Kruskal-Wallis Test**: The nonparametric alternative to one-way ANOVA, comparing multiple independent groups.
-- **Kolmogorov-Smirnov Test**: Tests whether a sample comes from a specific distribution (e.g., checks for normality).
-
-### 5.4 Empirical Examples in Practice
-1. **Hypothesis Test of Branch Operations**: We test the null hypothesis that a factory's daily output equals 50 units ($H_0: \\mu = 50$) against the alternative $H_1: \\mu \\neq 50$. A sample of $n = 100$ operational days yields $\\bar{X} = 51.5$ and $s = 5.0$. The test statistic is:
-   $$t = \\frac{51.5 - 50}{\\frac{5.0}{\\sqrt{100}}} = \\frac{1.5}{0.5} = 3.0$$
-   Since $|t| > 1.98$ (the critical value at the 5% significance level with df $= 99$), we reject the null hypothesis, concluding that daily output differs from 50.
-2. **Two-Sample Comparison of Regional Spending**: A study compares average household spending in two regions. Region 1: $n_1=45$, $\\bar{X}_1 =$ \\$350, $s_1 =$ \\$40. Region 2: $n_2=45$, $\\bar{X}_2 =$ \\$330, $s_2 =$ \\$35. The calculated $Z$-statistic is:
-   $$Z = \\frac{350 - 330}{\\sqrt{\\frac{40^2}{45} + \\frac{35^2}{45}}} = \\frac{20}{\\sqrt{35.55 + 27.22}} = \\frac{20}{7.92} \\approx 2.52$$
-   Since $Z > 1.96$, we reject the null hypothesis, concluding that household spending differs between regions.
-3. **ANOVA of Consumer Price Index (CPI) Across Sectors**: An analyst compares price increases across three sectors (Food, Energy, Services). The calculated $F$-statistic is:
-   $$F = \\frac{\\text{MS}_{Between}}{\\text{MS}_{Within}} = \\frac{24.5}{4.1} = 5.98$$
-   Since $F_{\\text{cal}} = 5.98 > F_{0.05, 2, 27} \\approx 3.35$, we reject the null hypothesis, concluding that price increases differ significantly across sectors.
-4. **Chi-Square Test of Industry Defaults and Location**: A regional bank tests if corporate loan defaults are independent of geographic location. Across 3 locations, the calculated Chi-Square statistic is $\\chi^2 = 12.45$. Since $\\chi^2 > 5.99$ (the critical value with df $= 2$ at the 5% level), we reject the null hypothesis of independence.
-5. **Kruskal-Wallis Test of Agricultural Yields**: Evaluates crop yields across four field types under non-normal conditions. The calculated $H$-statistic is $9.82$. Since this exceeds the critical value of $7.81$ (df $= 3$), we reject the null hypothesis of equal distributions.
-6. **One-Tailed Test of Portfolio Gains**: A fund manager tests if active returns exceed the benchmark rate of 8% ($H_0: \\mu = 8\\%, H_1: \\mu > 8\\%$). For $n = 36, \\bar{X} = 9.8\\%, s = 4\\%$:
-   $$t = \\frac{9.8 - 8.0}{\\frac{4.0}{\\sqrt{36}}} = \\frac{1.8}{0.67} = 2.70$$
-   Since $t > 1.69$ (one-tailed critical value), we reject the null hypothesis at the 5% significance level, concluding that returns significantly exceed 8%.
-7. **Wilcoxon Match-Pair Test of Training Programs**: Assesses employee productivity ranks before and after a technical training course, rejecting the null hypothesis of equal ranks.
-8. **Kolmogorov-Smirnov Normality Diagnostics**: Tests whether residuals from a simple model conform to a normal distribution. The KS statistic of $0.034$ is below the critical threshold, confirming the normality assumption.
-
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Figure 5.1: Chi-Square Distribution Profiles over Degrees of Freedom (df)",
-  "labels": ["X=0.5", "X=1", "X=2", "X=4", "X=6", "X=8", "X=10"],
-  "datasets": [
-    {
-      "label": "df=3",
-      "data": [0.35, 0.24, 0.15, 0.08, 0.04, 0.02, 0.01]
-    },
-    {
-      "label": "df=6",
-      "data": [0.08, 0.14, 0.18, 0.16, 0.10, 0.06, 0.03]
-    }
-  ]
-}
-\`\`\`
-
-#### Interactive Hypothesis Testing Tool
-\`\`\`simulator
-{
-  "mode": "hypothesis_testing",
-  "title": "Interactive Hypothesis Testing (Z-test / t-test) Simulator"
-}
-\`\`\`
-
----
-
-## Chapter 6: The Simple Linear Regression Model
-
-### 6.1 Model Specification and Setup
-The simple linear regression model expresses the relationship between a dependent variable $Y$ and a single independent variable $X$:
-$$Y_i = \\beta_0 + \\beta_1 X_i + u_i$$
-Where $\\beta_0$ and $\\beta_1$ are the population parameters (intercept and slope), and $u_i$ is the stochastic disturbance term.
-
-### 6.2 Ordinary Least Squares (OLS) Estimation
-Ordinary Least Squares (OLS) estimates parameters by minimizing the sum of squared residuals (RSS):
-$$\\text{RSS} = \\sum_{i=1}^n \\hat{u}_i^2 = \\sum_{i=1}^n (Y_i - \\hat{\\beta}_0 - \\hat{\\beta}_1 X_i)^2$$
-
-To find the minimum, we take the partial derivatives with respect to $\\hat{\\beta}_0$ and $\\hat{\\beta}_1$, set them to zero, and solve the system. This yields the slope estimator:
-$$\\hat{\\beta}_1 = \\frac{\\sum_{i=1}^n (X_i - \\bar{X})(Y_i - \\bar{Y})}{\\sum_{i=1}^n (X_i - \\bar{X})^2} = \\frac{\\text{Cov}(X,Y)}{\\text{Var}(X)}$$
-And the intercept estimator:
-$$\\hat{\\beta}_0 = \\bar{Y} - \\hat{\\beta}_1 \\bar{X}$$
-
-### 6.3 Goodness of Fit and $R^2$
-We decompose the variation in the dependent variable into explained and unexplained components:
-$$\\text{TSS} = \\text{ESS} + \\text{RSS}$$
-$$\\sum (Y_i - \\bar{Y})^2 = \\sum (\\hat{Y}_i - \\bar{Y})^2 + \\sum \\hat{u}_i^2$$
-
-The **Coefficient of Determination ($R^2$)** measures the proportion of total variation in $Y$ explained by the regression model:
-$$R^2 = \\frac{\\text{ESS}}{\\text{TSS}} = 1 - \\frac{\\text{RSS}}{\\text{TSS}}$$
-
-### 6.4 Precision and Inference of OLS Estimators
-Under the Gauss-Markov assumptions, the OLS estimators are Best Linear Unbiased Estimators (BLUE). The standard errors of the estimators are:
-$$\\text{se}(\\hat{\\beta}_1) = \\frac{\\hat{\\sigma}}{\\sqrt{\\sum (X_i - \\bar{X})^2}} \\quad \\text{where } \\hat{\\sigma}^2 = s^2 = \\frac{\\text{RSS}}{n-2}$$
-
-To test individual significance ($H_0: \\beta_1 = 0$), we use the t-statistic:
-$$t = \\frac{\\hat{\\beta}_1}{\\text{se}(\\hat{\\beta}_1)} \\sim t(n-2)$$
-
-### 6.5 Empirical Examples in Practice
-1. **Consumption Function OLS Estimation**: Given a sample of 5 household records, we calculate OLS estimates:
-   - Income ($X$): $[100, 200, 300, 400, 500] \\implies \\bar{X} = 300$
-   - Consumption ($Y$): $[90, 160, 250, 310, 390] \\implies \\bar{Y} = 240$
-   - Computed sums: $\\sum (X_i - \\bar{X})^2 = 100,000$ and $\\sum (X_i - \\bar{X})(Y_i - \\bar{Y}) = 74,000$
-   - Estimates:
-     $$\\hat{\\beta}_1 = \\frac{74,000}{100,000} = 0.74 \\quad \\text{(the MPC)}$$
-     $$\\hat{\\beta}_0 = 240 - 0.74(300) = 18 \\quad \\text{(autonomous consumption)}$$
-     $$\\text{Regression Equation: } \\hat{Y} = 18 + 0.74X$$
-2. **Standard Error of the Slope**: Given $RSS = 390$ and $n = 5$, we estimate the residual variance:
-   $$s^2 = \\frac{390}{5 - 2} = 130 \\implies s = \\sqrt{130} \\approx 11.4$$
-   The standard error of $\\hat{\\beta}_1$ is:
-   $$\\text{se}(\\hat{\\beta}_1) = \\frac{11.4}{\\sqrt{100,000}} = \\frac{11.4}{316.2} \\approx 0.036$$
-   The calculated t-ratio is $t = 0.74 / 0.036 \\approx 20.55$, indicating high statistical significance.
-3. **Okun's Law Model**: Regresses changes in the unemployment rate ($Y$) on GDP growth rates ($X$):
-   $$\\hat{Y} = 1.2 - 0.35X$$
-   This indicates that a 1% increase in GDP growth is associated with a 0.35% decrease in the unemployment rate.
-4. **Real-Estate Area Valuations**: Logistical analysis of 50 home sales yields:
-   $$\\hat{Y} = 45000 + 1150 \\text{Area} \\quad (R^2 = 0.82)$$
-   A 1 square-meter increase in area is associated with an \\$1150 increase in home price.
-5. **Coefficient of Determination ($R^2$) Decompositions**: Given $\\text{TSS} = 20,000$ and $\\text{RSS} = 2,500$:
-   $$R^2 = 1 - \\frac{2,500}{20,000} = 87.5\\%$$
-6. **Verification of Average Residuals**: For any regression model with an intercept, the sum of OLS residuals is mathematically guaranteed to equal zero:
-   $$\\sum_{i=1}^n \\hat{u}_i = 0$$
-7. **Interest Yield Margins**: Regressing bond yields ($Y$) on central bank interest rates ($X$) yields a slope of $0.92$, showing high transmission efficiency.
-8. **Testing OLS Assumptions (Breusch-Pagan)**: White's test on the consumption residuals confirms a homoscedastic distribution ($p$-value $= 0.45 > 0.05$).
-
-\`\`\`simulator
-{
-  "mode": "simple_regression",
-  "title": "Interactive Simple Linear Regression OLS Line Calculator"
-}
-\`\`\`
-
----
-
-## Chapter 7: The Multiple Linear Regression Model
-
-### 7.1 Model Specification in Matrix Form
-Multiple linear regression generalizes the model to include $k$ explanatory variables:
-$$Y_i = \\beta_0 + \\beta_1 X_{1i} + \\beta_2 X_{2i} + \\dots + \\beta_k X_{ki} + u_i$$
-
-In matrix form:
-$$\\mathbf{Y} = \\mathbf{X}\\boldsymbol{\\beta} + \\mathbf{u}$$
-Where:
-$$\\mathbf{Y} = \\begin{bmatrix} Y_1 \\\\ \\vdots \\\\ Y_n \\end{bmatrix}, \\quad \\mathbf{X} = \\begin{bmatrix} 1 & X_{11} & \\dots & X_{k1} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ 1 & X_{1n} & \\dots & X_{kn} \\end{bmatrix}, \\quad \\boldsymbol{\\beta} = \\begin{bmatrix} \\beta_0 \\\\ \\beta_1 \\\\ \\vdots \\\\ \\beta_k \\end{bmatrix}, \\quad \\mathbf{u} = \\begin{bmatrix} u_1 \\\\ \\vdots \\\\ u_n \\end{bmatrix}$$
-
-### 7.2 Matrix Derivation of OLS Estimators
-The sum of squared residuals in matrix form is:
-$$\\text{RSS} = \\mathbf{\\hat{u}'\\hat{u}} = (\\mathbf{Y} - \\mathbf{X}\\hat{\\boldsymbol{\\beta}})'(\\mathbf{Y} - \\mathbf{X}\\hat{\\boldsymbol{\\beta}}) = \\mathbf{Y'Y} - 2\\hat{\\boldsymbol{\\beta}}'\\mathbf{X'Y} + \\hat{\\boldsymbol{\\beta}}'\\mathbf{X'X}\\hat{\\boldsymbol{\\beta}}$$
-
-Taking the derivative with respect to $\\hat{\\boldsymbol{\\beta}}$ and setting it to zero yields the normal equations:
-$$\\mathbf{X'X}\\hat{\\boldsymbol{\\beta}} = \\mathbf{X'Y} \\implies \\hat{\\boldsymbol{\\beta}} = (\\mathbf{X'X})^{-1}\\mathbf{X'Y}$$
-
-The variance-covariance matrix of OLS estimators is:
-$$\\text{Var}(\\hat{\\boldsymbol{\\beta}}) = \\sigma^2 (\\mathbf{X'X})^{-1}$$
-
-### 7.3 Goodness of Fit, Adjusted $R^2$, and Joint Significance
-- **Adjusted $R^2$ ($\\bar{R}^2$)**: Penalizes the inclusion of unnecessary explanatory variables:
-  $$\\bar{R}^2 = 1 - (1 - R^2)\\left( \\frac{n - 1}{n - k - 1} \\right)$$
-- **Overall Model Significance ($F$-Test)**: Tests if all slope coefficients are simultaneously zero ($H_0: \\beta_1 = \\beta_2 = \\dots = \\beta_k = 0$):
-  $$F = \\frac{\\frac{\\text{ESS}}{k}}{\\frac{\\text{RSS}}{n-k-1}} = \\frac{\\frac{R^2}{k}}{\\frac{1-R^2}{n-k-1}}$$
-
-### 7.4 Empirical Examples in Practice
-1. **Cobb-Douglas Production Model**: Running a multiple log-log regression to estimate capital ($X_1$) and labor ($X_2$) elasticities:
-   $$\\ln Y = 2.3 + 0.65 \\ln X_1 + 0.35 \\ln X_2$$
-   This indicates that a 1% increase in capital is associated with a 0.65% increase in output, holding labor constant.
-2. **Pricing Model with Structural Controls**: Pricing houses based on square meters ($X_1$) and distance to city center ($X_2$ in kilometers):
-   $$\\hat{Y} = 120,000 + 1,400 X_1 - 1,800 X_2$$
-3. **F-Test for Joint Parameter Significance**: Given $R^2 = 0.75$, $n = 30$, and $k = 2$. We compute the $F$-statistic to test if the variables are jointly significant:
-   $$F = \\frac{\\frac{0.75}{2}}{\\frac{1-0.75}{30-2-1}} = \\frac{0.375}{\\frac{0.25}{27}} = 40.5$$
-   Since $F = 40.5 > 3.35$ (critical value), we reject the null hypothesis of joint insignificance.
-4. **Computing the Adjusted $R^2$**: Given $R^2 = 0.82$, $n=25$, and $k=4$:
-   $$\\bar{R}^2 = 1 - (1 - 0.82) \\left( \\frac{24}{25-4-1} \\right) = 1 - 0.18(1.2) = 1 - 0.216 = 78.4\\%$$
-5. **Partial Correlation Coefficient Calculation**: Given simple correlations $r_{Y,X1} = 0.8$, $r_{Y,X2} = 0.7$, and $r_{X1,X2} = 0.6$. The partial correlation between $Y$ and $X_1$ controlling for $X_2$ is:
-   $$r_{Y1.2} = \\frac{0.8 - 0.7 \\times 0.6}{\\sqrt{(1 - 0.7^2)(1 - 0.6^2)}} = \\frac{0.8 - 0.42}{\\sqrt{0.51 \\times 0.64}} = \\frac{0.38}{\\sqrt{0.3264}} = \\frac{0.38}{0.571} \\approx 0.665$$
-6. **Matrix OLS Estimation Parameter Mechanics**: An analyst calculates the inverse matrix $(\\mathbf{X'X})^{-1}$ and uses it to compute standard errors for the slope parameters from diagonal elements.
-7. **Monetary Taylor Rule Model**: Regressing policy interest rates ($Y$) on the inflation gap ($X_1$) and output gap ($X_2$):
-   $$\\hat{Y} = 0.02 + 1.5 X_1 + 0.5 X_2$$
-8. **Unbiased Variance of Disturbance Term**: Decomposing total OLS errors to estimate the true population error variance:
-   $$s^2 = \\frac{\\mathbf{\\hat{u}'\\hat{u}}}{n - k - 1}$$
-
-\`\`\`simulator
-{
-  "mode": "multiple_regression",
-  "title": "Interactive Multiple Linear Regression OLS Significance Simulator"
-}
-\`\`\`
-
----
-
-## Chapter 8: Specification Errors and Measurement Problems
-
-### 8.1 Model Specification Errors
-Model specification errors occur when the regression model does not match the actual data-generating process:
-- **Omission of a Relevant Variable**:
-  Suppose the true model is $Y = \\beta_1 + \\beta_2 X_2 + \\beta_3 X_3 + u$, but we estimate $Y = \\alpha_1 + \\alpha_2 X_2 + e$. 
-  
-  This omission introduces **Omitted Variable Bias (OVB)**. The expected value of the OLS estimator is:
-  $$E[\\hat{\\alpha}_2] = \\beta_2 + \\beta_3 \\delta_2 \\quad \\text{where } \\delta_2 = \\frac{\\text{Cov}(X_2, X_3)}{\\text{Var}(X_2)}$$
-  The estimated parameter will be biased unless the omitted variable has no effect on $Y$ ($\\beta_3 = 0$) or is uncorrelated with the included variable ($\\text{Cov}(X_2, X_3) = 0$).
-- **Inclusion of an Irrelevant Variable**:
-  If we include an unnecessary variable $X_3$ that has no actual effect on $Y$, the estimated parameters remain unbiased:
-  $$E[\\hat{\\beta}_2] = \\beta_2$$
-  However, including the irrelevant variable leads to a loss of efficiency. It increases the variance of the estimated coefficients, reducing the precision and power of our hypothesis tests.
-
-### 8.2 Measurement Errors
-Measurement errors occur when the recorded data does not reflect the true values of the variables of interest:
-- **Measurement Error in the Dependent Variable ($Y$)**:
-  Our observed dependent variable includes a random measurement error: $Y_i = Y_i^* + \\epsilon_i$.
-  - **Consequences**: If the measurement error $\\epsilon_i$ is uncorrelated with $X_i$, the OLS estimators remain unbiased and consistent. However, the error variance increases, which inflates the standard errors and reduces the precision of our estimates.
-- **Measurement Error in the Independent Variable ($X$)**:
-  Our observed independent variable includes a random measurement error: $X_i = X_i^* + w_i$.
-  - **Consequences**: This violates a key Gauss-Markov assumption (Exogeneity), leading to biased and inconsistent estimates. Under the assumption that $\\text{Cov}(X_i^*, w_i) = 0$, the probability limit of the OLS slope estimator is:
-    $$\\text{plim } \\hat{\\beta}_1 = \\beta_1 \\left( \\frac{\\sigma_{X^*}^2}{\\sigma_{X^*}^2 + \\sigma_w^2} \\right)$$
-    Since the term in parentheses is less than 1, the estimated coefficient is biased toward zero. This bias is known as **Attenuation Bias** (or errors-in-variables bias).
-
-### 8.3 Empirical Examples in Practice
-1. **Omitted Ability Bias in Returns to Education**: Regressing wages ($Y$) on years of schooling ($X_2$) without controlling for unobserved innate ability ($X_3$) introduces positive bias (OVB) because ability has a positive impact on wages ($\\beta_3 > 0$) and is positively correlated with education ($\\text{Cov}(X_2, X_3) > 0$).
-2. **Calculating Attenuation Bias**: An analyst regresses sales on advertising expenditure. If the true variance of advertising is $\\sigma_{X^*}^2 = 100$ and the measurement error variance of the recording system is $\\sigma_w^2 = 25$, the OLS estimated slope will be biased toward zero:
-   $$\\text{plim } \\hat{\\beta}_1 = \\beta_1 \\left( \\frac{100}{100 + 25} \\right) = 0.80 \\beta_1 \\quad \\text{(a 20\\% underestimation bias)}$$
-3. **Inclusion of Irrelevant Variables and Efficiency Loss**: Regressing household consumption on income ($X_2$) and household phone number digits ($X_3$) does not introduce bias (since $\\beta_3 = 0$), but it inflates the variance of the estimated coefficient on income if $X_2$ and $X_3$ are weakly correlated.
-4. **White's Test for Measurement System Variance**: A study confirms that errors in the dependent variable are uncorrelated with $X_i$ ($p$-value $= 0.64$), indicating the estimates remain unbiased.
-5. **Evaluating the Direction of Omitted Variable Bias**:
-   - If $\\beta_{\\text{omitted}} > 0$ and $\\text{Cov}(X_2, X_3) > 0 \\implies \\text{Positive Bias}$
-   - If $\\beta_{\\text{omitted}} > 0$ and $\\text{Cov}(X_2, X_3) < 0 \\implies \\text{Negative Bias}$
-   - If $\\beta_{\\text{omitted}} < 0$ and $\\text{Cov}(X_2, X_3) > 0 \\implies \\text{Negative Bias}$
-   - If $\\beta_{\\text{omitted}} < 0$ and $\\text{Cov}(X_2, X_3) < 0 \\implies \\text{Positive Bias}$
-6. **Determining True Volatility in Financial Assets**: Correcting for attenuation bias in asset return models using high-frequency proxy variables.
-7. **Bivariate Simulation of Instrumental Variables (2SLS)**: Resolving endogeneity caused by measurement error in $X$ by using an instrument $Z$ that is correlated with $X$ but uncorrelated with the error term.
-8. **Double-log Formulation of OVB Systems**: Using log-log specifications to simplify the mathematical representation of omitted interactive variables.
-
----
-
-## Chapter 9: Dummy Variables
-
-### 9.1 Qualitative Explanatory Variables
-Dummy variables (or indicator variables) are binary variables used to represent qualitative characteristics such as gender, region, or policy periods:
-$$D_i = \\begin{cases} 1 & \\text{if the attribute is present} \\\\ 0 & \\text{otherwise} \\end{cases}$$
-
-### 9.2 The Dummy Variable Trap
-The dummy variable trap occurs when dummy variables are perfectly collinear with the intercept term. If a qualitative variable has $m$ categories, we must include only **$m-1$** dummy variables in the regression if an intercept is present. 
-
-For example, if we have two categories (e.g., Male and Female):
-$$Y_i = \\beta_0 + \\beta_1 D_{\\text{Male}, i} + \\beta_2 D_{\\text{Female}, i} + u_i \\quad \\text{(Violates No-Collinearity assumption because } D_{\\text{Male}} + D_{\\text{Female}} = 1)$$
-To avoid this perfect collinearity, we must either drop the intercept or, more commonly, omit one dummy variable to serve as the baseline or reference category:
-$$Y_i = \\beta_0 + \\beta_1 D_{\\text{Male}, i} + u_i \\quad \\text{(Female is the reference category represented by } \\beta_0\\text{)}$$
-
-### 9.3 Slope Dummies and Interaction Terms
-Dummy variables can also interact with continuous variables to allow the effect of the explanatory variable to vary across groups:
-$$Y_i = \\beta_0 + \\beta_1 X_i + \\gamma D_i + \\delta (D_i \\times X_i) + u_i$$
-- **Base Group ($D_i = 0$):**
-  $$Y_i = \\beta_0 + \\beta_1 X_i + u_i \\implies \\text{Intercept} = \\beta_0, \\quad \\text{Slope} = \\beta_1$$
-- **Comparison Group ($D_i = 1$):**
-  $$Y_i = (\\beta_0 + \\gamma) + (\\beta_1 + \\delta)X_i + u_i \\implies \\text{Intercept} = \\beta_0 + \\gamma, \\quad \\text{Slope} = \\beta_1 + \\delta$$
-
-### 9.4 Structural Breaks: The Chow Test
-To determine if a model's parameters are stable across two distinct time periods or sub-populations (e.g., before and after a policy change), we use the Chow test:
-1. Run the pooled regression for the entire dataset (sample size $n = n_1 + n_2$) to obtain the pooled residual sum of squares ($RSS_P$).
-2. Run separate regressions for sub-population 1 (sample size $n_1$) and sub-population 2 (sample size $n_2$) to obtain their respective residual sums of squares ($RSS_1$ and $RSS_2$).
-3. Compute the Chow F-statistic:
-   $$F = \\frac{\\frac{RSS_P - (RSS_1 + RSS_2)}{k}}{\\frac{RSS_1 + RSS_2}{n_1 + n_2 - 2k}}$$
-   Where $k$ is the total number of parameters estimated (including the intercept). If $F$ exceeds the critical value, we reject the null hypothesis of parameter stability, indicating a structural break occurred.
-
-### 9.5 Empirical Examples in Practice
-1. **Gender Wage Gap with Intercept Shift**: Regressing wage on years of schooling and a female dummy variable:
-   $$\\text{Wage} = 15.0 + 3.2 \\text{Education} - 2.50 D_{\\text{Female}}$$
-   This indicates that females earn \\$2.50 less per hour than males with the same level of education.
-2. **Interaction Slope Shift (Returns to Education)**:
-   $$\\text{Wage} = 12.0 + 2.5 \\text{Education} + 1.0 (D_{\\text{Female}} \\times \\text{Education})$$
-   This indicates that the return to education is \\$2.50/hour for males and \\$3.50/hour for females.
-3. **Evaluating a Policy Reform (The Chow Test)**: A study evaluates if investment behaviors changed after a tax reform. Pooled regression ($n = 100$): $RSS_P = 25,000$. Pre-reform ($n_1 = 50$): $RSS_1 = 8,000$. Post-reform ($n_2 = 50$): $RSS_2 = 12,000$. The number of parameters is $k = 3$. We compute the Chow $F$-statistic:
-   $$F = \\frac{\\frac{25,000 - (8,000 + 12,000)}{3}}{\\frac{8,000 + 12,000}{100 - 6}} = \\frac{\\frac{5,000}{3}}{\\frac{20,000}{94}} = \\frac{1,666.67}{212.77} \\approx 7.83$$
-   Since $F = 7.83 > 2.70$ (critical value), we reject parameter stability, confirming a structural break.
-4. **Seasonal Fluctuations using Dummy Variables**: A retail company models quarterly sales using three seasonal dummy variables:
-   $$\\hat{Y} = 1500 + 450 D_{\\text{Q1}} + 200 D_{\\text{Q2}} + 350 D_{\\text{Q3}}$$
-   Where Q4 is the reference category represented by the intercept of 1500.
-5. **Dummy Variables for Regional Tax Rates**: A study of small business locations uses three regional dummy variables (North, South, West) with East serving as the reference category.
-6. **Interaction Slope Analysis for Financial Beta**: A study evaluates if portfolio returns respond differently to market Beta during recessions ($D_{\\text{Recession}} = 1$).
-7. **Modeling COVID-19 Structural Shocks**: Using a dummy variable ($D_{\\text{COVID}} = 1$ for observations after Q1 2020) to capture structural shifts in consumer spending.
-8. **Chow Test of Sector Stability**: A study of manufacturing vs. services sectors confirms structural differences using separate and pooled OLS regressions.
-
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Figure 9.1: Slope and Intercept Shifts (D=0 vs. D=1)",
-  "labels": ["X=0", "X=1", "X=2", "X=3", "X=4", "X=5"],
-  "datasets": [
-    {
-      "label": "Base Group (D=0)",
-      "data": [10, 15, 20, 25, 30, 35]
-    },
-    {
-      "label": "Shifted Group (D=1)",
-      "data": [25, 32, 39, 46, 53, 60]
-    }
-  ]
-}
-\`\`\`
-
----
-
-## Chapter 10: Multicollinearity
-
-### 10.1 Definition and Classifications
-Multicollinearity refers to a situation in multiple regression where two or more independent variables are highly correlated with each other, making it difficult to isolate their individual effects on the dependent variable:
-- **Perfect Multicollinearity**: A perfect linear relationship exists among the independent variables:
-  $$\\lambda_1 X_1 + \\lambda_2 X_2 + \\dots + \\lambda_k X_k = 0$$
-  In this case, the matrix $(\\mathbf{X'X})$ is singular and cannot be inverted, meaning the OLS parameters cannot be calculated.
-- **Near (Stochastic) Multicollinearity**: High, but not perfect, correlation exists:
-  $$\\lambda_1 X_1 + \\lambda_2 X_2 + \\dots + \\lambda_k X_k + v_i = 0 \\quad \\text{where } v_i \\text{ is a random error term}$$
-
-### 10.2 Consequences of Multicollinearity
-While the OLS estimators remain unbiased and consistent in the presence of multicollinearity, several issues arise:
-1.  **High Variances and Standard Errors**: The precision of the estimates decreases, leading to larger standard errors:
-    $$\\text{Var}(\\hat{\\beta}_j) = \\frac{\\sigma^2}{\\sum x_j^2} \\times \\frac{1}{1 - R_j^2} = \\frac{\\sigma^2}{\\sum x_j^2} \\times {\\text{VIF}_j}$$
-    Where $R_j^2$ is the coefficient of determination obtained by regressing $X_j$ on all other explanatory variables.
-2.  **Insignificant t-Statistics**: Due to the inflated standard errors, the calculated t-ratios ($t = \\hat{\\beta}_j / \\text{se}(\\hat{\\beta}_j)$) tend to be small, often leading to the incorrect conclusion that individual variables are statistically insignificant.
-3.  **High $R^2$ with Insignificant t-Statistics**: The overall model may have a high $R^2$ and a highly significant F-statistic, even though individual t-tests fail to reject the null hypothesis for most variables.
-4.  **Sensitivity to Small Changes**: The estimated coefficients can change dramatically in response to minor additions or deletions of data.
-
-### 10.3 Detection Methods
-1.  **High Pairwise Correlations**: Checking the correlation matrix of the independent variables. If pairwise correlations exceed $0.8$, multicollinearity may be a concern.
-2.  **Auxiliary Regressions**: Regressing each independent variable on all other independent variables. A high auxiliary $R_j^2$ indicates strong collinearity.
-3.  **Variance Inflation Factor (VIF)**: Measures how much the variance of an estimated coefficient is inflated due to collinearity:
-    $$\\text{VIF}_j = \\frac{1}{1 - R_j^2}$$
-    *   $\\text{VIF}_j > 10$ is a common threshold indicating severe multicollinearity.
-
-### 10.4 Empirical Examples in Practice
-1.  **VIF Calculation for Marketing Budgets**: A digital agency regresses sales on Google AdSpend ($X_1$) and YouTube AdSpend ($X_2$). Since both channels are scaled together, regressing Google AdSpend on YouTube AdSpend yields $R_1^2 = 0.96$. {The Variance Inflation Factor is:}
-    $$\\text{VIF}_1 = \\frac{1}{1 - 0.96} = 25$$
-    Since $\\text{VIF} = 25 > 10$, this indicates severe multicollinearity, leading to inflated standard errors.
-2.  **Evaluating Correlated Demographics**: A developer attempts to estimate retail demand using average household income ($X_1$) and average home value ($X_2$). Because income and wealth are highly correlated, the estimated coefficients on both variables are statistically insignificant, despite a model $R^2 = 0.85$.
-3.  **dropping redundant collinear variables**: To resolve multicollinearity in the marketing model, the analyst drops Google AdSpend and estimates sales using total combined ad spend, reducing standard errors by 60%.
-4.  **Acquiring More Data to Resolve Collinearity**: A demographic study increases its sample size from $n = 50$ to $n = 500$, adding variation that helps isolate individual parameters even in the presence of multicollinearity.
-5.  **First-Difference Variable Transformations**: A time-series model reduces correlation between variables by transforming them into first differences:
-    $$\\Delta Y_t = \\beta_1 \\Delta X_{1t} + \\beta_2 \\Delta X_{2t} + u_t$$
-6.  **VIF Diagnostics for Credit Models**: A bank's credit risk model flags collinearity between credit utilization ($X_1$) and household debt ratio ($X_2$), obtaining $\\text{VIF}_1 = 12.5$.
-7.  **Principal Component Analysis (PCA) transformations**: A financial index combines 5 highly correlated interest rate series into a single principal component index, resolving multicollinearity.
-8.  **Evaluating Parameter Sensitivity**: A study of small business investments demonstrates that dropping 2 extreme observations causes estimated coefficients to change by over 200% due to multicollinearity.
-
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Figure 10.1: Inflated Variance of Estimates via High VIF",
-  "labels": ["R_j^2 = 0.0", "R_j^2 = 0.5", "R_j^2 = 0.8", "R_j^2 = 0.9", "R_j^2 = 0.95", "R_j^2 = 0.98"],
-  "datasets": [
-    {
-      "label": "Variance Inflation Factor (VIF)",
-      "data": [1, 2, 5, 10, 20, 50]
-    }
-  ]
-}
-\`\`\`
-
----
-
-## Chapter 11: Heteroscedasticity
-
-### 11.1 Definition and Setup
-Heteroscedasticity occurs when the variance of the error term is not constant across all observations:
-$$\\text{Var}(u_i \\mid X_i) = \\sigma_i^2 \\quad \\forall i$$
-
-### 11.2 Consequences of Heteroscedasticity
-1.  **OLS is No Longer BLUE**: OLS estimators remain unbiased and consistent, but they are no longer efficient (they do not have the minimum variance among linear unbiased estimators).
-2.  **Biased Standard Errors**: The standard OLS formulas for standard errors are biased, usually underestimating the true variability of the estimates.
-3.  **Invalid Statistical Inference**: Because the standard errors are biased, the calculated t and F statistics are invalid, which can lead to incorrect conclusions about the significance of the variables.
-
-### 11.3 Diagnostic Detection Tests
-- **Graphical Inspection**: Plotting the squared residuals ($\\hat{u}_i^2$) against the independent variables ($X_i$) or the fitted values ($\\hat{Y}_i$) to look for systematic patterns.
-- **The Goldfeld-Quandt Test**:
-  1. Sort the observations in ascending order based on the values of the variable $X$.
-  2. Omit a central chunk of $c$ observations (typically about 20% of the sample) to help distinguish between the two groups.
-  3. Run separate OLS regressions on the remaining two groups: Group 1 (small values of $X$) and Group 2 (large values of $X$).
-  4. Calculate the ratio of the residual sums of squares:
-     $$F = \\frac{\\text{RSS}_2}{\\text{RSS}_1}$$
-     If $F > F_{\\alpha}$, we reject the null hypothesis of homoscedasticity.
-- **The Breusch-Pagan-Godfrey (BPG) Test**:
-  1. Estimate the OLS model and obtain the squared residuals $\\hat{u}_i^2$.
-  2. Run an auxiliary regression of $\\hat{u}_i^2$ on the explanatory variables:
-     $$\\hat{u}_i^2 = \\alpha_0 + \\alpha_1 Z_{1i} + \\dots + \\alpha_m Z_{mi} + v_i$$
-  3. Compute the BPG test statistic:
-     $$\\Theta = n \\cdot R_{\\text{aux}}^2 \\sim \\chi^2(m)$$
-
-### 11.4 Remedial Measures
-- **Weighted Least Squares (WLS)**: If the structure of the heteroscedasticity is known (e.g., $\\text{Var}(u_i \\mid X_i) = \\sigma^2 X_i^2$), we transform the model by dividing by $X_i$:
-  $$\\frac{Y_i}{X_i} = \\beta_0 \\left( \\frac{1}{X_i} \\right) + \\beta_1 + \\frac{u_i}{X_i}$$
-  The transformed error term $u_i^* = u_i / X_i$ is homoscedastic:
-  $$\\text{Var}(u_i^*) = \\text{Var}\\left( \\frac{u_i}{X_i} \\right) = \\frac{1}{X_i^2} \\text{Var}(u_i) = \\frac{\\sigma^2 X_i^2}{X_i^2} = \\sigma^2$$
-- **White's Robust Standard Errors**: If the structure of the heteroscedasticity is unknown, we adjust the standard errors to make statistical inference valid, without altering the estimated OLS coefficients themselves.
-
-### 11.5 Empirical Examples in Practice
-1.  **Heteroscedastic Spending Variance**: A regression of household consumption on income has errors whose variance increases with income. Low-wage households have stable spending, while high-income households have volatile spending.
-2.  **Performing a Goldfeld-Quandt Test**: A sample of $n = 30$ stores is analyzed. Observations are sorted by store size, and the middle $c = 6$ observations are omitted. Separate regressions on the remainining groups yield $RSS_1 = 120$ (small stores) and $RSS_2 = 480$ (large stores). The test statistic is:
-   $$F = \\frac{480}{120} = 4.0$$
-   Since $F = 4.0 > F_{0.05, 11, 11} \\approx 2.82$, we reject the null hypothesis of homoscedasticity.
-3.  **BPG Auxiliary Test for Small Business Profits**: Running a regression of squared residuals on business age and asset size yields an auxiliary $R_{\\text{aux}}^2 = 0.24$ with $n=50$. The BPG test statistic is:
-   $$\\Theta = 50 \\times 0.24 = 12.0$$
-   Since $\\Theta = 12.0 > 5.99$ (critical value with df $= 2$), we reject homoscedasticity.
-4.  **WLS Transformation for Housing Wealth**: A study of family wealth divides the regression model by $\\sqrt{\\text{Income}_i}$ to correct for heteroscedasticity when variance is proportional to income.
-5.  **Robust standard errors evaluation**: A wage regression uses White's robust standard errors, which increases the standard error of the education coefficient from $0.05$ to $0.08$, reducing the calculated t-ratio but ensuring valid statistical inference.
-6.  **Fanning Residual Plots**: A regression of corporate profits on marketing assets shows residuals that fan out, indicating heteroscedasticity.
-7.  **White's Test with Interaction Terms**: A regression is run with cross-products of independent variables, confirming heteroscedasticity ($W = 18.52 > \\chi^2_{\\text{crit}}$).
-8.  **Remedying Volatility via Logarithmic Transformation**: An analyst applies a natural log transformation to both the dependent and independent variables ($\\ln Y_t$ and $\\ln X_t$), which reduces heteroscedasticity.
-
-\`\`\`chart
-{
-  "type": "scatter",
-  "title": "Figure 11.1: Heteroscedastic Error Spread (Fitted Values vs. Residuals)",
-  "xAxis": "Fitted_Value",
-  "yAxis": "Residual",
-  "data": [
-    {"Fitted_Value": 10, "Residual": 0.5},
-    {"Fitted_Value": 20, "Residual": -0.8},
-    {"Fitted_Value": 30, "Residual": 1.4},
-    {"Fitted_Value": 40, "Residual": -2.2},
-    {"Fitted_Value": 50, "Residual": 3.9},
-    {"Fitted_Value": 60, "Residual": -5.1}
-  ],
-  "series": [
-    {"key": "Residual", "name": "Model Residual (u-hat)", "color": "#ef4444"}
-  ]
-}
-\`\`\`
-
----
-
-## Chapter 12: Autocorrelation
-
-### 12.1 Definition and Setup
-Autocorrelation (or serial correlation) occurs when the error terms of different observations in a model are correlated with each other, which is common in time-series data:
-$$\\text{Cov}(u_t, u_s) \\neq 0 \\quad \\text{for } t \\neq s$$
-
-The most common form is first-order autoregressive autocorrelation, denoted as $AR(1)$:
-$$u_t = \\rho u_{t-1} + \\epsilon_t \\quad \\text{where } |\\rho| < 1 \\text{ and } \\epsilon_t \\sim iid(0, \\sigma_{\\epsilon}^2)$$
-- $\\rho$: The parameter of serial correlation.
-  - $\\rho > 0 \\implies \\text{Positive Autocorrelation}$
-  - $\\rho < 0 \\implies \\text{Negative Autocorrelation}$
-
-### 12.2 Consequences of Autocorrelation
-1.  **OLS is No Longer BLUE**: The OLS estimators remain unbiased and consistent, but they are no longer efficient.
-2.  **Underestimated Standard Errors**: Standard OLS standard error formulas are biased downward, meaning they underestimate the true variability of the estimates.
-3.  **Artificially High $R^2$**: The model's goodness of fit and individual t-statistics will appear higher than they actually are, leading to inflated Type I error rates.
-
-### 12.3 Diagnostic Detection Tests
-- **The Durbin-Watson ($d$) Test**: Designed to test for first-order ($AR(1)$) autocorrelation:
-  $$d = \\frac{\\sum_{t=2}^n (\\hat{u}_t - \\hat{u}_{t-1})^2}{\\sum_{t=1}^n \\hat{u}_t^2} \\approx 2(1 - \\hat{\\rho})$$
-  - **Interpretation of $d$**:
-    - $d \\approx 2 \\implies \\text{No Autocorrelation } (\\hat{\\rho} = 0)$
-    - $d \\approx 0 \\implies \\text{Positive Autocorrelation } (\\hat{\\rho} = 1)$
-    - $d \\approx 4 \\implies \\text{Negative Autocorrelation } (\\hat{\\rho} = -1)$
-- **The Breusch-Godfrey (LM) Test**: More general and can test for higher-order autocorrelation ($AR(p)$), even in the presence of lagged dependent variables:
-  $$\\hat{u}_t = \\alpha_0 + \\beta_1 X_{1t} + \\dots + \\rho_1 \\hat{u}_{t-1} + \\rho_2 \\hat{u}_{t-2} + \\dots + \\rho_p \\hat{u}_{t-p} + v_t$$
-  The test statistic is:
-  $$LM = (n - p) \\times R_{\\text{aux}}^2 \\sim \\chi^2(p)$$
-
-### 12.4 Remedial Measures
-- **Cochrane-Orcutt Iterative Procedure**: If the autocorrelation structure is $AR(1)$ with parameter $\\rho$, we can transform the model using quasi-first differencing:
-  $$Y_t^* = Y_t - \\rho Y_{t-1}$$
-  $$X_t^* = X_t - \\rho X_{t-1}$$
-  We then run OLS on the transformed model:
-  $$Y_t^* = \\beta_0(1-\\rho) + \\beta_1 X_t^* + \\epsilon_t$$
-- **Newey-West HAC Robust Standard Errors**: Adjusts the standard errors to make statistical inference valid, without altering the estimated OLS coefficients themselves.
-
-### 12.5 Empirical Examples in Practice
-1.  **First-Order Autoregressive Errors**: Regressing national consumption on GDP using monthly time-series data yields a residual sequence where positive errors follow positive errors, indicating positive autocorrelation.
-2.  **Using the Durbin-Watson Test**: An OLS regression of asset sales yields a Durbin-Watson statistic $d = 0.60$. This indicates strong positive first-order autocorrelation ($\\hat{\\rho} \\approx 1 - 0.60/2 = 0.70$).
-3.  **Using the Breusch-Godfrey Test**: A quarterly model estimates the relationship between interest rates and inflation. To test for second-order autocorrelation, we run an auxiliary regression of the residuals on the explanatory variables and two lags of the residuals, finding $R_{\\text{aux}}^2 = 0.18$ with $n=40$. The test statistic is:
-   $$LM = (40 - 2) \\times 0.18 = 6.84$$
-   Since $LM = 6.84 > 5.99$ (critical value with df $= 2$ at the 5% level), we reject the null hypothesis of no autocorrelation of order 2.
-4.  **Cochrane-Orcutt quasi-first differencing transformation**: To correct for autocorrelation, an analyst transforms the variables using $Y_t - 0.70 Y_{t-1}$ and runs OLS on the transformed model, eliminating serial correlation.
-5.  **Robust HAC standard errors evaluation**: A time-series model of price changes uses Newey-West HAC standard errors, which increases the standard error of the slope coefficient from $0.12$ to $0.18$, making statistical inference valid.
-6.  **Limitations of the Durbin-Watson Test**: An analyst models stock prices using a lagged dependent variable ($Y_{t-1}$), rendering the Durbin-Watson test invalid and prompting the use of Durbin's h-statistic instead.
-7.  **Breusch-Godfrey Test with High-Order Lags**: A time-series model of industrial output uses 4 lags of the residuals to check for seasonal autocorrelation.
-8.  **First-Difference Transformations for Random Walks**: To correct for strong autocorrelation ($\\rho \\approx 1$), an analyst transforms the model into first differences:
-   $$\\Delta Y_t = \\beta_1 \\Delta X_t + \\epsilon_t$$
-
-\`\`\`chart
-{
-  "type": "line",
-  "title": "Figure 12.1: Positive Serial Correlation (Cyclical Residual Trend over Time)",
-  "labels": ["t=1", "t=2", "t=3", "t=4", "t=5", "t=6", "t=7", "t=8", "t=9"],
-  "datasets": [
-    {
-      "label": "Residual value (u-hat)",
-      "data": [1.5, 1.8, 1.2, 0.4, -0.8, -1.2, -1.5, -0.7, 0.3]
-    }
-  ]
-}
-\`\`\`
-
-\`\`\`simulator
-{
-  "mode": "autocorrelation",
-  "title": "Interactive Durbin-Watson Autocorrelation Bound Detector"
-}
-\`\`\`
-
-`};
+`,"ug-statistical": STATISTICAL_ECONOMICS_GUIDE
+};

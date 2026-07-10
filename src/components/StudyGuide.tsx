@@ -10,7 +10,7 @@ import {
   AreaChart, Area, BarChart, Bar, ScatterChart, Scatter, Cell,
   PieChart, Pie, ComposedChart
 } from 'recharts';
-import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles, Copy, Check } from 'lucide-react';
+import { Loader2, ChevronRight, ChevronLeft, BookOpen, ArrowLeft, ArrowRight, Sparkles, Copy, Check, Maximize2, Minimize2, Columns, List } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../useAuth';
 import { MICRO_STUDY_GUIDE } from '../lib/studyData';
@@ -20,52 +20,47 @@ import { SS3_STUDY_GUIDE } from '../lib/ss3StudyData';
 import { generateStudyGuide } from '../gemini';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 import { motion, AnimatePresence } from 'motion/react';
 import { useRoadmap } from '../hooks/useRoadmap';
 import { db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-const cleanMarkdownContent = (text: string): string => {
-  if (!text) return text;
-  
-  // 1. Fix control character backslash escaping issues
-  let cleaned = text
-    .replace(/\x08/g, '\\b')
-    .replace(/\x0c/g, '\\f')
-    .replace(/\x09/g, '\\t');
-    
-  // 2. Ensure a blank line before markdown tables (lines starting with '|')
-  const lines = cleaned.split('\n');
-  const processedLines: string[] = [];
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-    
-    if (trimmed.startsWith('|')) {
-      // If previous line exists, is not empty, and does not start with '|', insert a blank line
-      if (i > 0) {
-        const prevLine = processedLines[processedLines.length - 1];
-        const prevTrimmed = prevLine.trim();
-        if (prevTrimmed !== '' && !prevTrimmed.startsWith('|') && !prevTrimmed.startsWith('<!--')) {
-          processedLines.push('');
-        }
-      }
+const retryImport = (fn: () => Promise<any>) => async () => {
+  try {
+    return await fn();
+  } catch (error) {
+    if (error.message.includes('fetch dynamically imported module') || error.message.includes('Failed to fetch')) {
+      console.warn('Chunk loading failed, reloading window...');
+      window.location.reload();
     }
-    processedLines.push(line);
+    throw error;
   }
-  
-  return processedLines.join('\n');
 };
 
-// Lazy load the EconomicsSimulator component
-const LazyEconomicsSimulator = React.lazy(() => 
+const LazyInternationalEconomicsTextbook = React.lazy(retryImport(() => 
+  import('./InternationalEconomicsTextbook').then(module => ({ default: module.InternationalEconomicsTextbook }))
+));
+const LazyEconometricsStudyGuide = React.lazy(retryImport(() => 
+  import('./EconometricsStudyGuide').then(module => ({ default: module.EconometricsStudyGuide }))
+));
+const LazyEconomicsSimulator = React.lazy(retryImport(() => 
   import('./EconomicsSimulator').then(module => ({ default: module.EconomicsSimulator }))
-);
+));
+
+
+const cleanMarkdownContent = (text: string) => {
+  if (!text) return text;
+  
+  // Clean up LaTeX formatting and extra asterisks that might mess up parsing
+  let cleaned = text.replace(/\\\\\[/g, '$$$$').replace(/\\\\\]/g, '$$$$');
+  cleaned = cleaned.replace(/\\\\\(/g, '$').replace(/\\\\\)/g, '$');
+  
+  return cleaned;
+};
 
 const extractLatex = (node: any): string | null => {
   if (!node) return null;
@@ -142,6 +137,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [viewMode, setViewMode] = useState<'textbook' | 'standard'>('standard');
+  const [isWideReader, setIsWideReader] = useState(false);
+  const [readerWidth, setReaderWidth] = useState<'standard' | 'wide' | 'full'>('wide');
+  const [isDoubleColumn, setIsDoubleColumn] = useState(false);
+  const [readerFontSize, setReaderFontSize] = useState<'base' | 'lg' | 'xl'>('base');
+  const [showFloatingTOC, setShowFloatingTOC] = useState(false);
   
   // Touch Swipes
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -152,21 +153,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
       if (!topic || topic.title === 'Loading...') return;
       setLoading(true);
 
-      try {
-        // Try to fetch from Firebase first
-        const docRef = doc(db, 'study_materials', topicId);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists() && docSnap.data().content) {
-          setContent(cleanMarkdownContent(docSnap.data().content));
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.error("Failed to fetch study material from db", err);
-      }
-
-      // Fallback to local
+      // Check local content first to render INSTANTLY without any network delay!
       let localContent = topicId.startsWith('ss2-') 
         ? SS2_STUDY_GUIDE[topicId] 
         : (topicId in ADVANCED_STUDY_GUIDE 
@@ -190,26 +177,52 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         }
       }
 
-      let guideContent = "";
-
       if (localContent) {
-        guideContent = localContent;
-        // Write back to Firestore so that it is in the database!
-        try {
-          await setDoc(doc(db, 'study_materials', topicId), { content: localContent });
-        } catch (writeErr) {
-          console.warn("Failed to seed study material to db", writeErr);
-        }
-      } else {
-        const genLevel = level === 'undergraduate' ? 'undergraduate' : 'secondary';
-        guideContent = await generateStudyGuide(topic.title, genLevel, topic.description);
+        setContent(cleanMarkdownContent(localContent));
+        setLoading(false);
+        
+        // Seed Firestore asynchronously in the background without blocking the UI
+        const docRef = doc(db, 'study_materials', topicId);
+        getDoc(docRef).then((snap) => {
+          if (!snap.exists()) {
+            setDoc(docRef, { content: localContent }).catch(e => console.warn("Failed to background seed study material", e));
+          }
+        }).catch(e => console.warn("Failed to check background study material existence", e));
+        return;
       }
 
-      setContent(cleanMarkdownContent(guideContent));
+      // If no local content, try fetching from Firestore
+      try {
+        const docRef = doc(db, 'study_materials', topicId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists() && docSnap.data().content) {
+          setContent(cleanMarkdownContent(docSnap.data().content));
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch study material from db", err);
+      }
+
+      // If not in Firestore either, generate using AI
+      try {
+        const genLevel = level === 'undergraduate' ? 'undergraduate' : 'secondary';
+        const guideContent = await generateStudyGuide(topic.title, genLevel, topic.description);
+        setContent(cleanMarkdownContent(guideContent));
+        
+        // Save generated guide to Firestore in background
+        setDoc(doc(db, 'study_materials', topicId), { content: guideContent }).catch(e => console.warn(e));
+      } catch (genErr) {
+        console.error("Failed to generate and save study guide", genErr);
+      }
       setLoading(false);
     };
-    if (roadmap.length > 0) fetchGuide();
-  }, [topicId, roadmap, topic]);
+
+    if (roadmap.length > 0 && topic && topic.title !== 'Loading...') {
+      fetchGuide();
+    }
+  }, [topicId, topic?.title, topic?.description, roadmap.length]);
 
   // Reset to first page when topicId changes
   useEffect(() => {
@@ -220,31 +233,73 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   // Parse pages split by horizontal rule `---` or fall back to high-level headings
   const pages = useMemo(() => {
     if (!content) return [];
-    let items = content.split(/(?:^|\n)\s*---\s*(?:\n|$)/);
-    items = items.map(p => p.trim()).filter(p => p.length > 0);
     
-    if (items.length <= 1) {
-      // Split by Level 2 headings as page breaks
-      const headingPages: string[] = [];
-      const lines = content.split('\n');
-      let currentPart: string[] = [];
-      for (const line of lines) {
-        if (line.trim().startsWith('## ') && currentPart.length > 0) {
-          headingPages.push(currentPart.join('\n'));
-          currentPart = [line];
+    // Pre-scan content to find the chapter heading level
+    let chapterLevel = 1; // Default to level 1 (e.g., # Chapter 1)
+    const chapterMatch = content.match(/^(#{1,4})\s+(CHAPTER|Chapter)\b/m);
+    if (chapterMatch) {
+      chapterLevel = chapterMatch[1].length;
+    }
+    
+    const subtopicPrefix = '#'.repeat(chapterLevel + 1) + ' ';
+    const lines = content.split('\n');
+    const finalPages: string[] = [];
+    let currentPart: string[] = [];
+    
+    const isNewPageBoundary = (lineStr: string) => {
+      const trimmed = lineStr.trim();
+      
+      // 1. Explicit page break
+      if (trimmed === '---') return true;
+      
+      // 2. Chapter starts
+      if (trimmed.match(/^#{1,4}\s+(CHAPTER|Chapter)\b/i)) {
+        return true;
+      }
+      
+      // 3. Part starts
+      if (trimmed.match(/^#{1,3}\s+(PART|Part)\b/i)) {
+        return true;
+      }
+      
+      // 4. Subtopic starts (matches '## ' if chapter is level 1, '### ' if level 2, '#### ' if level 3)
+      if (trimmed.startsWith(subtopicPrefix)) {
+        // Double check it's not a chapter or part to prevent double matching
+        const cleanText = trimmed.substring(subtopicPrefix.length).trim();
+        if (!cleanText.toUpperCase().startsWith('CHAPTER') && !cleanText.toUpperCase().startsWith('PART')) {
+          return true;
+        }
+      }
+      
+      return false;
+    };
+    
+    for (const line of lines) {
+      if (isNewPageBoundary(line) && currentPart.length > 0) {
+        const joined = currentPart.join('\n').trim();
+        if (joined.length > 0) {
+          finalPages.push(joined);
+        }
+        
+        if (line.trim() === '---') {
+          currentPart = [];
         } else {
+          currentPart = [line];
+        }
+      } else {
+        if (line.trim() !== '---') {
           currentPart.push(line);
         }
       }
-      if (currentPart.length > 0) {
-        headingPages.push(currentPart.join('\n'));
-      }
-      if (headingPages.length > 1) {
-        items = headingPages;
+    }
+    
+    if (currentPart.length > 0) {
+      const joined = currentPart.join('\n').trim();
+      if (joined.length > 0) {
+        finalPages.push(joined);
       }
     }
     
-    const finalPages = items.length > 0 ? items : [content];
     return finalPages;
   }, [content]);
 
@@ -256,7 +311,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
     const extracted: { level: number; text: string; id: string; pageIndex: number }[] = [];
     
     pages.forEach((pageContent, pageIndex) => {
-      const pageHeadingRegex = /^(#{1,3})\s+(.+)$/gm;
+      const pageHeadingRegex = /^(#{1,4})\s+(.+)$/gm;
       let match;
       while ((match = pageHeadingRegex.exec(pageContent)) !== null) {
         const level = match[1].length;
@@ -269,11 +324,22 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   }, [pages]);
 
   // Navigation handlers
+  const scrollIntoReadingView = () => {
+    const element = document.getElementById('reading-content-start');
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const targetY = rect.top + scrollTop - 32; // Offset by 32px for elegant top spacing
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
       setDirection(1);
       setCurrentPage(prev => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -281,7 +347,6 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
     if (currentPage > 0) {
       setDirection(-1);
       setCurrentPage(prev => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -373,7 +438,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
     const text = React.Children.toArray(children).join('');
     const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
     const Tag = `h${level}` as any;
-    return <Tag id={id} className="scroll-mt-32">{children}</Tag>;
+    return <Tag id={id} className="scroll-mt-32 break-inside-avoid">{children}</Tag>;
   };
 
   const SimulatorRenderer = ({ node, inline, className, children, ...props }: any) => {
@@ -545,7 +610,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   return (
     <div className="min-h-screen bg-paper pt-24 md:pt-32 pb-24 md:pb-32 transition-colors duration-300">
       {/* Hero Header */}
-      <header className="px-6 md:px-10 max-w-7xl mx-auto mb-10 md:mb-16">
+      <header className={cn(
+        "px-6 md:px-10 mx-auto mb-10 md:mb-16 transition-all duration-500",
+        isWideReader 
+          ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+          : "max-w-7xl"
+      )}>
         <div className="flex items-center gap-4 mb-6 sm:mb-8">
           <button 
             onClick={() => navigate('/dashboard')}
@@ -569,9 +639,177 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         </p>
       </header>
 
-      <div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 lg:gap-16">
+      {(topicId === 'ug-international' || topicId === 'ug-econometrics') && (
+        <div className={cn(
+          "px-6 md:px-10 mx-auto mb-10 flex gap-3 flex-wrap transition-all duration-500",
+          isWideReader 
+            ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+            : "max-w-7xl"
+        )}>
+          <button
+            onClick={() => setViewMode('textbook')}
+            className={cn(
+              "px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer shadow-sm",
+              viewMode === 'textbook'
+                ? "bg-slate-900 text-white border-slate-900 dark:bg-sky-600 dark:border-sky-600"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+            )}
+          >
+            {topicId === 'ug-international' ? '62-Chapter Textbook Companion' : '12-Chapter Textbook Companion'}
+          </button>
+          <button
+            onClick={() => setViewMode('standard')}
+            className={cn(
+              "px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer shadow-sm",
+              viewMode === 'standard'
+                ? "bg-slate-900 text-white border-slate-900 dark:bg-sky-600 dark:border-sky-600"
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+            )}
+          >
+            {topicId === 'ug-international' ? '5-Page Core Summary Guide' : 'Core Summary Guide'}
+          </button>
+        </div>
+      )}
+
+      {/* Dynamic Option-based Layout Toolbar for Widescreen Reading */}
+      <div className={cn(
+        "px-6 md:px-10 mx-auto mb-10 transition-all duration-500",
+        isWideReader 
+          ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+          : "max-w-7xl"
+      )}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-sm transition-all">
+          {/* Left: Mode togglers */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setIsWideReader(!isWideReader);
+                if (!isWideReader) {
+                  setReaderWidth('wide'); // Default to wide on first focus
+                }
+              }}
+              className={cn(
+                "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer",
+                isWideReader
+                  ? "bg-slate-900 dark:bg-sky-600 text-white border-slate-900 dark:bg-sky-600 shadow-sm"
+                  : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850"
+              )}
+              title={isWideReader ? "Disable Wide Reading View" : "Enable Wide Reading View"}
+            >
+              {isWideReader ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              <span>{isWideReader ? "Exit Focus" : "Focus Mode"}</span>
+            </button>
+            
+            {isWideReader && viewMode !== 'textbook' && (
+              <button
+                onClick={() => setIsDoubleColumn(!isDoubleColumn)}
+                className={cn(
+                  "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer hidden md:flex",
+                  isDoubleColumn
+                    ? "bg-slate-900 dark:bg-sky-600 text-white border-slate-900 dark:bg-sky-600 shadow-sm"
+                    : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850"
+                )}
+                title="Toggle Double Column Textbook Layout"
+              >
+                <Columns size={14} />
+                <span>{isDoubleColumn ? "2-Column" : "1-Column"}</span>
+              </button>
+            )}
+          </div>
+
+          {/* Right: Sub-controls when Wide View is active */}
+          {isWideReader && (
+            <div className="flex items-center flex-wrap gap-4 sm:gap-6 text-slate-600 dark:text-slate-400">
+              {/* Width Preset Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Width</span>
+                <div className="bg-slate-100 dark:bg-slate-950 p-1 rounded-xl flex border border-slate-200 dark:border-slate-800">
+                  {(['standard', 'wide', 'full'] as const).map((w) => (
+                    <button
+                      key={w}
+                      onClick={() => setReaderWidth(w)}
+                      className={cn(
+                        "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer",
+                        readerWidth === w
+                          ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
+                          : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                      )}
+                    >
+                      {w === 'standard' ? '3XL' : w === 'wide' ? '5XL' : 'Cinema'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Font Size Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Text</span>
+                <div className="bg-slate-100 dark:bg-slate-950 p-1 rounded-xl flex border border-slate-200 dark:border-slate-800">
+                  {(['base', 'lg', 'xl'] as const).map((sz) => (
+                    <button
+                      key={sz}
+                      onClick={() => setReaderFontSize(sz)}
+                      className={cn(
+                        "px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center min-w-[2rem]",
+                        readerFontSize === sz
+                          ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
+                          : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                      )}
+                    >
+                      {sz === 'base' ? 'A' : sz === 'lg' ? 'A+' : 'A++'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {topicId === 'ug-international' && viewMode === 'textbook' ? (
+        <div className={cn(
+          "px-4 sm:px-6 md:px-10 mx-auto mb-24 transition-all duration-500",
+          isWideReader 
+            ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+            : "max-w-7xl"
+        )}>
+          <React.Suspense fallback={
+            <div className="py-24 flex flex-col items-center justify-center gap-4">
+              <Loader2 className="animate-spin text-sky-600 w-10 h-10" />
+              <p className="text-slate-600 dark:text-slate-400 font-semibold animate-pulse">Loading Textbook Companion...</p>
+            </div>
+          }>
+            <LazyInternationalEconomicsTextbook />
+          </React.Suspense>
+        </div>
+      ) : topicId === 'ug-econometrics' && viewMode === 'textbook' ? (
+        <div className={cn(
+          "px-4 sm:px-6 md:px-10 mx-auto mb-24 transition-all duration-500",
+          isWideReader 
+            ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+            : "max-w-7xl"
+        )}>
+          <React.Suspense fallback={
+            <div className="py-24 flex flex-col items-center justify-center gap-4">
+              <Loader2 className="animate-spin text-sky-600 w-10 h-10" />
+              <p className="text-slate-600 dark:text-slate-400 font-semibold animate-pulse">Loading Textbook Companion...</p>
+            </div>
+          }>
+            <LazyEconometricsStudyGuide />
+          </React.Suspense>
+        </div>
+      ) : (
+        <div className={cn(
+          "px-4 sm:px-6 md:px-10 mx-auto flex flex-col lg:flex-row gap-8 lg:gap-16 transition-all duration-500",
+          isWideReader 
+            ? (readerWidth === 'full' ? "max-w-[95%] lg:max-w-[90%]" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+            : "max-w-7xl"
+        )}>
         {/* Sidebar TOC & Chapter Filter */}
-        <aside className="hidden lg:block w-64 shrink-0 sticky top-32 h-fit space-y-12">
+        <aside className={cn(
+          "hidden lg:block w-64 shrink-0 sticky top-32 h-fit space-y-12 transition-all duration-500",
+          isWideReader ? "lg:hidden opacity-0 w-0 h-0 overflow-hidden pointer-events-none" : "opacity-100"
+        )}>
           <div className="border-l border-slate-200 dark:border-slate-800 pl-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 mb-8">{profile?.level === "undergraduate" ? "Switch Course" : "Switch Topic"}</p>
             <nav className="space-y-4">
@@ -602,7 +840,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                       "block text-left text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-sky-600 dark:hover:text-sky-400 w-full cursor-pointer",
                       currentPage === heading.pageIndex ? "text-sky-600 dark:text-sky-400" :
                       heading.level === 1 ? "text-slate-900 dark:text-white" : 
-                      heading.level === 2 ? "pl-4 text-slate-600 dark:text-slate-500" : "pl-8 text-slate-500 dark:text-slate-700"
+                      heading.level === 2 ? "pl-4 text-slate-600 dark:text-slate-500" : heading.level === 3 ? "pl-8 text-slate-500 dark:text-slate-700" : "pl-12 text-slate-400 dark:text-slate-600"
                     )}
                   >
                     {heading.text}
@@ -654,7 +892,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
         </div>
 
         {/* Paginated Content & Controls */}
-        <div className="flex-1 max-w-3xl">
+        <div className={cn(
+          "flex-1 transition-all duration-500",
+          isWideReader 
+            ? (readerWidth === 'full' ? "max-w-none" : readerWidth === 'wide' ? "max-w-5xl" : "max-w-3xl")
+            : "max-w-3xl"
+        )}>
           {loading ? (
             <div className="py-32 flex flex-col items-center justify-center gap-6">
               <Loader2 className="w-12 h-12 text-sky-600 animate-spin" />
@@ -663,7 +906,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
           ) : (
             <div className="space-y-8">
               {/* Dynamic Pages Indicator & Swipe Hint */}
-              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-muted">
+              <div id="reading-content-start" className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-muted">
                 <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
                   <Sparkles size={11} className="animate-pulse" />
                   Swipe left/right or use arrows to turn pages
@@ -726,7 +969,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                     className="relative bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/90 rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-10 shadow-xl shadow-slate-200/40 dark:shadow-none border-l-[3px] sm:border-l-[6px] border-l-sky-500 dark:border-l-sky-600/90"
                     style={{ touchAction: 'pan-y' }}
                   >
-                    <div className="markdown-body prose prose-base md:prose-lg prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-headings:tracking-tight prose-headings:font-bold prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-p:leading-relaxed prose-li:text-slate-600 dark:prose-li:text-slate-400">
+                    <div className={cn(
+                      "markdown-body prose prose-slate dark:prose-invert max-w-none transition-all duration-300",
+                      isWideReader && isDoubleColumn ? "lg:columns-2 lg:gap-12 xl:gap-16 [column-fill:auto]" : "",
+                      readerFontSize === 'lg' ? "prose-lg md:prose-xl" : readerFontSize === 'xl' ? "prose-xl md:prose-2xl" : "prose-base md:prose-lg",
+                      "prose-headings:text-slate-900 dark:prose-headings:text-white prose-headings:tracking-tight prose-headings:font-bold prose-p:text-slate-600 dark:prose-p:text-slate-400 prose-p:leading-relaxed prose-li:text-slate-600 dark:prose-li:text-slate-400"
+                    )}>
                       <ReactMarkdown
                         remarkPlugins={[remarkMath, remarkGfm]}
                         rehypePlugins={[rehypeRaw, rehypeKatex, rehypeMathMarker]}
@@ -752,7 +1000,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
 
                             return (
                               <pre 
-                                className="my-6 p-4 sm:p-6 bg-slate-950 dark:bg-slate-900/50 border border-slate-800 dark:border-slate-800/80 rounded-xl overflow-x-auto whitespace-pre text-xs sm:text-sm font-mono text-slate-100 dark:text-slate-200 leading-normal scrollbar-thin"
+                                className="my-6 p-4 sm:p-6 bg-slate-950 dark:bg-slate-900/50 border border-slate-800 dark:border-slate-800/80 rounded-xl overflow-x-auto whitespace-pre text-xs sm:text-sm font-mono text-slate-100 dark:text-slate-200 leading-normal scrollbar-thin break-inside-avoid"
                                 {...props}
                               >
                                 {children}
@@ -771,7 +1019,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                               delete cleanProps['data-math-inner'];
 
                               return (
-                                <span className={cn(className, "relative group", isBlock ? "flex justify-center w-full my-6 p-2 rounded-xl hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800" : "inline-block mx-0.5 px-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-text")} {...cleanProps}>
+                                <span className={cn(className, "relative group", isBlock ? "flex justify-center w-full my-6 p-2 rounded-xl hover:bg-slate-50/80 dark:hover:bg-slate-900/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-800 break-inside-avoid" : "inline-block mx-0.5 px-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-text")} {...cleanProps}>
                                   {children}
                                   {latex && <CopyMathButton latex={latex} isBlock={isBlock} />}
                                 </span>
@@ -784,7 +1032,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                             return <span className={className} {...cleanProps}>{children}</span>;
                           },
                           table: ({ children }) => (
-                            <div className="my-10 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm">
+                            <div className="my-10 overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm break-inside-avoid">
                               <table className="w-full border-collapse text-left min-w-[500px]">
                                 {children}
                               </table>
@@ -856,6 +1104,78 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
           )}
         </div>
       </div>
+      )}
+
+      {/* Floating TOC Trigger Button - Only visible in Focus Mode */}
+      {isWideReader && !loading && headingsWithPages.length > 0 && (
+        <button
+          onClick={() => setShowFloatingTOC(!showFloatingTOC)}
+          className={cn(
+            "fixed bottom-8 left-8 z-40 p-4 rounded-full shadow-lg border backdrop-blur transition-all duration-300 flex items-center justify-center cursor-pointer",
+            showFloatingTOC
+              ? "bg-slate-950 dark:bg-sky-600 text-white border-slate-950 dark:border-sky-600 rotate-90 scale-105 animate-none"
+              : "bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white border-slate-200 dark:border-slate-800 hover:scale-110 active:scale-95 shadow-slate-200/50 dark:shadow-none"
+          )}
+          title="Toggle Navigation Outline"
+        >
+          <List size={20} />
+        </button>
+      )}
+
+      {/* Slide-out Outline Drawer */}
+      <AnimatePresence>
+        {isWideReader && showFloatingTOC && !loading && headingsWithPages.length > 0 && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowFloatingTOC(false)}
+              className="fixed inset-0 bg-black z-40"
+            />
+            
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: -320, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -320, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              className="fixed left-0 top-0 bottom-0 w-80 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-8 z-50 shadow-2xl overflow-y-auto scrollbar-thin"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Course Outline</span>
+                <button
+                  onClick={() => setShowFloatingTOC(false)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+              
+              <nav className="space-y-4">
+                {headingsWithPages.map((heading, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      handleHeadingClick(heading.id, heading.pageIndex);
+                      setShowFloatingTOC(false);
+                    }}
+                    className={cn(
+                      "block text-left text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:text-sky-600 dark:hover:text-sky-400 w-full cursor-pointer leading-relaxed",
+                      currentPage === heading.pageIndex ? "text-sky-600 dark:text-sky-400" :
+                      heading.level === 1 ? "text-slate-900 dark:text-white font-black" : 
+                      heading.level === 2 ? "pl-4 text-slate-600 dark:text-slate-500" : heading.level === 3 ? "pl-8 text-slate-500 dark:text-slate-700" : "pl-12 text-slate-400 dark:text-slate-600"
+                    )}
+                  >
+                    {heading.text}
+                  </button>
+                ))}
+              </nav>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

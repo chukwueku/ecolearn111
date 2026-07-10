@@ -772,3 +772,132 @@ export const respondDirectChallenge = async (challengeId: string, status: 'accep
 // We'll read from arena_queue for those "searching", and we can't easily track idle without cloud functions.
 // We'll skip complex presence for now to ensure stability on Vercel.
 
+export interface DailyChallenge {
+  id?: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  level: string; // "undergraduate" or other levels
+  questions: any[]; // 50 questions
+  active: boolean;
+  createdAt: any;
+}
+
+export interface DailyChallengeAttempt {
+  id?: string;
+  userId: string;
+  userDisplayName: string;
+  challengeId: string;
+  challengeTitle: string;
+  score: number;
+  questionsCount: number;
+  correctAnswers: number;
+  answers: Record<number, boolean>;
+  completedAt: any;
+}
+
+export const saveDailyChallenge = async (challenge: Omit<DailyChallenge, 'id'>) => {
+  const path = 'daily_challenges';
+  try {
+    const docRef = doc(collection(db, 'daily_challenges'));
+    await setDoc(docRef, {
+      ...challenge,
+      id: docRef.id,
+      createdAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch(e) {
+    handleFirestoreError(e, OperationType.WRITE, path);
+    return null;
+  }
+};
+
+export const getDailyChallengesAdmin = async (): Promise<DailyChallenge[]> => {
+  const path = 'daily_challenges';
+  try {
+    const q = query(collection(db, 'daily_challenges'), orderBy('date', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as DailyChallenge));
+  } catch(e) {
+    handleFirestoreError(e, OperationType.LIST, path);
+    return [];
+  }
+};
+
+export const deleteDailyChallenge = async (id: string): Promise<void> => {
+  const path = `daily_challenges/${id}`;
+  try {
+    await deleteDoc(doc(db, 'daily_challenges', id));
+  } catch(e) {
+    handleFirestoreError(e, OperationType.DELETE, path);
+  }
+};
+
+export const getTodayDailyChallenge = async (level: string): Promise<DailyChallenge | null> => {
+  const path = 'daily_challenges';
+  const todayStr = new Date().toISOString().split('T')[0];
+  try {
+    // 1. Try to fetch the challenge specifically for today's date
+    const qToday = query(
+      collection(db, 'daily_challenges'),
+      where('level', '==', level),
+      where('active', '==', true),
+      where('date', '==', todayStr)
+    );
+    const snapToday = await getDocs(qToday);
+    if (!snapToday.empty) {
+      return { id: snapToday.docs[0].id, ...snapToday.docs[0].data() } as DailyChallenge;
+    }
+
+    // 2. Fallback: Try to fetch any recent active challenge for this level
+    const qFallback = query(
+      collection(db, 'daily_challenges'),
+      where('level', '==', level),
+      where('active', '==', true),
+      orderBy('date', 'desc'),
+      limit(1)
+    );
+    const snapFallback = await getDocs(qFallback);
+    if (!snapFallback.empty) {
+      return { id: snapFallback.docs[0].id, ...snapFallback.docs[0].data() } as DailyChallenge;
+    }
+  } catch(e) {
+    handleFirestoreError(e, OperationType.LIST, path);
+  }
+  return null;
+};
+
+export const saveDailyChallengeAttempt = async (attempt: Omit<DailyChallengeAttempt, 'id'>) => {
+  const path = 'daily_challenge_attempts';
+  try {
+    const docRef = doc(collection(db, 'daily_challenge_attempts'));
+    await setDoc(docRef, {
+      ...attempt,
+      id: docRef.id,
+      completedAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch(e) {
+    handleFirestoreError(e, OperationType.WRITE, path);
+    return null;
+  }
+};
+
+export const getUserDailyChallengeAttempt = async (userId: string, challengeId: string): Promise<DailyChallengeAttempt | null> => {
+  const path = 'daily_challenge_attempts';
+  try {
+    const q = query(
+      collection(db, 'daily_challenge_attempts'),
+      where('userId', '==', userId),
+      where('challengeId', '==', challengeId),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return { id: snap.docs[0].id, ...snap.docs[0].data() } as DailyChallengeAttempt;
+    }
+  } catch(e) {
+    handleFirestoreError(e, OperationType.LIST, path);
+  }
+  return null;
+};
+

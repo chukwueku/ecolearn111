@@ -375,9 +375,9 @@ Commercial banks do not simply store deposits; they actively create bank money t
 ### Step-by-Step Mathematical Credit Expansion Example
 Suppose the Central Bank sets a cash reserve ratio of **10%** ($r = 0.10$).
 1.  An investor makes an initial deposit of **₦50,000** into Bank A.
-2.  Bank A must hold $10\%$ in reserves (₦5,000) and can lend the remaining **₦45,000** to Borrower B.
+2.  Bank A must hold $10\\%$ in reserves (₦5,000) and can lend the remaining **₦45,000** to Borrower B.
 3.  Borrower B buys materials, and the recipient deposits the ₦45,000 into Bank B.
-4.  Bank B holds $10\%$ (₦4,500) and lends out **₦40,500**.
+4.  Bank B holds $10\\%$ (₦4,500) and lends out **₦40,500**.
 5.  This geometric progression continues indefinitely.
 
 $$\\text{The Money Multiplier (M)} = \\frac{1}{r} = \\frac{1}{0.10} = 10$$
@@ -735,19 +735,19 @@ High compound interest rates and penalties meant that a massive share of Nigeria
 ### 2. Debt Sustainability Metrics
 Economists assess a nation's debt burden using two primary mathematical ratios:
 *   **Debt-to-GDP Ratio**: Measures the size of a country's total debt relative to its overall economic output. A high ratio indicates that the country may struggle to pay off its debt.
-    $$\text{Debt-to-GDP Ratio} = \frac{\text{Total External Debt}}{\text{Nominal GDP}} \times 100$$
+    $$\\text{Debt-to-GDP Ratio} = \\frac{\\text{Total External Debt}}{\\text{Nominal GDP}} \\times 100$$
 *   **Debt Service-to-Revenue Ratio**: Measures the proportion of government revenue that goes into paying annual principal and interest (debt service). A high ratio indicates severe fiscal stress.
-    $$\text{Debt Service-to-Revenue Ratio} = \frac{\text{Annual Debt Service Payments}}{\text{Total Government Revenue}} \times 100$$
+    $$\\text{Debt Service-to-Revenue Ratio} = \\frac{\\text{Annual Debt Service Payments}}{\\text{Total Government Revenue}} \\times 100$$
 
 ### 3. Solved Example: Debt Ratio Calculations
 Suppose Country N has a Nominal GDP of **$50 billion** and total government revenue of **$8 billion**. Its total outstanding external debt is **$15 billion**, and its annual debt service payment is **$2.4 billion**. 
 
 Let's calculate and interpret Country N's debt sustainability metrics:
 *   **Step 1: Calculate the Debt-to-GDP Ratio**
-    $$\text{Debt-to-GDP} = \frac{\$15\text{ billion}}{\$50\text{ billion}} \times 100 = 30\%$$
+    $$\\text{Debt-to-GDP} = \\frac{\$15\\text{ billion}}{\$50\\text{ billion}} \\times 100 = 30\\%$$
     *   *Interpretation*: A ratio of 30% is generally considered moderate and within safe sustainable thresholds (usually under 40% for developing economies).
 *   **Step 2: Calculate the Debt Service-to-Revenue Ratio**
-    $$\text{Debt Service-to-Revenue} = \frac{\$2.4\text{ billion}}{\$8\text{ billion}} \times 100 = 30\%$$
+    $$\\text{Debt Service-to-Revenue} = \\frac{\$2.4\\text{ billion}}{\$8\\text{ billion}} \\times 100 = 30\\%$$
     *   *Interpretation*: Spending 30% of all government revenue just to service debt interest and principal represents a heavy fiscal burden, leaving only 70% of revenue for security, healthcare, and infrastructure. This indicates potential fiscal distress.
 
 ### 4. Nigeria's Historical Debt Rise and Relief

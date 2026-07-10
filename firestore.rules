@@ -99,5 +99,18 @@ service cloud.firestore {
       allow write: if isSignedIn() && (request.auth.uid == request.resource.data.challengerId || isAdmin());
       allow update: if isSignedIn() && (request.auth.uid == resource.data.targetId || isAdmin());
     }
+
+    // Daily Challenges
+    match /daily_challenges/{challengeId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Daily Challenge Attempts
+    match /daily_challenge_attempts/{attemptId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
   }
 }

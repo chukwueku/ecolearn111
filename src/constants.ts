@@ -513,14 +513,19 @@ export const UNDERGRADUATE_REAL_ROADMAP: RoadmapTopic[] = [
   {
     id: 'ug-statistical',
     title: 'Statistical Economics',
-    description: 'Descriptive and inferential statistics, probability distributions, sampling techniques, estimation, and hypothesis testing.',
+    description: 'Comprehensive guide covering descriptive and inferential statistics, probability distributions, sampling, estimation, hypothesis testing, ANOVA, simple and multiple regression analysis.',
     category: 'Course 3',
     subtopics: [
-      'Measures of Central Tendency & Dispersion',
-      'Probability Theory and Conditional Probability',
-      'Discrete & Continuous Probability Distributions',
-      'Point and Interval Estimation Techniques',
-      'Null Hypothesis Testing, t-tests, & Chi-Square'
+      'Descriptive Statistics & Organizing Data',
+      'Probability and Probability Distributions',
+      'Statistical Inference: Point & Interval Estimation',
+      'Hypothesis Testing, Chi-Square, & ANOVA',
+      'The Simple Linear Regression Model & OLS',
+      'The Multiple Linear Regression Model & Matrix Form',
+      'Specification Errors & Measurement Problems',
+      'Qualitative Dummy Variables & Structural Breaks',
+      'Problems in Regression (Collinearity, Heteroscedasticity, Autocorrelation)',
+      'Simultaneous-Equations and Time-Series Methods'
     ]
   },
   {
@@ -593,5 +598,12 @@ export const CHALLENGES: Record<string, { question: string, options: string[], a
   'ug-ch1': [
     { question: 'Which country is NOT considered one of the Four Asian Tigers?', options: ['South Korea', 'Singapore', 'Japan', 'Taiwan'], answer: 2 },
     { question: 'What was the average annual economic growth rate of the Asian Tigers from the 1960s to 1990s?', options: ['Exceeding 7%', 'Around 2%', 'Between 3-4%', 'Negative growth'], answer: 0 },
+  ],
+  'ug-international': [
+    { question: 'According to the Heckscher-Ohlin theorem, trade patterns are primarily determined by:', options: ['Differences in technology', 'Differences in relative factor endowments', 'Increasing returns to scale', 'Differences in consumer preferences'], answer: 1 },
+    { question: 'If a small nation has a 10% nominal tariff on imported shoes, and shoe production uses raw leather representing 60% of the untariffed value, which is imported tariff-free, what is the Effective Rate of Protection (ERP)?', options: ['10%', '16.7%', '25%', '40%'], answer: 2 },
+    { question: 'Which of the following conditions must hold for currency devaluation to improve a nation\'s trade balance under the elasticities approach?', options: ['The Fisher Effect', 'The Marshall-Lerner Condition', 'Uncovered Interest Rate Parity', 'The Rybczynski Theorem'], answer: 1 },
+    { question: 'Under the Mundell-Fleming model with perfect capital mobility, which policy is completely ineffective under a flexible exchange rate regime?', options: ['Monetary Expansion', 'Fiscal Expansion', 'Import Tariffs', 'Export Subsidies'], answer: 1 },
+    { question: 'The Policy Trilemma (Impossible Trinity) states that an open economy cannot simultaneously achieve which three objectives?', options: ['Low Inflation, Low Unemployment, Trade Surplus', 'Fixed Exchange Rate, Independent Monetary Policy, Perfect Capital Mobility', 'Free Trade, High Tariffs, Balanced Budget', 'High GDP Growth, Income Equality, Stable Reserves'], answer: 1 }
   ]
 };

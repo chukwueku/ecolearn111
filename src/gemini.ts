@@ -67,3 +67,26 @@ export const extractQuestionsFromPdf = async (pdfBase64: string, level: string, 
   }
 };
 
+export const generateDailyChallengeBatch = async (courses: string[], count: number, level: string = "undergraduate", exclude: string[] = []) => {
+  try {
+    const response = await fetch("/api/generateDailyChallengeBatch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ courses, count, level, exclude }),
+    });
+    if (!response.ok) return [];
+    
+    const text = await response.text();
+    try {
+      const data = JSON.parse(text);
+      return data.questions || [];
+    } catch (e) {
+      console.error("JSON parse error:", e, text);
+      return [];
+    }
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    return [];
+  }
+};
+

@@ -1025,9 +1025,9 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
         formulaText = "\\bar{x} = \\frac{\\sum_{i=1}^n x_i}{n} \\quad S^2 = \\frac{\\sum_{i=1}^n (x_i - \\bar{x})^2}{n - 1}";
         steps = [
           <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Parse and Sort Observations (<InlineMath math="n" />):</strong> Dataset contains {count} observations. Sorted: <span className="font-mono bg-paper px-1.5 py-0.5 rounded border border-border text-xs">{sorted.join(', ')}</span>.</div>,
-          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Sample Sum (<InlineMath math="\sum x_i" />):</strong> Sum is {sum.toFixed(2)}.</div>,
-          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Solve for Sample Mean (<InlineMath math="\bar{x}" />):</strong> <InlineMath math={`\\bar{x} = \\frac{${sum.toFixed(2)}}{${count}} = ${mean.toFixed(4)}`} />.</div>,
-          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Calculate Sum of Squared Deviations (<InlineMath math="\sum (x_i - \bar{x})^2" />):</strong> Sum of squared differences from the mean is {sqDiffSum.toFixed(4)}.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Sample Sum (<InlineMath math="\\sum x_i" />):</strong> Sum is {sum.toFixed(2)}.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Solve for Sample Mean (<InlineMath math="\\bar{x}" />):</strong> <InlineMath math={`\\bar{x} = \\frac{${sum.toFixed(2)}}{${count}} = ${mean.toFixed(4)}`} />.</div>,
+          <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Calculate Sum of Squared Deviations (<InlineMath math="\\sum (x_i - \\bar{x})^2" />):</strong> Sum of squared differences from the mean is {sqDiffSum.toFixed(4)}.</div>,
           <div key="s5" className="flex items-center gap-1 flex-wrap"><strong>Step 5: Solve for Sample Variance (<InlineMath math="S^2" />) & Standard Deviation (<InlineMath math="S" />):</strong> <InlineMath math={`S^2 = \\frac{${sqDiffSum.toFixed(4)}}{${count - 1}} = ${parseFloat(result.sampleVar).toFixed(4)}`} />, Standard Deviation <InlineMath math={`S = \\sqrt{S^2} = ${parseFloat(result.sampleSD).toFixed(4)}`} />.</div>
         ];
         interpretationTitle = "Descriptive Data Summary & Interpretation";
@@ -1042,8 +1042,8 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
         formulaText = "y = \\beta_0 + \\beta_1 x \\quad \\beta_1 = \\frac{n\\sum xy - \\sum x \\sum y}{n\\sum x^2 - (\\sum x)^2}";
         steps = [
           <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Check Data Pairs (<InlineMath math="n" />):</strong> Regression calculated for {n} coordinate pairs.</div>,
-          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Slope Beta 1 (<InlineMath math="\hat{\beta}_1" />):</strong> OLS numerator and denominator solve to yield a slope of <InlineMath math={`\\hat{\\beta}_1 = ${result.beta1}`} />.</div>,
-          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate Intercept Beta 0 (<InlineMath math="\hat{\beta}_0" />):</strong> Intersection point with vertical axis is <InlineMath math={`\\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1 \\bar{x} = ${result.beta0}`} />.</div>,
+          <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Slope Beta 1 (<InlineMath math="\\hat{\\beta}_1" />):</strong> OLS numerator and denominator solve to yield a slope of <InlineMath math={`\\hat{\\beta}_1 = ${result.beta1}`} />.</div>,
+          <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Calculate Intercept Beta 0 (<InlineMath math="\\hat{\\beta}_0" />):</strong> Intersection point with vertical axis is <InlineMath math={`\\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1 \\bar{x} = ${result.beta0}`} />.</div>,
           <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Solve for Goodness of Fit (<InlineMath math="R^2" />):</strong> Coefficient of Determination is {result.r2} (Correlation coefficient <InlineMath math={`r = ${result.r}`} />).</div>
         ];
         interpretationTitle = "OLS Simple Linear Regression Analysis";
@@ -1058,7 +1058,7 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
         
         formulaText = "Test \\ Stat = \\frac{\\bar{x} - \\mu_0}{S / \\sqrt{n}}";
         steps = [
-          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Define Hypotheses:</strong> Null Hypothesis <InlineMath math="H_0: \mu = \mu_0" /> vs. Alternative <InlineMath math={isOneTailed ? "H_1: \mu > \mu_0" : "H_1: \mu \\neq \mu_0"} />.</div>,
+          <div key="s1" className="flex items-center gap-1 flex-wrap"><strong>Step 1: Define Hypotheses:</strong> Null Hypothesis <InlineMath math="H_0: \\mu = \\mu_0" /> vs. Alternative <InlineMath math={isOneTailed ? "H_1: \\mu > \\mu_0" : "H_1: \\mu \\neq \\mu_0"} />.</div>,
           <div key="s2" className="flex items-center gap-1 flex-wrap"><strong>Step 2: Calculate Standard Error (SE):</strong> Standard error of the sample mean is <InlineMath math="SE = \\frac{S}{\\sqrt{n}}" />.</div>,
           <div key="s3" className="flex items-center gap-1 flex-wrap"><strong>Step 3: Compute Test Statistic:</strong> Test score solves to a value of <InlineMath math={`t = ${testStat}`} />.</div>,
           <div key="s4" className="flex items-center gap-1 flex-wrap"><strong>Step 4: Compare with Critical Value:</strong> Critical boundary is <InlineMath math={`t_{\\alpha} = ${critValue}`} />. Decision reached: {decision}.</div>

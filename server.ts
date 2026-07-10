@@ -218,6 +218,55 @@ Return the response in JSON format as an array of objects with the following sch
     }
   });
 
+  app.post("/api/generateDailyChallengeBatch", async (req, res) => {
+    const { courses, count, level, exclude } = req.body;
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
+
+    // Build the prompt requesting highly balanced, real-world analytical questions with clear scenario and question separation.
+    const prompt = `You are an elite university professor of Economics. Generate exactly ${count || 10} multiple-choice questions for a Daily Challenge at the '${level || 'undergraduate'}' level.
+The questions must toggle and rotate dynamically across different core fields of economics: Microeconomics, Macroeconomics, Econometrics (empirical regression analysis), International Trade, Public Finance, and Game Theory.
+
+CRITICAL DESIGN & CONTENT GUIDELINES:
+1. CONCISE SCENARIOS: Keep each scenario very short, crisp, and high-impact (maximum 1 to 2 sentences). Avoid long blocks of text.
+2. HEAVILY CONCEPTUAL & THEORETICAL: At least 80% of the generated questions MUST be purely conceptual, theoretical, or qualitative, testing core principles, policy intuition, structural characteristics, or economic logic (e.g., Giffen goods, Nash equilibrium definitions, Ricardian trade theory, Gauss-Markov assumptions, liquidity traps, or public goods characteristics). No calculations should be required for these.
+3. MINIMAL LIGHT MATH: At most 20% of the questions should contain extremely simple, single-step mathematical or statistical logic (e.g. simple elasticity, basic expenditure totals, or simple multiplier calculations). Keep numbers friendly and simple.
+4. MATHEMATICAL EXPRESSIONS (LaTeX): For any mathematical variables, functional forms, equations, systems of equations, vectors, or matrices, you MUST format them using LaTeX notation. Use inline math delimiters like "\\\\( ... \\\\)" (e.g. "\\\\( U(x,y) = x \\\\cdot y \\\\)" or "\\\\( P = 15 \\\\)") and display/block math delimiters like "\\\\\\\\[ ... \\\\\\\\]" for large equations. Ensure all variables (like \\\\( k^* \\\\), \\\\( P^* \\\\), \\\\( Y \\\\)) are in LaTeX format so they render beautifully and professionally.
+5. REAL ECONOMY REASONING: Ground each question in real-world scenarios or realistic empirical study concepts.
+6. SEPARATION OF SCENARIO AND QUESTION: Clearly split the situational setup (the scenario/data) from the actual technical query.
+7. NO REPETITION: Do NOT generate questions similar or identical to the following previously generated scenarios/questions:
+${exclude && exclude.length > 0 ? JSON.stringify(exclude) : '[]'}
+
+Each question must be an object matching this JSON schema:
+{
+  "scenario": "string (1-2 sentence situational setup with beautifully formatted LaTeX variables and equations)",
+  "question": "string (the specific analytical, mathematical, or conceptual question to solve, with LaTeX formatting)",
+  "options": ["string (with LaTeX formatting if it is an equation, variable, or numerical value)", "string", "string", "string"],
+  "correctAnswer": number (index 0-3),
+  "explanation": "string (scholarly, clear, step-by-step logic and calculation showing exactly why the option is correct, using LaTeX formatting for equations)",
+  "course": "string (the specific category: 'Microeconomics', 'Macroeconomics', 'Econometrics', 'International Economics', 'Public Finance', or 'Game Theory')"
+}
+
+Return the response in JSON format as a raw array of objects matching this schema. Do not wrap the JSON in markdown code blocks. Make sure to return exactly ${count || 10} unique questions.`;
+
+    try {
+      const response = await withRetry(() => ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      }));
+      res.json({ questions: JSON.parse(response.text || "[]") });
+    } catch (error: any) {
+      console.error("Gemini Daily Challenge Generation Error:", error);
+      let status = typeof error?.status === 'number' ? error.status : 500;
+      if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
+      if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
+      res.status(status).json({ questions: [], error: "Failed to generate daily challenge questions" });
+    }
+  });
+
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
@@ -436,3 +485,4 @@ Return the response in JSON format as an array of objects with the following sch
 }
 
 startServer();
+

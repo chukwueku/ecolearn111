@@ -962,7 +962,7 @@ An inward-looking strategy aiming to replace foreign imports with domestically p
 *   **Aims**: Conserve scarce foreign exchange reserves, achieve self-reliance, and create local jobs.
 *   **Examples in Nigeria**: Setting up local breweries, assembly plants, and textile mills to replace imported items.
 *   **Formulas of Protectionism**: The **Effective Rate of Protection ($g$)** measures the percentage increase in value-added made possible by the tariff structure:
-    $$g = \frac{t_f - a \cdot t_m}{1 - a}$$
+    $$g = \\frac{t_f - a \\cdot t_m}{1 - a}$$
     Where $t_f$ is the tariff rate on finished imports, $t_m$ is the tariff on imported raw inputs, and $a$ is the ratio of imported input value to finished product value.
 
 ### 2. Export Promotion Industrialisation (EPI)
@@ -1007,8 +1007,8 @@ To understand the structural significance of industrialization, we look at the s
 
 ### Example Calculation: Rate of Industrial Growth
 Suppose Nigeria's industrial output was valued at **₦4.2 trillion** in 2022 and grew to **₦4.5 trillion** in 2023. Let's calculate the annual industrial growth rate ($G_{ind}$):
-$$G_{ind} = \frac{\text{Output}_{2023} - \text{Output}_{2022}}{\text{Output}_{2022}} \times 100$$
-$$G_{ind} = \frac{4.5 - 4.2}{4.2} \times 100 = \frac{0.3}{4.2} \times 100 = 7.14\%$$
+$$G_{ind} = \\frac{\\text{Output}_{2023} - \\text{Output}_{2022}}{\\text{Output}_{2022}} \\times 100$$
+$$G_{ind} = \\frac{4.5 - 4.2}{4.2} \\times 100 = \\frac{0.3}{4.2} \\times 100 = 7.14\\%$$
 This represents a healthy rate of industrial expansion for that period.
 `,
 
@@ -1088,8 +1088,8 @@ To understand the macroeconomic role of agriculture in Nigeria, we analyze its s
 A cooperative farmer cultivating cassava harvested **15 tonnes per hectare** in Year 1 using traditional inputs. After joining the Anchor Borrowers' Programme and adopting high-yielding stems and fertilizer, the yield rose to **22 tonnes per hectare** in Year 2.
 
 Let's calculate the percentage increase in cassava land productivity ($P_{land}$):
-$$P_{land} = \frac{\text{Yield}_{\text{Year 2}} - \text{Yield}_{\text{Year 1}}}{\text{Yield}_{\text{Year 1}}} \times 100$$
-$$P_{land} = \frac{22 - 15}{15} \times 100 = \frac{7}{15} \times 100 = 46.67\%$$
+$$P_{land} = \\frac{\\text{Yield}_{\\text{Year 2}} - \\text{Yield}_{\\text{Year 1}}}{\\text{Yield}_{\\text{Year 1}}} \\times 100$$
+$$P_{land} = \\frac{22 - 15}{15} \\times 100 = \\frac{7}{15} \\times 100 = 46.67\\%$$
 Thus, adopting improved inputs raised agricultural land productivity by **46.67%**!
 `,
 
@@ -1155,22 +1155,22 @@ Taxes levied on goods and services. The tax burden can be shifted partially or f
 **Incidence of Taxation** refers to the final resting point of the tax burden—who actually pays the tax in the end. When the government levies an indirect tax $t$ on a product, the burden is split between the buyer and the seller depending on the **price elasticity of demand ($E_d$)** and **price elasticity of supply ($E_s$)**:
 
 1.  **Perfectly Inelastic Demand ($E_d = 0$)**: The entire tax is shifted to the buyer; price rises by the full tax amount.
-2.  **Perfectly Elastic Demand ($E_d = \infty$)**: The seller bears the entire tax burden; price does not change.
+2.  **Perfectly Elastic Demand ($E_d = \\infty$)**: The seller bears the entire tax burden; price does not change.
 3.  **Perfectly Inelastic Supply ($E_s = 0$)**: The seller bears the entire tax burden.
-4.  **Perfectly Elastic Supply ($E_s = \infty$)**: The buyer bears the entire tax burden.
+4.  **Perfectly Elastic Supply ($E_s = \\infty$)**: The buyer bears the entire tax burden.
 
 ### Mathematical Incidence Formulas
 The share of a unit tax $t$ borne by the buyer ($T_{buyer}$) and the seller ($T_{seller}$) can be calculated as:
-$$T_{buyer} = t \times \frac{E_s}{E_d + E_s}$$
-$$T_{seller} = t \times \frac{E_d}{E_d + E_s}$$
+$$T_{buyer} = t \\times \\frac{E_s}{E_d + E_s}$$
+$$T_{seller} = t \\times \\frac{E_d}{E_d + E_s}$$
 
 ### Solved Example: Tax Incidence Calculation
 Suppose the government levies an indirect tax of **₦50** per bag on cement. The price elasticity of demand for cement is **$0.4$** (inelastic) and the price elasticity of supply is **$1.6$** (elastic). Let's calculate how the tax burden is shared:
 
 *   **Step 1: Calculate the Buyer's Share ($T_{buyer}$)**
-    $$T_{buyer} = ₦50 \times \frac{1.6}{0.4 + 1.6} = ₦50 \times \frac{1.6}{2.0} = ₦50 \times 0.8 = ₦40$$
+    $$T_{buyer} = ₦50 \\times \\frac{1.6}{0.4 + 1.6} = ₦50 \\times \\frac{1.6}{2.0} = ₦50 \\times 0.8 = ₦40$$
 *   **Step 2: Calculate the Seller's Share ($T_{seller}$)**
-    $$T_{seller} = ₦50 \times \frac{0.4}{0.4 + 1.6} = ₦50 \times \frac{0.4}{2.0} = ₦50 \times 0.2 = ₦10$$
+    $$T_{seller} = ₦50 \\times \\frac{0.4}{0.4 + 1.6} = ₦50 \\times \\frac{0.4}{2.0} = ₦50 \\times 0.2 = ₦10$$
 
 Therefore, the **buyer bears ₦40** (in the form of a ₦40 price increase), while the **seller bears ₦10** (in the form of lower net margins). This shows that because demand is more inelastic than supply, the buyer bears the greater share of the tax!
 
@@ -1213,10 +1213,10 @@ A **budget** is estimated projected revenues and expenditures of a government ov
 The government of Nigeria decides to spend **₦500 billion** on road construction. If the citizens have a Marginal Propensity to Consume (MPC) of **0.75**, let's calculate the total increase in national income.
 
 #### Step 1: Calculate the Keynesian Multiplier ($k$)
-$$Multiplier \ k = \frac{1}{1 - MPC} = \frac{1}{1 - 0.75} = \frac{1}{0.25} = 4.0$$
+$$Multiplier \ k = \\frac{1}{1 - MPC} = \\frac{1}{1 - 0.75} = \\frac{1}{0.25} = 4.0$$
 
-#### Step 2: Calculate the Total Increase in Income ($\Delta Y$)
-$$\Delta Y = k \times \Delta G = 4.0 \times ₦500\text{ billion} = ₦2,000\text{ billion}$$
+#### Step 2: Calculate the Total Increase in Income ($\\Delta Y$)
+$$\\Delta Y = k \\times \\Delta G = 4.0 \\times ₦500\\text{ billion} = ₦2,000\\text{ billion}$$
 
 Therefore, injecting ₦500 billion of government spending re-circulates to generate **₦2 trillion** in total national income!
 
@@ -1429,7 +1429,7 @@ The price level is tracked using index numbers (e.g. Retail Price Index).
 A consumer spends money on Rice and Beans.
 *   Base year (1980): Rice = ₦5, Beans = ₦8.
 *   Current year (1987): Rice = ₦8, Beans = ₦12.
-*   Consumer spends twice as much on Rice as Beans $\implies$ Weight ($W$) of Rice = 2, Weight of Beans = 1.
+*   Consumer spends twice as much on Rice as Beans $\\implies$ Weight ($W$) of Rice = 2, Weight of Beans = 1.
 
 #### Step 1: Calculate Price Index ($P_{idx} = \\frac{Current}{Base} \\times 100$)
 *   Rice: $\\frac{8}{5} \\times 100 = 160$
