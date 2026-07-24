@@ -12,11 +12,35 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const FALLBACK_QUESTIONS: Question[] = [
+  { question: "What is the primary subject matter of Economics?", options: ["Wealth accumulation only", "Scarcity and choice under limited resources", "Stock market trading algorithms", "Government tax collection"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Economics is the study of allocation of scarce resources among competing ends." },
+  { question: "Which of the following is classified as a land factor of production?", options: ["Machinery", "Natural mineral deposits", "Bank deposits", "Entrepreneurial skill"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Land encompasses all natural resources provided by nature." },
+  { question: "A market equilibrium occurs when:", options: ["Price equals zero", "Quantity demanded equals quantity supplied", "Government sets a price ceiling", "Imports exceed exports"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Equilibrium is reached when quantity demanded equals quantity supplied." },
+  { question: "What does an upward-sloping supply curve indicate?", options: ["Producers supply less at higher prices", "Producers supply more at higher prices", "Consumers buy more at higher prices", "Price has no effect on supply"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "According to the Law of Supply, higher prices incentivize greater output." },
+  { question: "Opportunity cost measures:", options: ["The monetary cost paid", "The value of the next best alternative forgone", "The total accounting profit", "The inflation rate"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Opportunity cost is the foregone benefit of the next best option." },
+  { question: "Inflation is best defined as:", options: ["A one-time increase in prices", "A sustained increase in the general price level", "An increase in stock prices", "A decrease in unemployment"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Inflation is a continuous rise in overall prices over time." },
+  { question: "Which policy is used by central banks to control money supply?", options: ["Fiscal Policy", "Monetary Policy", "Trade Policy", "Industrial Policy"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Monetary policy regulates interest rates and money supply." },
+  { question: "A public good is characterized by:", options: ["Rivalry and Excludability", "Non-rivalry and Non-excludability", "High cost and low demand", "Private ownership"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Public goods can be consumed simultaneously without excluding anyone." },
+  { question: "Gross Domestic Product (GDP) measures:", options: ["Total wealth of citizens", "Total market value of goods and services produced within a country", "Government budget surplus", "Total exports minus total gold reserves"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "GDP measures output within a nation's borders." },
+  { question: "What happens to price when demand exceeds supply?", options: ["Price tends to fall", "Price tends to rise", "Price remains fixed", "Supply automatically doubles"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Shortage creates upward pressure on prices." },
+  { question: "Which market structure has a single seller with no close substitutes?", options: ["Monopoly", "Perfect Competition", "Oligopoly", "Monopolistic Competition"], correctAnswer: 0, level: 'secondary', topicId: 'ss1', explanation: "A monopoly is controlled by a single supplier." },
+  { question: "The law of diminishing marginal utility states that as consumption increases:", options: ["Total utility decreases to zero", "Additional satisfaction from each unit decreases", "Price automatically falls", "Demand becomes infinitely elastic"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Marginal utility falls as more units are consumed." },
+  { question: "Fiscal policy is implemented through changes in:", options: ["Interest rates and reserve ratios", "Government spending and taxation", "Exchange rates and tariffs", "Money supply and credit limits"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Fiscal policy uses taxation and government spending." },
+  { question: "In economics, 'capital' as a factor of production refers to:", options: ["Money in bank accounts", "Man-made assets used in production", "Shares of stocks", "Raw land"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Capital includes physical tools, machinery, and buildings used in production." },
+  { question: "Elasticity of demand measures:", options: ["The absolute price of a good", "Responsiveness of quantity demanded to a price change", "Cost of production", "Income level of producers"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Elasticity measures sensitivity of quantity demanded to price changes." },
+  { question: "Deflation is characterized by:", options: ["Rising prices and low interest rates", "A sustained decrease in the general price level", "High inflation and high unemployment", "Increased government spending"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Deflation is a persistent decline in general price levels." },
+  { question: "When marginal cost equals marginal revenue, a firm:", options: ["Maximizes total profit", "Minimizes total revenue", "Breaks even with zero cost", "Shuts down immediately"], correctAnswer: 0, level: 'secondary', topicId: 'ss1', explanation: "Profit is maximized where MR = MC." },
+  { question: "A tariff is best defined as a tax on:", options: ["Domestically produced goods", "Imported goods and services", "Corporate profits", "Individual income"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "Tariffs are duties imposed on imported items." },
+  { question: "Which curve shows the relationship between tax rates and tax revenue?", options: ["Lorenz Curve", "Laffer Curve", "Phillips Curve", "Indifference Curve"], correctAnswer: 1, level: 'secondary', topicId: 'ss1', explanation: "The Laffer Curve illustrates tax revenue at varying tax rates." },
+  { question: "A negative externality in production results in:", options: ["Overproduction relative to social optimum", "Underproduction relative to social optimum", "Zero social cost", "Equal private and social benefits"], correctAnswer: 0, level: 'secondary', topicId: 'ss1', explanation: "Negative externalities lead to social costs exceeding private costs." }
+];
+
 const getQuestionForPlayer = (match: any, playerIndex: number, qIndexForPlayer: number) => {
   if (!match?.questions || match.questions.length === 0) return null;
+  const total = match.questions.length;
   const pIndex = playerIndex < 0 ? 0 : playerIndex;
-  const globalIndex = pIndex === 0 ? qIndexForPlayer * 2 : qIndexForPlayer * 2 + 1;
-  return match.questions[globalIndex] || match.questions[qIndexForPlayer % match.questions.length];
+  const globalIndex = (pIndex === 0 ? qIndexForPlayer * 2 : qIndexForPlayer * 2 + 1) % total;
+  return match.questions[globalIndex];
 };
 
 export const LiveChallenge: React.FC = () => {
@@ -199,7 +223,7 @@ export const LiveChallenge: React.FC = () => {
          
          if (currentMatchIdRef.current !== matchDocId) {
              const opponent = myMatch.players.find((p: any) => p.id !== user.uid);
-             if (isSearching || expectingMatchRef.current) {
+             if (isSearching || expectingMatchRef.current || myMatch.status === 'playing') {
                  // New match found from queue or accepted challenge
                  currentMatchIdRef.current = matchDocId;
                  clearInterval(searchTimerRef.current);
@@ -334,21 +358,16 @@ export const LiveChallenge: React.FC = () => {
 
   const pendingSubmitRef = useRef(false);
 
+  const activeTurnPlayer = matchData?.players?.find((p: any) => p.id === matchData?.currentTurnUid);
+  const activeQuestionIndex = activeTurnPlayer?.currentQuestion || 0;
+
   useEffect(() => {
     if (!matchData || finished) return;
     const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
-    const totalTime = MODE_CONFIGS[mode].time;
+    const totalTime = MODE_CONFIGS[mode]?.time || 15;
 
-    if (matchData.isDemoMode) {
-      setTimeLeft(totalTime);
-    } else if (matchData.lastTurnChangeAt?.seconds) {
-      const nowSec = Math.floor(Date.now() / 1000);
-      const elapsed = Math.max(0, nowSec - matchData.lastTurnChangeAt.seconds);
-      setTimeLeft(Math.max(0, totalTime - elapsed));
-    } else {
-      setTimeLeft(totalTime);
-    }
-  }, [matchData?.matchId, matchData?.currentTurnUid, matchData?.lastTurnChangeAt, finished]);
+    setTimeLeft(totalTime);
+  }, [matchData?.matchId, matchData?.currentTurnUid, activeQuestionIndex, finished]);
 
   useEffect(() => {
     if (!matchData || finished) return;
@@ -368,9 +387,9 @@ export const LiveChallenge: React.FC = () => {
                         // Demo opponent timed out on their turn!
                         handleDemoOpponentAnswer(false, MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz'].time);
                     } else if (user) {
-                        // Forcefully timeout opponent if disconnected
+                        // Safe fallback timeout for opponent if disconnected
                         const opp = matchData?.players?.find((p: any) => p.id !== user.uid);
-                        if (opp && matchData.matchId) {
+                        if (opp && matchData.matchId && matchData.currentTurnUid === opp.id) {
                            timeoutMatchTurn(matchData.matchId, opp.id, opp.currentQuestion || 0);
                         }
                     }
@@ -382,7 +401,7 @@ export const LiveChallenge: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timerInterval);
-  }, [matchData?.matchId, matchData?.currentTurnUid, finished, waitingForOpponent, showAnswerFeedback, user]);
+  }, [matchData?.matchId, matchData?.currentTurnUid, activeQuestionIndex, finished, waitingForOpponent, showAnswerFeedback, user]);
 
   const demoOpponentTimeoutRef = useRef<any>(null);
 
@@ -439,6 +458,11 @@ export const LiveChallenge: React.FC = () => {
       if (meNow && meNow.currentQuestion >= targetQ && oppNow && oppNow.currentQuestion >= targetQ) {
         setFinished(true);
         setDuelStarted(false);
+      } else if (meNow && meNow.currentQuestion >= targetQ) {
+        setWaitingForOpponent(true);
+        const modeTime = MODE_CONFIGS[mode]?.time || 15;
+        setMatchData(prev => prev ? ({ ...prev, currentTurnUid: oppNow?.id || 'sample-rival-2' }) : null);
+        triggerDemoOpponentTurn(modeTime);
       } else {
         setWaitingForOpponent(false);
         setMatchData(prev => prev ? ({ ...prev, currentTurnUid: myUid }) : null);
@@ -491,9 +515,7 @@ export const LiveChallenge: React.FC = () => {
     
     try {
       const questions = await getQuestions(topicId);
-      const finalQuestions: Question[] = questions.length > 0 ? questions : [
-         { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topicId, explanation: "" }
-      ];
+      const finalQuestions: Question[] = questions.length >= 5 ? questions : FALLBACK_QUESTIONS;
       await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
     } catch(e) { console.error(e); }
     setLoading(false);
