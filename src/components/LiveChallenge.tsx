@@ -4,7 +4,7 @@ import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leave
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { useRoadmap } from '../hooks/useRoadmap';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search, Flag } from 'lucide-react';
+import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search, Flag, Clock } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -1050,16 +1050,11 @@ export const LiveChallenge: React.FC = () => {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm md:text-lg font-bold truncate">{opponent?.displayName || 'Opponent'}</p>
-                    {(waitingForOpponent || Boolean(showAnswerFeedback)) && oppCurrentAns?.selectedOption !== null && oppCurrentAns?.selectedOption !== undefined ? (
-                      <span className={cn(
-                        "text-[8px] md:text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider border flex items-center gap-1 shrink-0",
-                        oppCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
-                      )}>
-                        Choice: Opt {String.fromCharCode(65 + oppCurrentAns.selectedOption)}
-                      </span>
-                    ) : (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? (
+                    {waitingForOpponent ? (
                       <span className="text-[8px] md:text-[10px] bg-emerald-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
-                    ) : null}
+                    ) : (
+                      <span className="text-[8px] md:text-[10px] bg-sky-500/20 text-sky-400 border border-sky-500/40 px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Waiting</span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] md:text-xs text-on-surface-variant flex items-center gap-1">
@@ -1159,7 +1154,15 @@ export const LiveChallenge: React.FC = () => {
                             {q.question}
                           </h3>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-auto">
+                        <div className="relative grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-auto">
+                          {waitingForOpponent && (
+                             <div className="absolute inset-0 z-10 bg-surface-container-low/60 backdrop-blur-[2px] flex items-center justify-center rounded-xl border border-outline-variant/30">
+                                <div className="bg-surface-container-highest px-4 py-2 rounded-full shadow-lg flex items-center gap-2 border border-emerald-500/30">
+                                   <Clock size={14} className="text-emerald-500 animate-pulse" />
+                                   <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Opponent is deciding...</span>
+                                </div>
+                             </div>
+                          )}
                           {q.options.map((option: string, i: number) => {
                             const showSelection = waitingForOpponent || Boolean(showAnswerFeedback);
                             const youPicked = showSelection && myCurrentAns?.selectedOption === i;
@@ -1269,17 +1272,11 @@ export const LiveChallenge: React.FC = () => {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm md:text-lg font-bold truncate">You</p>
-                    {matchData.currentTurnUid === user?.uid && !waitingForOpponent && (
-                      <span className="text-[8px] md:text-[10px] bg-sky-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
-                    )}
-                    {myCurrentAns?.selectedOption !== null && myCurrentAns?.selectedOption !== undefined && (
-                      <span className={cn(
-                        "text-[8px] md:text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider border flex items-center gap-1 shrink-0",
-                        myCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
-                      )}>
-                        Choice: Opt {String.fromCharCode(65 + myCurrentAns.selectedOption)}
-                      </span>
-                    )}
+                    {waitingForOpponent ? (
+                      <span className="text-[8px] md:text-[10px] bg-sky-500/20 text-sky-400 border border-sky-500/40 px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Waiting</span>
+                    ) : (matchData.currentTurnUid === user?.uid) ? (
+                      <span className="text-[8px] md:text-[10px] bg-sky-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0 animate-pulse">Thinking</span>
+                    ) : null}
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] md:text-xs text-emerald-400 flex items-center gap-1">
