@@ -587,11 +587,13 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
 
         // check win
         let status = data.status;
-        const totalQuestions = data.questions?.length || 0;
+        const mode = data.gameMode || 'blitz';
+        const targetQuestionsMap: Record<string, number> = { bullet: 5, blitz: 15, rapid: 20 };
+        const targetQuestions = targetQuestionsMap[mode] || 15;
         
-        if (players.every((p: any) => p.currentQuestion >= totalQuestions)) {
+        if (players.every((p: any) => p.currentQuestion >= targetQuestions)) {
           status = 'finished';
-        } else if (nextPlayer && nextPlayer.currentQuestion >= totalQuestions) {
+        } else if (nextPlayer && nextPlayer.currentQuestion >= targetQuestions) {
           // If the opponent is done, turn returns to us until we're done
           nextTurnUid = uid;
         }
@@ -639,11 +641,13 @@ export const timeoutMatchTurn = async (matchId: string, timedOutUid: string, que
          let nextTurnUid = nextPlayer ? nextPlayer.id : timedOutUid;
 
          let status = data.status;
-         const totalQuestions = data.questions?.length || 0;
+         const mode = data.gameMode || 'blitz';
+         const targetQuestionsMap: Record<string, number> = { bullet: 5, blitz: 15, rapid: 20 };
+         const targetQuestions = targetQuestionsMap[mode] || 15;
          
-         if (players.every((p: any) => p.currentQuestion >= totalQuestions)) {
+         if (players.every((p: any) => p.currentQuestion >= targetQuestions)) {
            status = 'finished';
-         } else if (nextPlayer && nextPlayer.currentQuestion >= totalQuestions) {
+         } else if (nextPlayer && nextPlayer.currentQuestion >= targetQuestions) {
            nextTurnUid = timedOutUid;
          }
          

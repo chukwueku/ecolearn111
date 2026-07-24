@@ -449,8 +449,7 @@ export const LiveChallenge: React.FC = () => {
   };
 
   const triggerDemoOpponentTurn = (modeTime: number) => {
-    const myUid = user?.uid || 'player-1';
-    const thinkTimeSeconds = Math.min(modeTime - 1, Math.floor(Math.random() * 5) + 3); // realistic 3-7 seconds
+    const thinkTimeSeconds = Math.floor(Math.random() * 2) + 1; // fast 1-2 seconds
     
     if (demoOpponentTimeoutRef.current) clearTimeout(demoOpponentTimeoutRef.current);
 
@@ -554,7 +553,7 @@ export const LiveChallenge: React.FC = () => {
           }
           return updated;
         });
-      }, 1000);
+      }, 400);
       return;
     }
 
@@ -571,7 +570,7 @@ export const LiveChallenge: React.FC = () => {
       } finally {
         setShowAnswerFeedback(null);
       }
-    }, 1200);
+    }, 400);
   };
 
   const sendMessage = (e: React.FormEvent) => {
