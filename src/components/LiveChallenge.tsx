@@ -4,7 +4,7 @@ import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leave
 import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { useRoadmap } from '../hooks/useRoadmap';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search } from 'lucide-react';
+import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search, Flag } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -37,7 +37,25 @@ export const LiveChallenge: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showAnswerFeedback, setShowAnswerFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [mobileTab, setMobileTab] = useState<'board' | 'analysis'>('board');
+  const [sidebarTab, setSidebarTab] = useState<'history' | 'analysis'>('history');
+  const [selectedAnalysisIndex, setSelectedAnalysisIndex] = useState<number>(0);
   const [toastOptions, setToastOptions] = useState<{message: string, type: 'error' | 'success'} | null>(null);
+
+  const parseAnswer = (ans: any) => {
+    if (ans === undefined || ans === null) return null;
+    if (typeof ans === 'boolean') {
+      return { isCorrect: ans, selectedOption: null, timeTaken: null, timedOut: false };
+    }
+    if (typeof ans === 'object') {
+      return {
+        isCorrect: !!ans.isCorrect,
+        selectedOption: typeof ans.selectedOption === 'number' ? ans.selectedOption : null,
+        timeTaken: typeof ans.timeTaken === 'number' ? ans.timeTaken : null,
+        timedOut: !!ans.timedOut
+      };
+    }
+    return null;
+  };
   const [challengedUserIds, setChallengedUserIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -170,12 +188,13 @@ export const LiveChallenge: React.FC = () => {
       if (myMatch) {
          const isMyTurn = myMatch.currentTurnUid === user.uid;
          const me = myMatch.players.find((p: any) => p.id === user.uid);
+         const matchDocId = myMatch.id || myMatch.matchId;
          
-         if (currentMatchIdRef.current !== myMatch.matchId) {
+         if (currentMatchIdRef.current !== matchDocId) {
              const opponent = myMatch.players.find((p: any) => p.id !== user.uid);
              if (isSearching || expectingMatchRef.current) {
                  // New match found from queue or accepted challenge
-                 currentMatchIdRef.current = myMatch.matchId;
+                 currentMatchIdRef.current = matchDocId;
                  clearInterval(searchTimerRef.current);
                  setSearchTime(0);
                  setIsSearching(false);
@@ -217,7 +236,12 @@ export const LiveChallenge: React.FC = () => {
       } else {
           if (activeMatchBanner) setActiveMatchBanner(null);
           // Check if myMatch just finished
-          const myFinishedMatch = allMatches.find(m => m.players?.some((p: any) => p.id === user.uid) && m.status === 'finished' && m.matchId === currentMatchIdRef.current);
+          const activeId = currentMatchIdRef.current || matchData?.matchId || matchData?.id;
+          const myFinishedMatch = allMatches.find(m => 
+            m.players?.some((p: any) => p.id === user.uid) && 
+            m.status === 'finished' && 
+            (m.matchId === activeId || m.id === activeId || (duelStarted && activeId))
+          );
           if (myFinishedMatch) {
               setMatchData(myFinishedMatch);
               setPlayers(myFinishedMatch.players);
@@ -305,26 +329,41 @@ export const LiveChallenge: React.FC = () => {
     if (!matchData || finished) return;
     const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
     const totalTime = MODE_CONFIGS[mode].time;
-    setTimeLeft(totalTime);
-  }, [matchData?.matchId, matchData?.currentTurnUid, finished]);
+
+    if (matchData.isDemoMode) {
+      setTimeLeft(totalTime);
+    } else if (matchData.lastTurnChangeAt?.seconds) {
+      const nowSec = Math.floor(Date.now() / 1000);
+      const elapsed = Math.max(0, nowSec - matchData.lastTurnChangeAt.seconds);
+      setTimeLeft(Math.max(0, totalTime - elapsed));
+    } else {
+      setTimeLeft(totalTime);
+    }
+  }, [matchData?.matchId, matchData?.currentTurnUid, matchData?.lastTurnChangeAt, finished]);
 
   useEffect(() => {
     if (!matchData || finished) return;
     
-    const isMyTurn = matchData.currentTurnUid === user?.uid;
+    const myUid = user?.uid || 'player-1';
+    const isMyTurn = matchData.currentTurnUid === myUid;
 
     const timerInterval = setInterval(() => {
         setTimeLeft((prev) => {
             const next = Math.max(0, prev - 1);
             
-            if (next === 0 && prev !== 0 && !showAnswerFeedback && user) {
+            if (next === 0 && prev !== 0 && !showAnswerFeedback) {
                 if (isMyTurn && !waitingForOpponent) {
                     handleAnswer(false);
-                } else if (!isMyTurn) {
-                    // Try to forcefully timeout the opponent if they disconnected
-                    const opp = matchData?.players?.find((p: any) => p.id !== user.uid);
-                    if (opp && matchData.matchId) {
-                       timeoutMatchTurn(matchData.matchId, opp.id, opp.currentQuestion || 0);
+                } else if (!isMyTurn || waitingForOpponent) {
+                    if (matchData.isDemoMode) {
+                        // Demo opponent timed out on their turn!
+                        handleDemoOpponentAnswer(false, MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz'].time);
+                    } else if (user) {
+                        // Forcefully timeout opponent if disconnected
+                        const opp = matchData?.players?.find((p: any) => p.id !== user.uid);
+                        if (opp && matchData.matchId) {
+                           timeoutMatchTurn(matchData.matchId, opp.id, opp.currentQuestion || 0);
+                        }
                     }
                 }
             }
@@ -335,6 +374,80 @@ export const LiveChallenge: React.FC = () => {
 
     return () => clearInterval(timerInterval);
   }, [matchData?.matchId, matchData?.currentTurnUid, finished, waitingForOpponent, showAnswerFeedback, user]);
+
+  const demoOpponentTimeoutRef = useRef<any>(null);
+
+  const handleDemoOpponentAnswer = (isCorrect: boolean, thinkTimeSeconds: number) => {
+    const myUid = user?.uid || 'player-1';
+    setPlayers(prevOpp => {
+      const oppPlayer = prevOpp.find(p => p.id !== myUid);
+      const qIndex = oppPlayer?.currentQuestion || 0;
+      const currentQ = matchData?.questions?.[qIndex];
+      let oppSelectedOpt = 0;
+      if (currentQ) {
+        if (isCorrect) {
+          oppSelectedOpt = currentQ.correctAnswer;
+        } else {
+          oppSelectedOpt = (currentQ.correctAnswer + 1) % currentQ.options.length;
+        }
+      }
+
+      const updatedOpp = prevOpp.map(p => {
+        if (p.id !== myUid) {
+          const newOppScore = p.score + (isCorrect ? 100 : 0);
+          const nextOppQ = p.currentQuestion + 1;
+          const prevAnswers = p.answers || {};
+          const newAnswers = {
+            ...prevAnswers,
+            [qIndex]: {
+              isCorrect,
+              selectedOption: oppSelectedOpt,
+              timeTaken: thinkTimeSeconds
+            }
+          };
+          return { ...p, score: newOppScore, currentQuestion: nextOppQ, answers: newAnswers };
+        }
+        return p;
+      });
+
+      const meNow = updatedOpp.find(p => p.id === myUid);
+      const oppNow = updatedOpp.find(p => p.id !== myUid);
+      const totalQ = matchData?.questions?.length || 5;
+
+      // Add chat feedback for opponent answer
+      setMessages(prevMsgs => [
+        ...prevMsgs,
+        {
+          id: `m-${Date.now()}`,
+          senderName: oppNow?.displayName || 'Alex',
+          text: isCorrect ? `Answered correctly in ${thinkTimeSeconds}s (+100 pts)!` : `Missed Q${(oppNow?.currentQuestion || 1)} after ${thinkTimeSeconds}s!`,
+          timestamp: Date.now()
+        }
+      ]);
+
+      if (meNow && meNow.currentQuestion >= totalQ && oppNow && oppNow.currentQuestion >= totalQ) {
+        setFinished(true);
+        setDuelStarted(false);
+      } else {
+        setWaitingForOpponent(false);
+        setMatchData(prev => prev ? ({ ...prev, currentTurnUid: myUid }) : null);
+        setCurrentQuestion(meNow?.currentQuestion || 0);
+      }
+      return updatedOpp;
+    });
+  };
+
+  const triggerDemoOpponentTurn = (modeTime: number) => {
+    const myUid = user?.uid || 'player-1';
+    const thinkTimeSeconds = Math.min(modeTime - 1, Math.floor(Math.random() * 5) + 3); // realistic 3-7 seconds
+    
+    if (demoOpponentTimeoutRef.current) clearTimeout(demoOpponentTimeoutRef.current);
+
+    demoOpponentTimeoutRef.current = setTimeout(() => {
+      const isCorrect = Math.random() < 0.75;
+      handleDemoOpponentAnswer(isCorrect, thinkTimeSeconds);
+    }, thinkTimeSeconds * 1000);
+  };
 
   const handleChallenge = async (targetUser: any) => {
     if (!user || !profile) return;
@@ -381,15 +494,63 @@ export const LiveChallenge: React.FC = () => {
     await respondDirectChallenge(incomingChallenge.id, 'declined');
   };
 
-  const handleAnswer = (correct: boolean) => {
-    if (!currentMatchIdRef.current || !user || waitingForOpponent || showAnswerFeedback) return;
+  const handleAnswer = (correct: boolean, optionIndex?: number) => {
+    if (showAnswerFeedback || waitingForOpponent) return;
     
     setShowAnswerFeedback(correct ? 'correct' : 'incorrect');
+
+    if (matchData?.isDemoMode) {
+      setTimeout(() => {
+        setShowAnswerFeedback(null);
+        const myUid = user?.uid || 'player-1';
+        const modeTime = MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz'].time;
+        
+        // Update user score and question
+        setPlayers(prev => {
+          const updated = prev.map(p => {
+            if (p.id === myUid) {
+              const newScore = p.score + (correct ? 100 : 0);
+              const nextQ = p.currentQuestion + 1;
+              const prevAnswers = p.answers || {};
+              const newAnswers = {
+                ...prevAnswers,
+                [p.currentQuestion]: {
+                  isCorrect: correct,
+                  selectedOption: typeof optionIndex === 'number' ? optionIndex : null,
+                  timeTaken: modeTime - timeLeft
+                }
+              };
+              return { ...p, score: newScore, currentQuestion: nextQ, answers: newAnswers };
+            }
+            return p;
+          });
+
+          const me = updated.find(p => p.id === myUid);
+          const opp = updated.find(p => p.id !== myUid);
+
+          // Check if both completed all questions
+          if (me && me.currentQuestion >= matchData.questions.length && opp && opp.currentQuestion >= matchData.questions.length) {
+            setFinished(true);
+            setDuelStarted(false);
+          } else {
+            // Hand turn over to opponent
+            setWaitingForOpponent(true);
+            setMatchData(prev => prev ? ({ ...prev, currentTurnUid: 'sample-rival-2' }) : null);
+            setTimeLeft(modeTime);
+            triggerDemoOpponentTurn(modeTime);
+          }
+          return updated;
+        });
+      }, 1000);
+      return;
+    }
+
+    if (!currentMatchIdRef.current || !user) return;
     
     // Minimal delay to see feedback
     setTimeout(async () => {
       try {
-        await submitMatchAnswer(currentMatchIdRef.current!, user.uid, correct, currentQuestion);
+        await submitMatchAnswer(currentMatchIdRef.current!, user.uid, correct, currentQuestion, optionIndex);
         setWaitingForOpponent(true);
       } catch (error) {
         console.error(error);
@@ -402,13 +563,40 @@ export const LiveChallenge: React.FC = () => {
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatInput.trim() || !matchData?.matchId || !user) return;
+    if (!chatInput.trim()) return;
     
+    if (matchData?.isDemoMode) {
+      const myName = profile?.displayName || 'You';
+      const userMsg = { id: `m-${Date.now()}`, senderName: myName, text: chatInput, timestamp: Date.now() };
+      setMessages(prev => [...prev, userMsg]);
+      const currentInput = chatInput;
+      setChatInput('');
+
+      setTimeout(() => {
+        const replies = [
+          "Good answer! Keep it up!",
+          "That was a close question!",
+          "Nice speed! Let's see who wins this round.",
+          "Economics speed is key here!",
+          "Great match so far!"
+        ];
+        const replyText = replies[Math.floor(Math.random() * replies.length)];
+        const oppMsg = { id: `m-${Date.now() + 1}`, senderName: 'Alex (Sample Rival)', text: replyText, timestamp: Date.now() };
+        setMessages(prev => [...prev, oppMsg]);
+      }, 1000);
+      return;
+    }
+
+    if (!matchData?.matchId || !user) return;
     sendMatchMessage(matchData.matchId, user.uid, profile?.displayName || 'User', chatInput);
     setChatInput('');
   };
 
   const handleRematch = async () => {
+    if (matchData?.isDemoMode) {
+      startDemoDuel();
+      return;
+    }
     if (!matchData?.matchId || !user) return;
     setRematchRequested(true);
     await requestMatchRematch(matchData.matchId, profile?.displayName || 'User', user.uid);
@@ -445,9 +633,126 @@ export const LiveChallenge: React.FC = () => {
   };
 
   const handleQuit = async () => {
-    if (!currentMatchIdRef.current || !user) return;
-    if (confirm("Are you sure you want to resign this match?")) {
-      await forfeitMatch(currentMatchIdRef.current, user.uid);
+    if (!confirm("Are you sure you want to resign this match? You will lose the match.")) return;
+
+    const myUid = user?.uid || 'player-1';
+
+    if (matchData?.isDemoMode) {
+      if (demoOpponentTimeoutRef.current) clearTimeout(demoOpponentTimeoutRef.current);
+      
+      const updatedPlayers = players.map(p => {
+        if (p.id === myUid) return { ...p, score: 0 };
+        return { ...p, score: Math.max(p.score || 0, 500) };
+      });
+
+      const finishedMatchData = {
+        ...matchData,
+        status: 'finished',
+        forfeitedBy: myUid,
+        players: updatedPlayers
+      };
+
+      setPlayers(updatedPlayers);
+      setMatchData(finishedMatchData);
+      setFinished(true);
+      setDuelStarted(false);
+      setToastOptions({ message: "You resigned the match.", type: 'error' });
+      return;
+    }
+
+    const activeMatchId = matchData?.id || matchData?.matchId || currentMatchIdRef.current;
+    if (!activeMatchId || !user) return;
+
+    try {
+      const updatedPlayers = players.map(p => {
+        if (p.id === user.uid) return { ...p, score: 0 };
+        return { ...p, score: Math.max(p.score || 0, 500) };
+      });
+      setPlayers(updatedPlayers);
+      if (matchData) {
+        setMatchData({
+          ...matchData,
+          status: 'finished',
+          forfeitedBy: user.uid,
+          players: updatedPlayers
+        });
+      }
+      setFinished(true);
+      setDuelStarted(false);
+
+      await forfeitMatch(activeMatchId, user.uid);
+      setToastOptions({ message: "You resigned the match.", type: 'error' });
+    } catch (err) {
+      console.error("Error resigning match:", err);
+    }
+  };
+
+  const startDemoDuel = async () => {
+    setLoading(true);
+    try {
+      const topicId = selectedTopicId || (profile?.level === 'undergraduate' ? 'uni' : 'ss1');
+      const questions = await getQuestions(topicId);
+      const finalQuestions: Question[] = questions.length > 0 ? questions.slice(0, 5) : [
+        { question: "What is the primary subject matter of Economics?", options: ["Wealth accumulation only", "Scarcity and choice under limited resources", "Stock market trading algorithms", "Government tax collection"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Economics is the study of allocation of scarce resources among competing ends." },
+        { question: "Which of the following is classified as a land factor of production?", options: ["Machinery", "Natural mineral deposits", "Bank deposits", "Entrepreneurial skill"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Land encompasses all natural resources provided by nature." },
+        { question: "A market equilibrium occurs when:", options: ["Price equals zero", "Quantity demanded equals quantity supplied", "Government sets a price ceiling", "Imports exceed exports"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Equilibrium is reached when quantity demanded equals quantity supplied." },
+        { question: "What does an upward-sloping supply curve indicate?", options: ["Producers supply less at higher prices", "Producers supply more at higher prices", "Consumers buy more at higher prices", "Price has no effect on supply"], correctAnswer: 1, level: 'secondary', topicId, explanation: "According to the Law of Supply, higher prices incentivize greater output." },
+        { question: "Opportunity cost measures:", options: ["The monetary cost paid", "The value of the next best alternative forgone", "The total accounting profit", "The inflation rate"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Opportunity cost is the foregone benefit of the next best option." }
+      ];
+
+      const myUid = user?.uid || 'player-1';
+      const myName = profile?.displayName || 'You (Player 1)';
+
+      const p1 = {
+        id: myUid,
+        displayName: myName,
+        score: 0,
+        currentQuestion: 0,
+        isDemo: false
+      };
+
+      const p2 = {
+        id: 'sample-rival-2',
+        displayName: 'Alex (Sample Rival)',
+        score: 0,
+        currentQuestion: 0,
+        isDemo: true
+      };
+
+      const demoMatch = {
+        matchId: 'demo-sample-match-' + Date.now(),
+        topicId,
+        gameMode: gameMode || 'blitz',
+        questions: finalQuestions,
+        currentQuestion: 0,
+        turnDeadline: Date.now() + 30000,
+        players: [p1, p2],
+        currentTurnUid: p1.id,
+        scores: {
+          [p1.id]: 0,
+          [p2.id]: 0
+        },
+        status: 'active',
+        isDemoMode: true
+      };
+
+      currentMatchIdRef.current = demoMatch.matchId;
+      setMatchData(demoMatch);
+      setPlayers([p1, p2]);
+      setCurrentQuestion(0);
+      setFinished(false);
+      setTimeLeft(MODE_CONFIGS[gameMode]?.time || 30);
+      setWaitingForOpponent(false);
+      setMessages([
+        { id: 'm1', senderName: 'System', text: '🎮 2-Player Demo Arena initialized! Practice turn-based dueling.', timestamp: Date.now() },
+        { id: 'm2', senderName: 'Alex (Sample Rival)', text: 'Good luck! Let’s test our economics speed.', timestamp: Date.now() + 100 }
+      ]);
+      setDuelStarted(true);
+      setToastOptions({ message: "🎮 Demo 2-Player Duel Started!", type: 'success' });
+    } catch (err) {
+      console.error("Demo duel error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -509,10 +814,15 @@ export const LiveChallenge: React.FC = () => {
     }
   };
   if (finished) {
-    const me = players.find(p => p.id === user?.uid);
-    const opponent = players.find(p => p.id !== user?.uid);
-    const won = me.score > opponent.score;
-    const draw = me.score === opponent.score;
+    const myUid = user?.uid || 'player-1';
+    const me = players.find(p => p.id === myUid) || players[0];
+    const opponent = players.find(p => p.id !== myUid) || players[1];
+
+    const isForfeitedByMe = matchData?.forfeitedBy === myUid;
+    const isForfeitedByOpponent = Boolean(matchData?.forfeitedBy && matchData.forfeitedBy !== myUid);
+
+    const won = isForfeitedByOpponent || (!isForfeitedByMe && (me?.score || 0) > (opponent?.score || 0));
+    const draw = !matchData?.forfeitedBy && (me?.score || 0) === (opponent?.score || 0);
 
     return (
       <div className="min-h-screen flex items-center justify-center px-6 bg-paper transition-colors duration-300 relative overflow-y-auto py-12">
@@ -553,8 +863,8 @@ export const LiveChallenge: React.FC = () => {
                 <div className="w-8 h-[1px] bg-outline-variant/50" />
               </div>
               {matchData?.forfeitedBy && (
-                <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-error animate-pulse">
-                   {matchData.forfeitedBy === user?.uid ? "Match Resigned" : "Opponent Forfeited"}
+                <p className="mt-4 text-xs font-black uppercase tracking-[0.25em] text-rose-500 animate-pulse bg-rose-500/10 py-1.5 px-4 rounded-full border border-rose-500/30 inline-block">
+                   {isForfeitedByMe ? "You Resigned The Match" : "Opponent Forfeited The Match"}
                 </p>
               )}
           </div>
@@ -596,6 +906,19 @@ export const LiveChallenge: React.FC = () => {
                 {rematchRequested ? 'Waiting for response...' : 'Request Rematch'}
               </button>
             )}
+
+            <button 
+              onClick={() => {
+                setFinished(false);
+                setSidebarTab('analysis');
+                setSelectedAnalysisIndex(0);
+                setMobileTab('analysis');
+              }}
+              className="w-full bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold py-5 rounded-2xl hover:bg-sky-500/20 transition-all flex items-center justify-center gap-3 uppercase tracking-[0.25em] text-[10px] shadow-lg"
+            >
+              <Search size={16} />
+              Inspect Full Analysis & Moves
+            </button>
             
             <button 
               onClick={() => {
@@ -619,6 +942,9 @@ export const LiveChallenge: React.FC = () => {
     const opponent = players.find(p => p.id !== user?.uid);
     const displayQuestionIndex = waitingForOpponent ? (opponent?.currentQuestion || 0) : currentQuestion;
     const q = matchData.questions[displayQuestionIndex];
+
+    const myCurrentAns = parseAnswer(me?.answers?.[displayQuestionIndex]);
+    const oppCurrentAns = parseAnswer(opponent?.answers?.[displayQuestionIndex]);
 
     if (!q) {
         return (
@@ -675,11 +1001,18 @@ export const LiveChallenge: React.FC = () => {
                   {opponent?.displayName?.[0] || 'O'}
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm md:text-lg font-bold truncate">{opponent?.displayName || 'Opponent'}</p>
-                    {(matchData.currentTurnUid !== user?.uid || waitingForOpponent) && (
+                    {(waitingForOpponent || Boolean(showAnswerFeedback)) && oppCurrentAns?.selectedOption !== null && oppCurrentAns?.selectedOption !== undefined ? (
+                      <span className={cn(
+                        "text-[8px] md:text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider border flex items-center gap-1 shrink-0",
+                        oppCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                      )}>
+                        Choice: Opt {String.fromCharCode(65 + oppCurrentAns.selectedOption)}
+                      </span>
+                    ) : (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? (
                       <span className="text-[8px] md:text-[10px] bg-emerald-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase animate-pulse shrink-0">Thinking</span>
-                    )}
+                    ) : null}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] md:text-xs text-on-surface-variant flex items-center gap-1">
@@ -711,21 +1044,55 @@ export const LiveChallenge: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.2 }}
-                        className="h-full flex flex-col items-center justify-center text-center space-y-6"
+                        className="h-full flex flex-col items-center justify-center text-center space-y-4"
                       >
                          <div className={cn(
-                           "w-24 h-24 rounded-full flex items-center justify-center border-4 animate-in zoom-in duration-300",
+                           "w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center border-4 animate-in zoom-in duration-300",
                            showAnswerFeedback === 'correct' ? "bg-emerald-500/20 border-emerald-500 text-emerald-500" : "bg-rose-500/20 border-rose-500 text-rose-500"
                          )}>
-                           {showAnswerFeedback === 'correct' ? <CheckCircle2 size={48} /> : <XCircle size={48} />}
+                           {showAnswerFeedback === 'correct' ? <CheckCircle2 size={44} /> : <XCircle size={44} />}
                          </div>
                          <h3 className={cn(
-                           "text-4xl font-black uppercase tracking-tighter italic",
+                           "text-3xl md:text-4xl font-black uppercase tracking-tighter italic",
                            showAnswerFeedback === 'correct' ? "text-emerald-500" : "text-rose-500"
                          )}>
                            {showAnswerFeedback === 'correct' ? "Brilliant!" : "Blunder!"}
                          </h3>
-                         <p className="text-on-surface-variant font-mono text-sm">SWITCHING TURNS...</p>
+
+                         {/* Selections side-by-side comparison */}
+                         <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6 bg-surface-container-highest/90 backdrop-blur p-3 px-5 rounded-2xl border border-outline-variant/40 shadow-xl max-w-md w-full">
+                           <div className="flex items-center gap-2">
+                             <span className="font-bold text-sky-400 text-xs">You:</span>
+                             {myCurrentAns?.selectedOption !== null && myCurrentAns?.selectedOption !== undefined ? (
+                               <span className={cn(
+                                 "px-2.5 py-0.5 rounded-md font-black uppercase text-[10px] flex items-center gap-1 border",
+                                 myCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                               )}>
+                                 Opt {String.fromCharCode(65 + myCurrentAns.selectedOption)} {myCurrentAns.isCorrect ? '✓' : '✗'}
+                               </span>
+                             ) : (
+                               <span className="text-on-surface-variant/50 italic text-[10px]">No selection</span>
+                             )}
+                           </div>
+
+                           <div className="w-px h-5 bg-outline-variant/40 hidden sm:block" />
+
+                           <div className="flex items-center gap-2">
+                             <span className="font-bold text-amber-400 text-xs">{opponent?.displayName || 'Opponent'}:</span>
+                             {oppCurrentAns?.selectedOption !== null && oppCurrentAns?.selectedOption !== undefined ? (
+                               <span className={cn(
+                                 "px-2.5 py-0.5 rounded-md font-black uppercase text-[10px] flex items-center gap-1 border",
+                                 oppCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                               )}>
+                                 Opt {String.fromCharCode(65 + oppCurrentAns.selectedOption)} {oppCurrentAns.isCorrect ? '✓' : '✗'}
+                               </span>
+                             ) : (
+                               <span className="text-on-surface-variant/50 italic text-[10px]">Thinking...</span>
+                             )}
+                           </div>
+                         </div>
+
+                         <p className="text-on-surface-variant font-mono text-xs tracking-widest uppercase">Switching turns...</p>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -746,28 +1113,73 @@ export const LiveChallenge: React.FC = () => {
                           </h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-auto">
-                          {q.options.map((option: string, i: number) => (
-                            <button
-                              key={i}
-                              disabled={waitingForOpponent}
-                              onClick={() => handleAnswer(i === q.correctAnswer)}
-                              className={cn(
-                                "group relative h-16 md:h-20 rounded-xl border-l-[4px] md:border-l-[6px] transition-all text-left px-4 md:px-6 flex items-center gap-3 md:gap-4 overflow-hidden",
-                                waitingForOpponent 
-                                  ? "bg-surface-container-highest border-outline-variant/30 opacity-60 cursor-not-allowed"
-                                  : "bg-surface-container-highest hover:bg-surface-container-highest border-outline-variant/30 hover:border-sky-500 cursor-pointer"
-                              )}
-                            >
-                               <div className="w-6 h-6 md:w-8 md:h-8 rounded bg-surface-container-highest flex items-center justify-center font-mono font-bold text-sm md:text-lg text-on-surface-variant/50 transition-colors shrink-0 group-hover:text-sky-500/50">
-                                 {String.fromCharCode(65 + i)}
-                               </div>
-                               <span className={cn(
-                                 "text-sm md:text-lg font-medium tracking-tight text-on-surface transition-transform line-clamp-2",
-                                 !waitingForOpponent && "group-hover:translate-x-1"
-                               )}>{option}</span>
-                               {!waitingForOpponent && <div className="absolute right-0 top-0 bottom-0 w-1 bg-surface-container opacity-0 group-hover:opacity-100 transition-opacity" />}
-                            </button>
-                          ))}
+                          {q.options.map((option: string, i: number) => {
+                            const showSelection = waitingForOpponent || Boolean(showAnswerFeedback);
+                            const youPicked = showSelection && myCurrentAns?.selectedOption === i;
+                            const oppPicked = showSelection && oppCurrentAns?.selectedOption === i;
+
+                            return (
+                              <button
+                                key={i}
+                                disabled={waitingForOpponent}
+                                onClick={() => handleAnswer(i === q.correctAnswer, i)}
+                                className={cn(
+                                  "group relative min-h-16 md:min-h-20 rounded-xl border-l-[4px] md:border-l-[6px] transition-all text-left px-4 md:px-5 py-3 flex items-center justify-between gap-3 overflow-hidden",
+                                  youPicked && oppPicked
+                                    ? "bg-purple-500/20 border-l-purple-500 border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                                    : youPicked
+                                      ? "bg-sky-500/20 border-l-sky-500 border-sky-500/50 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+                                      : oppPicked
+                                        ? "bg-amber-500/20 border-l-amber-500 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                                        : waitingForOpponent 
+                                          ? "bg-surface-container-highest border-outline-variant/30 opacity-60 cursor-not-allowed"
+                                          : "bg-surface-container-highest hover:bg-surface-container-highest border-outline-variant/30 hover:border-sky-500 cursor-pointer"
+                                )}
+                              >
+                                 <div className="flex items-center gap-3 min-w-0 flex-1">
+                                    <div className={cn(
+                                      "w-6 h-6 md:w-8 md:h-8 rounded flex items-center justify-center font-mono font-bold text-sm md:text-lg transition-colors shrink-0",
+                                      youPicked && oppPicked ? "bg-purple-500 text-on-surface" :
+                                      youPicked ? "bg-sky-500 text-on-surface" :
+                                      oppPicked ? "bg-amber-500 text-on-surface" :
+                                      "bg-surface-container-highest text-on-surface-variant/50 group-hover:text-sky-500/50"
+                                    )}>
+                                       {String.fromCharCode(65 + i)}
+                                    </div>
+                                    <span className={cn(
+                                      "text-sm md:text-base font-medium tracking-tight text-on-surface transition-transform line-clamp-2",
+                                      !waitingForOpponent && !youPicked && !oppPicked && "group-hover:translate-x-1"
+                                    )}>{option}</span>
+                                 </div>
+
+                                 {/* Choice Badges */}
+                                 <div className="flex items-center gap-1 shrink-0 ml-2">
+                                    {youPicked && oppPicked ? (
+                                      <span className="px-2 py-0.5 rounded bg-purple-500/30 text-purple-300 border border-purple-500/50 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                                        <Users size={10} /> Both Picked
+                                      </span>
+                                    ) : (
+                                      <>
+                                        {youPicked && (
+                                          <span className="px-2 py-0.5 rounded bg-sky-500/30 text-sky-300 border border-sky-500/50 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                                            <User size={10} /> Your Choice
+                                          </span>
+                                        )}
+                                        {oppPicked && (
+                                          <span className="px-2 py-0.5 rounded bg-amber-500/30 text-amber-300 border border-amber-500/50 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                                            <Swords size={10} /> {opponent?.displayName || 'Opponent'}'s Choice
+                                          </span>
+                                        )}
+                                      </>
+                                    )}
+                                 </div>
+
+                                 {!waitingForOpponent && !youPicked && !oppPicked && (
+                                   <div className="absolute right-0 top-0 bottom-0 w-1 bg-surface-container opacity-0 group-hover:opacity-100 transition-opacity" />
+                                 )}
+                              </button>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     )}
@@ -808,10 +1220,18 @@ export const LiveChallenge: React.FC = () => {
                   {profile?.displayName?.[0] || 'U'}
                 </div>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm md:text-lg font-bold truncate">You</p>
                     {matchData.currentTurnUid === user?.uid && !waitingForOpponent && (
                       <span className="text-[8px] md:text-[10px] bg-sky-500 text-on-surface px-1 md:px-1.5 py-0.5 rounded font-black uppercase shrink-0">Your Turn</span>
+                    )}
+                    {myCurrentAns?.selectedOption !== null && myCurrentAns?.selectedOption !== undefined && (
+                      <span className={cn(
+                        "text-[8px] md:text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider border flex items-center gap-1 shrink-0",
+                        myCurrentAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                      )}>
+                        Choice: Opt {String.fromCharCode(65 + myCurrentAns.selectedOption)}
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -821,8 +1241,9 @@ export const LiveChallenge: React.FC = () => {
                     </span>
                     <button 
                       onClick={handleQuit}
-                      className="text-[8px] md:text-[10px] text-rose-500/50 hover:text-rose-500 transition-colors uppercase font-black tracking-widest flex items-center gap-1 border border-rose-500/20 px-1.5 py-0.5 rounded"
+                      className="text-[9px] md:text-[10px] text-rose-400 hover:text-rose-300 transition-colors uppercase font-black tracking-widest flex items-center gap-1 border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 rounded shadow-sm"
                     >
+                      <Flag size={10} />
                       Resign
                     </button>
                   </div>
@@ -841,92 +1262,277 @@ export const LiveChallenge: React.FC = () => {
           </div>
         </div>
 
-        {/* Sidebar (Analysis/Chat) */}
+        {/* Sidebar (Move History / Analysis / Chat) */}
         <div className={cn(
-          "flex-1 md:flex-none w-full md:w-[320px] bg-surface-container-low border-l border-outline-variant/30 flex flex-col transition-all duration-300",
+          "flex-1 md:flex-none w-full md:w-[360px] bg-surface-container-low border-l border-outline-variant/30 flex flex-col transition-all duration-300",
           mobileTab !== 'analysis' && "hidden md:flex"
         )}>
            {/* Header tabs */}
-           <div className="flex border-b border-outline-variant/30 p-1">
-              <button className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-ink border-b-2 border-sky-500 transition-all">Move History</button>
-              <button onClick={() => setIsChatOpen(!isChatOpen)} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-all">Analysis</button>
-              <button onClick={handleQuit} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:text-rose-400 transition-all border-l border-outline-variant/30 flex items-center gap-2">
-                <XCircle size={12} />
+           <div className="flex border-b border-outline-variant/30 p-1 bg-surface-container-low shrink-0">
+              <button 
+                onClick={() => setSidebarTab('history')} 
+                className={cn(
+                  "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2",
+                  sidebarTab === 'history' ? "text-sky-400 border-sky-500 font-bold" : "text-on-surface-variant/60 border-transparent hover:text-on-surface"
+                )}
+              >
+                Move History
+              </button>
+              <button 
+                onClick={() => setSidebarTab('analysis')} 
+                className={cn(
+                  "flex-1 py-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2",
+                  sidebarTab === 'analysis' ? "text-sky-400 border-sky-500 font-bold" : "text-on-surface-variant/60 border-transparent hover:text-on-surface"
+                )}
+              >
+                Analysis
+              </button>
+              <button onClick={handleQuit} className="px-3 py-3 text-[10px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 transition-all border-l border-outline-variant/30 flex items-center gap-1.5 shrink-0 bg-rose-500/10 hover:bg-rose-500/20">
+                <Flag size={11} />
                 Resign
               </button>
            </div>
 
-           {/* History List */}
-           <div className="flex-1 overflow-y-auto p-4 space-y-2 font-mono scrollbar-hide">
-              {matchData.questions.map((_: any, i: number) => {
-                const myAnswer = me?.answers?.[i];
-                const opponentAnswer = opponent?.answers?.[i];
-                const myAsked = i <= (me?.currentQuestion || 0);
-                const oppAsked = i <= (opponent?.currentQuestion || 0);
+           {/* Tab Body */}
+           <div className="flex-1 overflow-y-auto p-3 space-y-3 font-sans scrollbar-hide">
+              {sidebarTab === 'history' ? (
+                <div className="space-y-2">
+                   <div className="grid grid-cols-[30px_1fr_1fr] items-center text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60 px-2 py-1 border-b border-outline-variant/20">
+                      <span>Q#</span>
+                      <span className="text-center text-sky-400">You</span>
+                      <span className="text-center text-emerald-400">{opponent?.displayName || 'Opponent'}</span>
+                   </div>
+                   {matchData.questions.map((q: Question, i: number) => {
+                     const myAns = parseAnswer(me?.answers?.[i]);
+                     const oppAns = parseAnswer(opponent?.answers?.[i]);
+                     const isMyCurrent = me?.currentQuestion === i;
+                     const isOppCurrent = opponent?.currentQuestion === i;
 
-                const myRes = myAnswer !== undefined ? (myAnswer ? "WIN" : "LOSS") : "...";
-                const oppRes = opponentAnswer !== undefined ? (opponentAnswer ? "WIN" : "LOSS") : "...";
+                     return (
+                       <div 
+                         key={i} 
+                         onClick={() => {
+                           setSelectedAnalysisIndex(i);
+                           setSidebarTab('analysis');
+                         }}
+                         className={cn(
+                           "p-2.5 rounded-xl border transition-all cursor-pointer group flex flex-col space-y-2",
+                           selectedAnalysisIndex === i 
+                            ? "bg-sky-500/10 border-sky-500/50 shadow-md"
+                            : "bg-surface-container-highest/50 hover:bg-surface-container-highest border-outline-variant/20"
+                         )}
+                       >
+                         <div className="flex items-center justify-between text-[10px]">
+                            <span className="font-mono font-bold text-on-surface-variant/70">Move {i + 1}</span>
+                            <span className="text-[9px] text-on-surface-variant/50 truncate max-w-[180px] italic">{q.question}</span>
+                         </div>
 
-                return (
-                  <div key={i} className={cn(
-                    "flex items-center gap-4 p-2 rounded transition-colors group",
-                    (i === me?.currentQuestion || i === opponent?.currentQuestion) ? "bg-surface-container border-l-2 border-sky-500/50" : ""
-                  )}>
-                    <span className="text-on-surface-variant/50 text-[10px] w-6">{i + 1}.</span>
-                    <div className="flex-1 grid grid-cols-2 gap-2">
-                       <div className={cn(
-                         "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all",
-                         myAnswer !== undefined
-                          ? myAnswer ? "bg-emerald-500/20 text-emerald-500 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]" : "bg-rose-500/20 text-rose-500"
-                          : "bg-surface-container-lowest text-outline-variant"
-                       )}>
-                         {myRes}
+                         <div className="grid grid-cols-2 gap-2">
+                            {/* My Move Status */}
+                            <div className={cn(
+                              "h-8 rounded-lg flex items-center justify-between px-2 text-[9px] font-black uppercase tracking-tight transition-all",
+                              myAns !== null
+                                ? myAns.isCorrect 
+                                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                                  : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                                : isMyCurrent && matchData.currentTurnUid === user?.uid && !waitingForOpponent
+                                  ? "bg-sky-500/20 text-sky-400 animate-pulse border border-sky-500/40"
+                                  : "bg-surface-container text-on-surface-variant/40"
+                            )}>
+                              {myAns !== null ? (
+                                <>
+                                  <span>{myAns.selectedOption !== null ? `Opt ${String.fromCharCode(65 + myAns.selectedOption)}` : 'Answered'}</span>
+                                  <span>{myAns.isCorrect ? '+100' : '+0'}</span>
+                                </>
+                              ) : isMyCurrent && matchData.currentTurnUid === user?.uid && !waitingForOpponent ? (
+                                <span className="w-full text-center">Your Turn...</span>
+                              ) : (
+                                <span className="w-full text-center">...</span>
+                              )}
+                            </div>
+
+                            {/* Opponent Move Status */}
+                            <div className={cn(
+                              "h-8 rounded-lg flex items-center justify-between px-2 text-[9px] font-black uppercase tracking-tight transition-all",
+                              oppAns !== null
+                                ? oppAns.isCorrect 
+                                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" 
+                                  : "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                                : isOppCurrent && (matchData.currentTurnUid !== user?.uid || waitingForOpponent)
+                                  ? "bg-emerald-500/20 text-emerald-400 animate-pulse border border-emerald-500/40"
+                                  : "bg-surface-container text-on-surface-variant/40"
+                            )}>
+                              {oppAns !== null ? (
+                                <>
+                                  <span>{oppAns.selectedOption !== null ? `Opt ${String.fromCharCode(65 + oppAns.selectedOption)}` : 'Answered'}</span>
+                                  <span>{oppAns.isCorrect ? '+100' : '+0'}</span>
+                                </>
+                              ) : isOppCurrent && (matchData.currentTurnUid !== user?.uid || waitingForOpponent) ? (
+                                <span className="w-full text-center">Thinking...</span>
+                              ) : (
+                                <span className="w-full text-center">...</span>
+                              )}
+                            </div>
+                         </div>
                        </div>
-                       <div className={cn(
-                         "h-7 rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-tighter transition-all opacity-60",
-                         opponentAnswer !== undefined
-                          ? opponentAnswer ? "bg-emerald-500/10 text-emerald-500/60" : "bg-rose-500/10 text-rose-500/60"
-                          : "bg-surface-container-lowest text-outline-variant"
-                       )}>
-                         {oppRes}
+                     );
+                   })}
+                </div>
+              ) : (
+                /* ANALYSIS TAB */
+                <div className="space-y-4">
+                   {/* Question Selector Pills */}
+                   <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+                      {matchData.questions.map((_: any, idx: number) => {
+                        const myAns = parseAnswer(me?.answers?.[idx]);
+                        const isSelected = selectedAnalysisIndex === idx;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedAnalysisIndex(idx)}
+                            className={cn(
+                              "px-3 py-1.5 rounded-lg text-[10px] font-black transition-all shrink-0 border",
+                              isSelected 
+                                ? "bg-sky-500 text-on-surface border-sky-400 shadow-md scale-105" 
+                                : myAns !== null
+                                  ? myAns.isCorrect ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-rose-500/20 text-rose-400 border-rose-500/30"
+                                  : "bg-surface-container-highest text-on-surface-variant/60 border-outline-variant/20"
+                            )}
+                          >
+                            Q{idx + 1}
+                          </button>
+                        );
+                      })}
+                   </div>
+
+                   {/* Analysis Details for selected question */}
+                   {(() => {
+                     const currentQ = matchData.questions[selectedAnalysisIndex];
+                     if (!currentQ) return null;
+                     const myAns = parseAnswer(me?.answers?.[selectedAnalysisIndex]);
+                     const oppAns = parseAnswer(opponent?.answers?.[selectedAnalysisIndex]);
+
+                     return (
+                       <div className="space-y-3">
+                          <div className="bg-surface-container-highest/60 p-3 rounded-xl border border-outline-variant/30 space-y-2">
+                            <div className="flex items-center justify-between">
+                               <span className="text-[9px] font-black uppercase tracking-widest text-sky-400">Question {selectedAnalysisIndex + 1} Analysis</span>
+                               <span className="text-[9px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded font-mono uppercase">{currentQ.level || 'Economics'}</span>
+                            </div>
+                            <h4 className="text-xs font-bold leading-relaxed text-on-surface">{currentQ.question}</h4>
+                          </div>
+
+                          {/* Options Breakdown */}
+                          <div className="space-y-2">
+                             {currentQ.options.map((opt: string, optIdx: number) => {
+                               const isCorrectOpt = optIdx === currentQ.correctAnswer;
+                               const youPicked = myAns?.selectedOption === optIdx;
+                               const oppPicked = oppAns?.selectedOption === optIdx;
+
+                               return (
+                                 <div 
+                                   key={optIdx}
+                                   className={cn(
+                                     "p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all",
+                                     isCorrectOpt 
+                                       ? "bg-emerald-500/15 border-emerald-500/60 text-emerald-300 font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                                       : (youPicked || oppPicked)
+                                         ? "bg-rose-500/15 border-rose-500/50 text-rose-300"
+                                         : "bg-surface-container-highest/40 border-outline-variant/20 text-on-surface-variant/70"
+                                   )}
+                                 >
+                                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                                       <span className={cn(
+                                         "w-5 h-5 rounded flex items-center justify-center font-mono font-bold text-[10px] shrink-0",
+                                         isCorrectOpt ? "bg-emerald-500 text-on-surface" : "bg-surface-container text-on-surface-variant/60"
+                                       )}>
+                                         {String.fromCharCode(65 + optIdx)}
+                                       </span>
+                                       <span className="truncate">{opt}</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-1 shrink-0">
+                                       {isCorrectOpt && (
+                                         <span className="bg-emerald-500/30 text-emerald-400 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Correct</span>
+                                       )}
+                                       {youPicked && (
+                                         <span className="bg-sky-500/30 text-sky-400 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">You</span>
+                                       )}
+                                       {oppPicked && (
+                                         <span className="bg-purple-500/30 text-purple-300 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Opponent</span>
+                                       )}
+                                    </div>
+                                 </div>
+                               );
+                             })}
+                          </div>
+
+                          {/* Rationale / Explanation Box */}
+                          <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-1">
+                             <div className="flex items-center gap-1.5 text-amber-400 text-[9px] font-black uppercase tracking-widest">
+                                <Zap size={12} />
+                                Economic Explanation
+                             </div>
+                             <p className="text-[11px] text-on-surface-variant/90 leading-normal italic">
+                                {currentQ.explanation || "In economic theory, this question addresses fundamental principles of market behavior and resource allocation."}
+                             </p>
+                          </div>
+
+                          {/* Pagination buttons */}
+                          <div className="flex justify-between gap-2 pt-1">
+                             <button 
+                               disabled={selectedAnalysisIndex === 0}
+                               onClick={() => setSelectedAnalysisIndex(prev => Math.max(0, prev - 1))}
+                               className="flex-1 py-1.5 bg-surface-container-highest hover:bg-surface-container border border-outline-variant/30 text-on-surface-variant disabled:opacity-40 rounded-lg text-[9px] font-black uppercase tracking-wider"
+                             >
+                               ← Prev Q
+                             </button>
+                             <button 
+                               disabled={selectedAnalysisIndex === matchData.questions.length - 1}
+                               onClick={() => setSelectedAnalysisIndex(prev => Math.min(matchData.questions.length - 1, prev + 1))}
+                               className="flex-1 py-1.5 bg-surface-container-highest hover:bg-surface-container border border-outline-variant/30 text-on-surface-variant disabled:opacity-40 rounded-lg text-[9px] font-black uppercase tracking-wider"
+                             >
+                               Next Q →
+                             </button>
+                          </div>
                        </div>
-                    </div>
-                  </div>
-                );
-              })}
+                     );
+                   })()}
+                </div>
+              )}
            </div>
 
            {/* Chat Section */}
-           <div className="h-[250px] md:h-[250px] border-t border-outline-variant/30 flex flex-col bg-black/10">
-              <div className="p-3 border-b border-black/10 flex items-center justify-between">
+           <div className="h-[210px] border-t border-outline-variant/30 flex flex-col bg-black/10 shrink-0">
+              <div className="p-2.5 border-b border-black/10 flex items-center justify-between">
                 <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                   Live Chat
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                   Live Arena Chat
                 </span>
               </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-3 space-y-2 text-xs scrollbar-hide">
                  {messages.length === 0 ? (
-                   <p className="text-[10px] text-on-surface-variant/50 text-center mt-4 italic">No messages yet...</p>
+                   <p className="text-[10px] text-on-surface-variant/50 text-center mt-2 italic">No chat messages yet...</p>
                  ) : (
                    messages.map((m, i) => (
-                     <div key={i} className="flex gap-2 text-xs leading-relaxed">
+                     <div key={i} className="flex gap-1.5 text-[11px] leading-tight">
                         <span className="font-bold text-sky-400 shrink-0">{m.senderName}:</span>
-                        <span className="text-on-surface/80">{m.message}</span>
+                        <span className="text-on-surface/90">{m.text || m.message}</span>
                      </div>
                    ))
                  )}
                  <div ref={chatEndRef} />
               </div>
-              <form onSubmit={sendMessage} className="p-3">
-                 <div className="bg-surface-container-highest rounded border border-outline-variant/30 p-1 flex items-center gap-2">
+              <form onSubmit={sendMessage} className="p-2 border-t border-outline-variant/20">
+                 <div className="bg-surface-container-highest rounded-lg border border-outline-variant/30 p-1 flex items-center gap-2">
                     <input 
                       type="text" 
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Type a message..."
-                      className="flex-1 bg-transparent border-none outline-none text-xs px-2 py-1 placeholder:text-outline"
+                      placeholder="Type chat message..."
+                      className="flex-1 bg-transparent border-none outline-none text-xs px-2 py-0.5 placeholder:text-outline text-on-surface"
                     />
-                    <button type="submit" className="p-1 px-3 bg-surface-container-highest text-on-surface-variant hover:text-on-surface rounded text-[10px] font-black uppercase tracking-widest transition-colors">Send</button>
+                    <button type="submit" className="p-1 px-3 bg-sky-500 hover:bg-sky-400 text-on-surface rounded-md text-[9px] font-black uppercase tracking-widest transition-colors">Send</button>
                  </div>
               </form>
            </div>
@@ -976,21 +1582,30 @@ export const LiveChallenge: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-surface/98 backdrop-blur-3xl flex items-center justify-center p-8 overflow-hidden"
+              className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-3xl flex items-center justify-center p-6 overflow-y-auto"
             >
               {/* Atmospheric Background Gradients */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-500/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(15,23,42,0.4)_100%)]" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-500/15 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/15 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(15,23,42,0.6)_100%)]" />
               </div>
 
-              <div className="text-center max-w-lg w-full relative z-10">
+              {/* Quick Top-Right Quit Button */}
+              <button
+                onClick={toggleSearching}
+                className="absolute top-5 right-5 z-20 w-11 h-11 bg-slate-800/80 hover:bg-rose-500/20 text-slate-300 hover:text-rose-400 rounded-full border border-slate-700/60 hover:border-rose-500/40 flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer"
+                title="Cancel search and exit"
+              >
+                <XCircle size={22} />
+              </button>
+
+              <div className="text-center max-w-md w-full relative z-10 py-6">
                 {matchFoundState ? (
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="space-y-16"
+                    className="space-y-10"
                   >
                     <div className="relative">
                       <motion.div 
@@ -998,48 +1613,49 @@ export const LiveChallenge: React.FC = () => {
                         transition={{ duration: 2, repeat: Infinity }}
                         className="absolute inset-0 bg-sky-500/20 rounded-full blur-3xl"
                       />
-                      <div className="w-48 h-48 bg-sky-500 rounded-[3.5rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(14,165,233,0.3)] border border-sky-400 relative z-10">
-                        <Swords size={96} className="text-on-primary animate-bounce" />
+                      <div className="w-36 h-36 bg-sky-500 rounded-[3rem] flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(14,165,233,0.3)] border border-sky-400 relative z-10">
+                        <Swords size={72} className="text-white animate-bounce" />
                       </div>
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <h2 className="text-5xl md:text-7xl font-bold text-on-surface mb-4 tracking-tighter uppercase font-display italic">Match Found!</h2>
-                      <div className="flex items-center justify-center gap-3 mb-8">
-                        <div className="w-12 h-[1px] bg-sky-500/30" />
-                        <p className="text-sky-400 font-bold uppercase tracking-[0.5em] text-[10px]">
+                      <h2 className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight uppercase font-display italic">Match Found!</h2>
+                      <div className="flex items-center justify-center gap-3 mb-6">
+                        <div className="w-10 h-[1px] bg-sky-500/40" />
+                        <p className="text-sky-400 font-extrabold uppercase tracking-[0.4em] text-[10px]">
                           {pendingMatch?.gameMode ? (`Ready for ${MODE_CONFIGS[pendingMatch.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Duel'}`) : 'Initializing Duel Arena'}
                         </p>
-                        <div className="w-12 h-[1px] bg-sky-500/30" />
+                        <div className="w-10 h-[1px] bg-sky-500/40" />
                       </div>
 
-                      <div className="flex flex-col items-center gap-4">
+                      <div className="flex flex-col items-center gap-3.5 w-full">
                         <button 
                           onClick={enterDuel}
-                          className="btn-premium px-12 py-5 text-sm uppercase tracking-[0.4em] shadow-[0_0_50px_rgba(14,165,233,0.3)] animate-bounce"
+                          className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm uppercase tracking-[0.3em] rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)] animate-bounce active:scale-95 transition-all cursor-pointer"
                         >
                           Start Duel
                         </button>
                         <button 
                           onClick={cancelMatchFound}
-                          className="text-[10px] font-black uppercase tracking-widest text-on-surface/30 hover:text-on-surface/60 transition-all"
+                          className="w-full py-3 bg-slate-800/80 hover:bg-rose-500/20 text-rose-400 border border-slate-700/60 hover:border-rose-500/40 font-extrabold text-xs uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                         >
-                          Cancel & Return to Lobby
+                          <XCircle size={16} />
+                          Cancel & Quit Arena
                         </button>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-6 md:gap-16">
+                    <div className="flex items-center justify-center gap-6">
                       <div className="text-center group">
-                        <div className="w-28 h-28 bg-surface-container rounded-[2.5rem] flex items-center justify-center text-on-surface mb-6 font-bold text-4xl border border-outline-variant/50 shadow-2xl backdrop-blur-md group-hover:border-sky-500/50 transition-colors">
+                        <div className="w-20 h-20 bg-slate-800/90 rounded-[2rem] flex items-center justify-center text-white mb-2 font-black text-2xl border border-slate-700 shadow-xl backdrop-blur-md">
                           {profile?.displayName?.[0]}
                         </div>
-                        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em]">{profile?.displayName}</p>
-                        <p className="text-[8px] text-sky-500/50 font-bold uppercase tracking-widest mt-1">Player 1</p>
+                        <p className="text-[11px] text-slate-300 font-bold uppercase tracking-wider">{profile?.displayName}</p>
+                        <p className="text-[9px] text-sky-400 font-bold uppercase tracking-widest mt-0.5">Player 1</p>
                       </div>
 
                       <div className="relative">
-                        <div className="text-5xl font-black text-outline-variant italic font-display select-none">VS</div>
+                        <div className="text-3xl font-black text-slate-600 italic font-display select-none">VS</div>
                         <motion.div 
                           animate={{ height: ['0%', '100%', '0%'] }}
                           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -1048,35 +1664,35 @@ export const LiveChallenge: React.FC = () => {
                       </div>
 
                       <div className="text-center group">
-                        <div className="w-28 h-28 bg-surface-container rounded-[2.5rem] flex items-center justify-center text-on-surface mb-6 font-bold text-4xl border border-outline-variant/50 shadow-2xl backdrop-blur-md group-hover:border-rose-500/50 transition-colors">
+                        <div className="w-20 h-20 bg-slate-800/90 rounded-[2rem] flex items-center justify-center text-white mb-2 font-black text-2xl border border-slate-700 shadow-xl backdrop-blur-md">
                           {players.find((p: any) => p.id !== user?.uid)?.displayName?.[0] || '?'}
                         </div>
-                        <p className="text-[11px] text-on-surface-variant font-bold uppercase tracking-[0.2em]">{players.find((p: any) => p.id !== user?.uid)?.displayName || 'Opponent'}</p>
-                        <p className="text-[8px] text-rose-500/50 font-bold uppercase tracking-widest mt-1">Player 2</p>
+                        <p className="text-[11px] text-slate-300 font-bold uppercase tracking-wider">{players.find((p: any) => p.id !== user?.uid)?.displayName || 'Opponent'}</p>
+                        <p className="text-[9px] text-rose-400 font-bold uppercase tracking-widest mt-0.5">Player 2</p>
                       </div>
                     </div>
                   </motion.div>
                 ) : (
                   <>
-                    <div className="relative w-48 h-48 mx-auto mb-20">
+                    <div className="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto mb-6">
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 border-[1px] border-dashed border-sky-500/20 rounded-full"
+                        className="absolute inset-0 border-[1px] border-dashed border-sky-500/30 rounded-full"
                       />
                       <motion.div
                         animate={{ rotate: -360 }}
                         transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-4 border-[1px] border-dashed border-indigo-500/20 rounded-full"
+                        className="absolute inset-3 border-[1px] border-dashed border-indigo-500/30 rounded-full"
                       />
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-0 border-t-2 border-sky-500 rounded-full"
+                        className="absolute inset-0 border-t-2 border-sky-400 rounded-full"
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="relative">
-                          <Users size={64} className="text-sky-500 animate-pulse" />
+                          <Users size={44} className="text-sky-400 animate-pulse" />
                           <motion.div 
                             animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
                             transition={{ duration: 2, repeat: Infinity }}
@@ -1086,27 +1702,28 @@ export const LiveChallenge: React.FC = () => {
                       </div>
                     </div>
 
-                    <h2 className="text-4xl md:text-6xl font-bold text-on-surface mb-6 tracking-tighter uppercase font-display italic">Searching...</h2>
+                    <h2 className="text-3xl sm:text-5xl font-black text-white mb-3 tracking-tight uppercase font-display italic">Searching...</h2>
                     
-                    <div className="inline-flex items-center gap-4 px-8 py-3 bg-surface-container-high border border-outline-variant/30 rounded-full mb-12 backdrop-blur-md">
+                    <div className="inline-flex items-center gap-2.5 px-5 py-2 bg-slate-800/90 border border-slate-700/80 rounded-full mb-5 backdrop-blur-md shadow-md">
                       <Timer size={16} className="text-sky-400" />
-                      <p className="text-sky-400 font-mono text-2xl font-bold tracking-tighter">
+                      <p className="text-sky-400 font-mono text-xl font-black tracking-tight">
                         {Math.floor(searchTime / 60)}:{(searchTime % 60).toString().padStart(2, '0')}
                       </p>
                     </div>
 
-                    <p className="text-on-surface-variant text-sm mb-20 font-medium leading-relaxed max-w-xs mx-auto">
+                    <p className="text-slate-300 text-xs sm:text-sm mb-6 font-medium leading-relaxed max-w-xs mx-auto">
                       Scanning the arena for a worthy opponent in <br />
-                      <span className="text-on-surface font-bold text-lg block mt-2 tracking-tight">
+                      <span className="text-emerald-400 font-extrabold text-base block mt-1 tracking-tight">
                         {selectedTopicId === 'ss1' ? 'SS1 Curriculum' : selectedTopicId === 'ss2' ? 'SS2 Curriculum' : selectedTopicId === 'ug' ? 'SS3 Curriculum' : 'Selected Curriculum'}
                       </span>
                     </p>
 
                     <button
                       onClick={toggleSearching}
-                      className="w-full py-6 bg-surface-container-high text-on-surface font-bold rounded-[2rem] hover:bg-surface-container-highest transition-all border border-outline-variant/30 uppercase tracking-[0.4em] text-[10px] hover:border-error/30 hover:text-error group"
+                      className="w-full py-4 px-6 bg-rose-500 hover:bg-rose-600 text-white font-extrabold rounded-2xl transition-all border border-rose-400/40 uppercase tracking-widest text-xs shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                     >
-                      <span className="group-hover:scale-110 transition-transform inline-block">Abstain from Combat</span>
+                      <XCircle size={18} />
+                      Cancel Search & Quit
                     </button>
                   </>
                 )}
@@ -1185,9 +1802,17 @@ export const LiveChallenge: React.FC = () => {
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10 w-full md:w-auto mt-6 md:mt-0">
             <button
+              onClick={startDemoDuel}
+              className="px-6 py-4 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest transition-all bg-emerald-500 hover:bg-emerald-600 text-white border-b-4 border-emerald-700 shadow-lg flex items-center gap-3 active:translate-y-1 active:shadow-none group cursor-pointer shrink-0"
+              title="Try an interactive 2-player sample preview duel"
+            >
+              <Swords size={20} className="transition-transform group-hover:rotate-12" />
+              Preview Demo Duel
+            </button>
+            <button
               onClick={toggleSearching}
               className={cn(
-                "px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none flex items-center gap-4 group",
+                "px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-[0_6px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none flex items-center gap-4 group cursor-pointer",
                 isSearching
                   ? "bg-error text-on-error hover:bg-error/90 border-b-4 border-error/50"
                   : "bg-primary text-on-primary hover:bg-primary/90 border-b-4 border-primary/50"
@@ -1328,12 +1953,19 @@ export const LiveChallenge: React.FC = () => {
           ))}
           
             {lobbyUsers.length <= 1 && (
-              <div className="col-span-full py-24 text-center rounded-[4rem] border border-dashed border-outline-variant bg-surface/30">
-                <div className="w-24 h-24 bg-surface-container-lowest rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-sm">
-                  <Users className="text-outline" size={40} />
+              <div className="col-span-full py-16 px-6 text-center rounded-[3rem] border border-dashed border-outline-variant bg-surface/30">
+                <div className="w-20 h-20 bg-surface-container-lowest rounded-[2rem] flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <Users className="text-outline" size={36} />
                 </div>
-                <h3 className="text-3xl font-bold text-on-surface mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
-                <p className="text-on-surface-variant font-medium">Be the first to enter the matchmaking queue.</p>
+                <h3 className="text-2xl font-bold text-on-surface mb-2 tracking-tighter uppercase font-display">Arena is Empty</h3>
+                <p className="text-on-surface-variant font-medium text-sm mb-6">Be the first to enter matchmaking, or try an interactive 2-player preview duel!</p>
+                <button
+                  onClick={startDemoDuel}
+                  className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-500/20 transition-all inline-flex items-center gap-3 active:scale-95 cursor-pointer"
+                >
+                  <Swords size={18} />
+                  Launch 2-Player Demo Preview
+                </button>
               </div>
             )}
           </div>

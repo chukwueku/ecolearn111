@@ -25,11 +25,24 @@ import { ECONOMETRICS_CHAPTERS, ECONOMETRICS_PARTS, getEconometricsExpansion } f
 import { StatsSimulator } from './StatsSimulator';
 import { MathText } from './MathComponents';
 
-export const EconometricsStudyGuide: React.FC = () => {
+export const EconometricsStudyGuide: React.FC<{
+  isWideReader?: boolean;
+  readerWidth?: 'standard' | 'wide' | 'full';
+  readerFontSize?: 'base' | 'lg' | 'xl';
+}> = ({ isWideReader, readerWidth, readerFontSize }) => {
   const [selectedPart, setSelectedPart] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChapterId, setSelectedChapterId] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<'summary' | 'syllabus' | 'quiz' | 'simulator'>('summary');
+  const [showChaptersList, setShowChaptersList] = useState(isWideReader ? false : true);
+
+  React.useEffect(() => {
+    if (isWideReader) {
+      setShowChaptersList(false);
+    } else {
+      setShowChaptersList(true);
+    }
+  }, [isWideReader]);
   
   // Quiz states
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
@@ -164,63 +177,75 @@ export const EconometricsStudyGuide: React.FC = () => {
       {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
         {/* Sidebar Chapter Selector */}
-        <div className="col-span-1 lg:col-span-4 border-r border-slate-200 dark:border-slate-800/80 max-h-[600px] overflow-y-auto bg-slate-50/50 dark:bg-slate-900/10 scrollbar-thin">
-          <div className="p-4 border-b border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950/40">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
-              Showing {filteredChapters.length} Curriculum Chapters
-            </p>
-          </div>
-          
-          <div className="divide-y divide-slate-100 dark:divide-slate-900">
-            {filteredChapters.map((ch) => (
-              <button
-                key={ch.id}
-                onClick={() => setSelectedChapterId(ch.id)}
-                className={`w-full text-left p-4 transition-all hover:bg-sky-500/5 dark:hover:bg-sky-500/10 flex items-start gap-3.5 border-l-4 cursor-pointer ${
-                  selectedChapterId === ch.id
-                    ? 'bg-sky-50/80 dark:bg-sky-950/20 border-l-sky-500'
-                    : 'border-l-transparent'
-                }`}
-              >
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
-                  selectedChapterId === ch.id
-                    ? 'bg-sky-500 text-white'
-                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                }`}>
-                  {ch.id}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 leading-none mb-1">
-                    Part {ch.partId} • Ch {ch.id}
-                  </p>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug truncate">
-                    {ch.title}
-                  </h4>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-1">
-                    {ch.topics.join(', ')}
-                  </p>
-                </div>
-              </button>
-            ))}
+        {showChaptersList && (
+          <div className="col-span-1 lg:col-span-4 border-r border-slate-200 dark:border-slate-800/80 max-h-[600px] overflow-y-auto bg-slate-50/50 dark:bg-slate-900/10 scrollbar-thin">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950/40">
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
+                Showing {filteredChapters.length} Curriculum Chapters
+              </p>
+            </div>
             
-            {filteredChapters.length === 0 && (
-              <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-                <Search className="mx-auto mb-3 opacity-30" size={32} />
-                <p className="text-xs font-bold">No chapters found matching your query.</p>
-                <p className="text-[10px] opacity-70 mt-1">Try another search or select "All Parts"</p>
-              </div>
-            )}
+            <div className="divide-y divide-slate-100 dark:divide-slate-900">
+              {filteredChapters.map((ch) => (
+                <button
+                  key={ch.id}
+                  onClick={() => setSelectedChapterId(ch.id)}
+                  className={`w-full text-left p-4 transition-all hover:bg-sky-500/5 dark:hover:bg-sky-500/10 flex items-start gap-3.5 border-l-4 cursor-pointer ${
+                    selectedChapterId === ch.id
+                      ? 'bg-sky-50/80 dark:bg-sky-950/20 border-l-sky-500'
+                      : 'border-l-transparent'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
+                    selectedChapterId === ch.id
+                      ? 'bg-sky-500 text-white'
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}>
+                    {ch.id}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 leading-none mb-1">
+                      Part {ch.partId} • Ch {ch.id}
+                    </p>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug truncate">
+                      {ch.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-1">
+                      {ch.topics.join(', ')}
+                    </p>
+                  </div>
+                </button>
+              ))}
+              
+              {filteredChapters.length === 0 && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+                  <Search className="mx-auto mb-3 opacity-30" size={32} />
+                  <p className="text-xs font-bold">No chapters found matching your query.</p>
+                  <p className="text-[10px] opacity-70 mt-1">Try another search or select "All Parts"</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Reading and Practice Pane */}
-        <div className="col-span-1 lg:col-span-8 flex flex-col bg-white dark:bg-slate-950">
+        <div className={`col-span-1 ${showChaptersList ? 'lg:col-span-8' : 'lg:col-span-12'} flex flex-col bg-white dark:bg-slate-950`}>
           {/* Active Chapter Header Info */}
           <div className="p-6 md:p-8 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/30 dark:bg-slate-950/10">
             <div className="flex items-center justify-between gap-4 mb-3">
-              <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
-                Part {currentChapter.partId}: {currentChapter.partTitle}
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowChaptersList(!showChaptersList)}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-white dark:bg-slate-950"
+                  title={showChaptersList ? "Hide Chapter Selection Sidebar" : "Show Chapter Selection Sidebar"}
+                >
+                  <Layers size={11} />
+                  <span>{showChaptersList ? "Hide Sidebar" : "Show Sidebar"}</span>
+                </button>
+                <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
+                  Part {currentChapter.partId}: {currentChapter.partTitle}
+                </span>
+              </div>
               <div className="flex gap-1.5 shrink-0">
                 <button
                   disabled={currentChapter.id === 1}

@@ -1096,34 +1096,34 @@ export const StatsSimulator: React.FC<StatsSimulatorProps> = ({ mode, title }) =
         </button>
 
         {isExplanationExpanded && (
-          <div className="mt-4 p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-900/20 rounded-2xl border border-border space-y-6">
+          <div className="mt-4 p-4 sm:p-6 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-6">
             <div>
-              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                <Percent size={12} /> Key Equation
+              <h4 className="text-xs font-extrabold text-sky-700 dark:text-sky-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Percent size={14} className="text-sky-600 dark:text-sky-400" /> Key Equation
               </h4>
-              <div className="p-4 bg-white dark:bg-slate-950 border border-border rounded-xl text-center font-mono text-sm overflow-x-auto text-ink flex justify-center py-5">
+              <div className="p-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-center font-mono text-sm overflow-x-auto text-slate-900 dark:text-slate-100 flex justify-center py-5 shadow-sm">
                 <BlockMath math={formulaText} />
               </div>
             </div>
 
             <div>
-              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Calculator size={12} /> Step-by-Step Statistical Workout
+              <h4 className="text-xs font-extrabold text-sky-700 dark:text-sky-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <Calculator size={14} className="text-sky-600 dark:text-sky-400" /> Step-by-Step Statistical Workout
               </h4>
               <div className="space-y-3 pl-1">
                 {steps.map((step, idx) => (
-                  <div key={idx} className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 border-l-2 border-sky-400 dark:border-sky-500/50 pl-3 py-0.5 leading-relaxed">
+                  <div key={idx} className="text-xs sm:text-sm text-slate-900 dark:text-slate-100 border-l-2 border-sky-500 dark:border-sky-400 pl-3.5 py-1 leading-relaxed font-medium bg-white/60 dark:bg-slate-950/40 rounded-r-lg">
                     {step}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="p-4 bg-sky-500/5 dark:bg-sky-500/10 border border-sky-500/20 rounded-xl">
-              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                <Lightbulb size={12} className="text-sky-500" /> {interpretationTitle}
+            <div className="p-5 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 rounded-xl shadow-sm">
+              <h4 className="text-xs font-extrabold text-sky-800 dark:text-sky-300 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Lightbulb size={16} className="text-sky-600 dark:text-sky-400 shrink-0" /> {interpretationTitle}
               </h4>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
+              <p className="text-xs sm:text-sm text-slate-900 dark:text-slate-100 leading-relaxed font-medium">
                 {interpretationText}
               </p>
             </div>

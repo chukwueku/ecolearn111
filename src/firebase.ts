@@ -406,20 +406,49 @@ export const getRecentDuels = async (limitCount: number = 10) => {
   }
 };
 
-export const getLeaderboard = async (limitCount: number = 10, mainPath: 'secondary' | 'undergraduate' = 'secondary'): Promise<UserProfile[]> => {
+export const getLeaderboard = async (limitCount: number = 10, mainPath: 'secondary' | 'undergraduate' | 'all' = 'secondary'): Promise<UserProfile[]> => {
   const path = 'users';
   try {
-    let q;
+    const snap = await getDocs(collection(db, 'users'));
+    let users = snap.docs.map(d => d.data() as UserProfile);
     if (mainPath === 'undergraduate') {
-      q = query(collection(db, 'users'), where('level', '==', 'undergraduate'), orderBy('points', 'desc'), limit(limitCount));
-    } else {
-      q = query(collection(db, 'users'), where('level', 'in', ['secondary', 'secondary-ss2', 'secondary-ss3']), orderBy('points', 'desc'), limit(limitCount));
+      users = users.filter(u => u.level === 'undergraduate');
+    } else if (mainPath === 'secondary') {
+      users = users.filter(u => u.level === 'secondary' || u.level === 'secondary-ss2' || u.level === 'secondary-ss3');
     }
-    const snap = await getDocs(q);
-    return snap.docs.map(d => d.data() as UserProfile);
+    users.sort((a, b) => (b.points || 0) - (a.points || 0));
+    return users.slice(0, limitCount);
   } catch(e) {
     handleFirestoreError(e, OperationType.LIST, path);
     return [];
+  }
+};
+
+export const getGlobalLeaderboardAndRank = async (currentUid?: string) => {
+  const path = 'users';
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const allUsers = snap.docs.map(d => d.data() as UserProfile);
+    
+    // Sort all users by points descending
+    allUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
+    
+    let userRank = 1;
+    if (currentUid) {
+      const idx = allUsers.findIndex(u => u.uid === currentUid);
+      if (idx !== -1) {
+        userRank = idx + 1;
+      }
+    }
+    
+    return {
+      topUsers: allUsers,
+      userRank,
+      totalUsers: allUsers.length
+    };
+  } catch(e) {
+    handleFirestoreError(e, OperationType.LIST, path);
+    return { topUsers: [], userRank: 1, totalUsers: 0 };
   }
 };
 
@@ -521,7 +550,7 @@ export const leaveMatchmaking = async (uid: string) => {
   }
 };
 
-export const submitMatchAnswer = async (matchId: string, uid: string, correct: boolean, questionIndex: number) => {
+export const submitMatchAnswer = async (matchId: string, uid: string, correct: boolean, questionIndex: number, selectedOption?: number) => {
   const path = `arena_matches/${matchId}`;
   try {
     const matchRef = doc(db, 'arena_matches', matchId);
@@ -546,7 +575,10 @@ export const submitMatchAnswer = async (matchId: string, uid: string, correct: b
         
         // Track answers for history
         if (!players[pIndex].answers) players[pIndex].answers = {};
-        players[pIndex].answers[questionIndex] = correct;
+        players[pIndex].answers[questionIndex] = {
+          isCorrect: correct,
+          selectedOption: typeof selectedOption === 'number' ? selectedOption : null
+        };
         
         players[pIndex].currentQuestion = questionIndex + 1;
         
@@ -595,7 +627,11 @@ export const timeoutMatchTurn = async (matchId: string, timedOutUid: string, que
          if (players[pIndex].currentQuestion !== questionIndex) return;
 
          if (!players[pIndex].answers) players[pIndex].answers = {};
-         players[pIndex].answers[questionIndex] = false; // Mark wrong since they timed out
+         players[pIndex].answers[questionIndex] = {
+           isCorrect: false,
+           selectedOption: null,
+           timedOut: true
+         };
          
          players[pIndex].currentQuestion = questionIndex + 1;
          

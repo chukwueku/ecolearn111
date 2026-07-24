@@ -20,8 +20,8 @@ service cloud.firestore {
 
     // Users Collection
     match /users/{userId} {
-      // Allow any signed-in user to read user profiles (for leaderboard/profiles)
-      allow read: if isSignedIn();
+      // Allow reading user profiles for leaderboards, rankings, online status, and profiles
+      allow read: if true;
       
       // Allow users to create their own profile
       allow create: if isOwner(userId);
@@ -41,9 +41,7 @@ service cloud.firestore {
     
     // Questions Collection
     match /questions/{questionId} {
-      // Any signed-in user can read questions
-      allow read: if isSignedIn();
-      // Only admins can write questions
+      allow read: if true;
       allow write: if isAdmin();
     }
     
@@ -61,25 +59,20 @@ service cloud.firestore {
     
     // Settings Collection (for announcements)
     match /settings/{settingId} {
-      // Announcements should be public for even non-logged in users if the app needs it, 
-      // but let's stick to signed-in for now to be safe unless requested otherwise.
-      // Actually, Home.tsx might show them before login? 
-      // Let's allow public read for announcement.
       allow read: if true; 
       allow write: if isAdmin();
     }
     
     // Duels (History)
     match /duels/{duelId} {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow write: if isSignedIn();
     }
     
     // Arena Queue
     match /arena_queue/{userId} {
       allow read, write: if isOwner(userId) || isAdmin();
-      // Matchmaking logic might require reading others in the same topic
-      allow list: if isSignedIn();
+      allow list: if true;
     }
     
     // Arena Matches
@@ -102,7 +95,7 @@ service cloud.firestore {
 
     // Daily Challenges
     match /daily_challenges/{challengeId} {
-      allow read: if isSignedIn();
+      allow read: if true;
       allow write: if isAdmin();
     }
 

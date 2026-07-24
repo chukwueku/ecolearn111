@@ -9,6 +9,13 @@ export interface ChapterExpansion {
   formula?: string;
   caseStudy: string;
   flashcards: Flashcard[];
+  graphData?: {
+    title: string;
+    type: 'line' | 'bar' | 'area' | 'pie';
+    xAxis: string;
+    series: { key: string; name: string; color?: string }[];
+    data: any[];
+  };
 }
 
 // Custom overrides for the most critical chapters to provide deep, precise academic expansions
@@ -33,7 +40,27 @@ const CUSTOM_EXPANSIONS: Record<number, ChapterExpansion> = {
       { front: "What is Ricardo's Law of Comparative Advantage?", back: "A nation should specialize in and export the commodity in which its opportunity cost of production is lower than its trading partner's." },
       { front: "What are the core assumptions of the Ricardian trade model?", back: "The labor theory of value, constant opportunity costs of production, perfect domestic factor mobility, and zero transport costs." },
       { front: "What are the limits to the terms of trade in the Ricardian model?", back: "The terms of trade must fall between the domestic autarkic opportunity cost ratios of the two trading nations." }
-    ]
+    ],
+    graphData: {
+      title: "Ricardian Production Possibility Frontiers (Tradeoff of Wine vs Cloth)",
+      type: "line",
+      xAxis: "Cloth",
+      series: [
+        { key: "CountryA_Wine", name: "Home Wine Frontier (Wine Advantage)", color: "#0ea5e9" },
+        { key: "CountryB_Wine", name: "Foreign Wine Frontier (Cloth Advantage)", color: "#10b981" }
+      ],
+      data: [
+        { Cloth: 0, CountryA_Wine: 100, CountryB_Wine: 40 },
+        { Cloth: 20, CountryA_Wine: 80, CountryB_Wine: 35 },
+        { Cloth: 40, CountryA_Wine: 60, CountryB_Wine: 30 },
+        { Cloth: 60, CountryA_Wine: 40, CountryB_Wine: 25 },
+        { Cloth: 80, CountryA_Wine: 20, CountryB_Wine: 20 },
+        { Cloth: 100, CountryA_Wine: 0, CountryB_Wine: 15 },
+        { Cloth: 120, CountryA_Wine: 0, CountryB_Wine: 10 },
+        { Cloth: 140, CountryA_Wine: 0, CountryB_Wine: 5 },
+        { Cloth: 160, CountryA_Wine: 0, CountryB_Wine: 0 }
+      ]
+    }
   },
   8: {
     spotlight: "The Heckscher-Ohlin (H-O) theory shifts the source of comparative advantage from Ricardo's labor productivity differences to differences in countries' physical resource endowments. Eli Heckscher and Bertil Ohlin proposed a 2x2x2 general equilibrium model (2 nations, 2 commodities, 2 factors: capital and labor). They proved that countries with relatively abundant capital will possess a comparative advantage in, and export, capital-intensive commodities, while labor-abundant countries will export labor-intensive commodities.",
@@ -44,7 +71,23 @@ const CUSTOM_EXPANSIONS: Record<number, ChapterExpansion> = {
       { front: "What determines comparative advantage in the Heckscher-Ohlin model?", back: "Differences in relative national factor endowments (the physical ratio of capital to labor, K/L)." },
       { front: "What is the Heckscher-Ohlin Theorem?", back: "A nation will export commodities that intensively use its relatively abundant factor of production, and import commodities that intensively use its relatively scarce factor." },
       { front: "How is relative factor abundance measured?", back: "Either physically (comparing total stock ratios of K/L) or via prices (comparing the ratio of rental rate of capital to wage rate, r/w)." }
-    ]
+    ],
+    graphData: {
+      title: "Heckscher-Ohlin Factor Price Convergence after Trade Liberalization",
+      type: "line",
+      xAxis: "Stage",
+      series: [
+        { key: "Wages", name: "Real Return to Labor (Wages)", color: "#6366f1" },
+        { key: "Capital_Rent", name: "Real Return to Capital (Rents)", color: "#f43f5e" }
+      ],
+      data: [
+        { Stage: "Autarky", Wages: 40, Capital_Rent: 120 },
+        { Stage: "Open Trade", Wages: 52, Capital_Rent: 108 },
+        { Stage: "Transition", Wages: 65, Capital_Rent: 95 },
+        { Stage: "Advanced", Wages: 74, Capital_Rent: 86 },
+        { Stage: "Equalization", Wages: 80, Capital_Rent: 80 }
+      ]
+    }
   },
   10: {
     spotlight: "This chapter covers two vital mathematical theorems of the neoclassical trade framework. First, the Stolper-Samuelson Theorem explores how changes in output prices (e.g. from tariffs or trade) alter real wages and capital returns. It proves that trade raises the real return of the country's abundant factor and reduces the real return of its scarce factor. Second, the Rybczynski Theorem models economic growth under constant commodity prices. It shows that increasing one factor endowment expands the sector intensive in that factor, while causing an absolute contraction in the other sector.",
@@ -99,7 +142,22 @@ const CUSTOM_EXPANSIONS: Record<number, ChapterExpansion> = {
       { front: "What are the deadweight losses of a tariff?", back: "The production distortion (inefficient domestic production) and the consumption distortion (consumers forced to purchase less or switch to inferior alternatives)." },
       { front: "How does a tariff impact a large nation differently from a small nation?", back: "A large nation can improve its terms of trade by forcing foreign exporters to lower their prices, potentially offsetting domestic deadweight losses." },
       { front: "What is the nominal price effect of a tariff in a small country?", back: "The domestic price of the imported good rises by the exact, absolute amount of the tariff." }
-    ]
+    ],
+    graphData: {
+      title: "Welfare Analysis of a Tariff (Consumer Loss vs Producer & Govt Gain)",
+      type: "bar",
+      xAxis: "Sector",
+      series: [
+        { key: "Surplus_Change", name: "Welfare Impact (USD Millions)", color: "#ef4444" }
+      ],
+      data: [
+        { Sector: "Consumer Loss", Surplus_Change: -120 },
+        { Sector: "Producer Gain", Surplus_Change: 45 },
+        { Sector: "Govt Revenue", Surplus_Change: 30 },
+        { Sector: "Production Distortion", Surplus_Change: -25 },
+        { Sector: "Consumption Distortion", Surplus_Change: -20 }
+      ]
+    }
   },
   21: {
     spotlight: "While nominal tariffs tell us the tax rate on a final good, they hide the true level of economic protection granted to domestic value-added. The Effective Rate of Protection (ERP) calculates protection by considering tariffs on both the final product and the imported intermediate raw materials used in its assembly. If final goods have high tariffs and inputs are imported tariff-free, the ERP is much higher than the nominal rate. Conversely, taxing inputs reduces the effective protection of domestic producers.",
@@ -154,7 +212,23 @@ const CUSTOM_EXPANSIONS: Record<number, ChapterExpansion> = {
       { front: "What is currency Devaluation?", back: "A deliberate, official reduction in the value of a nation's currency relative to a gold standard or foreign reserve currency under a fixed exchange rate system." },
       { front: "What does the Marshall-Lerner Condition state?", back: "A currency devaluation will improve a nation's trade balance only if the absolute sum of the price elasticities of demand for exports and imports is greater than one." },
       { front: "Why does the J-Curve effect occur?", back: "Because in the short run, export and import quantities are highly inelastic due to existing commercial contracts, while the immediate pricing effect of devaluation worsens the trade balance." }
-    ]
+    ],
+    graphData: {
+      title: "The J-Curve Effect: Evolution of Net Exports (Trade Balance) Post-Devaluation",
+      type: "area",
+      xAxis: "Months",
+      series: [
+        { key: "Net_Exports", name: "Net Trade Balance (USD Billions)", color: "#06b6d4" }
+      ],
+      data: [
+        { Months: "Pre-Deval", Net_Exports: -10 },
+        { Months: "Month 1 (Deval)", Net_Exports: -15 },
+        { Months: "Month 3 (Lag)", Net_Exports: -18 },
+        { Months: "Month 6 (Adapt)", Net_Exports: -8 },
+        { Months: "Month 12 (Surplus)", Net_Exports: 5 },
+        { Months: "Month 18 (Equilibrium)", Net_Exports: 12 }
+      ]
+    }
   },
   61: {
     spotlight: "This chapter reviews India's trade trajectory. From 1951 to 1990, India pursued an inward-looking, highly protected Import-Substitution Industrialization policy with strict exchange controls and import licensing. This led to persistent BOP deficits, culminating in the 1991 Balance of Payments crisis when reserves fell to just two weeks of imports. In response, India launched structural reforms—devaluing the Rupee, slashing tariffs, removing licensing, and moving to a market-determined exchange rate, which led to high service-led export growth and a major expansion of foreign reserves.",

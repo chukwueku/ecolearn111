@@ -20,16 +20,43 @@ import {
   Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ChartTooltip,
+  Legend
+} from 'recharts';
 import { Chapter, PARTS, INTERNATIONAL_ECONOMICS_CHAPTERS } from '../lib/internationalEconomicsChapters';
 import { EconomicsSimulator } from './EconomicsSimulator';
 import { MathText } from './MathComponents';
 import { getChapterExpansion } from '../lib/chapterExpansions';
 
-export const InternationalEconomicsTextbook: React.FC = () => {
+export const InternationalEconomicsTextbook: React.FC<{
+  isWideReader?: boolean;
+  readerWidth?: 'standard' | 'wide' | 'full';
+  readerFontSize?: 'base' | 'lg' | 'xl';
+}> = ({ isWideReader, readerWidth, readerFontSize }) => {
   const [selectedPart, setSelectedPart] = useState<number | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChapterId, setSelectedChapterId] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<'summary' | 'syllabus' | 'quiz' | 'simulator'>('summary');
+  const [showChaptersList, setShowChaptersList] = useState(isWideReader ? false : true);
+
+  React.useEffect(() => {
+    if (isWideReader) {
+      setShowChaptersList(false);
+    } else {
+      setShowChaptersList(true);
+    }
+  }, [isWideReader]);
   
   // Quiz states
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
@@ -157,63 +184,75 @@ export const InternationalEconomicsTextbook: React.FC = () => {
       {/* Main Grid Content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
         {/* Sidebar Chapter Selector */}
-        <div className="col-span-1 lg:col-span-4 border-r border-slate-200 dark:border-slate-800/80 max-h-[600px] overflow-y-auto bg-slate-50/50 dark:bg-slate-900/10 scrollbar-thin">
-          <div className="p-4 border-b border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950/40">
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
-              Showing {filteredChapters.length} Chapters
-            </p>
-          </div>
-          
-          <div className="divide-y divide-slate-100 dark:divide-slate-900">
-            {filteredChapters.map((ch) => (
-              <button
-                key={ch.id}
-                onClick={() => setSelectedChapterId(ch.id)}
-                className={`w-full text-left p-4 transition-all hover:bg-sky-500/5 dark:hover:bg-sky-500/10 flex items-start gap-3.5 border-l-4 cursor-pointer ${
-                  selectedChapterId === ch.id
-                    ? 'bg-sky-50/80 dark:bg-sky-950/20 border-l-sky-500'
-                    : 'border-l-transparent'
-                }`}
-              >
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
-                  selectedChapterId === ch.id
-                    ? 'bg-sky-500 text-white'
-                    : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                }`}>
-                  {ch.id}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 leading-none mb-1">
-                    Part {ch.partId} • Ch {ch.id}
-                  </p>
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug truncate">
-                    {ch.title}
-                  </h4>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-1">
-                    {ch.topics.join(', ')}
-                  </p>
-                </div>
-              </button>
-            ))}
+        {showChaptersList && (
+          <div className="col-span-1 lg:col-span-4 border-r border-slate-200 dark:border-slate-800/80 max-h-[600px] overflow-y-auto bg-slate-50/50 dark:bg-slate-900/10 scrollbar-thin">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-950/40">
+              <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
+                Showing {filteredChapters.length} Chapters
+              </p>
+            </div>
             
-            {filteredChapters.length === 0 && (
-              <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-                <Search className="mx-auto mb-3 opacity-30" size={32} />
-                <p className="text-xs font-bold">No chapters found matching your query.</p>
-                <p className="text-[10px] opacity-70 mt-1">Try another search or select "All Parts"</p>
-              </div>
-            )}
+            <div className="divide-y divide-slate-100 dark:divide-slate-900">
+              {filteredChapters.map((ch) => (
+                <button
+                  key={ch.id}
+                  onClick={() => setSelectedChapterId(ch.id)}
+                  className={`w-full text-left p-4 transition-all hover:bg-sky-500/5 dark:hover:bg-sky-500/10 flex items-start gap-3.5 border-l-4 cursor-pointer ${
+                    selectedChapterId === ch.id
+                      ? 'bg-sky-50/80 dark:bg-sky-950/20 border-l-sky-500'
+                      : 'border-l-transparent'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 ${
+                    selectedChapterId === ch.id
+                      ? 'bg-sky-500 text-white'
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}>
+                    {ch.id}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 leading-none mb-1">
+                      Part {ch.partId} • Ch {ch.id}
+                    </p>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug truncate">
+                      {ch.title}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-1">
+                      {ch.topics.join(', ')}
+                    </p>
+                  </div>
+                </button>
+              ))}
+              
+              {filteredChapters.length === 0 && (
+                <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+                  <Search className="mx-auto mb-3 opacity-30" size={32} />
+                  <p className="text-xs font-bold">No chapters found matching your query.</p>
+                  <p className="text-[10px] opacity-70 mt-1">Try another search or select "All Parts"</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Reading and Practice Pane */}
-        <div className="col-span-1 lg:col-span-8 flex flex-col bg-white dark:bg-slate-950">
+        <div className={`col-span-1 ${showChaptersList ? 'lg:col-span-8' : 'lg:col-span-12'} flex flex-col bg-white dark:bg-slate-950`}>
           {/* Active Chapter Header Info */}
           <div className="p-6 md:p-8 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/30 dark:bg-slate-950/10">
             <div className="flex items-center justify-between gap-4 mb-3">
-              <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
-                Part {currentChapter.partId}: {currentChapter.partTitle}
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowChaptersList(!showChaptersList)}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900 text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-white dark:bg-slate-950"
+                  title={showChaptersList ? "Hide Chapter Selection Sidebar" : "Show Chapter Selection Sidebar"}
+                >
+                  <Layers size={11} />
+                  <span>{showChaptersList ? "Hide Sidebar" : "Show Sidebar"}</span>
+                </button>
+                <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
+                  Part {currentChapter.partId}: {currentChapter.partTitle}
+                </span>
+              </div>
               <div className="flex gap-1.5 shrink-0">
                 <button
                   disabled={currentChapter.id === 1}
@@ -366,6 +405,62 @@ export const InternationalEconomicsTextbook: React.FC = () => {
                         {chapterExpansion.caseStudy}
                       </p>
                     </div>
+
+                    {/* Interactive Economic Graph Section */}
+                    {chapterExpansion.graphData && (
+                      <div className="p-6 bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="text-sky-500 shrink-0" size={16} />
+                          <h5 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                            Interactive Academic Chart: {chapterExpansion.graphData.title}
+                          </h5>
+                        </div>
+                        <div className="h-[280px] w-full bg-white dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-900 shadow-sm not-prose">
+                          <ResponsiveContainer width="100%" height="100%">
+                            {chapterExpansion.graphData.type === 'line' ? (
+                              <LineChart data={chapterExpansion.graphData.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} vertical={false} />
+                                <XAxis dataKey={chapterExpansion.graphData.xAxis} tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <ChartTooltip contentStyle={{ borderRadius: '8px', fontSize: 10, background: '#1e293b', border: 'none', color: '#fff' }} />
+                                <Legend wrapperStyle={{ fontSize: 9, paddingTop: 10 }} iconType="circle" />
+                                {chapterExpansion.graphData.series.map((s: any, idx: number) => (
+                                  <Line key={idx} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} strokeWidth={2.5} dot={{ r: 3, strokeWidth: 1 }} activeDot={{ r: 5 }} />
+                                ))}
+                              </LineChart>
+                            ) : chapterExpansion.graphData.type === 'area' ? (
+                              <AreaChart data={chapterExpansion.graphData.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <defs>
+                                  <linearGradient id="colorNetExports" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2}/>
+                                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} vertical={false} />
+                                <XAxis dataKey={chapterExpansion.graphData.xAxis} tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <ChartTooltip contentStyle={{ borderRadius: '8px', fontSize: 10, background: '#1e293b', border: 'none', color: '#fff' }} />
+                                <Legend wrapperStyle={{ fontSize: 9, paddingTop: 10 }} iconType="circle" />
+                                {chapterExpansion.graphData.series.map((s: any, idx: number) => (
+                                  <Area key={idx} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} fill="url(#colorNetExports)" strokeWidth={2.5} />
+                                ))}
+                              </AreaChart>
+                            ) : (
+                              <BarChart data={chapterExpansion.graphData.data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.4} vertical={false} />
+                                <XAxis dataKey={chapterExpansion.graphData.xAxis} tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fontSize: 9, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                <ChartTooltip contentStyle={{ borderRadius: '8px', fontSize: 10, background: '#1e293b', border: 'none', color: '#fff' }} />
+                                <Legend wrapperStyle={{ fontSize: 9, paddingTop: 10 }} iconType="circle" />
+                                {chapterExpansion.graphData.series.map((s: any, idx: number) => (
+                                  <Bar key={idx} dataKey={s.key} name={s.name} fill={s.color} radius={[4, 4, 0, 0]} />
+                                ))}
+                              </BarChart>
+                            )}
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Section 4: Interactive Flashcards */}
                     <div className="p-5 bg-sky-500/5 dark:bg-sky-500/[0.01] border border-sky-500/10 rounded-2xl space-y-4">
