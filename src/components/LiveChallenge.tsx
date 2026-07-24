@@ -12,6 +12,13 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const getQuestionForPlayer = (match: any, playerIndex: number, qIndexForPlayer: number) => {
+  if (!match?.questions || match.questions.length === 0) return null;
+  const pIndex = playerIndex < 0 ? 0 : playerIndex;
+  const globalIndex = pIndex === 0 ? qIndexForPlayer * 2 : qIndexForPlayer * 2 + 1;
+  return match.questions[globalIndex] || match.questions[qIndexForPlayer % match.questions.length];
+};
+
 export const LiveChallenge: React.FC = () => {
   const { user, profile } = useAuth();
   
@@ -198,11 +205,11 @@ export const LiveChallenge: React.FC = () => {
                  clearInterval(searchTimerRef.current);
                  setSearchTime(0);
                  setIsSearching(false);
-                 setPlayers([me, opponent]);
+                 setPlayers(myMatch.players || [me, opponent]);
                  
                  // Auto-start the duel
                  setMatchData(myMatch);
-                 setCurrentQuestion(me.currentQuestion || 0);
+                 setCurrentQuestion(me?.currentQuestion || 0);
                  setWaitingForOpponent(myMatch.currentTurnUid !== user.uid);
                  setDuelStarted(true);
                  setMatchFoundState(false);
@@ -217,13 +224,15 @@ export const LiveChallenge: React.FC = () => {
                  setActiveMatchBanner(myMatch);
              }
              setLoading(false);
-         } else if (duelStarted) {
+         } else {
+             // Active match update - directly sync state whenever Firestore updates
              setPlayers(myMatch.players);
              setMatchData(myMatch);
+             setDuelStarted(true);
              
              // Directly sync question and turn state from DB
              if (me) {
-               setCurrentQuestion(me.currentQuestion);
+               setCurrentQuestion(me.currentQuestion || 0);
              }
              setWaitingForOpponent(!isMyTurn);
 
@@ -380,15 +389,16 @@ export const LiveChallenge: React.FC = () => {
   const handleDemoOpponentAnswer = (isCorrect: boolean, thinkTimeSeconds: number) => {
     const myUid = user?.uid || 'player-1';
     setPlayers(prevOpp => {
-      const oppPlayer = prevOpp.find(p => p.id !== myUid);
+      const oppIndex = prevOpp.findIndex(p => p.id !== myUid);
+      const oppPlayer = prevOpp[oppIndex !== -1 ? oppIndex : 1];
       const qIndex = oppPlayer?.currentQuestion || 0;
-      const currentQ = matchData?.questions?.[qIndex];
+      const currentQ = getQuestionForPlayer(matchData, oppIndex !== -1 ? oppIndex : 1, qIndex);
       let oppSelectedOpt = 0;
       if (currentQ) {
         if (isCorrect) {
           oppSelectedOpt = currentQ.correctAnswer;
         } else {
-          oppSelectedOpt = (currentQ.correctAnswer + 1) % currentQ.options.length;
+          oppSelectedOpt = (currentQ.correctAnswer + 1) % (currentQ.options?.length || 4);
         }
       }
 
@@ -412,7 +422,8 @@ export const LiveChallenge: React.FC = () => {
 
       const meNow = updatedOpp.find(p => p.id === myUid);
       const oppNow = updatedOpp.find(p => p.id !== myUid);
-      const totalQ = matchData?.questions?.length || 5;
+      const mode = matchData?.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
+      const targetQ = MODE_CONFIGS[mode]?.questions || 5;
 
       // Add chat feedback for opponent answer
       setMessages(prevMsgs => [
@@ -425,7 +436,7 @@ export const LiveChallenge: React.FC = () => {
         }
       ]);
 
-      if (meNow && meNow.currentQuestion >= totalQ && oppNow && oppNow.currentQuestion >= totalQ) {
+      if (meNow && meNow.currentQuestion >= targetQ && oppNow && oppNow.currentQuestion >= targetQ) {
         setFinished(true);
         setDuelStarted(false);
       } else {
@@ -527,9 +538,11 @@ export const LiveChallenge: React.FC = () => {
 
           const me = updated.find(p => p.id === myUid);
           const opp = updated.find(p => p.id !== myUid);
+          const mode = matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz';
+          const targetQ = MODE_CONFIGS[mode]?.questions || 5;
 
-          // Check if both completed all questions
-          if (me && me.currentQuestion >= matchData.questions.length && opp && opp.currentQuestion >= matchData.questions.length) {
+          // Check if both completed target questions
+          if (me && me.currentQuestion >= targetQ && opp && opp.currentQuestion >= targetQ) {
             setFinished(true);
             setDuelStarted(false);
           } else {
@@ -692,12 +705,17 @@ export const LiveChallenge: React.FC = () => {
     try {
       const topicId = selectedTopicId || (profile?.level === 'undergraduate' ? 'uni' : 'ss1');
       const questions = await getQuestions(topicId);
-      const finalQuestions: Question[] = questions.length > 0 ? questions.slice(0, 5) : [
+      const finalQuestions: Question[] = questions.length >= 10 ? questions.slice(0, 10) : [
         { question: "What is the primary subject matter of Economics?", options: ["Wealth accumulation only", "Scarcity and choice under limited resources", "Stock market trading algorithms", "Government tax collection"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Economics is the study of allocation of scarce resources among competing ends." },
         { question: "Which of the following is classified as a land factor of production?", options: ["Machinery", "Natural mineral deposits", "Bank deposits", "Entrepreneurial skill"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Land encompasses all natural resources provided by nature." },
         { question: "A market equilibrium occurs when:", options: ["Price equals zero", "Quantity demanded equals quantity supplied", "Government sets a price ceiling", "Imports exceed exports"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Equilibrium is reached when quantity demanded equals quantity supplied." },
         { question: "What does an upward-sloping supply curve indicate?", options: ["Producers supply less at higher prices", "Producers supply more at higher prices", "Consumers buy more at higher prices", "Price has no effect on supply"], correctAnswer: 1, level: 'secondary', topicId, explanation: "According to the Law of Supply, higher prices incentivize greater output." },
-        { question: "Opportunity cost measures:", options: ["The monetary cost paid", "The value of the next best alternative forgone", "The total accounting profit", "The inflation rate"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Opportunity cost is the foregone benefit of the next best option." }
+        { question: "Opportunity cost measures:", options: ["The monetary cost paid", "The value of the next best alternative forgone", "The total accounting profit", "The inflation rate"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Opportunity cost is the foregone benefit of the next best option." },
+        { question: "Inflation is best defined as:", options: ["A one-time increase in prices", "A sustained increase in the general price level", "An increase in stock prices", "A decrease in unemployment"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Inflation is a continuous rise in overall prices over time." },
+        { question: "Which policy is used by central banks to control money supply?", options: ["Fiscal Policy", "Monetary Policy", "Trade Policy", "Industrial Policy"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Monetary policy regulates interest rates and money supply." },
+        { question: "A public good is characterized by:", options: ["Rivalry and Excludability", "Non-rivalry and Non-excludability", "High cost and low demand", "Private ownership"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Public goods can be consumed simultaneously without excluding anyone." },
+        { question: "Gross Domestic Product (GDP) measures:", options: ["Total wealth of citizens", "Total market value of goods and services produced within a country", "Government budget surplus", "Total exports minus total gold reserves"], correctAnswer: 1, level: 'secondary', topicId, explanation: "GDP measures output within a nation's borders." },
+        { question: "What happens to price when demand exceeds supply?", options: ["Price tends to fall", "Price tends to rise", "Price remains fixed", "Supply automatically doubles"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Shortage creates upward pressure on prices." }
       ];
 
       const myUid = user?.uid || 'player-1';
@@ -938,10 +956,18 @@ export const LiveChallenge: React.FC = () => {
   }
 
   if (matchData) {
-    const me = players.find(p => p.id === user?.uid);
-    const opponent = players.find(p => p.id !== user?.uid);
+    const meIndex = players.findIndex(p => p.id === user?.uid);
+    const oppIndex = players.findIndex(p => p.id !== user?.uid);
+    const mePlayerIdx = meIndex !== -1 ? meIndex : 0;
+    const oppPlayerIdx = oppIndex !== -1 ? oppIndex : 1;
+
+    const me = players[mePlayerIdx];
+    const opponent = players[oppPlayerIdx];
+
     const displayQuestionIndex = waitingForOpponent ? (opponent?.currentQuestion || 0) : currentQuestion;
-    const q = matchData.questions[displayQuestionIndex];
+    const q = waitingForOpponent 
+      ? getQuestionForPlayer(matchData, oppPlayerIdx, displayQuestionIndex)
+      : getQuestionForPlayer(matchData, mePlayerIdx, displayQuestionIndex);
 
     const myCurrentAns = parseAnswer(me?.answers?.[displayQuestionIndex]);
     const oppCurrentAns = parseAnswer(opponent?.answers?.[displayQuestionIndex]);
@@ -983,7 +1009,7 @@ export const LiveChallenge: React.FC = () => {
                      {MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS]?.label || 'Blitz'}
                   </span>
                   <div className="w-1 h-1 rounded-full bg-sky-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/80">Q{displayQuestionIndex + 1}/{matchData.questions.length}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-500/80">Q{displayQuestionIndex + 1}/{MODE_CONFIGS[matchData.gameMode as keyof typeof MODE_CONFIGS || 'blitz']?.questions || 15}</span>
                </div>
                <button onClick={handleQuit} className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 hover:text-rose-400 font-black tracking-widest uppercase text-[9px] rounded-full transition-all border border-rose-500/20 group">
                   <XCircle size={12} className="group-hover:rotate-90 transition-transform" />

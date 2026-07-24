@@ -490,9 +490,9 @@ export const enterMatchmaking = async (user: { uid: string, displayName: string,
             const matchRef = doc(collection(db, 'arena_matches'));
             matchCreated = matchRef.id;
             
-            // Slice questions based on mode
-            const modeCounts = { bullet: 5, blitz: 15, rapid: 20 };
-            const finalQuestions = questions.slice(0, modeCounts[gameMode] || 15);
+            // Slice questions based on mode (2x total questions so each player gets unique set)
+            const modeCounts = { bullet: 10, blitz: 30, rapid: 40 };
+            const finalQuestions = questions.slice(0, modeCounts[gameMode] || 30);
 
             transaction.set(matchRef, {
               matchId: matchRef.id,
@@ -724,8 +724,8 @@ export const acceptMatchRematch = async (matchId: string, questions: Question[])
        const data = snap.data();
        const players = data.players.map((p: any) => ({ ...p, score: 0, currentQuestion: 0, answers: {} }));
        const mode = data.gameMode || 'blitz';
-       const modeCounts: any = { bullet: 5, blitz: 15, rapid: 20 };
-       const finalQuestions = questions.slice(0, modeCounts[mode] || 15);
+       const modeCounts: any = { bullet: 10, blitz: 30, rapid: 40 };
+       const finalQuestions = questions.slice(0, modeCounts[mode] || 30);
 
        transaction.update(matchRef, {
          players,
@@ -777,8 +777,8 @@ export const respondDirectChallenge = async (challengeId: string, status: 'accep
       
       if (status === 'accepted' && questions) {
          const mode = data.gameMode || 'blitz';
-         const modeCounts: any = { bullet: 5, blitz: 15, rapid: 20 };
-         const finalQuestions = questions.slice(0, modeCounts[mode] || 15);
+         const modeCounts: any = { bullet: 10, blitz: 30, rapid: 40 };
+         const finalQuestions = questions.slice(0, modeCounts[mode] || 30);
 
          // Create the match
          const matchRef = doc(collection(db, 'arena_matches'));
