@@ -505,8 +505,8 @@ export const AdminPage: React.FC = () => {
   const paginatedQuestions = filteredQuestions.slice((qPage - 1) * qPageSize, qPage * qPageSize);
 
   const filteredUsers = users.filter(u => 
-    u.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (u.displayName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (u.email || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const COLORS = isDarkMode 

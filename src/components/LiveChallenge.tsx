@@ -1939,7 +1939,7 @@ export const LiveChallenge: React.FC = () => {
             />
           </div>
           <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-outline">
-             <span>{lobbyUsers.filter(u => u.uid !== user?.uid && u.displayName?.toLowerCase().includes(lobbySearchQuery.toLowerCase())).length} Results</span>
+             <span>{lobbyUsers.filter(u => u.uid !== user?.uid && (u.displayName || '').toLowerCase().includes(lobbySearchQuery.toLowerCase())).length} Results</span>
              <div className="w-1.5 h-1.5 rounded-full bg-outline-variant/50" />
              <span>Lobby Filter</span>
           </div>
@@ -1948,7 +1948,7 @@ export const LiveChallenge: React.FC = () => {
         <div className="grid lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3 grid md:grid-cols-2 gap-8">
             {lobbyUsers
-              .filter(u => u.uid !== user?.uid && u.displayName?.toLowerCase().includes(lobbySearchQuery.toLowerCase()))
+              .filter(u => u.uid !== user?.uid && (u.displayName || '').toLowerCase().includes(lobbySearchQuery.toLowerCase()))
               .map((u, i) => (
             <motion.div
               key={u.uid}
