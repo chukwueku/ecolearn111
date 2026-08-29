@@ -142,7 +142,7 @@ export const AdminPage: React.FC = () => {
       const previousQuestionTexts = dailyChallenges.flatMap(dc => (dc.questions || []).map(q => q.question || ''));
 
       // Step 1: Batch 1
-      setDcGenStep(`Batch 1/4: Synthesizing ${topicsBatch1.join(' & ')} puzzles (12 questions)...`);
+      setDcGenStep(isUg ? `Batch 1/4: Synthesizing ${topicsBatch1.join(' & ')} puzzles (12 questions)...` : `Batch 1/4: Synthesizing ${topicsBatch1.join(' & ')} WASSCE/JAMB questions (12 questions)...`);
       const batch1 = await generateDailyChallengeBatch(
         topicsBatch1,
         12,
@@ -152,7 +152,7 @@ export const AdminPage: React.FC = () => {
       
       // Step 2: Batch 2
       const exclude2 = [...previousQuestionTexts, ...batch1.map(q => q.question || '')];
-      setDcGenStep(`Batch 2/4: Formulating ${topicsBatch2.join(' & ')} proofs (12 questions)...`);
+      setDcGenStep(isUg ? `Batch 2/4: Formulating ${topicsBatch2.join(' & ')} proofs (12 questions)...` : `Batch 2/4: Formulating ${topicsBatch2.join(' & ')} WASSCE/JAMB questions (12 questions)...`);
       const batch2 = await generateDailyChallengeBatch(
         topicsBatch2,
         12,
@@ -162,7 +162,7 @@ export const AdminPage: React.FC = () => {
       
       // Step 3: Batch 3
       const exclude3 = [...exclude2, ...batch2.map(q => q.question || '')];
-      setDcGenStep(`Batch 3/4: Creating ${topicsBatch3.join(' & ')} puzzles (12 questions)...`);
+      setDcGenStep(isUg ? `Batch 3/4: Creating ${topicsBatch3.join(' & ')} puzzles (12 questions)...` : `Batch 3/4: Creating ${topicsBatch3.join(' & ')} WASSCE/JAMB questions (12 questions)...`);
       const batch3 = await generateDailyChallengeBatch(
         topicsBatch3,
         12,
@@ -172,7 +172,7 @@ export const AdminPage: React.FC = () => {
       
       // Step 4: Batch 4
       const exclude4 = [...exclude3, ...batch3.map(q => q.question || '')];
-      setDcGenStep(`Batch 4/4: Constructing ${topicsBatch4.join(' & ')} puzzles (14 questions)...`);
+      setDcGenStep(isUg ? `Batch 4/4: Constructing ${topicsBatch4.join(' & ')} puzzles (14 questions)...` : `Batch 4/4: Constructing ${topicsBatch4.join(' & ')} WASSCE/JAMB questions (14 questions)...`);
       const batch4 = await generateDailyChallengeBatch(
         topicsBatch4,
         14,
@@ -360,6 +360,7 @@ export const AdminPage: React.FC = () => {
 
     const course = topics.find(t => t.id === selectedCourse);
     let topicTitleStr = "";
+    const isSecondaryGroup = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
 
     if (topicId === "all-subtopics") {
       // All subtopics of this course
@@ -370,6 +371,10 @@ export const AdminPage: React.FC = () => {
     } else {
       // A specific subtopic
       topicTitleStr = `${course?.title || selectedCourse} — ${topicId}`;
+    }
+
+    if (isSecondaryGroup) {
+      topicTitleStr = `WASSCE/WAEC & JAMB Senior Secondary Economics: ${topicTitleStr}`;
     }
 
     try {
@@ -931,6 +936,24 @@ export const AdminPage: React.FC = () => {
                 })()}
 
                 <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
+                  {(() => {
+                    const isSecondary = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
+                    if (!isSecondary) return null;
+                    return (
+                      <div className="mb-6 p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 flex items-start gap-3.5 text-xs sm:text-sm">
+                        <span className="text-lg leading-none">🛡️</span>
+                        <div>
+                          <p className="font-black uppercase tracking-wider text-[10px] sm:text-xs text-amber-600 dark:text-amber-400 mb-0.5">
+                            Curriculum Guard Active • Secondary School Standards
+                          </p>
+                          <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed">
+                            Questions generated under this curriculum are strictly restricted to <strong>WASSCE (WAEC)</strong> and <strong>JAMB (UTME)</strong> Senior Secondary syllabus standards. Undergraduate questions, university-level calculus, and advanced econometrics derivations are strictly prohibited.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-10">
 
                     {/* ACADEMIC LEVEL = Level group selector */}
@@ -1021,7 +1044,9 @@ export const AdminPage: React.FC = () => {
                     className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 sm:py-5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest text-[10px]"
                   >
                     {loading ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                    {loading ? `Generating ${count} Technical Questions...` : "Generate Technical Questions"}
+                    {loading
+                      ? `Generating ${count} ${level.startsWith('secondary') ? 'WASSCE / JAMB' : 'Technical'} Questions...`
+                      : `Generate ${level.startsWith('secondary') ? 'WASSCE / JAMB' : 'Technical'} Questions`}
                   </button>
                 </div>
 
@@ -1414,7 +1439,7 @@ export const AdminPage: React.FC = () => {
                           className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 sm:py-5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest text-[10px]"
                         >
                           <Database size={18} />
-                          Generate 50 Critical Thinking Puzzles across 8 courses
+                          {dcLevel === 'undergraduate' ? 'Generate 50 Critical Thinking Puzzles across 8 courses' : 'Generate 50 WASSCE / JAMB Secondary Challenge Questions'}
                         </button>
                       )}
                     </div>

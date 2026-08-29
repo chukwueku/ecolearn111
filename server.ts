@@ -152,6 +152,7 @@ Make the tone deeply educational, intellectually stimulating, and perfectly tail
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
 
+    const isSecondary = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
     const totalNeeded = Math.min(Math.max(Number(requestedCount) || 5, 1), 500);
     const excludeList = Array.isArray(exclude) ? [...exclude] : [];
     const allQuestions: any[] = [];
@@ -166,7 +167,48 @@ Make the tone deeply educational, intellectually stimulating, and perfectly tail
           ...allQuestions.map(q => q.question)
         ];
 
-        const prompt = `You are an experienced Economics professor and examiner. Generate exactly ${currentBatchCount} well-balanced, MODERATE DIFFICULTY multiple-choice questions for a ${level} student covering: "${topicTitle}".
+        const prompt = isSecondary
+          ? `You are an expert Chief Examiner for Senior Secondary School Economics, specializing strictly in the West African Examinations Council (WAEC / WASSCE) and Nigerian Joint Admissions and Matriculation Board (JAMB / UTME) curricula.
+
+Generate exactly ${currentBatchCount} authentic, high-quality multiple-choice questions for a Senior Secondary School student (${level}) covering: "${topicTitle}".
+
+CRITICAL CURRICULUM BOUNDARIES & STRICT INSTRUCTIONS:
+1. STRICT WAEC & JAMB STANDARDS ONLY:
+   - Target the exact standard, style, and syllabus of official WASSCE and JAMB UTME Economics examination past questions.
+   - Questions must test high school principles, analytical clarity, definitions, features, functions, differences, and practical West African / Nigerian economic scenarios.
+2. ABSOLUTELY NO UNDERGRADUATE CONTENT:
+   - Under no circumstances should university-level, graduate-level, or advanced undergraduate economics questions be generated.
+   - STRICTLY FORBIDDEN: Calculus, partial derivatives, Lagrangian optimization, Cobb-Douglas utility derivations (\\( U = x^\\alpha y^{1-\\alpha} \\)), Slutsky equations, Solow-Swan growth differential equations, Gauss-Markov theorem, OLS matrix regression / econometric error assumptions, Game Theory payoff matrices / Nash equilibria, IS-LM-BP algebraic proofs.
+3. ALLOWED MATHEMATICS / QUANTITATIVE LEVEL:
+   - Only basic secondary school arithmetic calculations typical of WAEC/JAMB:
+     * Simple elasticity calculation: \\( \\text{Elasticity} = \\frac{\\% \\Delta Q}{\\% \\Delta P} \\) or \\( \\frac{\\Delta Q}{\\Delta P} \\times \\frac{P}{Q} \\).
+     * Simple arithmetic tables: Calculating Total Revenue (\\( TR = P \\times Q \\)), Marginal Revenue (\\( MR = \\Delta TR / \\Delta Q \\)), Average Cost (\\( AC = TC / Q \\)), Marginal Cost (\\( MC = \\Delta TC / \\Delta Q \\)), or Total/Marginal Utility (\\( MU = \\Delta TU / \\Delta Q \\)).
+     * Finding market equilibrium price and quantity from simple linear equations like \\( Q_d = 50 - 2P \\) and \\( Q_s = 10 + 2P \\).
+     * Simple multiplier: \\( k = \\frac{1}{1 - MPC} \\) or \\( \\frac{1}{MPS} \\).
+     * Simple statistics: Mean, Median, Mode from simple frequency data.
+4. DIVERSE QUESTION TYPES:
+   - Conceptual understanding and definitions (e.g. Scarcity vs Choice, Scale of Preference, Opportunity Cost, Factors of Production, Division of Labour).
+   - Real-world West African economic scenarios (e.g. inflation control, agricultural marketing boards, crude oil sector, ECOWAS trade).
+   - Curve analysis & shifts (e.g. shifts in demand vs movement along demand curve, price ceilings and minimum price legislation).
+5. QUESTION FORMAT:
+   - Concise, direct question stems (1–2 sentences).
+   - Exactly 4 realistic options (Option A, B, C, D) with one unambiguously correct answer and 3 plausible distractors typical of WAEC/JAMB.
+   - Whenever variables or equations appear, format using inline LaTeX \\( ... \\).
+6. NO DUPLICATION: Do NOT repeat or generate questions similar to any of these excluded questions:
+${JSON.stringify(accumulatedExcludes.slice(-100))}
+
+Format the output strictly as a JSON array matching this schema:
+[
+  {
+    "question": "string (clear, direct question stem typical of WAEC/JAMB)",
+    "options": ["string (Option A)", "string (Option B)", "string (Option C)", "string (Option D)"],
+    "correctAnswer": number (0-3),
+    "explanation": "string (clear, concise explanation referencing WAEC/JAMB economic principles)"
+  }
+]
+
+Return only raw valid JSON array.`
+          : `You are an experienced Economics professor and examiner. Generate exactly ${currentBatchCount} well-balanced, MODERATE DIFFICULTY multiple-choice questions for a ${level} student covering: "${topicTitle}".
 
 REQUIREMENTS:
 1. MODERATE DIFFICULTY: Questions should be neither too easy nor overly complex. They must test genuine understanding — not just memorisation, but also not advanced graduate-level derivations. Aim for the level of a well-prepared final-year student.
@@ -219,6 +261,109 @@ Return only raw valid JSON array.`;
 
       if (allQuestions.length === 0) {
         // Fallback to offline generator if AI failed completely
+        if (isSecondary) {
+          const secondaryFallbacks = [
+            {
+              question: `Which of the following best defines opportunity cost in economics with reference to ${topicTitle}?`,
+              options: [
+                "The next best alternative forgone when a choice is made",
+                "The total monetary cost of purchasing a good",
+                "The financial expense recorded in a firm's balance sheet",
+                "The market price determined by government decree"
+              ],
+              correctAnswer: 0,
+              explanation: "In WAEC and JAMB economics, opportunity cost is defined as the real cost of an action expressed in terms of the next best alternative sacrificed."
+            },
+            {
+              question: `In the study of ${topicTitle}, a movement along a demand curve is caused by a change in:`,
+              options: [
+                "The price of the commodity itself",
+                "Consumers' disposable income",
+                "Prices of substitute goods",
+                "Tastes and preferences of consumers"
+              ],
+              correctAnswer: 0,
+              explanation: "A change in the price of the commodity itself leads to a movement along the demand curve (contraction or expansion in quantity demanded), whereas other factors cause a shift of the demand curve."
+            },
+            {
+              question: `If a 10% rise in the price of a product leads to a 5% drop in quantity demanded during analysis of ${topicTitle}, the price elasticity of demand is:`,
+              options: [
+                "Inelastic (\\( E_d = 0.5 \\))",
+                "Elastic (\\( E_d = 2.0 \\))",
+                "Unitary elastic (\\( E_d = 1.0 \\))",
+                "Perfectlys elastic (\\( E_d = \\infty \\))"
+              ],
+              correctAnswer: 0,
+              explanation: "Price elasticity of demand is \\( \\frac{\\% \\Delta Q_d}{\\% \\Delta P} = \\frac{5\\%}{10\\%} = 0.5 \\). Since \\( E_d < 1 \\), demand is inelastic."
+            },
+            {
+              question: `According to the law of diminishing marginal utility relevant to ${topicTitle}, as a consumer consumes more units of a commodity:`,
+              options: [
+                "The marginal utility derived from each successive unit diminishes",
+                "The total utility decreases immediately from the first unit",
+                "The marginal utility increases at an increasing rate",
+                "Average utility always equals zero"
+              ],
+              correctAnswer: 0,
+              explanation: "The law of diminishing marginal utility states that as additional units of a good are consumed, the extra satisfaction (marginal utility) derived from each successive unit decreases."
+            },
+            {
+              question: `In production economics under ${topicTitle}, division of labour is primarily limited by:`,
+              options: [
+                "The extent of the market and demand",
+                "The level of direct taxation",
+                "The presence of trade unions alone",
+                "The availability of commercial bank overdrafts"
+              ],
+              correctAnswer: 0,
+              explanation: "Adam Smith famously demonstrated that the division of labour is limited by the extent of the market (the volume of demand)."
+            },
+            {
+              question: `Which of the following is a primary function of a Central Bank that distinguishes it from commercial banks under ${topicTitle}?`,
+              options: [
+                "Acting as lender of last resort to commercial banks",
+                "Accepting demand deposits from individual customers",
+                "Granting personal overdrafts to small retail businesses",
+                "Underwriting corporate shares on the stock exchange"
+              ],
+              correctAnswer: 0,
+              explanation: "The Central Bank acts as the lender of last resort, banker to the government, and sole issuer of legal tender, which commercial banks cannot do."
+            },
+            {
+              question: `Under fiscal policy and public finance regarding ${topicTitle}, a tax whose rate increases as income increases is called a:`,
+              options: [
+                "Progressive tax",
+                "Regressive tax",
+                "Proportional tax",
+                "Specific excise tax"
+              ],
+              correctAnswer: 0,
+              explanation: "A progressive tax takes a higher percentage of income from higher-income earners, aiding income redistribution."
+            },
+            {
+              question: `In national income accounting covering ${topicTitle}, Gross Domestic Product (GDP) differs from Gross National Product (GNP) by:`,
+              options: [
+                "Net factor income from abroad",
+                "Depreciation (capital consumption allowance)",
+                "Transfer payments from government",
+                "Undistributed corporate profits"
+              ],
+              correctAnswer: 0,
+              explanation: "GNP = GDP + Net Factor Income from Abroad (NFIA)."
+            }
+          ];
+          const fallback = Array.from({ length: totalNeeded }).map((_, i) => {
+            const item = secondaryFallbacks[i % secondaryFallbacks.length];
+            return {
+              question: item.question,
+              options: item.options,
+              correctAnswer: item.correctAnswer,
+              explanation: item.explanation
+            };
+          });
+          return res.json({ questions: fallback });
+        }
+
         const fallback = Array.from({ length: totalNeeded }).map((_, i) => ({
           question: `In advanced technical analysis of ${topicTitle}, consider optimal resource allocation model # ${i + 1} with utility \\( U(x,y) = x^\\alpha y^{1-\\alpha} \\). What condition maximizes technical efficiency?`,
           options: [
@@ -382,8 +527,32 @@ Return only raw valid JSON array.`;
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
     
+    const isSecondary = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
     // The prompt guides the model to extract questions specifically addressing the PDF content
-    const prompt = `You are an expert Economics examiner. Given the provided document, extract and generate ${count || 5} multiple-choice questions suitable for a ${level} student.
+    const prompt = isSecondary
+      ? `You are an expert Chief Examiner for Senior Secondary School Economics, specializing strictly in WASSCE (WAEC) and JAMB (UTME) standards. Given the provided document, extract and generate ${count || 5} multiple-choice questions suitable for a Senior Secondary School student (${level}).
+
+CRITICAL RESTRICTIONS:
+- All questions must strictly adhere to the high school WASSCE/JAMB Economics syllabus.
+- Under NO circumstances generate undergraduate calculus, advanced microeconomic derivations, or econometrics questions.
+- Maintain standard 4 options (A, B, C, D) with a single clearly correct answer.
+
+Each question must have:
+- A clear question text directly related to the concepts in the document.
+- Exactly 4 options.
+- The index of the correct answer (0-3).
+- A brief explanation for the correct answer based on the document.
+
+Return the response in JSON format as an array of objects with the following schema:
+[
+  {
+    "question": "string",
+    "options": ["string", "string", "string", "string"],
+    "correctAnswer": number,
+    "explanation": "string"
+  }
+]`
+      : `You are an expert Economics examiner. Given the provided document, extract and generate ${count || 5} multiple-choice questions suitable for a ${level} student.
 
 Each question must have:
 - A clear question text directly related to the concepts in the document.
@@ -432,8 +601,34 @@ Return the response in JSON format as an array of objects with the following sch
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
 
-    // Build the prompt requesting highly balanced, real-world analytical questions with clear scenario and question separation.
-    const prompt = `You are an elite university professor of Economics. Generate exactly ${count || 10} multiple-choice questions for a Daily Challenge at the '${level || 'undergraduate'}' level.
+    const isSecondary = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
+
+    // Build the prompt requesting highly balanced questions with clear scenario and question separation.
+    const prompt = isSecondary
+      ? `You are an expert Senior Secondary School Economics Chief Examiner specializing in the official West African Examinations Council (WAEC / WASSCE) and Nigerian Joint Admissions and Matriculation Board (JAMB / UTME) curricula. Generate exactly ${count || 10} high-quality multiple-choice questions for a Daily Challenge at the Senior Secondary level (${level || 'secondary'}).
+The questions must rotate dynamically across standard secondary economics fields: Basic Economic Principles, Theory of Demand and Supply, Theory of Production, Market Structures, Money and Banking, Public Finance, National Income, and International Trade.
+
+CRITICAL DESIGN & CONTENT GUIDELINES:
+1. STRICTLY WASSCE & JAMB STANDARDS: Target the exact standard, style, and syllabus of official WASSCE and JAMB UTME Economics examination past questions.
+2. ABSOLUTELY NO UNDERGRADUATE CONTENT: Under no circumstances generate university-level, graduate-level, or advanced econometrics/calculus derivations. Strictly avoid Cobb-Douglas derivations, Slutsky equations, Solow-Swan growth differential equations, Gauss-Markov theorem, OLS matrix errors, or Game Theory payoff matrices.
+3. CONCISE SCENARIOS: Keep each scenario short, crisp, and high-impact (maximum 1 to 2 sentences) grounded in realistic West African economic contexts.
+4. MINIMAL LIGHT MATH: At most 20% simple arithmetic (simple price elasticity % calculation, TR/MR table calculation, or basic linear Qd=Qs equilibrium).
+5. FORMATTING: Use inline LaTeX \\( ... \\) for any numbers, variables, or equations so they render cleanly.
+6. NO REPETITION: Do NOT generate questions similar or identical to the following previously generated scenarios/questions:
+${exclude && exclude.length > 0 ? JSON.stringify(exclude) : '[]'}
+
+Each question must be an object matching this JSON schema:
+{
+  "scenario": "string (1-2 sentence situational setup in West African/secondary context with LaTeX formatting)",
+  "question": "string (the specific secondary school economic question, with LaTeX formatting)",
+  "options": ["string (with LaTeX formatting if numerical/variable)", "string", "string", "string"],
+  "correctAnswer": number (index 0-3),
+  "explanation": "string (clear, high school level explanation referencing WAEC/JAMB economic principles, using LaTeX formatting for equations)",
+  "course": "string (the specific category: 'Basic Principles', 'Demand & Supply', 'Production & Markets', 'Money & Banking', 'Public Finance', 'National Income', or 'International Trade')"
+}
+
+Return the response in JSON format as a raw array of objects matching this schema. Do not wrap the JSON in markdown code blocks. Make sure to return exactly ${count || 10} unique questions.`
+      : `You are an elite university professor of Economics. Generate exactly ${count || 10} multiple-choice questions for a Daily Challenge at the '${level || 'undergraduate'}' level.
 The questions must toggle and rotate dynamically across different core fields of economics: Microeconomics, Macroeconomics, Econometrics (empirical regression analysis), International Trade, Public Finance, and Game Theory.
 
 CRITICAL DESIGN & CONTENT GUIDELINES:
