@@ -266,12 +266,54 @@ Return only raw valid JSON array.`;
   });
 
   app.post("/api/agentTask", async (req, res) => {
-    const { prompt, agent } = req.body;
+    const { prompt, agent, stream } = req.body;
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
 
     const agentModel = agent || "antigravity-preview-05-2026";
     const userPrompt = prompt || "Explain economic equilibrium and market elasticity.";
+
+    if (stream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      try {
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+        let streamResult = null;
+        let lastError = null;
+
+        for (const modelName of modelsToTry) {
+          try {
+            streamResult = await ai.models.generateContentStream({
+              model: modelName,
+              contents: userPrompt
+            });
+            break; // Success
+          } catch (err) {
+            lastError = err;
+            console.warn(`Streaming failed for ${modelName}, trying next...`);
+          }
+        }
+
+        if (!streamResult) {
+          throw lastError;
+        }
+
+        for await (const chunk of streamResult) {
+          if (chunk.text) {
+            res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+          }
+        }
+        res.write('data: [DONE]\n\n');
+        res.end();
+      } catch (error: any) {
+        console.error("Gemini Streaming Error:", error);
+        res.write(`data: ${JSON.stringify({ error: error?.message || "Streaming failed" })}\n\n`);
+        res.end();
+      }
+      return;
+    }
 
     try {
       if ((ai as any).interactions && typeof (ai as any).interactions.create === 'function') {

@@ -3,6 +3,8 @@ import { Calculator, TrendingUp, Scale, Factory, Zap, Info, Percent, Coins, Chev
 import { motion, AnimatePresence } from 'motion/react';
 import { InlineMath, BlockMath } from './MathComponents';
 import { StatsSimulator } from './StatsSimulator';
+import { MicroEconomicsSimulator, type MicroMode } from './simulators/MicroEconomicsSimulator';
+import { MacroEconomicsSimulator, type MacroMode } from './simulators/MacroEconomicsSimulator';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -262,8 +264,19 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
     'autocorrelation'
   ];
 
+  const microModes = ['utility', 'elasticity', 'equilibrium', 'production', 'cost_revenue'];
+  const macroModes = ['inflation', 'money_multiplier', 'taylor_rule', 'fiscal_policy', 'labour_market', 'population', 'nigerian_economy', 'distributive_trade'];
+
   if (statsModes.includes(mode)) {
     return <StatsSimulator mode={mode as any} title={title} initialValues={initialValues} />;
+  }
+
+  if (microModes.includes(mode)) {
+    return <MicroEconomicsSimulator mode={mode as MicroMode} initialValues={initialValues} />;
+  }
+
+  if (macroModes.includes(mode)) {
+    return <MacroEconomicsSimulator mode={mode as MacroMode} initialValues={initialValues} title={title} />;
   }
 
   const [values, setValues] = useState<Record<string, number>>(() => {

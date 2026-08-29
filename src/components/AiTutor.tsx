@@ -67,32 +67,71 @@ User's query: ${userMessage}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agent: 'antigravity-preview-05-2026',
-          prompt: systemPrompt
+          prompt: systemPrompt,
+          stream: true
         })
       });
 
       if (!response.ok) throw new Error('Failed to fetch from AI Tutor');
+      if (!response.body) throw new Error('No response body');
 
-      const data = await response.json();
+      // Add a placeholder message for the AI response
+      setMessages(prev => [...prev, { role: 'model', content: '' }]);
+      setIsLoading(false); // Stop loading animation since we're streaming
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
       let aiResponse = "";
-      
-      // Handle the two possible response formats from our backend
-      if (typeof data.result === 'string') {
-        aiResponse = data.result;
-      } else if (data.result && data.result.response) {
-         // If it returns the interaction object directly
-         aiResponse = data.result.response.text || data.result.response;
-      } else {
-        aiResponse = JSON.stringify(data.result);
-      }
 
-      setMessages(prev => [...prev, { role: 'model', content: aiResponse }]);
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.substring(6);
+            if (dataStr === '[DONE]') {
+              break;
+            }
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.text) {
+                aiResponse += parsed.text;
+                // Update the last message
+                setMessages(prev => {
+                  const newMessages = [...prev];
+                  newMessages[newMessages.length - 1].content = aiResponse;
+                  return newMessages;
+                });
+              } else if (parsed.error) {
+                 console.error('AI Tutor Stream Error:', parsed.error);
+              }
+            } catch (e) {
+              // Ignore parse errors from partial chunks
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error('AI Tutor Error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'model', 
-        content: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!" 
-      }]);
+      setMessages(prev => {
+        // If we already started streaming and failed, just append error, else replace last message
+        const isStreaming = prev[prev.length - 1].role === 'model' && prev[prev.length - 1].content !== '';
+        if (!isStreaming) {
+           const newMsg = [...prev];
+           if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'model') {
+             newMsg[newMsg.length - 1].content = "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!";
+             return newMsg;
+           }
+        }
+        return [...prev, { 
+          role: 'model', 
+          content: "\\n\\n*[Connection Error: Failed to complete response]*" 
+        }];
+      });
     } finally {
       setIsLoading(false);
     }

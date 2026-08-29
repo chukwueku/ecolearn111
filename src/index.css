@@ -178,6 +178,12 @@
 
   /* Additional utility styles from HTML */
   .progress-glow { box-shadow: 0 0 20px rgba(0, 108, 73, 0.15); }
+  
+  /* Mobile Safe Areas (Capacitor/iOS/Android) */
+  .pb-safe { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .pt-safe { padding-top: max(16px, env(safe-area-inset-top)); }
+  .pl-safe { padding-left: max(16px, env(safe-area-inset-left)); }
+  .pr-safe { padding-right: max(16px, env(safe-area-inset-right)); }
 }
 
 /* KaTeX Math Overflow & Styling */
