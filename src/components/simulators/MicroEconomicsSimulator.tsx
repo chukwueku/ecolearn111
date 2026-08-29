@@ -15,9 +15,10 @@ export type MicroMode = 'utility' | 'elasticity' | 'equilibrium' | 'production' 
 export interface MicroSimulatorProps {
   mode: MicroMode;
   initialValues?: Record<string, number>;
+  title?: string;
 }
 
-export const MicroEconomicsSimulator: React.FC<MicroSimulatorProps> = ({ mode, initialValues }) => {
+export const MicroEconomicsSimulator: React.FC<MicroSimulatorProps> = ({ mode, initialValues, title }) => {
   const [values, setValues] = useState<Record<string, number>>(() => {
     const defaults: Record<string, number> = {};
     if (mode === 'cost_revenue') {
@@ -620,7 +621,7 @@ export const MicroEconomicsSimulator: React.FC<MicroSimulatorProps> = ({ mode, i
           <Calculator size={16} className="sm:w-6 sm:h-6" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-white text-sm sm:text-base md:text-xl font-bold tracking-tight mb-0.5 break-words leading-tight">Microeconomics Simulator</h3>
+          <h3 className="text-white text-sm sm:text-base md:text-xl font-bold tracking-tight mb-0.5 break-words leading-tight">{title || 'Microeconomics Simulator'}</h3>
           <p className="text-sky-400 dark:text-sky-300 text-[8px] sm:text-[10px] uppercase tracking-[0.12em] font-bold truncate">Interactive Calculation Engine</p>
         </div>
       </div>
