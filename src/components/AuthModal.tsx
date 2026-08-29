@@ -80,10 +80,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen = false, onClose = 
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         setError('Email already in use. Try logging in.');
-      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
         setError('Invalid email or password.');
       } else if (err.code === 'auth/weak-password') {
         setError('Password must be at least 6 characters.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError('Network error: Please check your internet connection and try again.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Access temporarily disabled due to too many failed attempts. Please try again later.');
       } else {
         setError(err.message || 'Authentication failed. Please try again.');
       }

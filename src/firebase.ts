@@ -76,6 +76,12 @@ export interface UserProfile {
   scores?: Record<string, number>;
   role?: 'admin' | 'user';
   points?: number;
+  xp?: number;
+  streak?: number;
+  lastStreakDate?: string; // ISO date string YYYY-MM-DD
+  badges?: string[];
+  dailyQuizStreak?: number;
+  lastDailyQuizDate?: string;
   lastActive?: number;
   createdAt: any;
 }
@@ -161,8 +167,54 @@ export const createUserProfile = async (user: any, level: 'secondary' | 'undergr
   return profile;
 };
 
-export const saveQuestions = async (questions: Question[]) => {
+export const normalizeQuestionText = (text: string): string => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
+};
+
+export const isDuplicateQuestion = (newQuestionText: string, existingQuestionTexts: string[]): boolean => {
+  const normNew = normalizeQuestionText(newQuestionText);
+  if (!normNew) return false;
+  return existingQuestionTexts.some(existing => {
+    const normExist = normalizeQuestionText(existing);
+    if (!normExist) return false;
+    if (normExist === normNew) return true;
+    // Overlap check for substantial length questions
+    if (normNew.length > 25 && normExist.length > 25) {
+      if (normNew.includes(normExist) || normExist.includes(normNew)) return true;
+    }
+    return false;
+  });
+};
+
+export const saveQuestions = async (questions: Question[]): Promise<{ savedCount: number; duplicateCount: number }> => {
+  let savedCount = 0;
+  let duplicateCount = 0;
+
+  // Retrieve existing question bank to check for duplicates
+  let existingTexts: string[] = [];
+  try {
+    const snap = await getDocs(collection(db, 'questions'));
+    existingTexts = snap.docs.map(d => d.data().question).filter(Boolean);
+  } catch (e) {
+    console.warn("Could not fetch existing question bank for deduplication:", e);
+  }
+
+  const seenInBatch: string[] = [];
+
   for (const q of questions) {
+    if (!q.question || !q.question.trim()) continue;
+
+    if (isDuplicateQuestion(q.question, [...existingTexts, ...seenInBatch])) {
+      console.warn("Duplicate question rejected:", q.question);
+      duplicateCount++;
+      continue;
+    }
+
+    seenInBatch.push(q.question);
     const path = 'questions';
     try {
       const qRef = doc(collection(db, 'questions'));
@@ -171,9 +223,25 @@ export const saveQuestions = async (questions: Question[]) => {
         id: qRef.id,
         createdAt: serverTimestamp()
       });
+      savedCount++;
+      existingTexts.push(q.question);
     } catch(e) {
       handleFirestoreError(e, OperationType.WRITE, path);
     }
+  }
+
+  return { savedCount, duplicateCount };
+};
+
+export const getQuestionsForLevel = async (level: string): Promise<Question[]> => {
+  const path = 'questions';
+  try {
+    const q = query(collection(db, 'questions'), where('level', '==', level));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...(doc.data() as any) } as Question));
+  } catch(e) {
+    handleFirestoreError(e, OperationType.LIST, path);
+    return [];
   }
 };
 
@@ -279,11 +347,156 @@ export const updatePoints = async (uid: string, pointsToAdd: number) => {
     const snap = await getDoc(userRef);
     if (snap.exists()) {
        const u = snap.data();
-       await updateDoc(userRef, { points: (u.points || 0) + pointsToAdd });
+       await updateDoc(userRef, {
+         points: (u.points || 0) + pointsToAdd,
+         xp: (u.xp || 0) + pointsToAdd,
+       });
     }
   } catch(e) { 
     handleFirestoreError(e, OperationType.UPDATE, path);
   }
+};
+
+// Get today's date as YYYY-MM-DD
+const getTodayDateStr = () => new Date().toISOString().split('T')[0];
+
+// Update login streak — call once on user login or daily puzzle completion
+export const updateStreak = async (uid: string): Promise<{ streak: number; isNew: boolean }> => {
+  const path = `users/${uid}`;
+  try {
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) return { streak: 0, isNew: false };
+    const u = snap.data();
+    const today = getTodayDateStr();
+    const lastDate = u.lastStreakDate || '';
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    let streak = u.streak || 0;
+    let isNew = false;
+    if (lastDate === today) {
+      return { streak, isNew: false }; // Already updated today
+    } else if (lastDate === yesterdayStr) {
+      streak = streak + 1;
+      isNew = true;
+    } else if (lastDate !== today) {
+      streak = 1; // Reset streak
+      isNew = true;
+    }
+    // Award bonus XP for streak milestones
+    const bonusXP = streak % 7 === 0 ? 50 : streak % 3 === 0 ? 20 : 10;
+    await updateDoc(userRef, {
+      streak,
+      lastStreakDate: today,
+      xp: (u.xp || 0) + bonusXP,
+      points: (u.points || 0) + bonusXP,
+    });
+    return { streak, isNew };
+  } catch(e) {
+    handleFirestoreError(e, OperationType.UPDATE, path);
+    return { streak: 0, isNew: false };
+  }
+};
+
+// Badge IDs available in the system
+export const BADGE_DEFINITIONS: Record<string, { name: string; description: string; emoji: string; color: string; tier: 'secondary' | 'undergrad' | 'both' }> = {
+  // --- Firsts & Early Milestones (5) ---
+  'first_lesson': { name: 'First Step', description: 'Completed your first lesson', emoji: '📖', color: 'from-emerald-400 to-teal-500', tier: 'both' },
+  'first_win': { name: 'First Victory', description: 'Won your first PvP duel', emoji: '⚔️', color: 'from-amber-400 to-orange-500', tier: 'both' },
+  'first_friend': { name: 'Socialite', description: 'Added your first friend', emoji: '👋', color: 'from-pink-400 to-rose-400', tier: 'both' },
+  'quiz_perfect': { name: 'Perfect Score', description: 'Got 100% on a chapter quiz', emoji: '💯', color: 'from-sky-400 to-blue-600', tier: 'both' },
+  'social_butterfly': { name: 'Social Butterfly', description: 'Engaged in a direct multiplayer duel', emoji: '🤝', color: 'from-pink-500 to-purple-600', tier: 'both' },
+
+  // --- Streaks (6) ---
+  'streak_3': { name: 'On Fire', description: 'Maintained a 3-day streak', emoji: '🔥', color: 'from-orange-400 to-red-500', tier: 'both' },
+  'streak_7': { name: 'Weekly Warrior', description: 'Maintained a 7-day streak', emoji: '🗓️', color: 'from-violet-400 to-purple-600', tier: 'both' },
+  'streak_14': { name: 'Fortnight Fighter', description: 'Maintained a 14-day streak', emoji: '📅', color: 'from-indigo-400 to-blue-500', tier: 'both' },
+  'streak_30': { name: 'Iron Economist', description: 'Maintained a 30-day streak', emoji: '🏆', color: 'from-yellow-400 to-amber-600', tier: 'both' },
+  'streak_100': { name: 'Centurion', description: 'Maintained a 100-day streak', emoji: '💯', color: 'from-red-500 to-rose-700', tier: 'both' },
+  'streak_365': { name: 'A Year of Eco', description: 'Maintained a 365-day streak', emoji: '🌍', color: 'from-yellow-300 to-yellow-600', tier: 'both' },
+
+  // --- Chapter & Study Milestones (9) ---
+  'chapters_5': { name: 'Scholar', description: 'Completed 5 chapters', emoji: '🎓', color: 'from-green-400 to-emerald-600', tier: 'both' },
+  'chapters_10': { name: 'Economist', description: 'Completed 10 chapters', emoji: '📊', color: 'from-indigo-400 to-blue-600', tier: 'both' },
+  'chapters_25': { name: 'Researcher', description: 'Completed 25 chapters', emoji: '🔍', color: 'from-teal-400 to-cyan-600', tier: 'both' },
+  'chapters_50': { name: 'Professor', description: 'Completed 50 chapters', emoji: '👨‍🏫', color: 'from-blue-500 to-indigo-700', tier: 'both' },
+  'subject_master': { name: 'Subject Master', description: 'Completed an entire subject roadmap', emoji: '📜', color: 'from-amber-600 to-red-700', tier: 'both' },
+  'curious_mind': { name: 'Curious Mind', description: 'Read 10 different chapter summaries', emoji: '🧠', color: 'from-teal-400 to-emerald-500', tier: 'both' },
+  'night_owl': { name: 'Night Owl', description: 'Completed a quiz between midnight and 4 AM', emoji: '🦉', color: 'from-indigo-700 to-slate-800', tier: 'both' },
+  'early_bird': { name: 'Early Bird', description: 'Studied between 5 AM and 8 AM', emoji: '🌅', color: 'from-orange-300 to-amber-500', tier: 'both' },
+  'weekend_warrior': { name: 'Weekend Warrior', description: 'Completed a chapter on the weekend', emoji: '🎉', color: 'from-fuchsia-500 to-rose-600', tier: 'both' },
+
+  // --- Daily Puzzles (5) ---
+  'puzzle_1': { name: 'Puzzler', description: 'Completed your first daily puzzle', emoji: '🧩', color: 'from-pink-400 to-rose-500', tier: 'both' },
+  'puzzle_master': { name: 'Puzzle Master', description: 'Completed 10 daily puzzles', emoji: '🧩', color: 'from-pink-500 to-rose-600', tier: 'both' },
+  'puzzle_grandmaster': { name: 'Puzzle Grandmaster', description: 'Completed 50 daily puzzles', emoji: '👑', color: 'from-purple-500 to-fuchsia-600', tier: 'both' },
+  'puzzle_streak_7': { name: 'Puzzle Addict', description: 'Solved daily puzzles 7 days in a row', emoji: '📅', color: 'from-blue-400 to-cyan-500', tier: 'both' },
+  'puzzle_flawless': { name: 'Sharp Mind', description: 'Got 5/5 on a daily puzzle batch', emoji: '🎯', color: 'from-emerald-400 to-green-600', tier: 'both' },
+
+  // --- Live Duel Milestones (9) ---
+  'duel_10': { name: 'Gladiator', description: 'Played 10 multiplayer duels', emoji: '⚔️', color: 'from-slate-400 to-gray-600', tier: 'both' },
+  'duel_veteran': { name: 'Duel Veteran', description: 'Played 50 multiplayer duels', emoji: '🛡️', color: 'from-slate-500 to-gray-700', tier: 'both' },
+  'duel_legend': { name: 'Duel Legend', description: 'Played 100 multiplayer duels', emoji: '🏰', color: 'from-slate-600 to-gray-900', tier: 'both' },
+  'win_10': { name: 'Competitor', description: 'Won 10 multiplayer duels', emoji: '🏅', color: 'from-amber-300 to-orange-400', tier: 'both' },
+  'win_25': { name: 'Champion', description: 'Won 25 multiplayer duels', emoji: '🏆', color: 'from-amber-400 to-orange-500', tier: 'both' },
+  'win_50': { name: 'Conqueror', description: 'Won 50 multiplayer duels', emoji: '👑', color: 'from-amber-500 to-orange-600', tier: 'both' },
+  'win_100': { name: 'Invincible', description: 'Won 100 multiplayer duels', emoji: '🐉', color: 'from-red-500 to-rose-700', tier: 'both' },
+  'undefeated': { name: 'Undefeated', description: 'Won 5 duels in a row', emoji: '🔥', color: 'from-yellow-400 to-yellow-600', tier: 'both' },
+  'flawless_victory': { name: 'Flawless Victory', description: 'Won a duel with 100% accuracy', emoji: '🌟', color: 'from-blue-400 to-indigo-500', tier: 'both' },
+
+  // --- XP & Level Tiers (5) ---
+  'level_10': { name: 'Rising Star', description: 'Reached Level 10', emoji: '⭐', color: 'from-cyan-300 to-blue-400', tier: 'both' },
+  'level_25': { name: 'Economic Prodigy', description: 'Reached Level 25', emoji: '📈', color: 'from-emerald-400 to-lime-500', tier: 'both' },
+  'level_50': { name: 'Mastermind', description: 'Reached Level 50', emoji: '🧠', color: 'from-purple-400 to-fuchsia-500', tier: 'both' },
+  'level_75': { name: 'Visionary', description: 'Reached Level 75', emoji: '👁️', color: 'from-rose-400 to-red-600', tier: 'both' },
+  'level_100': { name: 'Apex Economist', description: 'Reached Level 100', emoji: '⛰️', color: 'from-yellow-400 to-amber-600', tier: 'both' },
+
+  // --- Notable Economics Scholars (Prestige Badges) (11) ---
+  'adam_smith': { name: 'Adam Smith Award', description: 'Reached 5,000 XP (Master of Free Markets)', emoji: '🏛️', color: 'from-amber-500 to-yellow-700', tier: 'both' },
+  'keynes_league': { name: 'Keynesian', description: 'Reached Keynes League (3000+ pts)', emoji: '💎', color: 'from-cyan-400 to-blue-500', tier: 'both' },
+  'karl_marx': { name: 'Karl Marx Medal', description: 'Read 20 chapters on Labor and Production', emoji: '🏭', color: 'from-red-500 to-red-800', tier: 'undergrad' },
+  'milton_friedman': { name: 'Milton Friedman Trophy', description: 'Answered 50 questions on Monetary Policy correctly', emoji: '💵', color: 'from-emerald-500 to-green-700', tier: 'undergrad' },
+  'hayek': { name: 'Hayek Prize', description: 'Maintained an 80% win rate over 20 duels', emoji: '⚖️', color: 'from-indigo-400 to-purple-600', tier: 'undergrad' },
+  'david_ricardo': { name: 'David Ricardo Shield', description: 'Perfect score in International Trade chapters', emoji: '🚢', color: 'from-blue-400 to-cyan-600', tier: 'secondary' },
+  'john_stuart_mill': { name: 'John Stuart Mill Star', description: 'Completed all Microeconomics chapters', emoji: '🌟', color: 'from-yellow-300 to-amber-500', tier: 'undergrad' },
+  'thomas_malthus': { name: 'Thomas Malthus Pin', description: 'Completed Population chapters', emoji: '👨‍👩‍👧‍👦', color: 'from-orange-400 to-red-500', tier: 'secondary' },
+  'joseph_schumpeter': { name: 'Schumpeter Crown', description: 'Won 10 duels as the underdog (lower rating)', emoji: '👑', color: 'from-purple-500 to-pink-600', tier: 'undergrad' },
+  'amartya_sen': { name: 'Amartya Sen Ribbon', description: 'Completed Development Economics chapters', emoji: '🌱', color: 'from-green-300 to-emerald-500', tier: 'undergrad' },
+  'john_nash': { name: 'John Nash Equilibrium', description: 'Draw 3 live duels', emoji: '🤝', color: 'from-slate-400 to-slate-600', tier: 'both' },
+};
+
+export const unlockBadge = async (uid: string, badgeId: string): Promise<boolean> => {
+  const path = `users/${uid}`;
+  try {
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) return false;
+    const u = snap.data();
+    const existing: string[] = u.badges || [];
+    if (existing.includes(badgeId)) return false; // Already has it
+    const newBadges = [...existing, badgeId];
+    await updateDoc(userRef, { badges: newBadges });
+    return true; // Newly unlocked
+  } catch(e) {
+    console.warn('unlockBadge error:', e);
+    return false;
+  }
+};
+
+// XP level calculation — returns level 1-50 based on XP
+export const getXPLevel = (xp: number = 0): { level: number; title: string; currentXP: number; nextXP: number; progress: number } => {
+  const thresholds = [0,100,250,500,850,1300,1900,2700,3700,5000,6600,8500,10800,13500,16700,20400,24700,29600,35200,41500,48600,56500,65200,74700,85000,96100,108000,120700,134200,148500,163600,179500,196200,213700,232000,251100,271000,291700,313200,335500,358600,382500,407200,432700,459000,486100,514000,542700,572200,600000];
+  const titles = ['Novice','Apprentice','Student','Scholar','Analyst','Economist','Strategist','Expert','Advisor','Theorist','Senior Analyst','Policy Maker','Research Fellow','Associate Prof','Lecturer','Sr. Lecturer','Professor','Economic Advisor','Lead Economist','Policy Director','Chief Economist','Macro Strategist','Trade Expert','Development Expert','Market Analyst','Keynesian','Monetarist','Supply-Sider','Institutional Expert','Behavioral Expert','Development Theorist','International Trade Expert','Game Theory Expert','Econometrician','Policy Architect','Macro Master','Micro Master','Global Economist','Financial Economist','Economic Historian','Nobel Contender','Economic Philosopher','Grand Economist','Economic Legend','Market Master','Supreme Economist','Economic Oracle','Economic Titan','Economic God','Keynesian Master'];
+  let level = 1;
+  for (let i = 1; i < thresholds.length; i++) {
+    if (xp >= thresholds[i]) level = i + 1;
+    else break;
+  }
+  level = Math.min(level, 50);
+  const currentXP = xp - thresholds[level - 1];
+  const nextXP = level < 50 ? thresholds[level] - thresholds[level - 1] : 1;
+  return { level, title: titles[level - 1], currentXP, nextXP, progress: Math.min((currentXP / nextXP) * 100, 100) };
 };
 
 export const getAllQuestionsAdmin = async (): Promise<Question[]> => {

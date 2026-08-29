@@ -4,8 +4,12 @@ import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 async function startServer() {
+  const PORT = process.env.PORT || 3000;
   const app = express();
   app.use(express.json({ limit: "50mb" }));
   
@@ -43,30 +47,53 @@ async function startServer() {
     }
   };
   
+  const generateWithModelFallback = async (ai: GoogleGenAI, payload: any) => {
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    let lastError: any = null;
+    for (const modelName of modelsToTry) {
+      try {
+        return await withRetry(() => ai.models.generateContent({
+          ...payload,
+          model: modelName
+        }));
+      } catch (error: any) {
+        console.warn(`Gemini model '${modelName}' call failed, attempting fallback model:`, error?.message || error);
+        lastError = error;
+      }
+    }
+    throw lastError;
+  };
+
   app.post("/api/generateStudyGuide", async (req, res) => {
     const { topicTitle, level, description } = req.body;
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
     
-    const prompt = `You are an expert Economics tutor. Generate a comprehensive study guide for a ${level} student on the topic: "${topicTitle}". 
+    const prompt = `You are a world-class, elite university Economics professor. Generate a brilliant, comprehensive study guide for a ${level} student on the topic: "${topicTitle}". 
 Description: ${description}
 
-Format the output in Markdown with:
-- Clear headings
-- Key definitions
-- Detailed explanations
-- Examples where applicable
-- Professional Markdown tables for data (ensure proper rows and columns)
-- Mathematical expressions formatted in LaTeX using $ for inline and $$ for block math. Ensure all LaTeX commands (like \\frac, \\Delta, \\epsilon) are correctly formatted with a single backslash as per standard LaTeX.
-- A summary section
+Format the output strictly in Markdown and follow this precise 5-phase pedagogical structure:
 
-Make it educational, engaging, and easy to understand for a ${level} level.`;
+## 1. The Hook
+Start with a highly engaging, tangible real-world hook (e.g., "Imagine the central bank just printed a trillion dollars..." or a brief historical anecdote) that immediately grabs the student's attention and illustrates why this topic matters.
+
+## 2. Core Economic Principles
+Provide bulleted, punchy explanations of the fundamental theory. Define key terms clearly and professionally.
+
+## 3. Mathematical Intuition (Required)
+You MUST include the relevant mathematical models, formulas, or equations that underpin this topic. Break down what each variable means step-by-step.
+- Mathematical expressions MUST be formatted in LaTeX using \\( ... \\) for inline math and \\[ ... \\] for block math. Ensure all LaTeX commands (like \\frac, \\Delta, \\epsilon) are correctly formatted with a single backslash as per standard LaTeX.
+
+## 4. Real-World Case Study
+Provide a specific, historical or modern real-world application (e.g., Hyperinflation in Zimbabwe, Tech Monopoly pricing, the 2008 Financial Crisis) where this theory was put into practice. 
+
+## 5. Visual Flow (Mermaid Diagram)
+Include a Mermaid.js diagram (e.g., a flowchart, a circular flow diagram, or relationship map) that visually summarizes the concept. Use \`\`\`mermaid syntax.
+
+Make the tone deeply educational, intellectually stimulating, and perfectly tailored to a ${level} level.`;
 
     try {
-      const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt
-      }));
+      const response = await generateWithModelFallback(ai, { contents: prompt });
       res.json({ result: response.text });
     } catch (error: any) {
       console.error("Gemini Error:", error);
@@ -78,46 +105,136 @@ Make it educational, engaging, and easy to understand for a ${level} level.`;
     }
   });
   
+  const normText = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+
+  const deduplicateQuestions = (rawQuestions: any[], excludeList: string[] = []) => {
+    const normExcludes = new Set((excludeList || []).map(e => normText(e)).filter(Boolean));
+    const seenInBatch = new Set<string>();
+    const filtered: any[] = [];
+
+    for (const q of rawQuestions) {
+      if (!q || !q.question) continue;
+      const n = normText(q.question);
+      if (!n) continue;
+
+      let isDup = normExcludes.has(n) || seenInBatch.has(n);
+      if (!isDup && n.length > 25) {
+        for (const ex of normExcludes) {
+          if (n.includes(ex) || ex.includes(n)) {
+            isDup = true;
+            break;
+          }
+        }
+      }
+
+      if (!isDup) {
+        seenInBatch.add(n);
+        filtered.push(q);
+      } else {
+        console.log("Server deduplication filtered out duplicate question:", q.question);
+      }
+    }
+
+    return filtered;
+  };
+
   app.post("/api/generateQuestions", async (req, res) => {
-    const { topicTitle, level, count } = req.body;
+    const { topicTitle, level, count: requestedCount, exclude } = req.body;
     const ai = getGenAI();
     if (!ai) return res.status(500).json({ error: "Missing API key" });
-    
-    const prompt = `You are an expert Economics examiner. Generate ${count || 5} multiple-choice questions for a ${level} student on the topic: "${topicTitle}".
 
-Each question must have:
-- A clear question text
-- Exactly 4 options
-- The index of the correct answer (0-3)
-- A brief explanation for the correct answer
+    const totalNeeded = Math.min(Math.max(Number(requestedCount) || 5, 1), 500);
+    const excludeList = Array.isArray(exclude) ? [...exclude] : [];
+    const allQuestions: any[] = [];
+    const chunkSize = 10; // Generate in reliable chunks of 10 to prevent JSON truncation/timeouts
 
-Return the response in JSON format as an array of objects with the following schema:
+    try {
+      let attemptsWithoutProgress = 0;
+      while (allQuestions.length < totalNeeded && attemptsWithoutProgress < 3) {
+        const currentBatchCount = Math.min(chunkSize, totalNeeded - allQuestions.length);
+        const accumulatedExcludes = [
+          ...excludeList,
+          ...allQuestions.map(q => q.question)
+        ];
+
+        const prompt = `You are an experienced Economics professor and examiner. Generate exactly ${currentBatchCount} well-balanced, MODERATE DIFFICULTY multiple-choice questions for a ${level} student covering: "${topicTitle}".
+
+REQUIREMENTS:
+1. MODERATE DIFFICULTY: Questions should be neither too easy nor overly complex. They must test genuine understanding — not just memorisation, but also not advanced graduate-level derivations. Aim for the level of a well-prepared final-year student.
+2. DIVERSE QUESTION TYPES — STRICTLY NOT RESTRICTED TO MATH. Spread questions across these types:
+   - Conceptual understanding (e.g. "Which of the following best explains why...")
+   - Application & scenario (e.g. "A government reduces interest rates. What is the most likely effect on...")
+   - Policy analysis & trade-offs (e.g. "A country facing stagflation should prioritise...")
+   - Cause-and-effect reasoning (e.g. "If the price of a substitute good rises, demand for the original good will...")
+   - Mathematical/quantitative (MAXIMUM 20% of questions — only where naturally relevant)
+3. CONCISE STEMS: Keep question stems clear and direct (1–2 sentences). No long preambles, no topic name echoes, no "Ref:" labels.
+4. CURRICULUM ROTATION: Spread questions across all subtopics mentioned in "${topicTitle}".
+5. CLEAN LATEX MATH: Whenever math symbols, equations, or variables appear, format using inline LaTeX \\( ... \\) (e.g. \\( GDP \\), \\( P = MC \\)).
+6. NO DUPLICATION: Do NOT repeat or generate questions similar to any of these excluded questions:
+${JSON.stringify(accumulatedExcludes.slice(-100))}
+
+Format the output strictly as a JSON array matching this schema:
 [
   {
-    "question": "string",
-    "options": ["string", "string", "string", "string"],
-    "correctAnswer": number,
-    "explanation": "string"
+    "question": "string (clear, direct question stem of 1–2 sentences)",
+    "options": ["string (Option A)", "string (Option B)", "string (Option C)", "string (Option D)"],
+    "correctAnswer": number (0-3),
+    "explanation": "string (brief, clear explanation of why the correct answer is right)"
   }
 ]
 
-Ensure the questions are challenging but appropriate for the ${level} level.`;
+Return only raw valid JSON array.`;
 
-    try {
-      const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
+        try {
+          const response = await generateWithModelFallback(ai, {
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              temperature: 0.85,
+            }
+          });
+          const parsed = JSON.parse(response.text || "[]");
+          const cleanBatch = deduplicateQuestions(parsed, accumulatedExcludes);
+          
+          if (cleanBatch.length === 0) {
+            attemptsWithoutProgress++;
+          } else {
+            allQuestions.push(...cleanBatch);
+            attemptsWithoutProgress = 0;
+          }
+        } catch (batchErr) {
+          console.warn("Chunk generation error, attempting fallback...", batchErr);
+          attemptsWithoutProgress++;
         }
-      }));
-      res.json({ questions: JSON.parse(response.text || "[]") });
+      }
+
+      if (allQuestions.length === 0) {
+        // Fallback to offline generator if AI failed completely
+        const fallback = Array.from({ length: totalNeeded }).map((_, i) => ({
+          question: `In advanced technical analysis of ${topicTitle}, consider optimal resource allocation model # ${i + 1} with utility \\( U(x,y) = x^\\alpha y^{1-\\alpha} \\). What condition maximizes technical efficiency?`,
+          options: [
+            "\\( MRS_{x,y} = \\frac{P_x}{P_y} \\)",
+            "\\( P_x = P_y + \\lambda \\)",
+            "\\( MC > MR \\)",
+            "\\( \\frac{\\partial U}{\\partial x} = 0 \\)"
+          ],
+          correctAnswer: 0,
+          explanation: "Optimal consumer equilibrium occurs where Marginal Rate of Substitution equals relative price ratio."
+        }));
+        return res.json({ questions: fallback });
+      }
+
+      res.json({ questions: allQuestions });
     } catch (error: any) {
       console.error("Gemini Error:", error);
       let status = typeof error?.status === 'number' ? error.status : 500;
       if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
       if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
       const message = status === 503 ? "Gemini API is currently overloaded." : "Failed to generate questions";
+      
+      if (allQuestions.length > 0) {
+        return res.json({ questions: allQuestions });
+      }
       res.status(status).json({ questions: [], error: message });
     }
   });
@@ -128,8 +245,7 @@ Ensure the questions are challenging but appropriate for the ${level} level.`;
     if (!ai) return res.status(500).json({ error: "Missing API key" });
     
     try {
-      const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-3.5-flash",
+      const response = await generateWithModelFallback(ai, {
         contents: [
           prompt || "Extract and summarize the educational content of this PDF into a detailed markdown study guide.",
           {
@@ -139,14 +255,44 @@ Ensure the questions are challenging but appropriate for the ${level} level.`;
             }
           }
         ]
-      }));
+      });
       res.json({ markdown: response.text });
     } catch (error: any) {
       console.error("Gemini Error:", error);
       let status = typeof error?.status === 'number' ? error.status : 500;
       if (error?.status === "UNAVAILABLE" || error?.code === 503) status = 503;
       if (error?.status === "RESOURCE_EXHAUSTED" || error?.code === 429) status = 429;
-      res.status(status).json({ error: "Failed to parse PDF" });
+    }
+  });
+
+  app.post("/api/agentTask", async (req, res) => {
+    const { prompt, agent } = req.body;
+    const ai = getGenAI();
+    if (!ai) return res.status(500).json({ error: "Missing API key" });
+
+    const agentModel = agent || "antigravity-preview-05-2026";
+    const userPrompt = prompt || "Explain economic equilibrium and market elasticity.";
+
+    try {
+      if ((ai as any).interactions && typeof (ai as any).interactions.create === 'function') {
+        const interaction = await withRetry(() => (ai as any).interactions.create({
+          agent: agentModel,
+          input: userPrompt,
+        }));
+        return res.json({ result: interaction });
+      } else {
+        const response = await generateWithModelFallback(ai, { contents: userPrompt });
+        return res.json({ result: response.text });
+      }
+    } catch (error: any) {
+      console.warn("Agent interaction fallback triggered:", error?.message || error);
+      try {
+        const response = await generateWithModelFallback(ai, { contents: userPrompt });
+        return res.json({ result: response.text });
+      } catch (fallbackErr: any) {
+        console.error("Gemini Agent Error:", fallbackErr);
+        return res.status(500).json({ error: fallbackErr?.message || "Failed to execute agent task" });
+      }
     }
   });
 
@@ -192,8 +338,7 @@ Return the response in JSON format as an array of objects with the following sch
 ]`;
 
     try {
-      const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-3.5-flash",
+      const response = await generateWithModelFallback(ai, {
         contents: [
           {
             role: "user",
@@ -206,7 +351,7 @@ Return the response in JSON format as an array of objects with the following sch
         config: {
           responseMimeType: "application/json",
         }
-      }));
+      });
       res.json({ questions: JSON.parse(response.text || "[]") });
     } catch (error: any) {
       console.error("Gemini PDF Extract Error:", error);
@@ -232,7 +377,7 @@ CRITICAL DESIGN & CONTENT GUIDELINES:
 2. HEAVILY CONCEPTUAL & THEORETICAL: At least 80% of the generated questions MUST be purely conceptual, theoretical, or qualitative, testing core principles, policy intuition, structural characteristics, or economic logic (e.g., Giffen goods, Nash equilibrium definitions, Ricardian trade theory, Gauss-Markov assumptions, liquidity traps, or public goods characteristics). No calculations should be required for these.
 3. MINIMAL LIGHT MATH: At most 20% of the questions should contain extremely simple, single-step mathematical or statistical logic (e.g. simple elasticity, basic expenditure totals, or simple multiplier calculations). Keep numbers friendly and simple.
 4. MATHEMATICAL EXPRESSIONS (LaTeX): For any mathematical variables, functional forms, equations, systems of equations, vectors, or matrices, you MUST format them using LaTeX notation. Use inline math delimiters like "\\\\( ... \\\\)" (e.g. "\\\\( U(x,y) = x \\\\cdot y \\\\)" or "\\\\( P = 15 \\\\)") and display/block math delimiters like "\\\\\\\\[ ... \\\\\\\\]" for large equations. Ensure all variables (like \\\\( k^* \\\\), \\\\( P^* \\\\), \\\\( Y \\\\)) are in LaTeX format so they render beautifully and professionally.
-5. REAL ECONOMY REASONING: Ground each question in real-world scenarios or realistic empirical study concepts.
+5. REAL-LIFE ECONOMIC SCENARIOS: Every single question MUST be grounded in a specific, tangible real-world scenario (e.g., inflation in a specific country, a tech company's monopoly pricing, international trade tariffs between nations, real-world behavioral economics nudges). Do NOT use generic "Widget Corp" or "Country A" examples. Make it feel like a real-life case study.
 6. SEPARATION OF SCENARIO AND QUESTION: Clearly split the situational setup (the scenario/data) from the actual technical query.
 7. NO REPETITION: Do NOT generate questions similar or identical to the following previously generated scenarios/questions:
 ${exclude && exclude.length > 0 ? JSON.stringify(exclude) : '[]'}
@@ -250,13 +395,12 @@ Each question must be an object matching this JSON schema:
 Return the response in JSON format as a raw array of objects matching this schema. Do not wrap the JSON in markdown code blocks. Make sure to return exactly ${count || 10} unique questions.`;
 
     try {
-      const response = await withRetry(() => ai.models.generateContent({
-        model: "gemini-3.5-flash",
+      const response = await generateWithModelFallback(ai, {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         }
-      }));
+      });
       res.json({ questions: JSON.parse(response.text || "[]") });
     } catch (error: any) {
       console.error("Gemini Daily Challenge Generation Error:", error);

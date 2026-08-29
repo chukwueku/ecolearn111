@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../useAuth';
-import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, timeoutMatchTurn, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard } from '../firebase';
-import { onSnapshot, collection, query, doc, orderBy, where, updateDoc } from 'firebase/firestore';
+import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leaveMatchmaking, submitMatchAnswer, timeoutMatchTurn, forfeitMatch, sendMatchMessage, requestMatchRematch, acceptMatchRematch, getAllUsers, sendDirectChallenge, respondDirectChallenge, updateUserPresence, Question, getLeaderboard, unlockBadge } from '../firebase';
+import { onSnapshot, collection, query, doc, getDoc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { useRoadmap } from '../hooks/useRoadmap';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search, Flag, Clock } from 'lucide-react';
@@ -211,7 +211,7 @@ export const LiveChallenge: React.FC = () => {
     const matchesRef = collection(db, 'arena_matches');
     const qMatches = query(matchesRef, where('playerUids', 'array-contains', user.uid));
 
-        const unsubMatches = onSnapshot(qMatches, (snap) => {
+        const unsubMatches = onSnapshot(qMatches, async (snap) => {
       setFirestoreError(false);
       const allMatches = snap.docs.map(d => ({ id: d.id, ...d.data() } as any));
       const myMatch = allMatches.find(m => m.status !== 'finished');
@@ -292,27 +292,74 @@ export const LiveChallenge: React.FC = () => {
                   );
                   updateDoc(matchRef, { players: updatedPlayers });
 
-                  const currentPoints = profile?.points || 0;
-                  const isKeynes = currentPoints >= 3000;
-                  const winPoints = isKeynes ? 15 : 25; // reduced points from original 50
-                  const drawPoints = isKeynes ? 5 : 10; // reduced points from original 20
-                  const participationPoints = isKeynes ? 2 : 5; // reduced points from original 10
+                  let winPoints = 15;
+                  let drawPoints = 5;
+                  let participationPoints = 2; // loss points
+
+                  const mode = myFinishedMatch.gameMode || 'blitz';
+                  if (mode === 'bullet') {
+                    winPoints = 10; drawPoints = 3; participationPoints = 1;
+                  } else if (mode === 'blitz') {
+                    winPoints = 15; drawPoints = 5; participationPoints = 2;
+                  } else if (mode === 'rapid') {
+                    winPoints = 30; drawPoints = 10; participationPoints = 5;
+                  }
+
+                  // --- Gamification Logic Start ---
+                  const userRef = doc(db, 'users', user.uid);
+                  const userSnap = await getDoc(userRef);
+                  const uData = userSnap.data() || {};
+                  let duelCount = (uData.duelCount || 0) + 1;
+                  let duelWinStreak = uData.duelWinStreak || 0;
+                  let duelWins = uData.duelWins || 0;
+
+                  unlockBadge(user.uid, 'social_butterfly');
+                  if (duelCount >= 10) unlockBadge(user.uid, 'duel_10');
+                  if (duelCount >= 50) unlockBadge(user.uid, 'duel_veteran');
+                  if (duelCount >= 100) unlockBadge(user.uid, 'duel_legend');
+
+                  const answerValues = Object.values(me.answers || {});
+                  const isFlawless = answerValues.length > 0 && answerValues.every((a: any) => a.isCorrect);
+                  if (isFlawless) unlockBadge(user.uid, 'flawless_victory');
+                  // --- Gamification Logic End ---
 
                   if (me.score > opponent.score) {
-                    updatePoints(user.uid, winPoints); // Win bonus
+                    duelWinStreak += 1;
+                    duelWins += 1;
+                    
+                    // Flame Streak Bonus (Chess.com logic)
+                    let finalWinPoints = winPoints;
+                    if (duelWinStreak >= 3) {
+                      finalWinPoints += 5;
+                    }
+                    
+                    updatePoints(user.uid, finalWinPoints); // Win bonus
+                    unlockBadge(user.uid, 'first_win');
+                    
+                    if (duelWins >= 10) unlockBadge(user.uid, 'win_10');
+                    if (duelWins >= 25) unlockBadge(user.uid, 'win_25');
+                    if (duelWins >= 50) unlockBadge(user.uid, 'win_50');
+                    if (duelWins >= 100) unlockBadge(user.uid, 'win_100');
+                    if (duelWinStreak >= 5) unlockBadge(user.uid, 'undefeated');
+
                     saveDuelResult({
                       winnerUid: user.uid,
                       winnerName: profile!.displayName,
                       loserUid: opponent.id,
                       loserName: opponent.displayName,
                       topicId: selectedTopicId || 'General',
-                      pointsAwarded: winPoints
+                      pointsAwarded: finalWinPoints
                     });
                   } else if (me.score === opponent.score) {
                     updatePoints(user.uid, drawPoints); // Draw
+                    duelWinStreak = 0;
+                    unlockBadge(user.uid, 'john_nash'); // John Nash Equilibrium badge!
                   } else {
                     updatePoints(user.uid, participationPoints); // Participation
+                    duelWinStreak = 0;
                   }
+                  
+                  updateDoc(userRef, { duelCount, duelWinStreak, duelWins });
               }
           }
       }
@@ -514,7 +561,16 @@ export const LiveChallenge: React.FC = () => {
     const topicId = incomingChallenge.topicId;
     
     try {
-      const questions = await getQuestions(topicId);
+      let questions = await getQuestions(topicId);
+      
+      // Shuffle the admin questions
+      for (let i = questions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+      // Limit to max 30 questions
+      questions = questions.slice(0, 30);
+      
       const finalQuestions: Question[] = questions.length >= 5 ? questions : FALLBACK_QUESTIONS;
       await respondDirectChallenge(incomingChallenge.id, 'accepted', finalQuestions);
     } catch(e) { console.error(e); }
@@ -725,7 +781,14 @@ export const LiveChallenge: React.FC = () => {
     setLoading(true);
     try {
       const topicId = selectedTopicId || (profile?.level === 'undergraduate' ? 'uni' : 'ss1');
-      const questions = await getQuestions(topicId);
+      let questions = await getQuestions(topicId);
+      
+      // Shuffle the admin questions
+      for (let i = questions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+      
       const finalQuestions: Question[] = questions.length >= 10 ? questions.slice(0, 10) : [
         { question: "What is the primary subject matter of Economics?", options: ["Wealth accumulation only", "Scarcity and choice under limited resources", "Stock market trading algorithms", "Government tax collection"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Economics is the study of allocation of scarce resources among competing ends." },
         { question: "Which of the following is classified as a land factor of production?", options: ["Machinery", "Natural mineral deposits", "Bank deposits", "Entrepreneurial skill"], correctAnswer: 1, level: 'secondary', topicId, explanation: "Land encompasses all natural resources provided by nature." },
@@ -802,7 +865,15 @@ export const LiveChallenge: React.FC = () => {
     const topics = roadmap.length > 0 ? roadmap : [{ id: matchData.topicId, title: "Custom Topic" } as any];
     const topic = topics.find(t => t.id === matchData.topicId) || topics[0];
     
-    const questions = await getQuestions(topic.id);
+    let questions = await getQuestions(topic.id);
+    
+    // Shuffle the admin questions
+    for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+    }
+    // Limit to max 30 questions to prevent exceeding Firestore 1MB document limit
+    questions = questions.slice(0, 30);
     
     const finalQuestions: Question[] = questions.length > 0 ? questions : [
        { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: topic.id, explanation: "" }
@@ -828,7 +899,16 @@ export const LiveChallenge: React.FC = () => {
       setLoading(true);
 
       try {
-        const questions = await getQuestions(selectedTopicId);
+        let questions = await getQuestions(selectedTopicId);
+        
+        // Shuffle the admin questions
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+        // Limit to max 30 questions to prevent exceeding Firestore 1MB document limit
+        questions = questions.slice(0, 30);
+
         const finalQuestions: Question[] = questions.length > 0 ? questions : [
           { question: "What is Economics?", options: ["Wealth", "Scarcity", "Choice", "All"], correctAnswer: 3, level: 'secondary', topicId: selectedTopicId, explanation: "" }
         ];

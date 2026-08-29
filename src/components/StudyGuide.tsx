@@ -20,14 +20,17 @@ import { SS3_STUDY_GUIDE } from '../lib/ss3StudyData';
 import { generateStudyGuide } from '../gemini';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion, AnimatePresence } from 'motion/react';
+
+import { useRoadmap } from '../hooks/useRoadmap';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ChapterQuiz } from './ChapterQuiz';
+
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-import { motion, AnimatePresence } from 'motion/react';
-import { useRoadmap } from '../hooks/useRoadmap';
-import { db } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const retryImport = (fn: () => Promise<any>) => async () => {
   try {
@@ -55,8 +58,11 @@ const LazyEconomicsSimulator = React.lazy(retryImport(() =>
 const cleanMarkdownContent = (text: string) => {
   if (!text) return text;
   
-  // Clean up LaTeX formatting and extra asterisks that might mess up parsing
-  let cleaned = text.replace(/\\\\\[/g, '$$$$').replace(/\\\\\]/g, '$$$$');
+  // Protect currency signs (e.g. $100, $50, $1,000) from being parsed as LaTeX math delimiters
+  let cleaned = text.replace(/\$(\s*\d[\d,.]*)/g, '\\$$$1');
+
+  // Clean up LaTeX formatting
+  cleaned = cleaned.replace(/\\\\\[/g, '$$$$').replace(/\\\\\]/g, '$$$$');
   cleaned = cleaned.replace(/\\\\\(/g, '$').replace(/\\\\\)/g, '$');
   
   return cleaned;
@@ -138,11 +144,23 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [direction, setDirection] = useState(0);
   const [viewMode, setViewMode] = useState<'textbook' | 'standard'>('standard');
-  const [isWideReader, setIsWideReader] = useState(false);
+  const [isWideReader, setIsWideReader] = useState(true);
   const [readerWidth, setReaderWidth] = useState<'standard' | 'wide' | 'full'>('wide');
   const [isDoubleColumn, setIsDoubleColumn] = useState(false);
   const [readerFontSize, setReaderFontSize] = useState<'base' | 'lg' | 'xl'>('base');
   const [showFloatingTOC, setShowFloatingTOC] = useState(false);
+  const [showChapterQuiz, setShowChapterQuiz] = useState(false);
+  const [sessionStartTime] = useState(Date.now());
+
+  const handleFinishModule = async () => {
+    setShowChapterQuiz(true);
+    if (Date.now() - sessionStartTime < 3 * 60 * 1000 && profile?.uid) {
+      const { unlockBadge } = await import('../firebase');
+      unlockBadge(profile.uid, 'speed_reader');
+    }
+  };
+
+
   
   // Touch Swipes
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -160,9 +178,10 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
           ? ADVANCED_STUDY_GUIDE[topicId as keyof typeof ADVANCED_STUDY_GUIDE] 
           : (topicId === 'ug-micro'
             ? MICRO_STUDY_GUIDE['ug-micro']
-            : (topicId.startsWith('ug-ch') 
+            : (topicId.startsWith('ug-ch') || topicId.startsWith('ss3-')
               ? SS3_STUDY_GUIDE[topicId] 
               : MICRO_STUDY_GUIDE[topicId])));
+
       
       // Special case: uni-ch1 or ug-development (restore missing Development Economics guide)
       if (!localContent && (topicId === 'uni-ch1' || topicId === 'ug-development')) {
@@ -230,77 +249,82 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
     setDirection(0);
   }, [topicId]);
 
-  // Parse pages split by horizontal rule `---` or fall back to high-level headings
+  // Parse pages with balanced length logic so every page is a full, rich reading page
   const pages = useMemo(() => {
     if (!content) return [];
     
-    // Pre-scan content to find the chapter heading level
-    let chapterLevel = 1; // Default to level 1 (e.g., # Chapter 1)
-    const chapterMatch = content.match(/^(#{1,4})\s+(CHAPTER|Chapter)\b/m);
-    if (chapterMatch) {
-      chapterLevel = chapterMatch[1].length;
-    }
-    
-    const subtopicPrefix = '#'.repeat(chapterLevel + 1) + ' ';
     const lines = content.split('\n');
     const finalPages: string[] = [];
-    let currentPart: string[] = [];
+    let currentChunk: string[] = [];
+    let currentLength = 0;
     
-    const isNewPageBoundary = (lineStr: string) => {
+    const MIN_PAGE_CHARS = 1200; // Minimum content length before allowing heading split
+    const MAX_PAGE_CHARS = 2600; // Maximum page length before forcing paragraph split
+
+    const isHardBreak = (lineStr: string) => {
       const trimmed = lineStr.trim();
-      
-      // 1. Explicit page break
-      if (trimmed === '---') return true;
-      
-      // 2. Chapter starts
-      if (trimmed.match(/^#{1,4}\s+(CHAPTER|Chapter)\b/i)) {
-        return true;
-      }
-      
-      // 3. Part starts
-      if (trimmed.match(/^#{1,3}\s+(PART|Part)\b/i)) {
-        return true;
-      }
-      
-      // 4. Subtopic starts (matches '## ' if chapter is level 1, '### ' if level 2, '#### ' if level 3)
-      if (trimmed.startsWith(subtopicPrefix)) {
-        // Double check it's not a chapter or part to prevent double matching
-        const cleanText = trimmed.substring(subtopicPrefix.length).trim();
-        if (!cleanText.toUpperCase().startsWith('CHAPTER') && !cleanText.toUpperCase().startsWith('PART')) {
-          return true;
-        }
-      }
-      
-      return false;
+      return trimmed === '---' || !!trimmed.match(/^#{1,3}\s+(CHAPTER|Chapter|PART|Part)\b/i);
     };
-    
+
+    const isHeading = (lineStr: string) => {
+      return lineStr.trim().startsWith('#');
+    };
+
     for (const line of lines) {
-      if (isNewPageBoundary(line) && currentPart.length > 0) {
-        const joined = currentPart.join('\n').trim();
-        if (joined.length > 0) {
-          finalPages.push(joined);
-        }
-        
-        if (line.trim() === '---') {
-          currentPart = [];
-        } else {
-          currentPart = [line];
-        }
+      const trimmed = line.trim();
+      const lineLen = line.length + 1;
+
+      // Case A: Hard chapter break (--- or # Chapter X) -> always push current chunk
+      if (isHardBreak(line) && currentChunk.length > 0) {
+        const text = currentChunk.join('\n').trim();
+        if (text) finalPages.push(text);
+        currentChunk = trimmed === '---' ? [] : [line];
+        currentLength = trimmed === '---' ? 0 : lineLen;
+        continue;
+      }
+
+      // Case B: Sub-heading break, only if current page has sufficient content
+      if (isHeading(line) && currentLength >= MIN_PAGE_CHARS) {
+        const text = currentChunk.join('\n').trim();
+        if (text) finalPages.push(text);
+        currentChunk = [line];
+        currentLength = lineLen;
+        continue;
+      }
+
+      // Case C: Maximum page length exceeded -> split at next blank line or heading
+      if (currentLength + lineLen > MAX_PAGE_CHARS && currentChunk.length > 0 && (trimmed === '' || isHeading(line))) {
+        const text = currentChunk.join('\n').trim();
+        if (text) finalPages.push(text);
+        currentChunk = trimmed ? [line] : [];
+        currentLength = trimmed ? lineLen : 0;
+        continue;
+      }
+
+      // Append line
+      if (trimmed !== '---') {
+        currentChunk.push(line);
+        currentLength += lineLen;
+      }
+    }
+
+    if (currentChunk.length > 0) {
+      const text = currentChunk.join('\n').trim();
+      if (text) finalPages.push(text);
+    }
+
+    // Post-pass: merge any leftover tiny fragments into the preceding page
+    const balancedPages: string[] = [];
+    for (let i = 0; i < finalPages.length; i++) {
+      const page = finalPages[i];
+      if (i > 0 && page.length < 450 && balancedPages[balancedPages.length - 1].length < 2400 && !page.match(/^#{1,3}\s+(CHAPTER|Chapter)/i)) {
+        balancedPages[balancedPages.length - 1] += '\n\n' + page;
       } else {
-        if (line.trim() !== '---') {
-          currentPart.push(line);
-        }
+        balancedPages.push(page);
       }
     }
-    
-    if (currentPart.length > 0) {
-      const joined = currentPart.join('\n').trim();
-      if (joined.length > 0) {
-        finalPages.push(joined);
-      }
-    }
-    
-    return finalPages;
+
+    return balancedPages;
   }, [content]);
 
   const totalPages = pages.length;
@@ -890,19 +914,21 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                           </div>
 
                           {currentPage === totalPages - 1 && (
-                            <div className="mt-16 p-6 sm:p-10 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="mt-16 p-6 sm:p-10 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/30 flex flex-col md:flex-row justify-between items-center gap-6">
                               <div className="text-center md:text-left">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted mb-2">Module Complete?</p>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 mb-2">Chapter Complete?</p>
                                 <h4 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">Test your knowledge</h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Take a 5-question quiz and earn XP!</p>
                               </div>
-                              <Link 
-                                to={`/challenge/${topicId}`}
-                                className="px-8 py-4 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 dark:hover:bg-sky-700 transition-all shadow-2xl shrink-0"
+                              <button
+                                onClick={() => setShowChapterQuiz(true)}
+                                className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[11px] font-bold uppercase tracking-widest rounded-xl hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-emerald-500/30 shrink-0 flex items-center gap-2"
                               >
-                                Start Challenge
-                              </Link>
+                                🧠 Start Quiz
+                              </button>
                             </div>
                           )}
+
                         </motion.div>
                       </AnimatePresence>
                     </div>
@@ -931,13 +957,14 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                           <ArrowRight size={14} className="ml-0.5" />
                         </button>
                       ) : (
-                        <Link
-                          to={`/challenge/${topicId}`}
-                          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
+                        <button
+                          onClick={() => setShowChapterQuiz(true)}
+                          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-[0.15em] transition-all active:scale-95"
                         >
-                          Finish Module
+                          🧠 Take Quiz
                           <Sparkles size={14} className="ml-0.5 animate-pulse" />
-                        </Link>
+                        </button>
+
                       )}
                     </div>
                   </div>
@@ -1013,9 +1040,22 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
             </>
           )}
         </AnimatePresence>
+
+        {/* Chapter Quiz Modal */}
+        <AnimatePresence>
+          {showChapterQuiz && (
+            <ChapterQuiz
+              topicId={topicId}
+              topicTitle={topic.title}
+              level={level === 'undergraduate' ? 'undergraduate' : 'secondary'}
+              onClose={() => setShowChapterQuiz(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-paper pt-24 md:pt-32 pb-24 md:pb-32 transition-colors duration-300">
@@ -1470,12 +1510,12 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted mb-2">Module Complete?</p>
                           <h4 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">Test your knowledge</h4>
                         </div>
-                        <Link 
-                          to={`/challenge/${topicId}`}
-                          className="px-8 py-4 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 dark:hover:bg-sky-700 transition-all shadow-2xl shrink-0"
+                        <button 
+                          onClick={handleFinishModule}
+                          className="px-8 py-4 bg-slate-900 dark:bg-sky-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-sky-600 dark:hover:bg-sky-700 transition-all shadow-2xl shrink-0 cursor-pointer"
                         >
                           Start Challenge
-                        </Link>
+                        </button>
                       </div>
                     )}
                   </motion.div>
@@ -1506,13 +1546,13 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
                     <ArrowRight size={14} className="ml-0.5" />
                   </button>
                 ) : (
-                  <Link
-                    to={`/challenge/${topicId}`}
-                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold uppercase tracking-[0.15em] transition-all"
+                  <button
+                    onClick={handleFinishModule}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-bold uppercase tracking-[0.15em] transition-all cursor-pointer"
                   >
                     Finish Module
                     <Sparkles size={14} className="ml-0.5 animate-pulse" />
-                  </Link>
+                  </button>
                 )}
               </div>
             </div>
@@ -1589,6 +1629,18 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
               </nav>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Chapter Quiz Modal (Standard Mode) */}
+      <AnimatePresence>
+        {showChapterQuiz && (
+          <ChapterQuiz
+            topicId={topicId}
+            topicTitle={topic.title}
+            level={level === 'undergraduate' ? 'undergraduate' : 'secondary'}
+            onClose={() => setShowChapterQuiz(false)}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -25,16 +25,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        let userProfile = await getUserProfile(firebaseUser.uid);
-        
-        // Ensure default admin has admin role
-        const isAdminEmail = firebaseUser.email === 'chukwuekudavid@gmail.com';
-        if (isAdminEmail && userProfile && userProfile.role !== 'admin') {
-          await updateUserRole(firebaseUser.uid, 'admin');
-          userProfile = { ...userProfile, role: 'admin' };
+        try {
+          let userProfile = await getUserProfile(firebaseUser.uid);
+          
+          if (!userProfile) {
+            // Auto-create missing profile so user doesn't get stuck with profile === null
+            userProfile = await createUserProfile({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Scholar',
+              photoURL: firebaseUser.photoURL || ''
+            }, 'pending');
+            
+            // Award first login badge
+            const { unlockBadge } = await import('./firebase');
+            await unlockBadge(firebaseUser.uid, 'first_login');
+          }
+
+          // Ensure default admin has admin role
+          const isAdminEmail = firebaseUser.email === 'chukwuekudavid@gmail.com';
+
+          if (isAdminEmail && userProfile && userProfile.role !== 'admin') {
+            await updateUserRole(firebaseUser.uid, 'admin');
+            userProfile = { ...userProfile, role: 'admin' };
+          }
+          
+          setProfile(userProfile);
+        } catch (err) {
+          console.error("Error fetching or creating user profile:", err);
+          // Fallback profile if Firestore is unreachable
+          const fallbackProfile: UserProfile = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Scholar',
+            photoURL: firebaseUser.photoURL || '',
+            level: 'pending',
+            progress: {},
+            role: firebaseUser.email === 'chukwuekudavid@gmail.com' ? 'admin' : 'user',
+            points: 0,
+            createdAt: new Date()
+          };
+          setProfile(fallbackProfile);
         }
-        
-        setProfile(userProfile);
       } else {
         setProfile(null);
       }

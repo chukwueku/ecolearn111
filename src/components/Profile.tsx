@@ -3,6 +3,11 @@ import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
 import { logout, updateUserLevel, updateUserProfile, deleteUserAccount, UserProfile } from '../firebase';
 import { useDarkMode } from '../DarkModeContext';
+import { getUserInitials } from '../lib/utils';
+import { Coins, Award, Trophy, Sun, Moon, ChevronRight, GraduationCap, Building2, UserCog, ShieldCheck, LogOut, X, Camera, Check, RotateCcw, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+import { XPLevelBar } from './XPLevelBar';
+import { StreakWidget } from './StreakWidget';
+import { AchievementBadges } from './AchievementBadges';
 
 export const Profile = () => {
     const { user, profile, setProfile } = useAuth();
@@ -138,7 +143,7 @@ export const Profile = () => {
             <div className="bg-background text-on-background min-h-screen pb-24 font-['Hanken_Grotesk']">
                 <header className="w-full sticky top-0 z-40 bg-surface dark:bg-surface-container-low shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex justify-between items-center px-grid-margin py-md">
                     <button onClick={() => setIsEditing(false)} className="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface">
-                        <span className="material-symbols-outlined">close</span>
+                        <X className="w-5 h-5" />
                     </button>
                     <h1 className="font-headline-md text-primary font-bold">Edit Profile</h1>
                     <div className="w-10"></div>
@@ -155,13 +160,13 @@ export const Profile = () => {
                                         alt="Avatar" 
                                     />
                                 ) : (
-                                    <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-4xl shrink-0 mb-4 group-hover:opacity-75 transition-opacity">
-                                        {editName?.[0]?.toUpperCase() || profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                                    <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-3xl shrink-0 mb-4 group-hover:opacity-75 transition-opacity tracking-wider">
+                                        {getUserInitials(editName || profile?.displayName || user?.displayName, profile?.email || user?.email)}
                                     </div>
                                 )}
                                 <div className="absolute inset-x-0 bottom-4 flex justify-center">
                                     <div className="bg-primary/80 text-on-primary p-1.5 rounded-full shadow-lg group-hover:scale-110 transition-transform">
-                                        <span className="material-symbols-outlined text-sm">photo_camera</span>
+                                        <Camera className="w-4 h-4" />
                                     </div>
                                 </div>
                                 <input 
@@ -206,9 +211,9 @@ export const Profile = () => {
                             className="w-full bg-primary text-on-primary font-headline-md font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-8"
                         >
                             {updateLoading ? (
-                                <span className="animate-spin material-symbols-outlined">progress_activity</span>
+                                <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
-                                <span className="material-symbols-outlined">check</span>
+                                <Check className="w-5 h-5" />
                             )}
                             Save Changes
                         </button>
@@ -222,7 +227,7 @@ export const Profile = () => {
                                 disabled={updateLoading}
                                 className="w-full border border-outline-variant/30 text-error font-label-md font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error/5 transition-all"
                             >
-                                <span className="material-symbols-outlined text-lg">restart_alt</span>
+                                <RotateCcw className="w-4 h-4" />
                                 Reset All Progress
                             </button>
 
@@ -232,7 +237,7 @@ export const Profile = () => {
                                 disabled={updateLoading}
                                 className="w-full border border-error/30 text-error font-label-md font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error/5 transition-all"
                             >
-                                <span className="material-symbols-outlined text-lg">delete_forever</span>
+                                <Trash2 className="w-4 h-4" />
                                 Delete Account
                             </button>
                         </div>
@@ -247,7 +252,7 @@ export const Profile = () => {
             {/* TopAppBar */}
             <header className="w-full sticky top-0 z-40 bg-surface dark:bg-surface-container-low shadow-[0_4px_12px_rgba(15,23,42,0.06)] flex justify-between items-center px-grid-margin py-md">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface">
-                    <span className="material-symbols-outlined">arrow_back</span>
+                    <ArrowLeft className="w-5 h-5" />
                 </button>
                 <h1 className="font-headline-md text-primary font-bold">Profile</h1>
                 <div className="w-10"></div> {/* Spacer to align title center */}
@@ -265,8 +270,8 @@ export const Profile = () => {
                                 alt="User Avatar" 
                             />
                         ) : (
-                            <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-4xl shrink-0">
-                                {profile?.displayName?.[0]?.toUpperCase() || 'S'}
+                            <div className="w-24 h-24 rounded-full border-4 border-secondary-container bg-black text-white flex items-center justify-center font-bold text-3xl shrink-0 tracking-wider">
+                                {getUserInitials(profile?.displayName || user?.displayName, profile?.email || user?.email)}
                             </div>
                         )}
                         <div className="absolute bottom-0 right-0 bg-secondary text-white text-xs px-2 py-0.5 rounded-full font-bold shadow-md border-2 border-white">
@@ -278,20 +283,38 @@ export const Profile = () => {
                     
                     <div className="flex gap-4 mt-6 w-full">
                         <div className="flex-1 bg-surface-container-low p-4 rounded-xl flex flex-col items-center justify-center">
-                            <span className="material-symbols-outlined text-secondary mb-1">generating_tokens</span>
+                            <Coins className="w-5 h-5 text-secondary mb-1" />
                             <span className="font-label-sm text-outline uppercase tracking-wider text-[10px]">Points</span>
                             <span className="font-headline-md font-bold text-primary">{profile?.points || 0}</span>
                         </div>
                         <div className="flex-1 bg-surface-container-low p-4 rounded-xl flex flex-col items-center justify-center">
-                            <span className="material-symbols-outlined text-tertiary-container mb-1">workspace_premium</span>
+                            <Award className="w-5 h-5 text-emerald-600 mb-1" />
                             <span className="font-label-sm text-outline uppercase tracking-wider text-[10px]">Completed</span>
                             <span className="font-headline-md font-bold text-primary">{completedCount}</span>
                         </div>
                         <div className="flex-1 bg-surface-container-low p-4 rounded-xl flex flex-col items-center justify-center">
-                            <span className="material-symbols-outlined text-error mb-1">emoji_events</span>
+                            <Trophy className="w-5 h-5 text-amber-500 mb-1" />
                             <span className="font-label-sm text-outline uppercase tracking-wider text-[10px]">Wins</span>
                             <span className="font-headline-md font-bold text-primary">{wins}</span>
                         </div>
+                    </div>
+                </section>
+
+                {/* XP & Streak Section */}
+                <section className="space-y-3">
+                    <h3 className="font-label-md text-on-surface-variant uppercase tracking-widest pl-2 font-bold text-xs">Progress & Streaks</h3>
+                    <XPLevelBar xp={profile?.xp || 0} />
+                    <StreakWidget streak={profile?.streak || 0} />
+                </section>
+
+                {/* Badges Section */}
+                <section className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-label-md text-on-surface-variant uppercase tracking-widest pl-2 font-bold text-xs">Achievements</h3>
+                        <span className="text-[11px] font-black text-emerald-600">{(profile?.badges || []).length} / 11 earned</span>
+                    </div>
+                    <div className="bg-surface-container-lowest rounded-2xl p-4 border border-outline-variant/20">
+                        <AchievementBadges earnedBadges={profile?.badges || []} showAll={true} />
                     </div>
                 </section>
 
@@ -305,42 +328,42 @@ export const Profile = () => {
                         <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={toggleDarkMode}>
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                                    <span className="material-symbols-outlined">{isDarkMode ? 'dark_mode' : 'light_mode'}</span>
+                                    {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                                 </div>
                                 <div>
                                     <p className="font-label-md font-bold text-primary">Theme Appearance</p>
                                     <p className="font-label-sm text-on-surface-variant">Toggle dark / light mode</p>
                                 </div>
                             </div>
-                            <span className="material-symbols-outlined text-outline">chevron_right</span>
+                            <ChevronRight className="w-5 h-5 text-outline" />
                         </div>
 
                         {/* Switch Learning Path */}
                         <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchLevel}>
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                                    <span className="material-symbols-outlined">school</span>
+                                    <GraduationCap className="w-5 h-5" />
                                 </div>
                                 <div>
                                     <p className="font-label-md font-bold text-primary">{level === 'undergraduate' ? 'Switch to Secondary' : 'Switch Level'}</p>
                                     <p className="font-label-sm text-on-surface-variant">{level === 'undergraduate' ? 'Return to secondary school curriculum' : 'Switch between SS1 to SS3'}</p>
                                 </div>
                             </div>
-                            <span className="material-symbols-outlined text-outline">chevron_right</span>
+                            <ChevronRight className="w-5 h-5 text-outline" />
                         </div>
 
                         {level !== 'undergraduate' && (
                             <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchToUndergraduate}>
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-indigo-500">
-                                        <span className="material-symbols-outlined">account_balance</span>
+                                        <Building2 className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <p className="font-label-md font-bold text-indigo-500">Switch to Undergraduate</p>
                                         <p className="font-label-sm text-on-surface-variant">Access advanced university-level curriculum</p>
                                     </div>
                                 </div>
-                                <span className="material-symbols-outlined text-outline">chevron_right</span>
+                                <ChevronRight className="w-5 h-5 text-outline" />
                             </div>
                         )}
 
@@ -348,14 +371,14 @@ export const Profile = () => {
                         <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setIsEditing(true)}>
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                                    <span className="material-symbols-outlined">manage_accounts</span>
+                                    <UserCog className="w-5 h-5" />
                                 </div>
                                 <div>
                                     <p className="font-label-md font-bold text-primary">Account Details</p>
                                     <p className="font-label-sm text-on-surface-variant">Manage your profile info</p>
                                 </div>
                             </div>
-                            <span className="material-symbols-outlined text-outline">chevron_right</span>
+                            <ChevronRight className="w-5 h-5 text-outline" />
                         </div>
 
                         {/* Admin Link */}
@@ -363,14 +386,14 @@ export const Profile = () => {
                             <div className="flex items-center justify-between p-4 bg-sky-50 dark:bg-sky-950/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors cursor-pointer" onClick={() => navigate('/admin')}>
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                                        <span className="material-symbols-outlined">admin_panel_settings</span>
+                                        <ShieldCheck className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <p className="font-label-md font-bold text-sky-800 dark:text-sky-300">Admin Dashboard</p>
                                         <p className="font-label-sm text-sky-600 dark:text-sky-400">Manage database, questions, and challenges</p>
                                     </div>
                                 </div>
-                                <span className="material-symbols-outlined text-sky-500">chevron_right</span>
+                                <ChevronRight className="w-5 h-5 text-sky-500" />
                             </div>
                         )}
 
@@ -384,17 +407,14 @@ export const Profile = () => {
                         disabled={isLoggingOut}
                         className="w-full bg-error-container text-on-error-container font-headline-md font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-error/20 active:scale-95 transition-all text-sm"
                     >
-                        <span className="material-symbols-outlined">logout</span>
+                        <LogOut className="w-5 h-5" />
                         {isLoggingOut ? 'Logging out...' : 'Log Out'}
                     </button>
                     <p className="text-center text-[10px] text-outline font-bold mt-6 tracking-widest uppercase">
                         EcoMastery v1.0.0
                     </p>
                 </section>
-
             </main>
-
-
         </div>
     );
 };

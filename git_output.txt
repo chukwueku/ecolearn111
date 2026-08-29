@@ -1,0 +1,3 @@
+fatal: could not open '/dev/null' for reading and writing: Permission denied
+fatal: could not open '/dev/null' for reading and writing: Permission denied
+fatal: could not open '/dev/null' for reading and writing: Permission denied

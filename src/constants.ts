@@ -313,7 +313,21 @@ export const SECONDARY_SS2_ROADMAP: RoadmapTopic[] = [
       'Creeping, hyperinflation, and suppressed inflation',
       'Demand-pull and Cost-push inflation causes',
       'Inflationary spirals, Stagflation, and policy controls',
-      'Deflation: causes, outcomes, and remedial measures'
+      'Deflation: causes, outcomes, and remedial measures',
+      'Nigeria 2024 Inflation Case Study & CBN Policy Response',
+      'WAEC/NECO Practice Questions with Model Answers'
+    ]
+  },
+  {
+    id: 'ss2-waec-summary',
+    title: 'SS2 Master Review — Formulas, Tables & WAEC Practice',
+    description: 'Comprehensive summary tables, master formula sheet, market structures comparison, and exam-ready quick reference for all SS2 topics.',
+    category: 'Exam Prep',
+    subtopics: [
+      'Master Formula Sheet (all 14 key formulas)',
+      'Market Structures Comparison Table (Nigeria examples)',
+      'Taxation Systems & Unemployment Types Quick Reference',
+      'WAEC Exam Strategy Tips'
     ]
   }
 ];
@@ -481,8 +495,23 @@ export const SECONDARY_SS3_ROADMAP: RoadmapTopic[] = [
       'Role of anti-corruption agencies (EFCC & ICPC)',
       'Role of regulatory agencies (NAFDAC & SON)'
     ]
+  },
+  {
+    id: 'ss3-waec-practice',
+    title: 'SS3 WAEC/NECO Practice & Exam Preparation',
+    description: 'High-frequency WAEC and NECO exam questions with full model answers, essay frameworks, comparative advantage calculations, and BOP analysis for SS3 revision.',
+    category: 'Exam Prep',
+    subtopics: [
+      '8 Multiple choice questions with model answers',
+      'Essay Q1: Problems & solutions of economic development in Nigeria',
+      'Essay Q2: Comparative Advantage calculation (Nigeria vs Ghana)',
+      'Essay Q3: Balance of Payments — current vs capital account',
+      'SS3 Key Concepts Summary Table (Dutch Disease, SAP, OPEC, ECOWAS)',
+      'WAEC Essay Writing Strategy Guide'
+    ]
   }
 ];
+
 
 export const UNDERGRADUATE_REAL_ROADMAP: RoadmapTopic[] = [
   {

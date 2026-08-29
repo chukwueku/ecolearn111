@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from
 import { AuthProvider, useAuth } from './useAuth';
 import { DarkModeProvider } from './DarkModeContext';
 import { AppNavigation } from './components/BottomNavBar';
+import { Loader2 } from 'lucide-react';
 
 import { Home } from './components/Home';
 import { Dashboard } from './components/Dashboard';
@@ -13,8 +14,11 @@ import { LiveChallenge } from './components/LiveChallenge';
 import { Profile } from './components/Profile';
 import { AdminPage } from './components/AdminPage';
 import { LevelSelection } from './components/LevelSelection';
+import { AiTutor } from './components/AiTutor';
+import { BadgeUnlockModal } from './components/BadgeUnlockModal';
 
 function AppContent() {
+
   const { user, profile, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,10 +35,10 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="flex bg-surface text-on-surface w-full min-h-screen items-center justify-center">
+      <div className="flex bg-slate-950 text-white w-full min-h-screen items-center justify-center font-['Hanken_Grotesk']">
         <div className="flex flex-col items-center gap-4">
-          <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
-          <p className="font-semibold text-on-surface/60">Loading EcoMastery...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+          <p className="font-semibold text-slate-300">Loading EcoMastery...</p>
         </div>
       </div>
     );
@@ -44,9 +48,12 @@ function AppContent() {
 
   return (
     <div className="flex bg-surface text-on-surface w-full min-h-screen">
+      {user && profile && <BadgeUnlockModal />}
       {showNav && <AppNavigation />}
+      {showNav && <AiTutor />}
       <div className={`flex-grow w-full max-w-full ${showNav ? 'md:ml-[88px]' : ''}`}>
         <Routes>
+
           <Route path="/" element={<Home />} />
           {user ? (
             <>

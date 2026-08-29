@@ -1509,5 +1509,223 @@ This implies the cost of living raised by **56.67%** between 1980 and 1987.
   }
 }
 \`\`\`
+
+---
+
+## 15.5 Nigeria's Inflation Experience (Case Study)
+
+Nigeria's inflation rate hit a **32-year high of 33.95%** in March 2024, driven by the June 2023 fuel subsidy removal and a sharp Naira devaluation. This is a textbook case of simultaneous **cost-push** and **import-cost-push** inflation:
+
+- **Fuel subsidy removal** raised petrol prices from ₦197/litre to over ₦600/litre, increasing transport costs for all goods.
+- **Naira devaluation** (from ₦460/$ to over ₦1,500/$) raised the local-currency cost of all imported raw materials and machinery.
+- **Food inflation** peaked at over 40% as farm input costs (diesel-powered irrigation, fertilizer) and distribution costs surged.
+
+### Policy Response Analysis
+
+| CBN Tool Used | How Applied | Expected Effect |
+|:---|:---|:---|
+| MPR hike (to 24.75%) | Raised cost of borrowing | Reduces credit expansion; cools demand-pull inflation |
+| CRR hike (to 45%) | Banks must hold more reserves | Less money available for lending; contracts money supply |
+| FX unification | Collapsed multiple exchange rate windows | Removes arbitrage; attracts foreign portfolio investors |
+
+> **WAEC Tip**: In exam questions, always identify whether inflation is **demand-pull** or **cost-push** before recommending monetary or fiscal remedies. Cost-push inflation does not respond well to demand-reduction policies alone — supply-side interventions (reducing production costs) are also needed.
+
+---
+
+## 📝 WAEC/NECO Practice Questions — SS2 Economics
+
+> The following questions are drawn from WAEC past question patterns. Attempt them before checking the model answers.
+
+### Section A: Multiple Choice (Objectives)
+
+**1.** If the price of Indomie noodles rises from ₦150 to ₦180, and quantity demanded falls from 1,000 to 850, the price elasticity of demand is approximately:
+
+- A) 0.25  
+- B) 0.75  
+- C) 1.00  
+- D) 1.20
+
+> **Answer: B** — PED = (% ΔQd) ÷ (% ΔP) = [(150/1000)×100] ÷ [(30/150)×100] = 15% ÷ 20% = **0.75** (inelastic)
+
+---
+
+**2.** A firm in perfect competition maximizes profit at the output level where:
+
+- A) TR = TC  
+- B) MC = AC  
+- C) MC = MR  
+- D) AR = AVC
+
+> **Answer: C** — The profit-maximising rule is **MC = MR**.
+
+---
+
+**3.** Which of the following is NOT a tool of the Central Bank of Nigeria's monetary policy?
+
+- A) Open Market Operations  
+- B) Cash Reserve Ratio  
+- C) Progressive Taxation  
+- D) Moral Suasion
+
+> **Answer: C** — Progressive Taxation is a **fiscal** policy tool of the government/FIRS, not the CBN.
+
+---
+
+**4.** If MPC = 0.80, the Keynesian multiplier is:
+
+- A) 2  
+- B) 4  
+- C) 5  
+- D) 8
+
+> **Answer: C** — Multiplier = 1 ÷ (1 − MPC) = 1 ÷ 0.20 = **5**
+
+---
+
+**5.** A tax in which the tax rate *decreases* as income rises is described as:
+
+- A) Progressive  
+- B) Proportional  
+- C) Regressive  
+- D) Flat
+
+> **Answer: C** — **Regressive tax** places a heavier burden on lower-income earners.
+
+---
+
+### Section B: Theory Questions (Essay/Short-Answer)
+
+**Question 1** (WAEC 2019 — Modified)
+
+*(a)* Distinguish between **expansion of demand** and **increase in demand**. *(4 marks)*
+
+*(b)* State and explain **four** factors that can cause a shift in the demand curve for a good. *(8 marks)*
+
+**Model Answer:**
+
+*(a)* **Expansion of demand** (also called extension) is a *movement along the same demand curve* caused solely by a fall in the price of the commodity itself. **Increase in demand** is a *shift of the entire demand curve to the right*, occurring at the same price level due to changes in factors other than the commodity's own price (e.g., rising consumer income).
+
+*(b)* Factors causing a demand curve shift:
+1. **Change in consumer income** — If income rises, demand for normal goods increases (rightward shift); demand for inferior goods falls.
+2. **Price of related goods** — A rise in the price of a substitute (e.g., butter) increases demand for complements (e.g., margarine). A fall in the price of a complement (e.g., petrol) increases demand for the complementary good (e.g., cars).
+3. **Changes in consumer tastes and fashion** — Positive advertising campaigns or viral trends increase demand (e.g., demand for wristwatches after luxury brand endorsements).
+4. **Population changes** — An increase in the population expands the number of buyers, shifting demand rightward.
+
+---
+
+**Question 2** (WAEC 2022 — Modified)
+
+The following data shows the cost structure of Mama-Put Catering Ltd. for a given week:
+
+| Output (Plates) | Total Fixed Cost (₦) | Total Variable Cost (₦) |
+|:---:|:---:|:---:|
+| 0 | 2,000 | 0 |
+| 10 | 2,000 | 800 |
+| 20 | 2,000 | 1,400 |
+| 30 | 2,000 | 2,400 |
+| 40 | 2,000 | 4,000 |
+
+*(a)* Calculate the Total Cost (TC), Average Cost (AC), and Marginal Cost (MC) at each output level. *(6 marks)*
+
+*(b)* At what output level is the firm producing at minimum Average Cost? *(2 marks)*
+
+**Model Answer (a):**
+
+| Output (Q) | FC | VC | TC = FC+VC | AC = TC/Q | MC = ΔTC/ΔQ |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| 0 | 2,000 | 0 | 2,000 | — | — |
+| 10 | 2,000 | 800 | 2,800 | ₦280 | ₦80 |
+| 20 | 2,000 | 1,400 | 3,400 | ₦170 | ₦60 |
+| 30 | 2,000 | 2,400 | 4,400 | ₦146.67 | ₦100 |
+| 40 | 2,000 | 4,000 | 6,000 | ₦150 | ₦160 |
+
+**Model Answer (b):**
+
+Minimum Average Cost occurs at **30 plates**, where AC = **₦146.67**. Note that after this point, AC begins to rise as MC > AC.
+
+---
+
+**Question 3** (NECO 2023 — Modified)
+
+Explain the **Keynesian liquidity preference theory** and identify the three motives for holding money. *(10 marks)*
+
+**Model Answer:**
+
+Keynes argued that individuals prefer to hold some of their wealth in liquid form (money) rather than in interest-yielding assets. This preference for liquidity is called **Liquidity Preference**. The demand for money (Md) depends on:
+
+1. **Transactions Motive** — People hold cash to finance everyday planned transactions (food, transport, utilities). This portion of money demand is directly proportional to income ($Y$).
+
+2. **Precautionary Motive** — People hold an additional cash buffer for unexpected emergencies (medical bills, car repairs). This also rises with income.
+
+3. **Speculative Motive** — People hold cash to exploit anticipated changes in bond prices. If interest rates are expected to rise (bond prices fall), people hold more cash to buy cheap bonds later. This is **inversely related** to the current interest rate ($r$): $M_{sp} = f(r)$ where $\frac{dM_{sp}}{dr} < 0$.
+
+Total money demand: $M_d = L_1(Y) + L_2(r)$
+
+The intersection of money demand ($M_d$) and the fixed money supply ($M_s$) determines the **equilibrium rate of interest**.
+`,
+
+  "ss2-waec-summary": `
+# SS2 Economics — Key Formulas & Summary Tables
+
+## 📊 Master Formula Sheet
+
+| Concept | Formula | Key Variables |
+|:---|:---|:---|
+| **Price Elasticity of Demand** | $E_p = \\frac{\\% \\Delta Q_d}{\\% \\Delta P}$ | Q = quantity, P = price |
+| **Income Elasticity** | $E_y = \\frac{\\% \\Delta Q_d}{\\% \\Delta Y}$ | Y = consumer income |
+| **Cross Elasticity** | $E_{xy} = \\frac{\\% \\Delta Q_x}{\\% \\Delta P_y}$ | Positive = substitutes |
+| **Marginal Product** | $MP = \\frac{\\Delta TP}{\\Delta L}$ | TP = total product, L = labor |
+| **Average Cost** | $AC = \\frac{TC}{Q} = AFC + AVC$ | TC = total cost |
+| **Marginal Cost** | $MC = \\frac{\\Delta TC}{\\Delta Q}$ | Must equal MR at profit max |
+| **Profit Condition** | Max profit where $MC = MR$ | — |
+| **Money Multiplier** | $M = \\frac{1}{r}$ | r = cash reserve ratio |
+| **Keynesian Multiplier** | $k = \\frac{1}{1 - MPC}$ | MPC = marginal propensity to consume |
+| **GDP (Expenditure)** | $Y = C + I + G + (X - M)$ | C=consumption, I=investment, G=gov't, X-M=net exports |
+| **Per Capita Income** | $PCI = \\frac{GNP}{\\text{Population}}$ | — |
+| **Weighted Price Index** | $P_{idx} = \\frac{\\sum P \\times W}{\\sum W}$ | W = weight of each good |
+| **Tax Incidence (Buyer)** | $T_{buyer} = t \\times \\frac{E_s}{E_d + E_s}$ | t = tax amount |
+| **Fiscal Multiplier Effect** | $\\Delta Y = k \\times \\Delta G$ | G = government spending |
+
+---
+
+## 📋 Key Concepts at a Glance
+
+### Market Structures Comparison
+
+| Feature | Perfect Competition | Monopoly | Oligopoly | Monopolistic |
+|:---|:---:|:---:|:---:|:---:|
+| **Sellers** | Very many | One | Few | Many |
+| **Product** | Homogeneous | Unique | Homogeneous/Diff. | Differentiated |
+| **Price Control** | None (price taker) | Full (price maker) | Partial | Partial |
+| **Barriers to entry** | None | Very high | High | Low |
+| **Long-run profit** | Normal only | Supernormal | Supernormal | Normal only |
+| **Examples (Nigeria)** | Open-air food markets | PHCN (historically) | Dangote/BUA cement | Soap brands, textiles |
+
+---
+
+### Taxation Systems Summary
+
+| System | Rate vs. Income | Equity | Example |
+|:---|:---|:---|:---|
+| **Progressive** | Rate rises with income | Most equitable | Nigerian PAYE income tax |
+| **Proportional** | Constant rate | Neutral | Flat 15% company tax |
+| **Regressive** | Rate falls with income | Least equitable | Poll tax, flat VAT on food |
+
+---
+
+### Types of Unemployment (Quick Reference)
+
+| Type | Cause | Solution |
+|:---|:---|:---|
+| **Frictional** | Time spent between jobs | Job placement centers |
+| **Structural** | Industry decline/tech replacement | Retraining & reskilling programs |
+| **Cyclical** | Recession/fall in aggregate demand | Expansionary fiscal/monetary policy |
+| **Seasonal** | Climate-driven demand fluctuations | Tourism diversification |
+| **Disguised** | MP = 0 (farm labor surplus) | Rural-urban industrial migration |
+
+---
+
+> **💡 WAEC Exam Tip**: Always read questions carefully to identify whether they ask about *changes along* a curve (change in quantity) or *shifts of* a curve (change in demand/supply). This is the most common source of marks lost in theory questions.
 `
 };
+

@@ -6457,7 +6457,7 @@ Addresses the accounting framework for the macroeconomy, distinguishing between 
 - **Disposable Income:** $YD = Y + TR - TA$
 - **Allocation of YD:** $YD = C + S$
 - **Savings-Investment Identity:** $S - I = (G + TR - TA) + NX$  (Private saving minus investment equals budget deficit plus net exports/trade surplus)
-- **Inflation rate ($\\$):** $\\ = (P_t - P_{t-1}) / P_{t-1}$
+- **Inflation rate ($\\pi$):** $\\pi = (P_t - P_{t-1}) / P_{t-1}$
 
 **Key Graphs & Tables:**
 - **Fig 2-1:** Composition of US GDP (C=70%, I=16.9%, G=18.9%, NX=-2.8%).
@@ -6472,11 +6472,11 @@ Focuses on Neoclassical Growth Theory (Solow Model). Growth is driven by capital
 
 **Key Equations:**
 - **Production function:** $Y = AF(K, N)$
-- **Growth accounting equation:** $\\ Y/Y = [(1-\\) \\times \\ N/N] + (\\ \\times \\ K/K) + \\ A/A$ (where $\\$ is capital's share).
-- **Per capita output growth:** $\\ y/y = \\ \\times \\ k/k + \\ A/A$
-- **Cobb-Douglas form:** $Y = AK^\\ N^{1-\\}$
-- **Capital accumulation:** $\\ k = sy - (n+d)k$
-- **Steady State ($\\ k = 0$):** $sy^* = (n+d)k^*$
+- **Growth accounting equation:** $\\Delta Y/Y = [(1-\\alpha) \\times \\Delta N/N] + (\\alpha \\times \\Delta K/K) + \\Delta A/A$ (where $\\alpha$ is capital's share).
+- **Per capita output growth:** $\\Delta y/y = \\alpha \\times \\Delta k/k + \\Delta A/A$
+- **Cobb-Douglas form:** $Y = AK^\\alpha N^{1-\\alpha}$
+- **Capital accumulation:** $\\Delta k = sy - (n+d)k$
+- **Steady State ($\\Delta k = 0$):** $sy^* = (n+d)k^*$
 
 **Key Graphs & Tables:**
 - **Fig 3-1:** GDP per capita for four countries.
@@ -6492,8 +6492,8 @@ Introduces Endogenous Growth Theory, which assumes a constant marginal product o
 
 **Key Equations:**
 - **Endogenous production function:** $Y = aK$
-- **Capital accumulation:** $\\ K = sY = saK$
-- **Growth rate (Endogenous):** $\\ Y/Y = s \\times a$
+- **Capital accumulation:** $\\Delta K = sY = saK$
+- **Growth rate (Endogenous):** $\\Delta Y/Y = s \\times a$
 
 **Key Graphs & Tables:**
 - **Fig 4-1:** Solow vs. Endogenous growth models.
@@ -6507,7 +6507,7 @@ Introduces Endogenous Growth Theory, which assumes a constant marginal product o
 Brings together the AD and AS curves to determine equilibrium output and price level. Explores the Keynesian extreme (flat AS, where output changes do not affect prices) and the Classical extreme (vertical AS, where AD shifts only change prices, not output).
 
 **Key Equations:**
-- **Dynamic Aggregate Supply:** $P_{t+1} = P_t [1 + \\(Y - Y^*)]$
+- **Dynamic Aggregate Supply:** $P_{t+1} = P_t [1 + \\gamma(Y - Y^*)]$
 - **Quantity Theory of Money (AD proxy):** $M \\times V = P \\times Y$
 
 **Key Graphs & Tables:**
@@ -6545,7 +6545,7 @@ The derivation of the modern expectations-augmented AS curve follows a structure
    $$ \\pi = \\pi^e + \\gamma(Y - Y^*) $$
    where $\\gamma = \\frac{\\alpha}{\\beta Y^*}$. This shows that inflation exceeds expected inflation when real output exceeds potential output (an inflationary gap).
 
-\`\`\`chart
+```chart
 {
   "type": "line",
   "title": "Figure 6.1: Deriving the Upward Sloping Aggregate Supply Curve",
@@ -6564,14 +6564,14 @@ The derivation of the modern expectations-augmented AS curve follows a structure
     {"key": "as_long_run", "name": "Long-Run AS (Potential GDP Y*=100)", "color": "#0f172a"}
   ]
 }
-\`\`\`
+```
 
 **6.2 Why Nominal Wages Are Sticky**
 If wages adjusted instantly and frictionlessly, the labor market would always clear, and the AS curve would be vertical even in the short term. However, in reality, nominal wages are sticky (slow to adjust). Key modern macroeconomic theories explain this friction:
 
 - **Coordination Problems (Mankiw / Cooper)**: Firms and unions would willingly adjust prices and wages downward in response to a drop in demand *if* they were certain every other competitor would do so simultaneously. In the absence of a central coordinating agency, no single firm wants to cut wages first (which would alienate workers and lower morale), leading to sticky wages.
 - **Efficiency Wage Theory**: The productivity (morale, effort, and turnover rate) of workers is a direct mathematical function of the real wage paid relative to the market average. According to the **Solow Condition**, firms maximize profits by retaining a real wage above the market-clearing level:
-  $$ \\text{Effort} = e(W) \\quad \\text{where } e'(W) > 0 $$
+  $$ \text{Effort} = e(W) \quad \text{where } e'(W) > 0 $$
   Cutting wages during a recession would reduce worker effort and trigger high-skilled employee departures, increasing net costs.
 - **Insider-Outsider Models**: Firm employees are split into two categories:
   - **Insiders**: Already employed, high-tenured workers who control union representation.
@@ -6597,7 +6597,7 @@ The **natural rate of unemployment** ($u^*$) is the rate at which the labor mark
 - **Structural Unemployment**: A mismatch between the skill sets demanded by employers and those possessed by job seekers, or a geographic mismatch. Structural factors are exacerbated by institutional rigidities like legal minimum wages or overly generous welfare programs that reduce job-search incentives.
 
 The aggregate rate is a weighted average of sector rates:
-$$ u^* = w_1 u_1^* + w_2 u_2^* + \\dots + w_n u_n^* $$
+$$ u^* = w_1 u_1^* + w_2 u_2^* + \dots + w_n u_n^* $$
 
 **7.3 The Costs of Inflation**
 Inflation is a general rise in the price level, reducing the purchasing power of nominal currency. Costs vary significantly depending on whether inflation is expected or unexpected:
@@ -6611,10 +6611,10 @@ Inflation is a general rise in the price level, reducing the purchasing power of
 
 **7.4 The Choice of Disinflation: The Sacrifice Ratio**
 To reduce inflation, the central bank must tighten monetary policy, which shifts the Aggregate Demand (AD) curve left and temporarily increases unemployment. The willingness of a nation to endure this is measured by the **Sacrifice Ratio**:
-$$ \\text{Sacrifice Ratio} = \\frac{\\text{Cumulative % Loss of Real GDP}}{\\text{Percentage Point Reduction in Inflation}} $$
+$$ \text{Sacrifice Ratio} = \frac{\text{Cumulative % Loss of Real GDP}}{\text{Percentage Point Reduction in Inflation}} $$
 For instance, a sacrifice ratio of 2.0 implies that to reduce inflation from 6% to 2% (a 4 percentage point drop), the economy must sacrifice a cumulative 8% of annual GDP (e.g., a 4% output gap for two consecutive years).
 
-\`\`\`chart
+```chart
 {
   "type": "area",
   "title": "Figure 7.3: The Sacrifice Ratio - Output Loss vs. Disinflation Path",
@@ -6632,7 +6632,7 @@ For instance, a sacrifice ratio of 2.0 implies that to reduce inflation from 6% 
     {"key": "actual_gdp", "name": "Actual Real GDP", "color": "#f43f5e"}
   ]
 }
-\`\`\`
+```
 
 The shaded gap between the blue potential line and the red actual line represents the cumulative output lost to achieve a 6.0 percentage point reduction in inflation.
 
@@ -6659,13 +6659,13 @@ Gives a practical overview of how central banks set policy. Explains the target 
 Develops the basic Keynesian cross model where prices are fixed. Output is driven by planned spending. Models consumption as a function of income and derives the spending multiplier. Extends the model to include the government sector and proportional taxes as automatic stabilizers.
 
 **Key Equations:**
-- **Consumption:** $C = \\bar{C} + cY$ (where $c$ is the Marginal Propensity to Consume, MPC).
-- **Saving:** $S = Y - C = -\\bar{C} + (1-c)Y$
-- **Equilibrium condition:** $Y = AD = \\bar{A} + cY \\quad Y_0 = \\frac{1}{1-c}\\bar{A}$
-- **Multiplier (no taxes):** $\\alpha = \\frac{1}{1-c}$
-- **Equilibrium with government & taxes:** $Y_0 = \\frac{1}{1-c(1-t)}(\\bar{C} + c\\bar{TR} + \\bar{I} + \\bar{G} + \\bar{NX})$
-- **Multiplier with taxes:** $\\alpha_G = \\frac{1}{1-c(1-t)}$
-- **Budget Surplus:** $BS = tY - \\bar{G} - \\bar{TR}$
+- **Consumption:** $C = \bar{C} + cY$ (where $c$ is the Marginal Propensity to Consume, MPC).
+- **Saving:** $S = Y - C = -\bar{C} + (1-c)Y$
+- **Equilibrium condition:** $Y = AD = \bar{A} + cY \quad Y_0 = \frac{1}{1-c}\bar{A}$
+- **Multiplier (no taxes):** $\alpha_G = \frac{1}{1-c}$
+- **Equilibrium with government & taxes:** $Y_0 = \frac{1}{1-c(1-t)}(\bar{C} + c\bar{TR} + \bar{I} + \bar{G} + \bar{NX})$
+- **Multiplier with taxes:** $\alpha_G = \frac{1}{1-c(1-t)}$
+- **Budget Surplus:** $BS = tY - \bar{G} - \bar{TR}$
 
 **Key Graphs & Tables:**
 - **Fig 9-1/9-2/9-3:** The Keynesian Cross and derivation of the Multiplier.
@@ -6679,11 +6679,11 @@ Develops the basic Keynesian cross model where prices are fixed. Output is drive
 Derives the IS-LM model. The IS curve represents equilibrium in the goods market. The LM curve represents equilibrium in the money market. Their intersection determines short-run equilibrium output and interest rates at a fixed price level.
 
 **Key Equations:**
-- **Investment demand:** $I = \\bar{I} - bi$
-- **IS Curve:** $Y = \\alpha_G(\\bar{A} - bi)$ or $i = \\frac{\\bar{A}}{b} - \\frac{Y}{\\alpha_G b}$
+- **Investment demand:** $I = \bar{I} - bi$
+- **IS Curve:** $Y = \alpha_G(\bar{A} - bi)$ or $i = \frac{\bar{A}}{b} - \frac{Y}{\alpha_G b}$
 - **Real Money Demand:** $L = kY - hi$
-- **LM Curve:** $i = \\frac{1}{h}(kY - \\frac{\\bar{M}}{\\bar{P}})$
-- **IS-LM Algebraic Solution for Y:** $Y = \\frac{h\\alpha_G}{h+kb\\alpha_G}\\bar{A} + \\frac{b\\alpha_G}{h+kb\\alpha_G} \\frac{\\bar{M}}{\\bar{P}}$
+- **LM Curve:** $i = \frac{1}{h}(kY - \frac{\bar{M}}{\bar{P}})$
+- **IS-LM Algebraic Solution for Y:** $Y = \frac{h\alpha_G}{h+kb\alpha_G}\bar{A} + \frac{b\alpha_G}{h+kb\alpha_G} \frac{\bar{M}}{\bar{P}}$
 
 **Key Graphs & Tables:**
 - **Fig 10-5:** Derivation of the IS curve.
@@ -6698,8 +6698,8 @@ Derives the IS-LM model. The IS curve represents equilibrium in the goods market
 Analyzes fiscal and monetary policy effectiveness using the IS-LM model. Discusses crowding out (where fiscal expansion raises interest rates, reducing private investment). Explores polar cases: the Liquidity Trap (horizontal LM) where monetary policy is useless, and the Classical Case (vertical LM) where fiscal policy causes full crowding out.
 
 **Key Concepts / Equations:**
-- **Monetary Transmission Mechanism:** Money supply changes $\\rightarrow$ Portfolio adjustments $\\rightarrow$ Interest rates change $\\rightarrow$ Investment changes $\\rightarrow$ Output changes.
-- **Classical LM:** $\\bar{M} = k(\\bar{P} \\times Y)$ (derived when $h=0$).
+- **Monetary Transmission Mechanism:** Money supply changes $\rightarrow$ Portfolio adjustments $\rightarrow$ Interest rates change $\rightarrow$ Investment changes $\rightarrow$ Output changes.
+- **Classical LM:** $\bar{M} = k(\bar{P} \times Y)$ (derived when $h=0$).
 
 **Key Graphs & Tables:**
 - **Fig 11-3:** Monetary expansion (LM shifts right).
@@ -6736,10 +6736,10 @@ Extends IS-LM to the Open Economy (Mundell-Fleming model). Introduces Capital Mo
 Moves beyond the simple Keynesian consumption function to Life-Cycle/Permanent-Income Hypotheses (LC-PIH). Consumption is smoothed over a lifetime. Explores reasons why LC-PIH doesn't perfectly hold: liquidity constraints and myopia. Introduces the Barro-Ricardo Equivalence Proposition.
 
 **Key Equations:**
-- **Simple Keynesian:** $C = \\bar{C} + cYD$
-- **Life-Cycle:** $C = \\frac{WL}{NL} \\times YL$ (Working Life / Normal Life $\\times$ Labor Income)
+- **Simple Keynesian:** $C = \bar{C} + cYD$
+- **Life-Cycle:** $C = \frac{WL}{NL} \times YL$ (Working Life / Normal Life $\times$ Labor Income)
 - **Permanent Income:** $C = c YP$
-- **Random Walk Model (Rational Expectations):** $C_{t+1} = C_t + \\epsilon$
+- **Random Walk Model (Rational Expectations):** $C_{t+1} = C_t + \epsilon$
 
 **Key Graphs & Tables:**
 - **Fig 13-4:** Lifetime Income, Consumption, Saving, and Wealth.
@@ -6752,9 +6752,9 @@ Moves beyond the simple Keynesian consumption function to Life-Cycle/Permanent-I
 Investment is highly volatile and drives the business cycle. Covers Business Fixed Investment (via the rental cost of capital and marginal product), Residential Investment (linked to mortgage rates), and Inventory Investment (the accelerator model). Also discusses Tobin's $q$ theory.
 
 **Key Equations:**
-- **Rental cost of capital (rc):** $rc = r + d = i - \\pi^e + d$ (interest rate - expected inflation + depreciation).
-- **Flexible Accelerator Model:** $K_0 = K_{-1} + \\lambda(K^* - K_{-1})$ and $I = \\lambda(K^* - K_{-1})$
-- **Present Value (Discounted Cash Flow):** $PV = \\frac{FV}{1+i}$
+- **Rental cost of capital (rc):** $rc = r + d = i - \pi^e + d$ (interest rate - expected inflation + depreciation).
+- **Flexible Accelerator Model:** $K_0 = K_{-1} + \lambda(K^* - K_{-1})$ and $I = \lambda(K^* - K_{-1})$
+- **Present Value (Discounted Cash Flow):** $PV = \frac{FV}{1+i}$
 
 **Key Graphs & Tables:**
 - **Fig 14-2/14-3:** Marginal Product of Capital and desired Capital stock.
@@ -6767,10 +6767,10 @@ Investment is highly volatile and drives the business cycle. Covers Business Fix
 Defines money (M1, M2) and its functions. Analyzes the transactions, precautionary, and speculative motives for holding money. Uses the Baumol-Tobin model to show that money demand is sensitive to interest rates and transaction costs, exhibiting economies of scale.
 
 **Key Equations:**
-- **Baumol-Tobin Transaction Demand:** $\\frac{M}{P} = \\sqrt{\\frac{tc \\times Y}{2i}}$
+- **Baumol-Tobin Transaction Demand:** $\frac{M}{P} = \sqrt{\frac{tc \times Y}{2i}}$
 - **Linear Money Demand:** $L = kY - hi$
-- **Income Velocity of Money:** $V = \\frac{P \\times Y}{M}$
-- **Classical Quantity Theory (Inflation):** $\\ = m - y + v$
+- **Income Velocity of Money:** $V = \frac{P \times Y}{M}$
+- **Classical Quantity Theory (Inflation):** $\\pi = m - y + v$
 
 **Key Graphs & Tables:**
 - **Fig 15-1:** Velocity of money and T-bill rates.
@@ -6785,8 +6785,8 @@ Explains how the Federal Reserve determines the money supply through the monetar
 **Key Equations:**
 - **Monetary Base (High-powered money):** $H = CU + reserves$
 - **Money Stock:** $M = CU + D$
-- **Money Multiplier:** $mm = \\frac{1+cu}{re+cu}$
-- **Total Money Supply:** $M = mm \\times H$
+- **Money Multiplier:** $mm = \frac{1+cu}{re+cu}$
+- **Total Money Supply:** $M = mm \times H$
 
 **Key Graphs & Tables:**
 - **Fig 16-2:** Relation between High-Powered Money and the Money Stock.
@@ -6801,8 +6801,8 @@ Explains how the Federal Reserve determines the money supply through the monetar
 Examines the practical difficulties of active stabilization policy. Discusses inside lags (recognition, decision, action) and outside lags (the time it takes for the economy to respond). Covers the debate of rules vs. discretion, dynamic inconsistency, and alternative targets like Real GDP vs Nominal GDP vs Inflation targeting.
 
 **Key Equations:**
-- **Constant-growth-rate activist rule:** $\\frac{\\Delta M}{M} = 4.0 + 2(u - 5.5)$
-- **Policymaker Loss Function (Dynamic Inconsistency):** $L = a(u - u^*) + \\pi^2$
+- **Constant-growth-rate activist rule:** $\frac{\Delta M}{M} = 4.0 + 2(u - 5.5)$
+- **Policymaker Loss Function (Dynamic Inconsistency):** $L = a(u - u^*) + \pi^2$
 
 **Key Graphs & Tables:**
 - **Fig 17-1:** Lags and destabilizing policy.
@@ -6815,9 +6815,9 @@ Examines the practical difficulties of active stabilization policy. Discusses in
 Explains the forward-looking nature of financial markets and the concept of arbitrage. Covers the yield curve (term structure of interest rates), the random walk of stock prices, and how exchange rate expectations adjust international returns.
 
 **Key Equations:**
-- **Expectations theory of term structure:** $_3i_{2020} = \\frac{_1i_{2020} + _1i^e_{2021} + _1i^e_{2022}}{3} + PR$
-- **Random walk of stock prices:** $P_{t+1} = a + P_t + \\epsilon$
-- **Uncovered Interest Parity:** $\\frac{e_{t+1} - e_t}{e_t} = i - i^*$
+- **Expectations theory of term structure:** $_3i_{2020} = \frac{_1i_{2020} + _1i^e_{2021} + _1i^e_{2022}}{3} + PR$
+- **Random walk of stock prices:** $P_{t+1} = a + P_t + \epsilon$
+- **Uncovered Interest Parity:** $\frac{e_{t+1} - e_t}{e_t} = i - i^*$
 
 **Key Graphs:**
 - **Fig 18-1, 18-3:** Yield Curves and historically tracking long vs short rates.
@@ -6830,9 +6830,9 @@ Explains the forward-looking nature of financial markets and the concept of arbi
 Examines extreme macroeconomic events. Summarizes the causes of the Great Depression, hyperinflations (driven by monetization of large deficits/inflation tax), and the ongoing debate surrounding government deficits and social security.
 
 **Key Equations:**
-- **Budget Financing Identity:** $Budget\\ Deficit = Sales\\ of\\ Bonds + Increase\\ in\\ Money\\ Base$
-- **Inflation-Adjusted Deficit:** $Total\\ Deficit - (Inflation\\ Rate \\times National\\ Debt)$
-- **Inflation Tax Revenue:** $Inflation\\ Rate \\times Real\\ Money\\ Base$
+- **Budget Financing Identity:** $Budget\ Deficit = Sales\ of\ Bonds + Increase\ in\ Money\ Base$
+- **Inflation-Adjusted Deficit:** $Total\ Deficit - (Inflation\ Rate \times National\ Debt)$
+- **Inflation Tax Revenue:** $Inflation\ Rate \times Real\ Money\ Base$
 - **Debt-Income Ratio:** $Debt / PY$
 
 **Key Graphs & Tables:**
@@ -6847,7 +6847,7 @@ Expands on Chapter 12 to look at long-term adjustment mechanisms. Demonstrates h
 
 **Key Equations:**
 - **Spending on domestic goods:** $DS + NX = (C + I + G) + (X - Q)$
-- **Monetary Approach (Balance sheet):** $\\Delta NFA = \\Delta H - \\Delta DC$
+- **Monetary Approach (Balance sheet):** $\Delta NFA = \Delta H - \Delta DC$
 
 **Key Graphs & Tables:**
 - **Fig 20-3:** Competitiveness and Adjustment.
@@ -6861,17 +6861,95 @@ Expands on Chapter 12 to look at long-term adjustment mechanisms. Demonstrates h
 Explores the modern frontier of macroeconomics: Rational Expectations, Real Business Cycle (RBC) Theory, and New Keynesian economics. RBC argues shocks are permanent technology shifts with purely market-clearing reactions. New Keynesians justify price stickiness using small "menu costs" and imperfect competition.
 
 **Key Equations:**
-- **Rational Expectations Prediction:** $p = p^e + \\(y - y^*)$
+- **Rational Expectations Prediction:** $p = p^e + \\gamma(y - y^*)$
 - **Rational Forecast:** $p^e = m^e + v - y^{*e}$
-- **Random Walk of GDP:** $y_t = y_{t-1} + \\$ (Difference stationary)
-- **New Keynesian Pricing (Markup):** $P_i = \\left(\\frac{\\}{\\ - 1}\\right) \\frac{W}{a}$
+- **Random Walk of GDP:** $y_t = y_{t-1} + \\epsilon$
+- **New Keynesian Pricing (Markup):** $P_i = \\left(\\frac{\\epsilon}{\\epsilon - 1}\\right) \\frac{W}{a}$
 
 **Key Graphs:**
 - **Fig 21-4/21-5:** Actual and Projected GDP (Trend vs Difference Stationary).
 - **Fig 21-6:** Mankiw's Menu Cost Breakthrough (profit loss curves under perfect vs imperfect competition).
 
 ---
+
+## Chapter 22: Advanced Macroeconomic Modeling (Mathematical Appendix)
+
+### 22.1 The Dynamic Optimization Framework (Ramsey-Cass-Koopmans Model)
+The modern foundation of macroeconomics involves intertemporal optimization. Households maximize lifetime utility subject to a dynamic budget constraint.
+
+**Household Problem:**
+$$\\max \\int_{0}^{\\infty} e^{-\\rho t} u(c(t)) dt$$
+Subject to the capital accumulation constraint:
+$$\\dot{k}(t) = f(k(t)) - c(t) - (n + \\delta)k(t)$$
+where $\\rho$ is the discount rate, $k$ is per capita capital, and $c$ is per capita consumption.
+
+Using the **Hamiltonian formulation**:
+$$H = e^{-\\rho t} u(c) + \\lambda [f(k) - c - (n + \\delta)k]$$
+The First Order Conditions (FOCs) yield the **Euler Equation** for consumption:
+$$\\frac{\\dot{c}}{c} = \\frac{1}{\\theta} [f'(k) - \\rho - n - \\delta]$$
+where $\\theta = -\\frac{c u''(c)}{u'(c)}$ is the coefficient of relative risk aversion. *Citation: Cass, D. (1965). "Optimum Growth in an Aggregative Model of Capital Accumulation." Review of Economic Studies.*
+
+### 22.2 Policy Analysis: Fiscal Sustainability
+The government's intertemporal budget constraint requires the present value of future primary surpluses to equal the current stock of debt.
+$$b_0 = \\int_{0}^{\\infty} e^{-rt} s(t) dt$$
+If a government runs a persistent deficit, the debt-to-GDP ratio $b(t)$ evolves as:
+$$\\dot{b}(t) = (r - g)b(t) - s(t)$$
+**Policy Implication:** If the real interest rate $r$ exceeds the GDP growth rate $g$, the government must run a primary surplus ($s > 0$) to stabilize the debt ratio. *Citation: Blanchard, O. (1990). "Suggestions for a New Set of Fiscal Indicators." OECD Working Papers.*
+
+---
 *End of Summary*
 
-`,"ug-statistical": STATISTICAL_ECONOMICS_GUIDE
+`,
+"ug-micro": `
+# Advanced Microeconomics: Mathematical and Theoretical Foundations
+
+## 1. Consumer Theory and Lagrangian Optimization
+
+### 1.1 The Utility Maximization Problem (UMP)
+A rational consumer seeks to maximize utility $U(x_1, x_2)$ subject to a budget constraint $p_1 x_1 + p_2 x_2 = I$. 
+This is solved using the **Lagrange Multiplier Method**:
+$$\\mathcal{L}(x_1, x_2, \\lambda) = U(x_1, x_2) + \\lambda (I - p_1 x_1 - p_2 x_2)$$
+
+**First-Order Conditions (FOCs):**
+1. $\\frac{\\partial \\mathcal{L}}{\\partial x_1} = U_1 - \\lambda p_1 = 0 \\implies U_1 = \\lambda p_1$
+2. $\\frac{\\partial \\mathcal{L}}{\\partial x_2} = U_2 - \\lambda p_2 = 0 \\implies U_2 = \\lambda p_2$
+3. $\\frac{\\partial \\mathcal{L}}{\\partial \\lambda} = I - p_1 x_1 - p_2 x_2 = 0$
+
+Taking the ratio of (1) and (2) yields the optimal condition:
+$$\\frac{U_1}{U_2} = \\frac{p_1}{p_2} \\implies MRS_{1,2} = \\frac{p_1}{p_2}$$
+The Marginal Rate of Substitution (MRS) must equal the price ratio. Here, $\\lambda$ represents the marginal utility of income.
+
+### 1.2 The Dual Problem: Expenditure Minimization
+Alternatively, consumers minimize expenditure $E = p_1 x_1 + p_2 x_2$ to achieve a target utility level $\\bar{U}$.
+$$\\mathcal{L} = p_1 x_1 + p_2 x_2 + \\mu (\\bar{U} - U(x_1, x_2))$$
+The solution yields **Hicksian (compensated) demand functions** $h_i(p, \\bar{U})$, which isolate the substitution effect and are foundational for welfare economics analysis. *Citation: Mas-Colell, A., Whinston, M. D., & Green, J. R. (1995). Microeconomic Theory.*
+
+## 2. Producer Theory and Duality
+
+### 2.1 Profit Maximization
+A firm maximizes profit $\\pi = p f(K, L) - rK - wL$.
+FOCs state that the value of the marginal product must equal the input price:
+$$p \\cdot MP_K = r \\quad \\text{and} \\quad p \\cdot MP_L = w$$
+
+### 2.2 Cost Minimization and Shephard's Lemma
+For a given output $q$, a firm minimizes cost $C = rK + wL$.
+Applying the Lagrangian, we derive the **conditional factor demands** $K(r, w, q)$ and $L(r, w, q)$.
+**Shephard's Lemma** proves that the derivative of the cost function with respect to an input price yields the conditional factor demand:
+$$\\frac{\\partial C(r, w, q)}{\\partial w} = L(r, w, q)$$
+
+## 3. Market Structures and Game Theory
+
+### 3.1 Cournot Oligopoly
+Two firms compete on quantity. Market price $P = a - b(q_1 + q_2)$.
+Firm 1 maximizes profit: $\\pi_1 = [a - b(q_1 + q_2)]q_1 - c q_1$
+Taking the derivative with respect to $q_1$ yields the **Reaction Function**:
+$$q_1 = \\frac{a - c - b q_2}{2b}$$
+By symmetry, the Nash Equilibrium quantities are $q_1^* = q_2^* = \\frac{a - c}{3b}$.
+
+### 3.2 Policy Analysis: Antitrust and Deadweight Loss
+In a monopoly, prices are set above marginal cost ($P > MC$), creating a Deadweight Loss (DWL).
+$$DWL = \\frac{1}{2} (P_M - P_C)(Q_C - Q_M)$$
+**Policy Application:** Regulatory agencies (like the FCC or FTC) use these derivations to assess the welfare impact of proposed corporate mergers and apply price-cap regulation formulas ($RPI - X$). *Citation: Tirole, J. (1988). The Theory of Industrial Organization. MIT Press.*
+`,
+"ug-statistical": STATISTICAL_ECONOMICS_GUIDE
 };

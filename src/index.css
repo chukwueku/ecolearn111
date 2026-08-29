@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/katex@0.16.40/dist/katex.min.css');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -180,7 +180,7 @@
   .progress-glow { box-shadow: 0 0 20px rgba(0, 108, 73, 0.15); }
 }
 
-/* KaTeX Math Overflow Fix */
+/* KaTeX Math Overflow & Styling */
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
@@ -191,7 +191,205 @@
   font-size: 1.1em !important;
 }
 
+.katex-error {
+  color: inherit !important;
+  background-color: rgba(148, 163, 184, 0.15) !important;
+  padding: 0.15rem 0.35rem !important;
+  border-radius: 0.375rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.9em !important;
+}
+
 /* Ensure tables within prose look good */
 .prose table {
   margin: 0 !important;
 }
+
+/* === PREMIUM ANIMATION KEYFRAMES === */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes slide-up-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.5), 0 0 60px rgba(16, 185, 129, 0.2); }
+}
+
+@keyframes star-sparkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(0.8) rotate(180deg); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: var(--progress, 0%); }
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes card-hover-lift {
+  from { transform: translateY(0px) scale(1); }
+  to { transform: translateY(-4px) scale(1.01); }
+}
+
+/* === UTILITY CLASSES === */
+@layer utilities {
+  /* Shimmer loading skeleton */
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .dark .skeleton-shimmer {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+  }
+
+  /* Animated gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  /* Eco green gradient text */
+  .gradient-text-eco {
+    background: linear-gradient(135deg, #10b981, #059669, #047857);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Float animation */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Slide up entrance */
+  .animate-slide-up {
+    animation: slide-up-in 0.5s ease-out both;
+  }
+
+  /* Glow effect */
+  .animate-glow {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* Star sparkle */
+  .animate-sparkle {
+    animation: star-sparkle 1.5s ease-in-out infinite;
+  }
+
+  /* Badge pop in */
+  .animate-badge-pop {
+    animation: badge-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* Glass morphism card */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .dark .glass-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Premium border gradient */
+  .border-gradient {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  /* Hero gradient background */
+  .hero-gradient {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f2a1e 100%);
+  }
+
+  /* Eco accent gradient */
+  .eco-gradient {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  }
+
+  /* Card with neon border on hover */
+  .card-neon-hover {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+  .card-neon-hover:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1), 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Progress ring */
+  .progress-ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 4;
+  }
+  .progress-ring-fill {
+    fill: none;
+    stroke: #10b981;
+    stroke-width: 4;
+    stroke-linecap: round;
+    transform-origin: center;
+    transform: rotate(-90deg);
+    transition: stroke-dashoffset 1s ease;
+  }
+
+  /* Topic card tier colors */
+  .topic-card-ss1 { border-left: 3px solid #10b981; }
+  .topic-card-ss2 { border-left: 3px solid #f59e0b; }
+  .topic-card-ss3 { border-left: 3px solid #6366f1; }
+  .topic-card-ug   { border-left: 3px solid #8b5cf6; }
+
+  /* Difficulty dots */
+  .difficulty-easy   { background: #10b981; }
+  .difficulty-medium { background: #f59e0b; }
+  .difficulty-hard   { background: #ef4444; }
+
+  /* Stat counter value */
+  .stat-value {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Sticky bar shadow */
+  .sticky-bar-shadow {
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+  }
+}
+

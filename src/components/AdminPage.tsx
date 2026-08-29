@@ -20,12 +20,13 @@ import {
   PieChart, Pie, Cell 
 } from 'recharts';
 
-import { cn } from '../lib/utils';
+import { cn, getUserInitials } from '../lib/utils';
 import { useAuth } from '../useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useDarkMode } from '../DarkModeContext';
 import { StudyMaterialsManager } from './admin/StudyMaterialsManager';
 import { useRoadmap } from '../hooks/useRoadmap';
+import { MathText } from './MathComponents';
 
 export const AdminPage: React.FC = () => {
   const { isDarkMode } = useDarkMode();
@@ -62,8 +63,10 @@ export const AdminPage: React.FC = () => {
   const [stats, setStats] = useState<any>(null);
   
   // Questions State
-  const [level, setLevel] = useState<'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate'>('secondary');
+  const [level, setLevel] = useState<'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate' | 'advanced'>('undergraduate');
   const { roadmap: topics } = useRoadmap(level);
+  // selectedCourse = the course/chapter id from the Academic Level dropdown
+  const [selectedCourse, setSelectedCourse] = useState<string>('');
   const [topicId, setTopicId] = useState('');
   const [count, setCount] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -103,7 +106,7 @@ export const AdminPage: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'overview') fetchStats();
     if (activeTab === 'users') fetchUsers();
-    if (activeTab === 'questions' && subTab === 'bank') fetchBank();
+    if (activeTab === 'questions') fetchBank();
     if (activeTab === 'questions' && subTab === 'daily-challenge') fetchDailyChallenges();
     if (activeTab === 'activity') fetchActivity();
     if (activeTab === 'settings') fetchAnnouncement();
@@ -308,23 +311,75 @@ export const AdminPage: React.FC = () => {
     }
   };
 
+  const getTopicCoverageStats = () => {
+    const topicCounts: Record<string, number> = {};
+    topics.forEach(t => { topicCounts[t.id] = 0; });
+
+    bankQuestions.forEach(q => {
+      const matchLvl = (level === 'undergraduate' || level === 'advanced')
+        ? (q.level === 'undergraduate' || q.level === 'advanced')
+        : (q.level === level || q.level === 'secondary' || q.level.startsWith('secondary'));
+
+      if (matchLvl) {
+        if (topicCounts[q.topicId] !== undefined) {
+          topicCounts[q.topicId] += 1;
+        } else {
+          const found = topics.find(t => t.id === q.topicId || t.title.toLowerCase() === (q.topicId || '').toLowerCase());
+          if (found) {
+            topicCounts[found.id] = (topicCounts[found.id] || 0) + 1;
+          }
+        }
+      }
+    });
+
+    const missing = topics.filter(t => (topicCounts[t.id] || 0) === 0);
+    const low = topics.filter(t => (topicCounts[t.id] || 0) > 0 && (topicCounts[t.id] || 0) < 10);
+    const healthy = topics.filter(t => (topicCounts[t.id] || 0) >= 10);
+
+    return { topicCounts, missing, low, healthy };
+  };
+
+  // Derive the subtopics list from the selected course
+  const getCourseSubtopics = (): string[] => {
+    if (!selectedCourse) return [];
+    const course = topics.find(t => t.id === selectedCourse);
+    return course?.subtopics || [];
+  };
+
   const handleGenerate = async () => {
+    if (!selectedCourse) {
+      alert("Please select an Academic Level / Course first.");
+      return;
+    }
     if (!topicId) {
-      alert("Please select a topic.");
+      alert("Please select a Target Topic or 'Select All Topics'.");
       return;
     }
     setLoading(true);
     setSaved(false);
-    const topic = topics.find(t => t.id === topicId);
-    if (!topic) {
-      setLoading(false);
-      return;
+
+    const course = topics.find(t => t.id === selectedCourse);
+    let topicTitleStr = "";
+
+    if (topicId === "all-subtopics") {
+      // All subtopics of this course
+      const subs = getCourseSubtopics();
+      topicTitleStr = subs.length > 0
+        ? `${course?.title || selectedCourse}: ${subs.join(', ')}`
+        : course?.title || selectedCourse;
+    } else {
+      // A specific subtopic
+      topicTitleStr = `${course?.title || selectedCourse} — ${topicId}`;
     }
 
     try {
-      const questions = await generateQuestions(topic.title, level, count);
+      const excludeList = [
+        ...bankQuestions.map(q => q.question),
+        ...generatedQuestions.map(q => q.question)
+      ];
+      const questions = await generateQuestions(topicTitleStr, level, count, excludeList);
       if (!questions || questions.length === 0) {
-        alert("Failed to generate questions. Please try again.");
+        alert("Failed to generate questions or all generated questions were duplicates. Please try again.");
       } else {
         setGeneratedQuestions(questions);
       }
@@ -386,10 +441,18 @@ export const AdminPage: React.FC = () => {
       level,
       createdAt: new Date()
     }));
-    await saveQuestions(questionsToSave);
+    const result = await saveQuestions(questionsToSave);
     setSaved(true);
     setLoading(false);
     setGeneratedQuestions([]);
+    fetchBank();
+
+    if (result.duplicateCount > 0) {
+      setSuccessMessage(`Saved ${result.savedCount} new questions. (${result.duplicateCount} duplicate questions were rejected)`);
+    } else {
+      setSuccessMessage(`Saved ${result.savedCount} questions to the bank successfully!`);
+    }
+    setTimeout(() => setSuccessMessage(null), 4000);
   };
 
   const handleUpdateQuestion = async (e: React.FormEvent) => {
@@ -408,12 +471,18 @@ export const AdminPage: React.FC = () => {
     e.preventDefault();
     if (!newQuestion.topicId || !newQuestion.question) return;
     setLoading(true);
-    await saveQuestions([{ ...newQuestion, createdAt: new Date() }]);
+    const result = await saveQuestions([{ ...newQuestion, createdAt: new Date() }]);
     setNewQuestion(emptyQuestion);
     setSaved(true);
     setLoading(false);
-    setSuccessMessage('Question created manually.');
-    setTimeout(() => setSuccessMessage(null), 2000);
+    fetchBank();
+
+    if (result.duplicateCount > 0) {
+      alert("This question already exists in the Question Bank and was rejected.");
+    } else {
+      setSuccessMessage('Question created manually.');
+    }
+    setTimeout(() => setSuccessMessage(null), 3000);
   };
 
   const handleDeleteQuestion = async (id: string) => {
@@ -636,8 +705,8 @@ export const AdminPage: React.FC = () => {
                         <span className="text-[10px] font-bold text-slate-400 dark:text-slate-600 w-4">
                           {i + 1}
                         </span>
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-slate-600 dark:text-slate-500 group-hover:bg-slate-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-slate-900 transition-all text-xs sm:text-sm">
-                          {user.displayName[0]}
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-slate-100 dark:bg-slate-800 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-slate-600 dark:text-slate-500 group-hover:bg-slate-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-slate-900 transition-all text-xs tracking-wider">
+                          {getUserInitials(user.displayName, user.email)}
                         </div>
                         <div>
                           <p className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1">{user.displayName}</p>
@@ -776,60 +845,183 @@ export const AdminPage: React.FC = () => {
 
             {subTab === 'generate' ? (
               <div className="space-y-6 sm:space-y-8">
+                {/* Topic Coverage Status Panel */}
+                {(() => {
+                  const { topicCounts, missing, low } = getTopicCoverageStats();
+                  return (
+                    <div className="bg-slate-900 text-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-800 shadow-xl space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-sky-400">Curriculum Fill Detector</p>
+                          </div>
+                          <h4 className="text-base sm:text-lg font-bold tracking-tight">Question Bank Coverage for '{level}'</h4>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            {missing.length > 0 ? (
+                              <span className="text-amber-400 font-bold">⚠️ {missing.length} topic(s) have 0 questions in the bank.</span>
+                            ) : low.length > 0 ? (
+                              <span className="text-sky-400 font-bold">⚡ All topics covered! {low.length} topic(s) have fewer than 10 questions.</span>
+                            ) : (
+                              <span className="text-emerald-400 font-bold">🎉 Outstanding! All topics have 10+ questions in the bank.</span>
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setTopicId('missing-topics')}
+                            className={cn(
+                              "px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border",
+                              topicId === 'missing-topics'
+                                ? "bg-amber-500 text-slate-950 border-amber-400 font-black shadow-lg"
+                                : "bg-slate-800 text-amber-300 border-amber-500/30 hover:bg-slate-700"
+                            )}
+                          >
+                            🎯 Target Missing ({missing.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTopicId('low-coverage-topics')}
+                            className={cn(
+                              "px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all border",
+                              topicId === 'low-coverage-topics'
+                                ? "bg-sky-500 text-slate-950 border-sky-400 font-black shadow-lg"
+                                : "bg-slate-800 text-sky-300 border-sky-500/30 hover:bg-slate-700"
+                            )}
+                          >
+                            ⚡ Target Low-Coverage ({low.length})
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Topic badges grid */}
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/80 max-h-36 overflow-y-auto">
+                        {topics.map(t => {
+                          const cnt = topicCounts[t.id] || 0;
+                          return (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => setTopicId(t.id)}
+                              className={cn(
+                                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border",
+                                topicId === t.id
+                                  ? "bg-white text-slate-900 border-white shadow-md scale-105"
+                                  : cnt === 0
+                                  ? "bg-rose-950/40 text-rose-300 border-rose-800/60 hover:bg-rose-900/60"
+                                  : cnt < 10
+                                  ? "bg-amber-950/40 text-amber-300 border-amber-800/60 hover:bg-amber-900/60"
+                                  : "bg-emerald-950/40 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/60"
+                              )}
+                            >
+                              <span>{t.title}</span>
+                              <span className={cn(
+                                "text-[9px] px-1.5 rounded-full font-extrabold",
+                                cnt === 0 ? "bg-rose-500 text-white" : cnt < 10 ? "bg-amber-500 text-slate-950" : "bg-emerald-500 text-slate-950"
+                              )}>
+                                {cnt}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 md:p-10 shadow-sm">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-10">
+
+                    {/* ACADEMIC LEVEL = Level group selector */}
                     <div className="space-y-2 sm:space-y-3">
-                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Academic Level</label>
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Academic Group</label>
                       <select
                         value={level}
                         onChange={(e) => {
                           setLevel(e.target.value as any);
+                          setSelectedCourse('');
                           setTopicId('');
                         }}
                         className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
                       >
                         <option value="secondary">Economics SS1</option>
+                        <option value="secondary-ss2">Economics SS2</option>
+                        <option value="secondary-ss3">Economics SS3</option>
                         <option value="undergraduate">Undergraduate</option>
+                        <option value="advanced">Advanced Undergrad</option>
                       </select>
                     </div>
 
+                    {/* COURSE = shows individual chapters/courses from the selected level */}
+                    <div className="space-y-2 sm:space-y-3">
+                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Course / Chapter</label>
+                      <select
+                        value={selectedCourse}
+                        onChange={(e) => {
+                          setSelectedCourse(e.target.value);
+                          setTopicId('');
+                        }}
+                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
+                      >
+                        <option value="">Select a course / chapter</option>
+                        {topics.map(t => {
+                          const { topicCounts } = getTopicCoverageStats();
+                          const cnt = topicCounts[t.id] || 0;
+                          return (
+                            <option key={t.id} value={t.id}>
+                              {cnt === 0 ? '🔴 ' : cnt < 10 ? '🟡 ' : '🟢 '}{t.title} ({cnt} in bank)
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+
+                    {/* TARGET TOPIC = shows subtopics of the selected course */}
                     <div className="space-y-2 sm:space-y-3">
                       <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Target Topic</label>
                       <select
                         value={topicId}
                         onChange={(e) => setTopicId(e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
+                        disabled={!selectedCourse}
+                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer disabled:opacity-40"
                       >
-                        <option value="">Select a topic</option>
-                        {topics.map(t => (
-                          <option key={t.id} value={t.id}>{t.title}</option>
-                        ))}
+                        <option value="">{selectedCourse ? 'Select a topic' : 'Select a course first'}</option>
+                        {selectedCourse && (
+                          <>
+                            <option value="all-subtopics">✅ Select All Topics in this Course</option>
+                            {getCourseSubtopics().map((sub, idx) => (
+                              <option key={idx} value={sub}>{sub}</option>
+                            ))}
+                          </>
+                        )}
                       </select>
                     </div>
+                  </div>
 
-                    <div className="space-y-2 sm:space-y-3 col-span-1 sm:col-span-2 md:col-span-1">
-                      <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1">Question Count</label>
-                      <input
-                        type="number"
-                        value={isNaN(count) ? '' : count}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          setCount(isNaN(val) ? 0 : val);
-                        }}
-                        min="1"
-                        max="20"
-                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all"
-                      />
-                    </div>
+                  {/* Question Count */}
+                  <div className="mb-6 sm:mb-10">
+                    <label className="text-[10px] font-bold text-slate-600 dark:text-slate-500 uppercase tracking-widest ml-1 block mb-2 sm:mb-3">Question Count</label>
+                    <input
+                      type="number"
+                      value={isNaN(count) ? '' : count}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setCount(isNaN(val) ? 0 : val);
+                      }}
+                      min="1"
+                      max="5000"
+                      className="w-full sm:w-48 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all"
+                    />
                   </div>
 
                   <button
                     onClick={handleGenerate}
-                    disabled={loading || !topicId}
+                    disabled={loading || !selectedCourse || !topicId}
                     className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-4 sm:py-5 rounded-xl sm:rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-widest text-[10px]"
                   >
                     {loading ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                    Generate Questions
+                    {loading ? `Generating ${count} Technical Questions...` : "Generate Technical Questions"}
                   </button>
                 </div>
 
@@ -855,17 +1047,19 @@ export const AdminPage: React.FC = () => {
                             <span className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl sm:rounded-2xl flex items-center justify-center text-base sm:text-lg font-bold">
                               {i + 1}
                             </span>
-                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
+                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">
+                              <MathText text={q.question} />
+                            </p>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ml-0 sm:ml-14 md:ml-16">
                             {q.options.map((opt: string, idx: number) => (
                               <div key={idx} className={cn(
                                 "p-4 sm:p-5 rounded-xl sm:rounded-2xl border text-xs sm:text-sm font-bold transition-all",
-                                idx === q.correctAnswer 
-                                  ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-900/30 text-sky-700 dark:text-sky-400' 
+                                idx === q.correctAnswer
+                                  ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-900/30 text-sky-700 dark:text-sky-400'
                                   : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-500'
                               )}>
-                                {opt}
+                                <MathText text={opt} />
                               </div>
                             ))}
                           </div>
@@ -943,7 +1137,10 @@ export const AdminPage: React.FC = () => {
                         className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-sky-500/5 transition-all cursor-pointer"
                       >
                         <option value="secondary">Economics SS1</option>
+                        <option value="secondary-ss2">Economics SS2</option>
+                        <option value="secondary-ss3">Economics SS3</option>
                         <option value="undergraduate">Undergraduate</option>
+                        <option value="advanced">Advanced Undergrad</option>
                       </select>
                     </div>
 
@@ -1009,7 +1206,9 @@ export const AdminPage: React.FC = () => {
                             <span className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl sm:rounded-2xl flex items-center justify-center text-base sm:text-lg font-bold">
                               {i + 1}
                             </span>
-                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
+                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">
+                              <MathText text={q.question} />
+                            </p>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ml-0 sm:ml-14 md:ml-16">
                             {q.options.map((opt: string, idx: number) => (
@@ -1019,7 +1218,7 @@ export const AdminPage: React.FC = () => {
                                   ? 'bg-sky-50 dark:bg-sky-900/20 border-sky-200 dark:border-sky-900/30 text-sky-700 dark:text-sky-400' 
                                   : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-500'
                               )}>
-                                {opt}
+                                <MathText text={opt} />
                               </div>
                             ))}
                           </div>
@@ -1050,7 +1249,10 @@ export const AdminPage: React.FC = () => {
                         required
                       >
                         <option value="secondary">Economics SS1</option>
+                        <option value="secondary-ss2">Economics SS2</option>
+                        <option value="secondary-ss3">Economics SS3</option>
                         <option value="undergraduate">Undergraduate</option>
+                        <option value="advanced">Advanced Undergrad</option>
                       </select>
                     </div>
 
@@ -1495,7 +1697,9 @@ export const AdminPage: React.FC = () => {
                                 </div>
                                 <div className="flex items-start gap-3">
                                   <span className="text-xs font-bold text-slate-400 mt-1">#{globalIndex}</span>
-                                  <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">{q.question}</p>
+                                  <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">
+                                    <MathText text={q.question} />
+                                  </p>
                                 </div>
                                 
                                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 pl-6">
@@ -1508,7 +1712,7 @@ export const AdminPage: React.FC = () => {
                                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                                       }`}
                                     >
-                                      <span className="mr-1.5 opacity-50 font-bold">{String.fromCharCode(65 + oIdx)}.</span> {opt}
+                                      <span className="mr-1.5 opacity-50 font-bold">{String.fromCharCode(65 + oIdx)}.</span> <MathText text={opt} />
                                     </div>
                                   ))}
                                 </div>
@@ -1516,7 +1720,9 @@ export const AdminPage: React.FC = () => {
                                 {q.explanation && (
                                   <div className="mt-4 pl-6 border-l-2 border-slate-200 dark:border-slate-800">
                                     <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Explanation</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{q.explanation}</p>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                                      <MathText text={q.explanation} />
+                                    </p>
                                   </div>
                                 )}
                               </div>

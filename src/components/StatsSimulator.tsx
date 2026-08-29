@@ -22,24 +22,129 @@ interface StatsSimulatorProps {
   initialValues?: Record<string, number>;
 }
 
-// Custom Input Component
-const Input = ({ label, value, onChange, placeholder = '0.00' }: { label: string, value: number | undefined, onChange: (v: string) => void, placeholder?: string }) => (
-  <div className="space-y-1">
-    <label className="text-[9px] font-bold text-slate-700 dark:text-slate-500 uppercase tracking-widest ml-1">{label}</label>
-    <div className="relative group">
-      <input
-        type="number"
-        value={value !== undefined && !isNaN(value) ? value : ''}
-        onChange={e => onChange(e.target.value)}
-        className="w-full bg-paper dark:bg-slate-800 border border-border rounded-lg pl-3 pr-8 py-2 text-xs sm:text-sm font-semibold text-ink transition-all placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 min-w-0"
-        placeholder={placeholder}
-      />
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted/60 group-focus-within:text-sky-500 transition-colors pointer-events-none">
-        <Calculator size={12} />
+// Custom Input Component with optional Range Slider
+const Input = ({ 
+  label, 
+  value, 
+  onChange, 
+  placeholder = '0.00',
+  min,
+  max,
+  step = 1,
+  suffix = ""
+}: { 
+  label: string, 
+  value: number | undefined, 
+  onChange: (v: string) => void, 
+  placeholder?: string,
+  min?: number,
+  max?: number,
+  step?: number,
+  suffix?: string
+}) => {
+  const currentVal = value !== undefined && !isNaN(value) ? value : 0;
+  const hasSlider = min !== undefined && max !== undefined;
+
+  return (
+    <div className="space-y-1 bg-paper/60 dark:bg-slate-800/40 p-2.5 rounded-xl border border-border/70">
+      <div className="flex items-center justify-between">
+        <label className="text-[9px] font-bold text-slate-700 dark:text-slate-400 uppercase tracking-widest">{label}</label>
+        {hasSlider && (
+          <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded">
+            {currentVal}{suffix}
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {hasSlider && (
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={currentVal}
+            onChange={e => onChange(e.target.value)}
+            className="w-full accent-sky-500 cursor-pointer h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg shrink"
+          />
+        )}
+        <div className="relative group shrink-0">
+          <input
+            type="number"
+            value={value !== undefined && !isNaN(value) ? value : ''}
+            onChange={e => onChange(e.target.value)}
+            className="w-24 bg-card border border-border rounded-lg pl-2 pr-6 py-1.5 text-xs font-semibold text-ink transition-all placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+            placeholder={placeholder}
+          />
+          <div className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted/60 group-focus-within:text-sky-500 transition-colors pointer-events-none">
+            <Calculator size={11} />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+const FormulaBreakdown = ({ 
+  title, 
+  formula, 
+  steps 
+}: { 
+  title: string, 
+  formula: string, 
+  steps: { label: string, value: string, math?: string }[] 
+}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-4 border border-border/80 rounded-2xl bg-card overflow-hidden transition-all shadow-sm">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+            <BookOpen size={14} />
+          </div>
+          <div>
+            <span className="text-xs sm:text-sm font-bold text-ink block">{title}</span>
+            <span className="text-[10px] text-muted font-medium">Click to view mathematical step-by-step derivation</span>
+          </div>
+        </div>
+        <div className="text-muted">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="p-4 border-t border-border space-y-3 bg-paper/40 dark:bg-slate-900/40"
+          >
+            <div className="bg-card p-3 rounded-xl border border-border/60">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted block mb-1">Core Formula</span>
+              <BlockMath math={formula} />
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted block">Step-by-Step Calculation</span>
+              {steps.map((step, idx) => (
+                <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 bg-card rounded-lg border border-border/40 text-xs gap-1">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">{step.label}</span>
+                  <div className="font-mono font-semibold text-sky-600 dark:text-sky-400">
+                    {step.math ? <InlineMath math={step.math} /> : step.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 // Custom Result Card
 const ResultCard = ({ label, value, icon, description }: { label: string, value: string | number, icon: React.ReactNode, description?: string }) => (
