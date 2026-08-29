@@ -92,3 +92,5 @@ export const EconomicsSimulator: React.FC<SimulatorProps> = ({ mode, title, init
     </div>
   );
 };
+
+export default EconomicsSimulator;
