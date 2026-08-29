@@ -4,6 +4,7 @@ import { Bot, User, Loader2, Sparkles, ChevronDown, Send } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import { useAuth } from '../useAuth';
 
@@ -12,19 +13,30 @@ interface Message {
   content: string;
 }
 
+const cleanMarkdownContent = (text: string) => {
+  if (!text) return text;
+  // Protect currency signs (e.g. $100, $50) from LaTeX delimiters
+  let cleaned = text.replace(/\$(\s*\d[\d,.]*)/g, '\\$$$1');
+  // Normalize LaTeX delimiters for remarkMath / rehypeKatex
+  cleaned = cleaned.replace(/\\\[/g, '$$$$').replace(/\\\]/g, '$$$$');
+  cleaned = cleaned.replace(/\\\(/g, '$').replace(/\\\)/g, '$');
+  return cleaned;
+};
+
 export const AiTutor = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { profile } = useAuth();
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
+    messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' });
+  }, [messages, isLoading, isStreaming]);
 
   // Initial greeting if opened for the first time
   useEffect(() => {
@@ -47,7 +59,7 @@ export const AiTutor = () => {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || isStreaming) return;
 
     const userMessage = input.trim();
     setInput('');
@@ -77,40 +89,50 @@ User's query: ${userMessage}`;
 
       // Add a placeholder message for the AI response
       setMessages(prev => [...prev, { role: 'model', content: '' }]);
-      setIsLoading(false); // Stop loading animation since we're streaming
+      setIsLoading(false);
+      setIsStreaming(true);
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let aiResponse = "";
+      let buffer = "";
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\\n');
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep incomplete fragment in buffer
         
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.substring(6);
-            if (dataStr === '[DONE]') {
-              break;
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data: ')) continue;
+          
+          const dataStr = trimmed.substring(6);
+          if (dataStr === '[DONE]') {
+            break;
+          }
+          
+          try {
+            const parsed = JSON.parse(dataStr);
+            if (parsed.text) {
+              aiResponse += parsed.text;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1] = {
+                  role: 'model',
+                  content: aiResponse
+                };
+                return newMessages;
+              });
+            } else if (parsed.error) {
+              console.error('AI Tutor Stream Error:', parsed.error);
+              throw new Error(parsed.error);
             }
-            try {
-              const parsed = JSON.parse(dataStr);
-              if (parsed.text) {
-                aiResponse += parsed.text;
-                // Update the last message
-                setMessages(prev => {
-                  const newMessages = [...prev];
-                  newMessages[newMessages.length - 1].content = aiResponse;
-                  return newMessages;
-                });
-              } else if (parsed.error) {
-                 console.error('AI Tutor Stream Error:', parsed.error);
-              }
-            } catch (e) {
-              // Ignore parse errors from partial chunks
+          } catch (e: any) {
+            if (e.message && !e.message.includes('Unexpected end of JSON')) {
+              console.warn('AI Tutor stream chunk warning:', e);
             }
           }
         }
@@ -118,22 +140,35 @@ User's query: ${userMessage}`;
     } catch (error) {
       console.error('AI Tutor Error:', error);
       setMessages(prev => {
-        // If we already started streaming and failed, just append error, else replace last message
-        const isStreaming = prev[prev.length - 1].role === 'model' && prev[prev.length - 1].content !== '';
-        if (!isStreaming) {
-           const newMsg = [...prev];
-           if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'model') {
-             newMsg[newMsg.length - 1].content = "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!";
-             return newMsg;
-           }
+        const lastMsg = prev[prev.length - 1];
+        const hasStartedStreaming = lastMsg && lastMsg.role === 'model' && lastMsg.content.length > 0;
+        
+        if (hasStartedStreaming) {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: 'model',
+            content: lastMsg.content + '\n\n*(Stream disconnected)*'
+          };
+          return updated;
         }
+
+        const newMsg = [...prev];
+        if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'model') {
+          newMsg[newMsg.length - 1] = {
+            role: 'model',
+            content: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!"
+          };
+          return newMsg;
+        }
+
         return [...prev, { 
           role: 'model', 
-          content: "\\n\\n*[Connection Error: Failed to complete response]*" 
+          content: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!" 
         }];
       });
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -153,7 +188,8 @@ User's query: ${userMessage}`;
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[100] w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-2xl flex items-center justify-center font-['Hanken_Grotesk'] border-2 border-emerald-400/30"
+        className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[100] w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-2xl flex items-center justify-center font-['Hanken_Grotesk'] border-2 border-emerald-400/30 cursor-pointer"
+        aria-label="Open AI Tutor"
       >
         <Sparkles size={24} />
       </motion.button>
@@ -166,7 +202,7 @@ User's query: ${userMessage}`;
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-0 md:bottom-8 right-0 md:right-8 z-[110] w-full md:w-[400px] h-[85vh] md:h-[600px] bg-white dark:bg-slate-900 md:rounded-3xl shadow-2xl flex flex-col overflow-hidden font-['Hanken_Grotesk'] border border-slate-200 dark:border-slate-800"
+            className="fixed bottom-0 md:bottom-8 right-0 md:right-8 z-[110] w-full md:w-[420px] h-[85vh] md:h-[600px] bg-white dark:bg-slate-900 md:rounded-3xl shadow-2xl flex flex-col overflow-hidden font-['Hanken_Grotesk'] border border-slate-200 dark:border-slate-800"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-4 text-white flex items-center justify-between shadow-md z-10 relative">
@@ -176,15 +212,15 @@ User's query: ${userMessage}`;
                 </div>
                 <div>
                   <h3 className="font-bold text-lg leading-tight">EcoTutor AI</h3>
-                  <p className="text-emerald-100 text-xs flex items-center gap-1">
+                  <p className="text-emerald-100 text-xs flex items-center gap-1.5">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    Online & Ready
+                    {isStreaming ? 'Streaming answer...' : 'Online & Ready'}
                   </p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors active:scale-95"
+                className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
               >
                 <ChevronDown size={22} />
               </button>
@@ -192,46 +228,53 @@ User's query: ${userMessage}`;
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950">
-              {messages.map((msg, idx) => (
-                <div 
-                  key={idx} 
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`flex gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    
-                    {/* Avatar */}
-                    <div className="flex-shrink-0 mt-1">
-                      {msg.role === 'user' ? (
-                        <div className="w-7 h-7 bg-sky-600 text-white rounded-full flex items-center justify-center shadow-sm">
-                          <User size={14} />
-                        </div>
-                      ) : (
-                        <div className="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-sm">
-                          <Bot size={14} />
-                        </div>
-                      )}
-                    </div>
+              {messages.map((msg, idx) => {
+                const isCurrentStreamingModel = isStreaming && idx === messages.length - 1 && msg.role === 'model';
 
-                    {/* Bubble */}
-                    <div 
-                      className={`p-3.5 rounded-2xl ${
-                        msg.role === 'user' 
-                          ? 'bg-sky-600 text-white rounded-tr-none' 
-                          : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm rounded-tl-none'
-                      }`}
-                    >
-                      <div className="text-sm prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-100 max-w-none">
-                        <ReactMarkdown 
-                          remarkPlugins={[remarkMath]} 
-                          rehypePlugins={[rehypeKatex]}
-                        >
-                          {msg.content}
-                        </ReactMarkdown>
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex gap-2 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      
+                      {/* Avatar */}
+                      <div className="flex-shrink-0 mt-1">
+                        {msg.role === 'user' ? (
+                          <div className="w-7 h-7 bg-sky-600 text-white rounded-full flex items-center justify-center shadow-sm">
+                            <User size={14} />
+                          </div>
+                        ) : (
+                          <div className="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-sm">
+                            <Bot size={14} />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Bubble */}
+                      <div 
+                        className={`p-3.5 rounded-2xl ${
+                          msg.role === 'user' 
+                            ? 'bg-sky-600 text-white rounded-tr-none' 
+                            : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm rounded-tl-none'
+                        }`}
+                      >
+                        <div className="text-sm prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-100 max-w-none">
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm, remarkMath]} 
+                            rehypePlugins={[rehypeKatex]}
+                          >
+                            {cleanMarkdownContent(msg.content)}
+                          </ReactMarkdown>
+                          {isCurrentStreamingModel && (
+                            <span className="inline-block w-2 h-4 ml-1 bg-emerald-500 animate-pulse align-middle" />
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               
               {isLoading && (
                 <div className="flex justify-start">
@@ -258,14 +301,15 @@ User's query: ${userMessage}`;
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask a question..."
-                  className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none outline-none text-slate-800 dark:text-white px-2 py-2.5 text-sm"
+                  placeholder={isStreaming ? "EcoTutor is responding..." : "Ask a question..."}
+                  disabled={isLoading || isStreaming}
+                  className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none outline-none text-slate-800 dark:text-white px-2 py-2.5 text-sm disabled:opacity-50"
                   rows={1}
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="w-11 h-11 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 disabled:hover:bg-emerald-600 transition-colors active:scale-95"
+                  disabled={!input.trim() || isLoading || isStreaming}
+                  className="w-11 h-11 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 disabled:hover:bg-emerald-600 transition-colors active:scale-95 cursor-pointer"
                 >
                   <Send size={18} className="ml-1" />
                 </button>

@@ -275,11 +275,15 @@ Return only raw valid JSON array.`;
 
     if (stream) {
       res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+      if (typeof res.flushHeaders === 'function') {
+        res.flushHeaders();
+      }
 
       try {
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
         let streamResult = null;
         let lastError = null;
 
@@ -290,26 +294,35 @@ Return only raw valid JSON array.`;
               contents: userPrompt
             });
             break; // Success
-          } catch (err) {
+          } catch (err: any) {
             lastError = err;
-            console.warn(`Streaming failed for ${modelName}, trying next...`);
+            console.warn(`Streaming failed for ${modelName}, trying next model...`, err?.message || err);
           }
         }
 
         if (!streamResult) {
-          throw lastError;
+          throw lastError || new Error("All Gemini streaming models failed");
         }
 
         for await (const chunk of streamResult) {
           if (chunk.text) {
             res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+            if (typeof (res as any).flush === 'function') {
+              (res as any).flush();
+            }
           }
         }
         res.write('data: [DONE]\n\n');
+        if (typeof (res as any).flush === 'function') {
+          (res as any).flush();
+        }
         res.end();
       } catch (error: any) {
         console.error("Gemini Streaming Error:", error);
         res.write(`data: ${JSON.stringify({ error: error?.message || "Streaming failed" })}\n\n`);
+        if (typeof (res as any).flush === 'function') {
+          (res as any).flush();
+        }
         res.end();
       }
       return;
