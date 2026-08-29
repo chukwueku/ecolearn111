@@ -1452,7 +1452,7 @@ export const AdminPage: React.FC = () => {
                                   ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
                                   : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
                               )}>
-                                <span className="mr-1.5 opacity-60">{String.fromCharCode(65 + oIdx)}.</span> {opt}
+                                <span className="mr-1.5 opacity-60">{String.fromCharCode(65 + oIdx)}.</span> <MathText text={opt} />
                               </div>
                             ))}
                           </div>
@@ -1566,9 +1566,7 @@ export const AdminPage: React.FC = () => {
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                               {q.options.map((opt: string, oIdx: number) => (
-                                <div key={oIdx} className={`p-2 rounded-lg text-xs font-medium border ${oIdx === q.correctAnswer ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'}`}>
-                                  {opt}
-                                </div>
+                                <div key={oIdx} className={`p-2 rounded-lg text-xs font-medium border ${oIdx === q.correctAnswer ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'}`}> <MathText text={opt} /> </div>
                               ))}
                             </div>
 

@@ -4,6 +4,7 @@ import { getQuestions, updatePoints, saveDuelResult, db, enterMatchmaking, leave
 import { onSnapshot, collection, query, doc, getDoc, orderBy, where, updateDoc } from 'firebase/firestore';
 import { useRoadmap } from '../hooks/useRoadmap';
 import { motion, AnimatePresence } from 'motion/react';
+import { MathText } from './MathComponents';
 import { Users, Zap, Trophy, Loader2, User, Swords, CheckCircle2, XCircle, Timer, MessageSquare, Send, ChevronRight, Search, Flag, Clock } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -1231,7 +1232,7 @@ export const LiveChallenge: React.FC = () => {
                             {waitingForOpponent ? `Opponent's Turn • Q${displayQuestionIndex + 1}` : `Your Turn • Q${displayQuestionIndex + 1}`}
                           </span>
                           <h3 className="text-xl md:text-3xl font-bold leading-tight">
-                            {q.question}
+                            <MathText text={q.question} />
                           </h3>
                         </div>
                         <div className="relative grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mt-auto">
@@ -1448,7 +1449,7 @@ export const LiveChallenge: React.FC = () => {
                        >
                          <div className="flex items-center justify-between text-[10px]">
                             <span className="font-mono font-bold text-on-surface-variant/70">Move {i + 1}</span>
-                            <span className="text-[9px] text-on-surface-variant/50 truncate max-w-[180px] italic">{q.question}</span>
+                            <span className="text-[9px] text-on-surface-variant/50 truncate max-w-[180px] italic"><MathText text={q.question} /></span>
                          </div>
 
                          <div className="grid grid-cols-2 gap-2">
@@ -1543,7 +1544,7 @@ export const LiveChallenge: React.FC = () => {
                                <span className="text-[9px] font-black uppercase tracking-widest text-sky-400">Question {selectedAnalysisIndex + 1} Analysis</span>
                                <span className="text-[9px] bg-surface-container text-on-surface-variant px-2 py-0.5 rounded font-mono uppercase">{currentQ.level || 'Economics'}</span>
                             </div>
-                            <h4 className="text-xs font-bold leading-relaxed text-on-surface">{currentQ.question}</h4>
+                            <h4 className="text-xs font-bold leading-relaxed text-on-surface"><MathText text={currentQ.question} /></h4>
                           </div>
 
                           {/* Options Breakdown */}
@@ -1572,7 +1573,7 @@ export const LiveChallenge: React.FC = () => {
                                        )}>
                                          {String.fromCharCode(65 + optIdx)}
                                        </span>
-                                       <span className="truncate">{opt}</span>
+                                       <span className="truncate"><MathText text={opt} /></span>
                                     </div>
 
                                     <div className="flex items-center gap-1 shrink-0">

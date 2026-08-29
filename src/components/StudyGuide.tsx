@@ -84,6 +84,21 @@ const extractLatex = (node: any): string | null => {
   return null;
 };
 
+
+// Preprocess LaTeX delimiters so remark-math can parse them
+const preprocessLaTeX = (text: string) => {
+  if (!text) return '';
+  return text
+    .replace(/\\\[/g, '$$$$')
+    .replace(/\\\]/g, '$$$$')
+    .replace(/\\\(/g, '$$')
+    .replace(/\\\)/g, '$$')
+    .replace(/\[/g, '$$$$')
+    .replace(/\]/g, '$$$$')
+    .replace(/\(/g, '$$')
+    .replace(/\)/g, '$$');
+};
+
 const rehypeMathMarker = () => {
   return (tree: any) => {
     visit(tree, 'element', (node: any, index: number, parent: any) => {

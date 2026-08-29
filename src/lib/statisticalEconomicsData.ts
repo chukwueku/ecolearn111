@@ -278,7 +278,7 @@ Relates dependent variable $Y$ to single explanatory variable $X$:
   2. **Non-Stochastic $X$**: Explanatory variables are fixed in repeated sampling; $E[u_i \\mid X_i] = 0$.
   3. **Zero Mean of Errors**: $E[u_i] = 0$.
   4. **Homoscedasticity**: Constant error variance: $\\text{Var}(u_i) = \\sigma^2$.
-  5. **No Autocorrelation**: No correlation between error terms: $\\text{Cov}(u_i, u_j) = 0$ for $i \\neq j$.
+  5. **No Autocorrelation**: No correlation between error terms: $\\text{Cov}(u_i, u_j) = 0$ for $i \\\neq j$.
   6. **Normality**: Errors are normally distributed: $u_i \\sim N(0, \\sigma^2)$ (for hypothesis testing).
 
 ### 6.2 The Ordinary Least-Squares (OLS) Method
@@ -293,7 +293,7 @@ Derives estimates by minimizing the sum of squared residuals: $\\sum \\hat{u}_i^
 - **Standard Error of $\\hat{\\beta}_1$**:
   $$\\text{se}(\\hat{\\beta}_1) = \\frac{s_{e}}{\\sqrt{\\sum (X_i - \\bar{X})^2}} \\quad \\text{where} \\quad s_{e}^2 = \\frac{\\sum \\hat{u}_i^2}{n - 2}$$
 - **Significance Testing**:
-  $$H_0: \\beta_1 = 0 \\quad \\text{vs.} \\quad H_1: \\beta_1 \\neq 0$$
+  $$H_0: \\beta_1 = 0 \\quad \\text{vs.} \\quad H_1: \\beta_1 \\\neq 0$$
   $$t_{\\text{calc}} = \\frac{\\hat{\\beta}_1}{\\text{se}(\\hat{\\beta}_1)} \\quad \\text{with } \\text{df} = n - 2$$
 
 ### 6.4 Goodness of Fit and Correlation
@@ -323,7 +323,7 @@ $$Y_i = \\beta_0 + \\beta_1 X_{1i} + \\beta_2 X_{2i} + u_i$$
 
 ### 7.2 Tests of Significance of Parameter Estimates
 Individual parameter estimates are tested using the t-statistic:
-$$H_0: \\beta_j = 0 \\quad \\text{vs.} \\quad H_1: \\beta_j \\neq 0$$
+$$H_0: \\beta_j = 0 \\quad \\text{vs.} \\quad H_1: \\beta_j \\\neq 0$$
 $$t_{\\text{calc}} = \\frac{\\hat{\\beta}_j}{\\text{se}(\\hat{\\beta}_j)} \\quad \\text{with } \\text{df} = n - k$$
 Where $k$ is the total number of estimated parameters (including the intercept).
 
