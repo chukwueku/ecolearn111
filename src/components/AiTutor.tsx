@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Bot, User, Loader2, Sparkles, ChevronDown, Send } from 'lucide-react';
+import { Bot, User, Loader2, Sparkles, ChevronDown, Send, Maximize2, Minimize2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
@@ -209,6 +209,7 @@ Feel free to ask for specific definitions, formulas, or step-by-step mathematica
 
 export const AiTutor = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -385,7 +386,11 @@ User's query: ${userMessage}`;
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-0 md:bottom-8 right-0 md:right-8 z-[110] w-full md:w-[420px] h-[85vh] md:h-[600px] bg-white dark:bg-slate-900 md:rounded-3xl shadow-2xl flex flex-col overflow-hidden font-['Hanken_Grotesk'] border border-slate-200 dark:border-slate-800"
+            className={`fixed bottom-0 md:bottom-6 right-0 md:right-6 z-[110] transition-all duration-300 ease-out bg-white dark:bg-slate-900 md:rounded-3xl shadow-2xl flex flex-col overflow-hidden font-['Hanken_Grotesk'] border border-slate-200 dark:border-slate-800 ${
+              isExpanded 
+                ? 'w-full md:w-[860px] lg:w-[940px] h-[92vh] md:h-[780px] max-w-[96vw]' 
+                : 'w-full sm:w-[480px] md:w-[520px] h-[85vh] md:h-[650px] max-w-[96vw]'
+            }`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-4 text-white flex items-center justify-between shadow-md z-10 relative">
@@ -401,16 +406,26 @@ User's query: ${userMessage}`;
                   </p>
                 </div>
               </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
-              >
-                <ChevronDown size={22} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  title={isExpanded ? "Collapse window" : "Expand window"}
+                  className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors active:scale-95 cursor-pointer text-emerald-50 hover:text-white"
+                >
+                  {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                </button>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  title="Minimize chat"
+                  className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors active:scale-95 cursor-pointer text-emerald-50 hover:text-white"
+                >
+                  <ChevronDown size={22} />
+                </button>
+              </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-slate-50 dark:bg-slate-950">
               {messages.map((msg, idx) => {
                 const isCurrentStreamingModel = isStreaming && idx === messages.length - 1 && msg.role === 'model';
 
@@ -419,7 +434,7 @@ User's query: ${userMessage}`;
                     key={idx} 
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex gap-2 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`flex gap-2.5 max-w-[94%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                       
                       {/* Avatar */}
                       <div className="flex-shrink-0 mt-1">
@@ -436,13 +451,13 @@ User's query: ${userMessage}`;
 
                       {/* Bubble */}
                       <div 
-                        className={`p-3.5 rounded-2xl ${
+                        className={`p-3.5 sm:p-4 rounded-2xl min-w-0 break-words ${
                           msg.role === 'user' 
-                            ? 'bg-sky-600 text-white rounded-tr-none' 
+                            ? 'bg-sky-600 text-white rounded-tr-none shadow-sm' 
                             : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm rounded-tl-none'
                         }`}
                       >
-                        <div className="text-sm prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-100 max-w-none">
+                        <div className="text-sm prose prose-sm dark:prose-invert prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-100 max-w-none break-words [&_.katex-display]:overflow-x-auto [&_.katex-display]:py-1.5 [&_.katex-display]:my-2 [&_.katex-display]:max-w-full [&_table]:overflow-x-auto [&_table]:block [&_table]:max-w-full">
                           <ReactMarkdown 
                             remarkPlugins={[remarkGfm, remarkMath]} 
                             rehypePlugins={[rehypeKatex]}
@@ -461,7 +476,7 @@ User's query: ${userMessage}`;
               
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="flex gap-2 max-w-[85%] flex-row">
+                  <div className="flex gap-2.5 max-w-[85%] flex-row">
                     <div className="flex-shrink-0 mt-1">
                       <div className="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-sm">
                         <Bot size={14} />
