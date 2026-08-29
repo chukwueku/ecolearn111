@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, GraduationCap, ArrowRight, Loader2, ChevronLeft, CheckCircle2, Zap, Star } from 'lucide-react';
+import { BookOpen, GraduationCap, ArrowRight, Loader2, ChevronLeft, CheckCircle2, Zap, Star, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../useAuth';
 import { updateUserLevel } from '../firebase';
@@ -54,6 +54,8 @@ export const LevelSelection = () => {
   const [selectedMainPath, setSelectedMainPath] = useState<MainPath>(null);
   const navigate = useNavigate();
 
+  const isAdmin = profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com';
+
   React.useEffect(() => {
     if (profile && profile.level !== 'pending') {
       if (profile.level === 'undergraduate') {
@@ -66,6 +68,10 @@ export const LevelSelection = () => {
 
   const handleSelectLevel = async (level: 'secondary' | 'secondary-ss2' | 'secondary-ss3' | 'undergraduate') => {
     if (!user) return;
+    if (level === 'undergraduate' && !isAdmin) {
+      alert('Access to the Undergraduate University Curriculum is restricted to Administrators.');
+      return;
+    }
     setLoading(level);
     try {
       await updateUserLevel(user.uid, level);
@@ -186,8 +192,19 @@ export const LevelSelection = () => {
 
               {/* Undergraduate */}
               <div
-                onClick={() => !loading && handleSelectLevel('undergraduate')}
-                className="relative p-7 rounded-3xl border border-white/10 hover:border-blue-500/40 bg-white/3 hover:bg-white/5 cursor-pointer group transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                onClick={() => {
+                  if (loading) return;
+                  if (!isAdmin) {
+                    alert('Access to the Advanced Undergraduate Curriculum is restricted to Administrators.');
+                    return;
+                  }
+                  handleSelectLevel('undergraduate');
+                }}
+                className={`relative p-7 rounded-3xl border transition-all duration-300 overflow-hidden ${
+                  !isAdmin 
+                    ? 'border-white/5 bg-white/[0.02] opacity-75 cursor-not-allowed' 
+                    : 'border-white/10 hover:border-blue-500/40 bg-white/3 hover:bg-white/5 cursor-pointer group hover:-translate-y-1'
+                }`}
               >
                 <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-bl-[6rem] opacity-[0.07] group-hover:opacity-[0.12] transition-opacity" />
                 <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-500 rounded-full blur-[50px] opacity-10 group-hover:opacity-20 transition-opacity" />
@@ -195,16 +212,26 @@ export const LevelSelection = () => {
                 <div className="relative z-10 space-y-5">
                   <div className="flex items-start justify-between">
                     <div className="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center group-hover:bg-blue-500/25 transition-colors">
-                      <GraduationCap className="w-7 h-7 text-blue-400" />
+                      {isAdmin ? <GraduationCap className="w-7 h-7 text-blue-400" /> : <Lock className="w-7 h-7 text-amber-400" />}
                     </div>
-                    <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-black rounded-full uppercase tracking-widest">
-                      University Level
+                    <div className={`px-3 py-1 border text-[10px] font-black rounded-full uppercase tracking-widest flex items-center gap-1.5 ${
+                      isAdmin 
+                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' 
+                        : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                    }`}>
+                      {!isAdmin && <Lock className="w-3 h-3 text-amber-400" />}
+                      {isAdmin ? 'University Level' : 'Admin Restricted'}
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-black text-white mb-2 group-hover:text-blue-100 transition-colors">
+                    <h3 className="text-2xl font-black text-white mb-2 group-hover:text-blue-100 transition-colors flex items-center gap-2">
                       Undergraduate
+                      {!isAdmin && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                          Admin Only
+                        </span>
+                      )}
                     </h3>
                     <p className="text-slate-400 text-sm leading-relaxed">
                       Advanced academic tier covering microeconomics, macroeconomics, econometrics, monetary & financial economics for university scholars.
@@ -221,12 +248,14 @@ export const LevelSelection = () => {
 
                   <div className="flex items-center justify-between pt-2 border-t border-white/5">
                     <span className="text-[11px] font-black tracking-widest text-slate-500 group-hover:text-blue-400 transition-colors uppercase">
-                      Select This Path
+                      {isAdmin ? 'Select This Path' : 'Admin Access Only'}
                     </span>
                     <div className="w-9 h-9 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:bg-blue-500 group-hover:border-blue-500 transition-all">
                       {loading === 'undergraduate'
                         ? <Loader2 className="w-4 h-4 text-white animate-spin" />
-                        : <ArrowRight className="w-4 h-4 text-blue-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        : isAdmin
+                          ? <ArrowRight className="w-4 h-4 text-blue-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                          : <Lock className="w-4 h-4 text-amber-400" />
                       }
                     </div>
                   </div>

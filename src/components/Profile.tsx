@@ -33,15 +33,22 @@ export const Profile = () => {
     const levelLabel = level === 'secondary-ss2' ? 'SS2' : (level === 'secondary-ss3' ? 'SS3' : (level === 'undergraduate' ? 'Undergraduate' : 'SS1'));
     const completedCount = Object.values(progress).filter(Boolean).length;
     const wins = 0;
+    const isAdmin = profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com';
 
     const handleSwitchLevel = async () => {
-        if (level === 'undergraduate' && user) {
-            try {
-                await updateUserLevel(user.uid, 'secondary');
-                setProfile({ ...profile, level: 'secondary' } as UserProfile);
-                navigate('/dashboard');
-            } catch (e) {
-                console.error("Error switching level:", e);
+        if (level === 'undergraduate') {
+            if (!isAdmin) {
+                alert("Only an Administrator has privilege to switch curriculum levels.");
+                return;
+            }
+            if (user) {
+                try {
+                    await updateUserLevel(user.uid, 'secondary');
+                    setProfile({ ...profile, level: 'secondary' } as UserProfile);
+                    navigate('/dashboard');
+                } catch (e) {
+                    console.error("Error switching level:", e);
+                }
             }
         } else {
             navigate('/select-level');
@@ -49,6 +56,10 @@ export const Profile = () => {
     };
 
     const handleSwitchToUndergraduate = async () => {
+        if (!isAdmin) {
+            alert("Only an Administrator has privilege to switch to the advanced university curriculum.");
+            return;
+        }
         if (user) {
             try {
                 await updateUserLevel(user.uid, 'undergraduate');
@@ -338,28 +349,53 @@ export const Profile = () => {
                             <ChevronRight className="w-5 h-5 text-outline" />
                         </div>
 
-                        {/* Switch Learning Path */}
-                        <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchLevel}>
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                                    <GraduationCap className="w-5 h-5" />
+                        {/* Switch Learning Path (If undergraduate, only Admin can switch to Secondary) */}
+                        {level === 'undergraduate' ? (
+                            isAdmin && (
+                                <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer bg-amber-50/20 dark:bg-amber-950/10 border-l-4 border-amber-500" onClick={handleSwitchLevel}>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                            <GraduationCap className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-label-md font-bold text-primary">Switch to Secondary</p>
+                                                <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400">Admin Only</span>
+                                            </div>
+                                            <p className="font-label-sm text-on-surface-variant">Return to secondary school curriculum</p>
+                                        </div>
+                                    </div>
+                                    <ChevronRight className="w-5 h-5 text-outline" />
                                 </div>
-                                <div>
-                                    <p className="font-label-md font-bold text-primary">{level === 'undergraduate' ? 'Switch to Secondary' : 'Switch Level'}</p>
-                                    <p className="font-label-sm text-on-surface-variant">{level === 'undergraduate' ? 'Return to secondary school curriculum' : 'Switch between SS1 to SS3'}</p>
-                                </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-outline" />
-                        </div>
-
-                        {level !== 'undergraduate' && (
-                            <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchToUndergraduate}>
+                            )
+                        ) : (
+                            /* In Secondary: Regular users can switch between SS1, SS2, and SS3 */
+                            <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer" onClick={handleSwitchLevel}>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-indigo-500">
+                                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+                                        <GraduationCap className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <p className="font-label-md font-bold text-primary">Switch Level</p>
+                                        <p className="font-label-sm text-on-surface-variant">Switch between SS1, SS2, and SS3</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-outline" />
+                            </div>
+                        )}
+
+                        {/* Switch to Undergraduate: ONLY ADMIN */}
+                        {level !== 'undergraduate' && isAdmin && (
+                            <div className="flex items-center justify-between p-4 hover:bg-surface-container-low transition-colors cursor-pointer bg-indigo-50/20 dark:bg-indigo-950/10 border-l-4 border-indigo-500" onClick={handleSwitchToUndergraduate}>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-500">
                                         <Building2 className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="font-label-md font-bold text-indigo-500">Switch to Undergraduate</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-label-md font-bold text-indigo-500">Switch to Undergraduate</p>
+                                            <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-500">Admin Only</span>
+                                        </div>
                                         <p className="font-label-sm text-on-surface-variant">Access advanced university-level curriculum</p>
                                     </div>
                                 </div>
@@ -382,7 +418,7 @@ export const Profile = () => {
                         </div>
 
                         {/* Admin Link */}
-                        {(profile?.role === 'admin' || user?.email === 'chukwuekudavid@gmail.com') && (
+                        {isAdmin && (
                             <div className="flex items-center justify-between p-4 bg-sky-50 dark:bg-sky-950/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 transition-colors cursor-pointer" onClick={() => navigate('/admin')}>
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-900 flex items-center justify-center text-sky-600 dark:text-sky-400">
