@@ -517,26 +517,32 @@ export const UNDERGRADUATE_REAL_ROADMAP: RoadmapTopic[] = [
   {
     id: 'ug-micro',
     title: 'Advanced Microeconomics',
-    description: 'Advanced consumer theory, indifference curves, producer theory, perfect and imperfect market structures, and general equilibrium.',
+    description: 'Advanced consumer theory, duality, producer optimization, general equilibrium, market structures, game theory, and factor markets.',
     category: 'Course 1',
     subtopics: [
-      'Consumer Utility & Indifference Curves',
-      'Theory of Production & Cost Functions',
-      'Perfect Competition vs. Pure Monopoly',
-      'Oligopoly Models & Game Theory'
+      'Advanced Consumer Theory & Duality (UMP vs EMP, Slutsky Decomposition, Roy\'s Identity)',
+      'Advanced Theory of the Firm (Cobb-Douglas, CES, Cost Functions, Shephard\'s Lemma, Hotelling)',
+      'General Equilibrium & Welfare Economics (Edgeworth Box, Walras\' Law, 1st & 2nd Welfare Theorems)',
+      'Monopoly & Price Discrimination (Lerner Index, 1st/2nd/3rd Degree, Two-Part Tariffs)',
+      'Oligopoly & Non-Cooperative Game Theory (Cournot, Bertrand, Stackelberg, Dynamic SPNE)',
+      'Risk, Uncertainty & Expected Utility (von Neumann-Morgenstern, Arrow-Pratt Measures)',
+      'Information Economics (Adverse Selection, Spence Signaling, Moral Hazard)',
+      'Factor Markets & Monopsony Wage Determination'
     ]
   },
   {
     id: 'ug-macro',
     title: 'Advanced Macroeconomics',
-    description: 'Aggregate output determination, IS-LM model framework, inflation dynamics, unemployment, and long-run economic growth theories.',
+    description: 'National accounting, IS-LM goods/money equilibrium, Mundell-Fleming open economy, AD-AS, inflation dynamics, and modern growth theory.',
     category: 'Course 2',
     subtopics: [
-      'National Income Determination',
-      'The IS-LM Equilibrium Framework',
-      'Aggregate Demand & Aggregate Supply (AD-AS)',
-      'The Phillips Curve and Inflation Expectations',
-      'Solow-Swan and Endogenous Growth Models'
+      'National Income Accounting & Savings-Investment Identity (Twin Deficits)',
+      'The IS-LM Closed Economy Equilibrium Framework (Multipliers & Liquidity Trap)',
+      'Open Economy Mundell-Fleming Model (Fixed vs Flexible Exchange Rates, Policy Trilemma)',
+      'Aggregate Demand & Short-Run Aggregate Supply (Sticky Wages, Menu Costs)',
+      'Inflation Dynamics & Expectations-Augmented Phillips Curve (NAIRU & Lucas Critique)',
+      'Neoclassical & Endogenous Growth Theory (Solow-Swan Steady-State, Golden Rule, Romer R&D)',
+      'Macroeconomic Policy Rules & Sovereign Debt Sustainability (Taylor Rule, r vs g)'
     ]
   },
   {
@@ -564,57 +570,62 @@ export const UNDERGRADUATE_REAL_ROADMAP: RoadmapTopic[] = [
     category: 'Course 4',
     subtopics: [
       'The Methodology and Goals of Econometrics',
-      'Two-Variable Linear Regression Model (OLS)',
-      'Multiple Regression Analysis & Matrix Form',
-      'Multicollinearity, Heteroscedasticity, & Autocorrelation'
+      'Two-Variable Linear Regression Model (OLS Assumptions & Gauss-Markov Theorem)',
+      'Multiple Regression Analysis & Matrix Form (Hypothesis Testing & F-Tests)',
+      'Diagnostic Testing (Multicollinearity, Heteroscedasticity, & Autocorrelation)'
     ]
   },
   {
     id: 'ug-monetary',
     title: 'Monetary Economics',
-    description: 'Money supply creation, central banking instruments, money demand theories, interest rates, and transmission channels.',
+    description: 'Money supply creation, high-powered money multipliers, money demand theories, interest rates, transmission channels, and CBN policy.',
     category: 'Course 5',
     subtopics: [
-      'Functions, Evolution, and Definitions of Money',
-      'The Credit Creation Money Multiplier Process',
-      'Classical, Keynesian, and Monetarist Demand for Money',
-      'Central Bank Policy Instruments & Interest Rates'
+      'Functions, Evolution, and Monetary Aggregates (M0, M1, M2, M3)',
+      'The Money Supply Process & High-Powered Money Multiplier',
+      'Theories of Money Demand (Fisher, Cambridge, Keynesian Liquidity Preference, Baumol-Tobin, Friedman)',
+      'Term Structure of Interest Rates & Yield Curve Profiles',
+      'Monetary Policy Transmission Mechanisms (Interest, FX, Asset Price, Credit Channels)',
+      'Central Banking Operations & Policy in Nigeria (CBN, MPR, CRR, OMO)'
     ]
   },
   {
     id: 'ug-development',
     title: 'Advanced Development Economics',
-    description: 'Multidimensional development concepts, income disparities, economic traps, capability theories, and structural transformations.',
+    description: 'Multidimensional development, poverty/inequality metrics, dual-sector transition, capability theories, institutional economics, and Dutch disease.',
     category: 'Course 6',
     subtopics: [
-      'Economic Growth vs. Multidimensional Development',
-      'Income Disparities and Danny Quah Twin Peaks',
-      'Amartya Sen Capability Approach & Functionings',
-      'Occupational Structures, Urbanization, and Debt Traps'
+      'Beyond GDP: Human Development Index (HDI) & Multidimensional Poverty (MPI)',
+      'Poverty & Inequality Metrics (Lorenz Curve, Gini Coefficient, FGT P0/P1/P2)',
+      'Dual-Sector & Migration Models (Arthur Lewis Unlimited Labor, Harris-Todaro)',
+      'Coordination Failures & Poverty Traps (Rosenstein-Rodan Big Push, Kremer O-Ring)',
+      'Institutions & Human Capabilities (Amartya Sen Freedom, Acemoglu Settler Mortality)',
+      'The Resource Curse & Dutch Disease in African Economies'
     ]
   },
   {
     id: 'ug-financial',
     title: 'Financial Economics',
-    description: 'Financial markets, asset valuation, risk and returns, the Capital Asset Pricing Model (CAPM), and portfolio optimization.',
+    description: 'Financial mathematics, bond valuation, Markowitz portfolio optimization, CAPM, market efficiency (EMH), and derivative options pricing.',
     category: 'Course 7',
     subtopics: [
-      'Financial System Functions & Market Types',
-      'Present Value, Bond Valuation, and Yields',
-      'Portfolio Theory: Variance & Diversification of Risk',
-      'Capital Asset Pricing Model (CAPM) & Beta Calculation'
+      'Time Value of Money, Bond Valuation, Duration, & Convexity',
+      'Modern Portfolio Theory (Markowitz Optimization, Efficient Frontier, Sharpe Ratio)',
+      'Capital Asset Pricing Model (Systematic Risk, Beta Derivation, SML, Jensen\'s Alpha)',
+      'Market Efficiency (EMH Weak/Semi-Strong/Strong) & Fama-French 3-Factor Model',
+      'Derivatives & Option Pricing (Put-Call Parity, Black-Scholes-Merton & Greeks)'
     ]
   },
   {
     id: 'ug-international',
     title: 'International Economics',
-    description: 'Pure theories of trade, protectionist tariffs, foreign exchange markets, and balance of payments disequilibrium adjustments.',
+    description: 'Pure trade theories, commercial protectionist policies, foreign exchange determination, and balance of payments disequilibrium adjustments.',
     category: 'Course 8',
     subtopics: [
       'Classical & Heckscher-Ohlin Trade Theories',
-      'Commercial Policy: Tariffs, Quotas, and Welfare Effects',
-      'Foreign Exchange Rate Determination Models',
-      'Balance of Payments (BOP) Accounts & Devaluation'
+      'Commercial Policy: Tariffs, Quotas, and Effective Protection',
+      'Foreign Exchange Rate Determination Models (PPP & UIP)',
+      'Balance of Payments (BOP Accounting, Marshall-Lerner Condition, & Devaluation)'
     ]
   }
 ];
