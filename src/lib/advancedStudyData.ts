@@ -1,4 +1,9 @@
 import { STATISTICAL_ECONOMICS_GUIDE } from './statisticalEconomicsData';
+import { MICRO_ECONOMICS_ADVANCED_GUIDE } from './microEconomicsData';
+import { MACRO_ECONOMICS_ADVANCED_GUIDE } from './macroEconomicsData';
+import { MONETARY_ECONOMICS_GUIDE } from './monetaryEconomicsData';
+import { DEVELOPMENT_ECONOMICS_GUIDE } from './developmentEconomicsData';
+import { FINANCIAL_ECONOMICS_GUIDE } from './financialEconomicsData';
 
 export const ADVANCED_STUDY_GUIDE: Record<string, string> = {"ug-econometrics":`
 # COMPREHENSIVE ECONOMETRICS STUDY GUIDE
@@ -6900,56 +6905,12 @@ $$\\dot{b}(t) = (r - g)b(t) - s(t)$$
 *End of Summary*
 
 `,
-"ug-micro": `
-# Advanced Microeconomics: Mathematical and Theoretical Foundations
-
-## 1. Consumer Theory and Lagrangian Optimization
-
-### 1.1 The Utility Maximization Problem (UMP)
-A rational consumer seeks to maximize utility $U(x_1, x_2)$ subject to a budget constraint $p_1 x_1 + p_2 x_2 = I$. 
-This is solved using the **Lagrange Multiplier Method**:
-$$\\mathcal{L}(x_1, x_2, \\lambda) = U(x_1, x_2) + \\lambda (I - p_1 x_1 - p_2 x_2)$$
-
-**First-Order Conditions (FOCs):**
-1. $\\frac{\\partial \\mathcal{L}}{\\partial x_1} = U_1 - \\lambda p_1 = 0 \\implies U_1 = \\lambda p_1$
-2. $\\frac{\\partial \\mathcal{L}}{\\partial x_2} = U_2 - \\lambda p_2 = 0 \\implies U_2 = \\lambda p_2$
-3. $\\frac{\\partial \\mathcal{L}}{\\partial \\lambda} = I - p_1 x_1 - p_2 x_2 = 0$
-
-Taking the ratio of (1) and (2) yields the optimal condition:
-$$\\frac{U_1}{U_2} = \\frac{p_1}{p_2} \\implies MRS_{1,2} = \\frac{p_1}{p_2}$$
-The Marginal Rate of Substitution (MRS) must equal the price ratio. Here, $\\lambda$ represents the marginal utility of income.
-
-### 1.2 The Dual Problem: Expenditure Minimization
-Alternatively, consumers minimize expenditure $E = p_1 x_1 + p_2 x_2$ to achieve a target utility level $\\bar{U}$.
-$$\\mathcal{L} = p_1 x_1 + p_2 x_2 + \\mu (\\bar{U} - U(x_1, x_2))$$
-The solution yields **Hicksian (compensated) demand functions** $h_i(p, \\bar{U})$, which isolate the substitution effect and are foundational for welfare economics analysis. *Citation: Mas-Colell, A., Whinston, M. D., & Green, J. R. (1995). Microeconomic Theory.*
-
-## 2. Producer Theory and Duality
-
-### 2.1 Profit Maximization
-A firm maximizes profit $\\pi = p f(K, L) - rK - wL$.
-FOCs state that the value of the marginal product must equal the input price:
-$$p \\cdot MP_K = r \\quad \\text{and} \\quad p \\cdot MP_L = w$$
-
-### 2.2 Cost Minimization and Shephard's Lemma
-For a given output $q$, a firm minimizes cost $C = rK + wL$.
-Applying the Lagrangian, we derive the **conditional factor demands** $K(r, w, q)$ and $L(r, w, q)$.
-**Shephard's Lemma** proves that the derivative of the cost function with respect to an input price yields the conditional factor demand:
-$$\\frac{\\partial C(r, w, q)}{\\partial w} = L(r, w, q)$$
-
-## 3. Market Structures and Game Theory
-
-### 3.1 Cournot Oligopoly
-Two firms compete on quantity. Market price $P = a - b(q_1 + q_2)$.
-Firm 1 maximizes profit: $\\pi_1 = [a - b(q_1 + q_2)]q_1 - c q_1$
-Taking the derivative with respect to $q_1$ yields the **Reaction Function**:
-$$q_1 = \\frac{a - c - b q_2}{2b}$$
-By symmetry, the Nash Equilibrium quantities are $q_1^* = q_2^* = \\frac{a - c}{3b}$.
-
-### 3.2 Policy Analysis: Antitrust and Deadweight Loss
-In a monopoly, prices are set above marginal cost ($P > MC$), creating a Deadweight Loss (DWL).
-$$DWL = \\frac{1}{2} (P_M - P_C)(Q_C - Q_M)$$
-**Policy Application:** Regulatory agencies (like the FCC or FTC) use these derivations to assess the welfare impact of proposed corporate mergers and apply price-cap regulation formulas ($RPI - X$). *Citation: Tirole, J. (1988). The Theory of Industrial Organization. MIT Press.*
-`,
-"ug-statistical": STATISTICAL_ECONOMICS_GUIDE
+  "ug-micro": MICRO_ECONOMICS_ADVANCED_GUIDE,
+  "ug-macro": MACRO_ECONOMICS_ADVANCED_GUIDE,
+  "ug-monetary": MONETARY_ECONOMICS_GUIDE,
+  "ug-development": DEVELOPMENT_ECONOMICS_GUIDE,
+  "ug-financial": FINANCIAL_ECONOMICS_GUIDE,
+  "ug-statistical": STATISTICAL_ECONOMICS_GUIDE,
+  "uni-ch1": DEVELOPMENT_ECONOMICS_GUIDE
 };
+
