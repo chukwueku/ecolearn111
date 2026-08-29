@@ -55,6 +55,8 @@ const LazyEconomicsSimulator = React.lazy(retryImport(() =>
 ));
 
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 const cleanMarkdownContent = (text: string) => {
   if (!text) return text;
   
@@ -186,7 +188,7 @@ export const StudyGuide = ({ topicId }: { topicId: string }) => {
       // Special case: uni-ch1 or ug-development (restore missing Development Economics guide)
       if (!localContent && (topicId === 'uni-ch1' || topicId === 'ug-development')) {
         try {
-          const res = await fetch('/api/restoreAdvancedStudy', { method: 'POST' });
+          const res = await fetch(`${API_BASE}/api/restoreAdvancedStudy`, { method: 'POST' });
           if (res.ok) {
             const data = await res.json();
             localContent = data.content;

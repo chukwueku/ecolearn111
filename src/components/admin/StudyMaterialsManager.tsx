@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 // Lazy load the EconomicsSimulator component
 const LazyEconomicsSimulator = React.lazy(() => 
   import('../EconomicsSimulator').then(module => ({ default: module.EconomicsSimulator }))
@@ -174,7 +176,7 @@ export const StudyMaterialsManager: React.FC = () => {
         const base64 = (event.target?.result as string).split(',')[1];
         try {
           // Send to Gemini backend endpoint to parse PDF to Markdown
-          const response = await fetch('/api/parsePdf', {
+          const response = await fetch(`${API_BASE}/api/parsePdf`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pdfBase64: base64, prompt: 'Extract the full text and educational content from this PDF and format it as a comprehensive Markdown study guide. Include headings, bullet points, and any important formulas using LaTeX. Do not generate questions, just extract and format the content into a study guide.' })
@@ -401,7 +403,7 @@ export const StudyMaterialsManager: React.FC = () => {
           onClick={async () => {
             try {
               setLoading(true);
-              const res = await fetch('/api/restoreAdvancedStudy', { method: 'POST' });
+              const res = await fetch(`${API_BASE}/api/restoreAdvancedStudy`, { method: 'POST' });
               if (res.ok) {
                 const data = await res.json();
                 setTopicContent(data.content);

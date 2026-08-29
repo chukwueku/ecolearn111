@@ -13,6 +13,8 @@ interface Message {
   content: string;
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 const cleanMarkdownContent = (text: string) => {
   if (!text) return text;
   // Protect currency signs (e.g. $100, $50) from LaTeX delimiters
@@ -21,6 +23,188 @@ const cleanMarkdownContent = (text: string) => {
   cleaned = cleaned.replace(/\\\[/g, '$$$$').replace(/\\\]/g, '$$$$');
   cleaned = cleaned.replace(/\\\(/g, '$').replace(/\\\)/g, '$');
   return cleaned;
+};
+
+const getOfflineEconomicsResponse = (query: string, displayName: string = 'Scholar', topicContext: string | null = null): string => {
+  const q = query.toLowerCase().trim();
+  
+  if (q.includes('what is economics') || q.includes('define economics') || q.includes('meaning of economics') || q.includes('definition of economics')) {
+    return `### **What is Economics?**
+
+**Economics** is the social science that analyzes how individuals, households, businesses, and governments make choices regarding the allocation of **scarce resources** to satisfy **unlimited wants**.
+
+---
+
+### **1. Core Pillars of Economics**
+* **Scarcity:** Resources (land, labor, capital, enterprise) are inherently limited in supply.
+* **Choice:** Because of scarcity, every society must choose *what* to produce, *how* to produce, and *for whom* to produce.
+* **Opportunity Cost:** The real cost of any choice—measured as the value of the next best alternative given up.
+
+---
+
+### **2. Foundational Definitions**
+* **Lionel Robbins (1932):** *"Economics is the science which studies human behaviour as a relationship between ends and scarce means which have alternative uses."*
+* **Alfred Marshall (1890):** *"A study of mankind in the ordinary business of life; it examines that part of individual and social action which is most closely connected with the attainment and with the use of the material requisites of wellbeing."*
+* **Adam Smith (1776):** Focused on the nature and causes of the wealth of nations and the role of the *"invisible hand"* in free markets.
+
+---
+
+### **3. The Two Main Branches**
+1. **Microeconomics:** Studies the behavior of individual economic agents (consumers, firms, specific markets, price determination).
+2. **Macroeconomics:** Studies aggregate economic variables for the entire nation (GDP, inflation, unemployment, monetary and fiscal policy).
+
+---
+
+### **4. Key Mathematical Formulation**
+A consumer faces the foundational **Budget Constraint**:
+\\[ P_X \\cdot X + P_Y \\cdot Y \\le I \\]
+Where:
+* \\( P_X, P_Y \\) = Unit prices of goods \\( X \\) and \\( Y \\)
+* \\( X, Y \\) = Quantities consumed
+* \\( I \\) = Total available budget/income
+
+Would you like to explore **Microeconomics**, **Macroeconomics**, or a specific topic next?`;
+  }
+
+  if (q.includes('elasticity') || q.includes('ped') || q.includes('inelastic')) {
+    return `### **Price Elasticity of Demand (PED)**
+
+**Price Elasticity of Demand (PED)** measures the responsiveness or sensitivity of the quantity demanded of a good to a change in its price.
+
+---
+
+### **1. Formula & Calculation**
+\\[ \\text{PED} = \\frac{\\% \\Delta Q_d}{\\% \\Delta P} = \\frac{\\frac{Q_2 - Q_1}{Q_1}}{\\frac{P_2 - P_1}{P_1}} \\]
+
+Using the Point-Elasticity differential form:
+\\[ \\varepsilon_d = \\frac{dQ}{dP} \\cdot \\frac{P}{Q} \\]
+
+---
+
+### **2. Interpretation of Values**
+* \\( |\\text{PED}| > 1 \\): **Price Elastic** (e.g., luxury goods; consumers react strongly to price changes).
+* \\( |\\text{PED}| < 1 \\): **Price Inelastic** (e.g., basic food, fuel, essential medicine; quantity changes little).
+* \\( |\\text{PED}| = 1 \\): **Unitary Elastic** (revenue is maximized).
+* \\( |\\text{PED}| = 0 \\): **Perfectively Inelastic** (vertical demand curve).
+* \\( |\\text{PED}| = \\infty \\): **Perfectively Elastic** (horizontal demand curve).
+
+---
+
+### **3. Total Revenue (TR) Relationship**
+* If Demand is **Elastic** (\\( |\\text{PED}| > 1 \\)): Lowering price $\\rightarrow$ Increases Total Revenue.
+* If Demand is **Inelastic** (\\( |\\text{PED}| < 1 \\)): Increasing price $\\rightarrow$ Increases Total Revenue.`;
+  }
+
+  if (q.includes('demand') || q.includes('supply') || q.includes('equilibrium') || q.includes('shortage') || q.includes('surplus')) {
+    return `### **Market Demand, Supply & Equilibrium**
+
+In competitive markets, price and output are determined by the interaction of **Demand** and **Supply**.
+
+---
+
+### **1. The Law of Demand and Supply**
+* **Law of Demand:** Ceteris paribus, as price \\( P \\) increases, quantity demanded \\( Q_d \\) decreases (downward sloping).
+* **Law of Supply:** Ceteris paribus, as price \\( P \\) increases, quantity supplied \\( Q_s \\) increases (upward sloping).
+
+---
+
+### **2. Mathematical Equilibrium**
+Equilibrium occurs where quantity demanded equals quantity supplied:
+\\[ Q_d(P^*) = Q_s(P^*) \\]
+
+Given linear equations:
+\\[ Q_d = a - bP \\]
+\\[ Q_s = c + dP \\]
+
+Equilibrium Price (\\( P^* \\)) and Quantity (\\( Q^* \\)):
+\\[ P^* = \\frac{a - c}{b + d} \\]
+\\[ Q^* = a - b \\left( \\frac{a - c}{b + d} \\right) \\]
+
+* **If \\( P > P^* \\):** Market Surplus (\\( Q_s > Q_d \\)) $\\rightarrow$ downward price pressure.
+* **If \\( P < P^* \\):** Market Shortage (\\( Q_d > Q_s \\)) $\\rightarrow$ upward price pressure.`;
+  }
+
+  if (q.includes('inflation') || q.includes('cpi') || q.includes('deflation') || q.includes('stagflation')) {
+    return `### **Understanding Inflation**
+
+**Inflation** is the persistent, sustained increase in the general price level of goods and services in an economy over a period of time, leading to a decrease in purchasing power.
+
+---
+
+### **1. Major Causes of Inflation**
+1. **Demand-Pull Inflation:** Occurs when aggregate demand (AD) outpaces aggregate supply (AS) (*"Too much money chasing too few goods"*).
+2. **Cost-Push Inflation:** Caused by rising costs of production (e.g., wage spikes, oil price shocks, raw material shortages).
+3. **Monetary Inflation:** Caused by excessive expansion of the domestic money supply by the central bank:
+   \\[ M \\cdot V = P \\cdot Y \\quad \\text{(Fisher's Equation of Exchange)} \\]
+
+---
+
+### **2. Measurement: Consumer Price Index (CPI)**
+\\[ \\text{CPI}_t = \\left( \\frac{\\sum (P_{t} \\cdot Q_{\\text{base}})}{\\sum (P_{\\text{base}} \\cdot Q_{\\text{base}})} \\right) \\times 100 \\]
+\\[ \\text{Inflation Rate} (\\pi) = \\left( \\frac{\\text{CPI}_t - \\text{CPI}_{t-1}}{\\text{CPI}_{t-1}} \\right) \\times 100\\% \\]`;
+  }
+
+  if (q.includes('gdp') || q.includes('national income') || q.includes('gross domestic product')) {
+    return `### **Gross Domestic Product (GDP)**
+
+**Gross Domestic Product (GDP)** is the total monetary value of all finished goods and services produced within a country's borders during a specific time period.
+
+---
+
+### **1. The Expenditure Approach Equation**
+\\[ Y = C + I + G + (X - M) \\]
+Where:
+* \\( Y \\) = Total National Income / Real GDP
+* \\( C \\) = Private Household Consumption
+* \\( I \\) = Gross Private Domestic Investment
+* \\( G \\) = Government Spending on goods/services
+* \\( X - M \\) = Net Exports (Exports minus Imports)
+
+---
+
+### **2. Real vs. Nominal GDP**
+* **Nominal GDP:** Measured using current-year market prices (includes inflation effect).
+* **Real GDP:** Evaluated at constant base-year prices (reflects true physical output growth).
+\\[ \\text{GDP Deflator} = \\left( \\frac{\\text{Nominal GDP}}{\\text{Real GDP}} \\right) \\times 100 \\]`;
+  }
+
+  if (q.includes('monetary') || q.includes('fiscal') || q.includes('central bank') || q.includes('tax')) {
+    return `### **Monetary Policy vs. Fiscal Policy**
+
+Governments and Central Banks use macroeconomic policies to stabilize the economic business cycle.
+
+---
+
+### **1. Monetary Policy (Central Bank)**
+* **Tools:** Open Market Operations (OMO), Policy Interest Rates (e.g., MPR / Fed Funds), Cash Reserve Ratio (CRR).
+* **Expansionary Policy:** Lower interest rates $\\rightarrow$ Cheaper borrowing $\\rightarrow$ Increases \\( I \\) & \\( C \\).
+* **Contractionary Policy:** Raise interest rates $\\rightarrow$ Tames inflation $\\rightarrow$ Slows aggregate demand.
+
+---
+
+### **2. Fiscal Policy (Ministry of Finance / Government)**
+* **Tools:** Taxation (\\( T \\)) and Government Expenditure (\\( G \\)).
+* **Keynesian Fiscal Multiplier:**
+\\[ k = \\frac{1}{1 - \\text{MPC}} = \\frac{1}{\\text{MPS}} \\]
+Where \\( \\text{MPC} \\) is the Marginal Propensity to Consume.`;
+  }
+
+  // General fallback for any other question
+  return `### **Economics Insight: ${query}**
+
+Hello ${displayName}! Here is a structured breakdown:
+
+1. **Economic Intuition:**
+   In economics, every decision involves evaluating trade-offs, opportunity costs, and incentives. When analyzing **"${query}"**, economists examine how rational agents optimize outcomes subject to constraints.
+
+2. **Core Theoretical Framework:**
+   * **Marginal Analysis:** Decision makers optimize by setting **Marginal Benefit = Marginal Cost** (\\( MB = MC \\)).
+   * **Equilibrium Condition:** Stable states are reached when no agent has an incentive to unilaterally alter their behavior (Nash Equilibrium / Market Clearing).
+
+3. **Recommended Study Path:**
+   ${topicContext ? `Since you are studying **${topicContext}**, review the interactive simulations and formulas in the Study Guide tab.` : 'Check the Study Guide and Interactive Simulators for hands-on models and graphs on this topic.'}
+
+Feel free to ask for specific definitions, formulas, or step-by-step mathematical proofs!`;
 };
 
 export const AiTutor = () => {
@@ -62,19 +246,19 @@ export const AiTutor = () => {
     if (!input.trim() || isLoading || isStreaming) return;
 
     const userMessage = input.trim();
+    const topicContext = getTopicContext(location.pathname);
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
       // Build context-aware prompt
-      const topicContext = getTopicContext(location.pathname);
       const systemPrompt = `You are an expert AI Economics Tutor named "EcoTutor". The user is ${profile?.displayName || 'a student'}.
 ${topicContext ? `The user is currently studying the topic: ${topicContext}. Try to relate your answers to this if relevant.` : ''}
 Answer the user's question clearly, pedagogically, and accurately. Use Markdown and LaTeX (with single backslash) for math formatting where appropriate.
 User's query: ${userMessage}`;
 
-      const response = await fetch('/api/agentTask', {
+      const response = await fetch(`${API_BASE}/api/agentTask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -84,7 +268,7 @@ User's query: ${userMessage}`;
         })
       });
 
-      if (!response.ok) throw new Error('Failed to fetch from AI Tutor');
+      if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
       if (!response.body) throw new Error('No response body');
 
       // Add a placeholder message for the AI response
@@ -138,12 +322,20 @@ User's query: ${userMessage}`;
         }
       }
     } catch (error) {
-      console.error('AI Tutor Error:', error);
+      console.warn('AI Tutor API unavailable, generating smart offline response:', error);
+      
+      const fallbackResponse = getOfflineEconomicsResponse(userMessage, profile?.displayName, topicContext);
+      
       setMessages(prev => {
         const lastMsg = prev[prev.length - 1];
-        const hasStartedStreaming = lastMsg && lastMsg.role === 'model' && lastMsg.content.length > 0;
-        
-        if (hasStartedStreaming) {
+        if (lastMsg && lastMsg.role === 'model' && lastMsg.content.length === 0) {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            role: 'model',
+            content: fallbackResponse
+          };
+          return updated;
+        } else if (lastMsg && lastMsg.role === 'model' && lastMsg.content.length > 0) {
           const updated = [...prev];
           updated[updated.length - 1] = {
             role: 'model',
@@ -152,18 +344,9 @@ User's query: ${userMessage}`;
           return updated;
         }
 
-        const newMsg = [...prev];
-        if (newMsg.length > 0 && newMsg[newMsg.length - 1].role === 'model') {
-          newMsg[newMsg.length - 1] = {
-            role: 'model',
-            content: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!"
-          };
-          return newMsg;
-        }
-
         return [...prev, { 
           role: 'model', 
-          content: "I'm having trouble connecting to my knowledge base right now. Please try again in a moment!" 
+          content: fallbackResponse 
         }];
       });
     } finally {

@@ -11,6 +11,15 @@ dotenv.config();
 async function startServer() {
   const PORT = process.env.PORT || 3000;
   const app = express();
+  app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
   app.use(express.json({ limit: "50mb" }));
   
   const httpServer = createServer(app);
@@ -48,7 +57,7 @@ async function startServer() {
   };
   
   const generateWithModelFallback = async (ai: GoogleGenAI, payload: any) => {
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro"];
     let lastError: any = null;
     for (const modelName of modelsToTry) {
       try {
@@ -283,7 +292,7 @@ Return only raw valid JSON array.`;
       }
 
       try {
-        const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+        const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro"];
         let streamResult = null;
         let lastError = null;
 
