@@ -259,17 +259,49 @@ ${topicContext ? `The user is currently studying the topic: ${topicContext}. Try
 Answer the user's question clearly, pedagogically, and accurately. Use Markdown and LaTeX (with single backslash) for math formatting where appropriate.
 User's query: ${userMessage}`;
 
-      const response = await fetch(`${API_BASE}/api/agentTask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agent: 'antigravity-preview-05-2026',
-          prompt: systemPrompt,
-          stream: true
-        })
-      });
+      let response: Response | null = null;
+      const clientApiKey = (process.env.GEMINI_API_KEY as string) || '';
 
-      if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+      // Strategy 1: If API_BASE is configured, try backend server with 5s timeout
+      if (API_BASE) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          response = await fetch(`${API_BASE}/api/agentTask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              agent: 'antigravity-preview-05-2026',
+              prompt: systemPrompt,
+              stream: true
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+        } catch (serverErr) {
+          console.warn('Backend server timeout/error, falling back to direct AI stream:', serverErr);
+          response = null;
+        }
+      }
+
+      // Strategy 2: If on mobile APK or backend unavailable, stream directly from Gemini 3.5 Flash Lite
+      if (!response || !response.ok) {
+        if (clientApiKey) {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:streamGenerateContent?alt=sse&key=${clientApiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: systemPrompt }] }]
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+        }
+      }
+
+      if (!response || !response.ok) throw new Error(`HTTP Error ${response?.status || 'No Response'}`);
       if (!response.body) throw new Error('No response body');
 
       // Add a placeholder message for the AI response
@@ -288,8 +320,8 @@ User's query: ${userMessage}`;
         
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // Keep incomplete fragment in buffer
-        
+        buffer = lines.pop() || '';
+
         for (const line of lines) {
           const trimmed = line.trim();
           if (!trimmed.startsWith('data: ')) continue;
@@ -301,8 +333,9 @@ User's query: ${userMessage}`;
           
           try {
             const parsed = JSON.parse(dataStr);
-            if (parsed.text) {
-              aiResponse += parsed.text;
+            const chunkText = parsed.text || parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (chunkText) {
+              aiResponse += chunkText;
               setMessages(prev => {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1] = {

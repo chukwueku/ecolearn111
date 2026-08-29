@@ -57,7 +57,7 @@ async function startServer() {
   };
   
   const generateWithModelFallback = async (ai: GoogleGenAI, payload: any) => {
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro"];
+    const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash"];
     let lastError: any = null;
     for (const modelName of modelsToTry) {
       try {
@@ -292,7 +292,7 @@ Return only raw valid JSON array.`;
       }
 
       try {
-        const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.0-flash-lite", "gemini-1.5-pro"];
+        const modelsToTry = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.7-flash"];
         let streamResult = null;
         let lastError = null;
 

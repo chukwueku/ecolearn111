@@ -1,23 +1,43 @@
 const API_BASE = import.meta.env.VITE_API_URL || "";
+const clientApiKey = (process.env.GEMINI_API_KEY as string) || '';
 
 export const generateStudyGuide = async (topicTitle: string, level: string, description: string) => {
   try {
-    const response = await fetch(`${API_BASE}/api/generateStudyGuide`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topicTitle, level, description }),
-    });
-    if (!response.ok) {
-      try {
-        const errorData = await response.json();
-        if (errorData.error) return errorData.error;
-      } catch (e) {}
-      return "Failed to generate study guide. Please try again later.";
+    if (API_BASE) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const response = await fetch(`${API_BASE}/api/generateStudyGuide`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topicTitle, level, description }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.result) return data.result;
+      }
     }
-    const data = await response.json();
-    return data.result;
+    
+    // Direct Gemini fallback if server is unreachable or in mobile APK
+    if (clientApiKey) {
+      const prompt = `You are a world-class Economics professor. Generate a comprehensive study guide for a ${level} student on the topic: "${topicTitle}". Description: ${description}. Format in Markdown with LaTeX math.`;
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${clientApiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      }
+    }
+    return "Failed to generate study guide. Please try again later.";
   } catch (error) {
-    console.error("Fetch Error:", error);
+    console.error("Study Guide Generation Error:", error);
     return "Failed to generate study guide. Please try again later.";
   }
 };
@@ -116,26 +136,32 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
 };
 
 export const generateQuestions = async (topicTitle: string, level: string, count: number = 5, exclude: string[] = []) => {
-  try {
-    const response = await fetch(`${API_BASE}/api/generateQuestions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topicTitle, level, count, exclude }),
-    });
-    
-    if (response.ok) {
-      const text = await response.text();
-      try {
-        const data = JSON.parse(text);
-        if (data.questions && data.questions.length > 0) {
-          return data.questions;
+  if (API_BASE) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(`${API_BASE}/api/generateQuestions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topicTitle, level, count, exclude }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const text = await response.text();
+        try {
+          const data = JSON.parse(text);
+          if (data.questions && data.questions.length > 0) {
+            return data.questions;
+          }
+        } catch (e) {
+          console.error("JSON parse error:", e);
         }
-      } catch (e) {
-        console.error("JSON parse error:", e);
       }
+    } catch (error) {
+      console.warn("API Fetch unavailable, using offline question generator:", error);
     }
-  } catch (error) {
-    console.warn("API Fetch unavailable, using offline question generator:", error);
   }
 
   // Seamless fallback for offline mode / unreachable backend
