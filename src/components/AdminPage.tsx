@@ -374,10 +374,6 @@ export const AdminPage: React.FC = () => {
       topicTitleStr = `${course?.title || selectedCourse} — ${topicId}`;
     }
 
-    if (isSecondaryGroup) {
-      topicTitleStr = `WASSCE/WAEC & JAMB Senior Secondary Economics: ${topicTitleStr}`;
-    }
-
     try {
       // Prioritize same course and topic bank questions first
       const sameCourseBank = bankQuestions.filter(q => 

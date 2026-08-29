@@ -49,18 +49,18 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
 
   const secondaryTemplates = [
     {
-      q: (t: string) => `Which of the following best defines opportunity cost in economics with reference to ${t}?`,
+      q: () => "Which of the following best defines opportunity cost in economics?",
       opts: [
-        "The alternative forgone when a choice is made",
-        "The total monetary expenditure incurred",
-        "The accounting cost recorded by a business firm",
-        "The market price officially set by the government"
+        "The next best alternative forgone when a choice is made",
+        "The total monetary expenditure incurred on goods",
+        "The accounting cost recorded in a company's ledger",
+        "The market price officially established by the government"
       ],
       ans: 0,
-      exp: "In WASSCE and JAMB Economics, opportunity cost is the real cost of satisfying a want, expressed in terms of the next best alternative sacrificed."
+      exp: "Opportunity cost is the real cost of satisfying a want, expressed in terms of the next best alternative sacrificed."
     },
     {
-      q: (t: string) => `In elementary demand analysis under ${t}, a movement along a demand curve occurs when:`,
+      q: () => "A movement along a demand curve occurs when:",
       opts: [
         "The price of the commodity itself changes",
         "Consumers' disposable income increases",
@@ -68,10 +68,10 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
         "Consumer tastes and preferences shift"
       ],
       ans: 0,
-      exp: "In secondary school economics, only a change in the price of the commodity itself causes a movement along its demand curve (expansion or contraction in quantity demanded)."
+      exp: "Only a change in the price of the commodity itself causes a movement along its demand curve (expansion or contraction in quantity demanded)."
     },
     {
-      q: (t: string) => `If a 10% rise in the price of a good results in a 20% decline in quantity demanded in the market for ${t}, the price elasticity of demand is:`,
+      q: () => "If a 10% rise in the price of a good results in a 20% decline in quantity demanded, the price elasticity of demand is:",
       opts: [
         "Elastic (\\( E_d = 2.0 \\))",
         "Inelastic (\\( E_d = 0.5 \\))",
@@ -82,7 +82,7 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
       exp: "Price elasticity of demand = \\( \\frac{\\% \\Delta Q}{\\% \\Delta P} = \\frac{20\\%}{10\\%} = 2.0 \\). Because \\( E_d > 1 \\), demand is elastic."
     },
     {
-      q: (t: string) => `According to the law of diminishing marginal utility relevant to ${t}, as additional units of a commodity are consumed:`,
+      q: () => "According to the law of diminishing marginal utility, as additional units of a commodity are consumed:",
       opts: [
         "The extra satisfaction derived from each successive unit decreases",
         "Total utility decreases continuously from the very first unit",
@@ -93,9 +93,9 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
       exp: "The law of diminishing marginal utility states that as a consumer consumes successive units of a good, marginal utility (additional satisfaction) declines."
     },
     {
-      q: (t: string) => `In production economics under ${t}, a major limitation to the division of labour is:`,
+      q: () => "In production economics, a major limitation to the division of labour is:",
       opts: [
-        "The extent of the market and demand",
+        "The extent of the market and volume of demand",
         "The rate of personal income taxation",
         "The presence of registered trade unions",
         "The availability of commercial bank overdrafts"
@@ -104,7 +104,7 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
       exp: "Adam Smith identified that division of labour and specialization are fundamentally limited by the extent of the market."
     },
     {
-      q: (t: string) => `Which of the following functions of a Central Bank distinguishes it from Commercial Banks in ${t}?`,
+      q: () => "Which of the following functions of a Central Bank distinguishes it from Commercial Banks?",
       opts: [
         "Acting as lender of last resort and issuing legal tender",
         "Accepting demand deposits from retail customers",
@@ -115,7 +115,29 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
       exp: "Only the Central Bank issues legal tender currency and serves as the lender of last resort to commercial banks and banker to the government."
     },
     {
-      q: (t: string) => `Under public finance and taxation covering ${t}, a tax system where higher income earners pay a larger percentage of their income is:`,
+      q: () => "Commercial banks create credit and expand the money supply primarily through:",
+      opts: [
+        "Granting loans and advances by crediting customer deposit accounts",
+        "Printing new paper currency and minting coins",
+        "Collecting direct income taxes on behalf of the state",
+        "Fixing the national statutory minimum wage rate"
+      ],
+      ans: 0,
+      exp: "Commercial banks create credit by granting loans and advances which generate new customer deposits within the banking system."
+    },
+    {
+      q: () => "In banking, liquidity of a commercial bank refers to its ability to:",
+      opts: [
+        "Convert its assets into cash quickly to meet depositors' cash withdrawal demands",
+        "Maximize annual dividend distribution to its shareholders",
+        "Eliminate all interest expenses paid on savings deposits",
+        "Operate without maintaining cash reserves with the Central Bank"
+      ],
+      ans: 0,
+      exp: "Bank liquidity is the ease and speed with which a financial institution can convert assets into cash to satisfy withdrawal requests from depositors."
+    },
+    {
+      q: () => "A tax system where higher-income earners pay a higher percentage of their income than lower-income earners is known as a:",
       opts: [
         "Progressive tax",
         "Regressive tax",
@@ -123,40 +145,62 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
         "Specific excise duty"
       ],
       ans: 0,
-      exp: "A progressive tax charges a higher percentage rate as taxable income increases, reducing income disparity."
+      exp: "A progressive tax charges an increasing percentage rate as taxable income rises, helping reduce income inequality."
     },
     {
-      q: (t: string) => `In national income accounting for ${t}, Gross Domestic Product (GDP) differs from Gross National Product (GNP) by:`,
+      q: () => "Gross Domestic Product (GDP) differs from Gross National Product (GNP) by:",
       opts: [
         "Net factor income from abroad",
-        "Depreciation of fixed capital",
+        "Depreciation of fixed capital assets",
         "Government transfer payments",
-        "Undistributed company profits"
+        "Undistributed corporate profits"
       ],
       ans: 0,
       exp: "GNP equals GDP plus Net Factor Income from Abroad (NFIA)."
     },
     {
-      q: (t: string) => `According to the principle of comparative advantage in ${t}, trade between two West African countries is advantageous if:`,
+      q: () => "According to the principle of comparative advantage, international trade between two nations is mutually beneficial if:",
       opts: [
-        "Each specializes in the good where its opportunity cost is lowest",
-        "One country has an absolute advantage in all commodities",
-        "Both countries impose equal protective import tariffs",
-        "Both countries produce strictly agricultural exports"
+        "Each nation specializes in the production of the good in which its opportunity cost is lower",
+        "One nation has an absolute cost advantage in all commodities",
+        "Both nations impose identical protective tariff barriers",
+        "Both nations have identical factor endowments and technology"
       ],
       ans: 0,
       exp: "David Ricardo's law of comparative advantage shows mutual trade gains arise when each nation specializes according to lower opportunity cost."
     },
     {
-      q: (t: string) => `In macroeconomics regarding ${t}, cost-push inflation is primarily initiated by:`,
+      q: () => "Cost-push inflation in an economy is primarily caused by:",
       opts: [
-        "Increases in the costs of factors of production such as wages and energy",
-        "Excessive growth in money supply relative to output",
-        "Persistent balance of payments surpluses",
-        "Substantial cuts in indirect sales taxes"
+        "Increases in the costs of production inputs such as wages and raw materials",
+        "Excessive growth in the aggregate money supply relative to real output",
+        "Persistent balance of payments surpluses in external trade",
+        "Substantial reductions in indirect sales and excise taxes"
       ],
       ans: 0,
-      exp: "Cost-push inflation occurs when production input costs (wages, raw materials, fuel) rise, causing aggregate supply to contract and prices to rise."
+      exp: "Cost-push inflation occurs when production input costs (wages, raw materials, fuel) rise, shifting the aggregate supply curve upward and raising price levels."
+    },
+    {
+      q: () => "When a government legally imposes a maximum price (price ceiling) below the market equilibrium price, the immediate consequence is:",
+      opts: [
+        "Excess demand resulting in shortages and black markets",
+        "Excess supply resulting in unsellable surpluses",
+        "An immediate drop in consumer purchasing power",
+        "A rightward shift of the market supply curve"
+      ],
+      ans: 0,
+      exp: "A price ceiling set below equilibrium makes quantity demanded exceed quantity supplied, creating shortages."
+    },
+    {
+      q: () => "Money serves as a standard of deferred payments when it is used to:",
+      opts: [
+        "State debts and settle future credit transactions",
+        "Store purchasing power safely over extended periods",
+        "Express the relative values and prices of different commodities",
+        "Overcome the problem of double coincidence of wants in barter"
+      ],
+      ans: 0,
+      exp: "As a standard of deferred payments, money enables goods to be bought on credit and debts to be scheduled and settled in the future."
     }
   ];
 
@@ -295,8 +339,8 @@ export const generateQuestions = async (topicTitle: string, level: string, count
         : '';
 
       const directPrompt = isSecondary
-        ? `You are an expert Chief Examiner for Senior Secondary School Economics specializing in WASSCE (WAEC) and JAMB (UTME) curricula. Generate exactly ${count} authentic multiple-choice questions for secondary school students (${level}) on: "${topicTitle}". CRITICAL RULE: Under NO circumstances generate undergraduate, graduate, calculus, or econometrics questions. Restrict solely to high school WAEC/JAMB syllabus.${excludeNotice} Output raw JSON array of objects: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`
-        : `You are an experienced Economics professor. Generate exactly ${count} multiple-choice questions for a ${level} student on: "${topicTitle}".${excludeNotice} Format as raw JSON array: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`;
+        ? `You are an expert Chief Examiner for Senior Secondary School Economics specializing in WASSCE and JAMB curricula. Generate exactly ${count} authentic multiple-choice questions for secondary school students (${level}) on: "${topicTitle}". CRITICAL RULES: 1. DO NOT mention "WASSCE", "WAEC", or "JAMB" anywhere in the question text or options. 2. DO NOT echo, prefix, or repeat the topic title in the question stem. Start directly with the question. 3. Under NO circumstances generate undergraduate, graduate, calculus, or econometrics questions. Restrict solely to high school syllabus.${excludeNotice} Output raw JSON array of objects: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`
+        : `You are an experienced Economics professor. Generate exactly ${count} multiple-choice questions for a ${level} student on: "${topicTitle}". DO NOT echo or include the topic title in the question stem.${excludeNotice} Format as raw JSON array: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`;
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${clientApiKey}`, {
         method: "POST",

@@ -282,9 +282,11 @@ CRITICAL CURRICULUM BOUNDARIES & STRICT INSTRUCTIONS:
    - Conceptual understanding and definitions (e.g. Scarcity vs Choice, Scale of Preference, Opportunity Cost, Factors of Production, Division of Labour).
    - Real-world West African economic scenarios (e.g. inflation control, agricultural marketing boards, crude oil sector, ECOWAS trade).
    - Curve analysis & shifts (e.g. shifts in demand vs movement along demand curve, price ceilings and minimum price legislation).
-5. QUESTION FORMAT:
+5. QUESTION FORMAT & STYLE RULES:
    - Concise, direct question stems (1–2 sentences).
-   - Exactly 4 realistic options (Option A, B, C, D) with one unambiguously correct answer and 3 plausible distractors typical of WAEC/JAMB.
+   - CRITICAL: DO NOT mention "WASSCE", "WAEC", "JAMB", or the syllabus name in the question text or options. The exam standard is only for internal standard calibration.
+   - CRITICAL: DO NOT echo, prefix, or repeat the topic title in the question stem (e.g. do NOT say "with reference to [Topic]..." or "In [Topic]..."). Start directly with the question.
+   - Exactly 4 realistic options (Option A, B, C, D) with one unambiguously correct answer and 3 plausible distractors.
    - Whenever variables or equations appear, format using inline LaTeX \\( ... \\).
 6. STRICT ZERO-DUPLICATION & HIGH-DIVERSITY MANDATE:
    - Every single question must be genuinely UNIQUE in both concept tested and phrasing.
@@ -296,10 +298,10 @@ ${JSON.stringify(promptExcludes)}
 Format the output strictly as a JSON array matching this schema:
 [
   {
-    "question": "string (clear, direct question stem typical of WAEC/JAMB)",
+    "question": "string (clear, direct question stem)",
     "options": ["string (Option A)", "string (Option B)", "string (Option C)", "string (Option D)"],
     "correctAnswer": number (0-3),
-    "explanation": "string (clear, concise explanation referencing WAEC/JAMB economic principles)"
+    "explanation": "string (clear, concise explanation of economic principles)"
   }
 ]
 
@@ -314,7 +316,7 @@ REQUIREMENTS:
    - Policy analysis & trade-offs (e.g. "A country facing stagflation should prioritise...")
    - Cause-and-effect reasoning (e.g. "If the price of a substitute good rises, demand for the original good will...")
    - Mathematical/quantitative (MAXIMUM 20% of questions — only where naturally relevant)
-3. CONCISE STEMS: Keep question stems clear and direct (1–2 sentences). No long preambles, no topic name echoes, no "Ref:" labels.
+3. CONCISE STEMS: Keep question stems clear and direct (1–2 sentences). No long preambles, NO topic name echoes, no "Ref:" labels. Start directly with the question.
 4. CURRICULUM ROTATION: Spread questions across all subtopics mentioned in "${topicTitle}".
 5. CLEAN LATEX MATH: Whenever math symbols, equations, or variables appear, format using inline LaTeX \\( ... \\) (e.g. \\( GDP \\), \\( P = MC \\)).
 6. STRICT ZERO-DUPLICATION & HIGH-DIVERSITY MANDATE:
@@ -364,7 +366,7 @@ Return only raw valid JSON array.`;
         if (isSecondary) {
           const secondaryFallbacks = [
             {
-              question: `Which of the following best defines opportunity cost in economics with reference to ${topicTitle}?`,
+              question: "Which of the following best defines opportunity cost in economics?",
               options: [
                 "The next best alternative forgone when a choice is made",
                 "The total monetary cost of purchasing a good",
@@ -372,10 +374,10 @@ Return only raw valid JSON array.`;
                 "The market price determined by government decree"
               ],
               correctAnswer: 0,
-              explanation: "In WAEC and JAMB economics, opportunity cost is defined as the real cost of an action expressed in terms of the next best alternative sacrificed."
+              explanation: "Opportunity cost is the real cost of satisfying a want, expressed in terms of the next best alternative sacrificed."
             },
             {
-              question: `In the study of ${topicTitle}, a movement along a demand curve is caused by a change in:`,
+              question: "A movement along a demand curve is caused by a change in:",
               options: [
                 "The price of the commodity itself",
                 "Consumers' disposable income",
@@ -383,10 +385,10 @@ Return only raw valid JSON array.`;
                 "Tastes and preferences of consumers"
               ],
               correctAnswer: 0,
-              explanation: "A change in the price of the commodity itself leads to a movement along the demand curve (contraction or expansion in quantity demanded), whereas other factors cause a shift of the demand curve."
+              explanation: "A change in the price of the commodity itself leads to a movement along the demand curve (contraction or expansion in quantity demanded)."
             },
             {
-              question: `If a 10% rise in the price of a product leads to a 5% drop in quantity demanded during analysis of ${topicTitle}, the price elasticity of demand is:`,
+              question: "If a 10% rise in the price of a product leads to a 5% drop in quantity demanded, the price elasticity of demand is:",
               options: [
                 "Inelastic (\\( E_d = 0.5 \\))",
                 "Elastic (\\( E_d = 2.0 \\))",
@@ -397,7 +399,7 @@ Return only raw valid JSON array.`;
               explanation: "Price elasticity of demand is \\( \\frac{\\% \\Delta Q_d}{\\% \\Delta P} = \\frac{5\\%}{10\\%} = 0.5 \\). Since \\( E_d < 1 \\), demand is inelastic."
             },
             {
-              question: `According to the law of diminishing marginal utility relevant to ${topicTitle}, as a consumer consumes more units of a commodity:`,
+              question: "According to the law of diminishing marginal utility, as a consumer consumes more units of a commodity:",
               options: [
                 "The marginal utility derived from each successive unit diminishes",
                 "The total utility decreases immediately from the first unit",
@@ -408,9 +410,9 @@ Return only raw valid JSON array.`;
               explanation: "The law of diminishing marginal utility states that as additional units of a good are consumed, the extra satisfaction (marginal utility) derived from each successive unit decreases."
             },
             {
-              question: `In production economics under ${topicTitle}, division of labour is primarily limited by:`,
+              question: "In production economics, division of labour is primarily limited by:",
               options: [
-                "The extent of the market and demand",
+                "The extent of the market and volume of demand",
                 "The level of direct taxation",
                 "The presence of trade unions alone",
                 "The availability of commercial bank overdrafts"
@@ -419,10 +421,10 @@ Return only raw valid JSON array.`;
               explanation: "Adam Smith famously demonstrated that the division of labour is limited by the extent of the market (the volume of demand)."
             },
             {
-              question: `Which of the following is a primary function of a Central Bank that distinguishes it from commercial banks under ${topicTitle}?`,
+              question: "Which of the following is a primary function of a Central Bank that distinguishes it from commercial banks?",
               options: [
-                "Acting as lender of last resort to commercial banks",
-                "Accepting demand deposits from individual customers",
+                "Acting as lender of last resort to commercial banks and issuing currency",
+                "Accepting demand deposits from individual retail customers",
                 "Granting personal overdrafts to small retail businesses",
                 "Underwriting corporate shares on the stock exchange"
               ],
@@ -430,7 +432,18 @@ Return only raw valid JSON array.`;
               explanation: "The Central Bank acts as the lender of last resort, banker to the government, and sole issuer of legal tender, which commercial banks cannot do."
             },
             {
-              question: `Under fiscal policy and public finance regarding ${topicTitle}, a tax whose rate increases as income increases is called a:`,
+              question: "Commercial banks create credit and expand deposits primarily by:",
+              options: [
+                "Granting loans and advances that generate new bank deposits",
+                "Printing new paper currency and minting coins",
+                "Collecting customs and excise duties for the treasury",
+                "Fixing the national minimum wage rate"
+              ],
+              correctAnswer: 0,
+              explanation: "Commercial banks create credit through the multiple deposit creation process when granting loans to customers."
+            },
+            {
+              question: "A tax system whose percentage rate increases as income increases is called a:",
               options: [
                 "Progressive tax",
                 "Regressive tax",
@@ -441,7 +454,7 @@ Return only raw valid JSON array.`;
               explanation: "A progressive tax takes a higher percentage of income from higher-income earners, aiding income redistribution."
             },
             {
-              question: `In national income accounting covering ${topicTitle}, Gross Domestic Product (GDP) differs from Gross National Product (GNP) by:`,
+              question: "Gross Domestic Product (GDP) differs from Gross National Product (GNP) by:",
               options: [
                 "Net factor income from abroad",
                 "Depreciation (capital consumption allowance)",
