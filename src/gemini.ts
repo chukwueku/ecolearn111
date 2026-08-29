@@ -1,3 +1,5 @@
+import { isDuplicateQuestion } from './firebase';
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 const clientApiKey = (process.env.GEMINI_API_KEY as string) || '';
 
@@ -42,7 +44,7 @@ export const generateStudyGuide = async (topicTitle: string, level: string, desc
   }
 };
 
-const generateOfflineQuestions = (topicTitle: string, level: string, count: number = 5) => {
+const generateOfflineQuestions = (topicTitle: string, level: string, count: number = 5, exclude: string[] = []) => {
   const isSecondary = level === 'secondary' || level === 'secondary-ss2' || level === 'secondary-ss3' || (typeof level === 'string' && level.startsWith('secondary'));
 
   const secondaryTemplates = [
@@ -239,7 +241,9 @@ const generateOfflineQuestions = (topicTitle: string, level: string, count: numb
   ];
 
   const pool = isSecondary ? secondaryTemplates : undergraduateTemplates;
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const nonDupPool = pool.filter(tmpl => !isDuplicateQuestion(tmpl.q(topicTitle), exclude));
+  const candidatePool = nonDupPool.length > 0 ? nonDupPool : pool;
+  const shuffled = [...candidatePool].sort(() => Math.random() - 0.5);
   return Array.from({ length: count }).map((_, i) => {
     const tmpl = shuffled[i % shuffled.length];
     return {
@@ -285,9 +289,14 @@ export const generateQuestions = async (topicTitle: string, level: string, count
   // Direct client Gemini fallback (e.g. mobile APK or standalone client)
   if (clientApiKey) {
     try {
+      const promptExcludes = (exclude || []).slice(0, 80);
+      const excludeNotice = promptExcludes.length > 0
+        ? ` STRICT NO-DUPLICATION REQUIREMENT: Under NO circumstances repeat or closely rephrase any of these existing questions:\n${JSON.stringify(promptExcludes)}.`
+        : '';
+
       const directPrompt = isSecondary
-        ? `You are an expert Chief Examiner for Senior Secondary School Economics specializing in WASSCE (WAEC) and JAMB (UTME) curricula. Generate exactly ${count} authentic multiple-choice questions for secondary school students (${level}) on: "${topicTitle}". CRITICAL RULE: Under NO circumstances generate undergraduate, graduate, calculus, or econometrics questions. Restrict solely to high school WAEC/JAMB syllabus. Output raw JSON array of objects: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`
-        : `You are an experienced Economics professor. Generate exactly ${count} multiple-choice questions for a ${level} student on: "${topicTitle}". Format as raw JSON array: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`;
+        ? `You are an expert Chief Examiner for Senior Secondary School Economics specializing in WASSCE (WAEC) and JAMB (UTME) curricula. Generate exactly ${count} authentic multiple-choice questions for secondary school students (${level}) on: "${topicTitle}". CRITICAL RULE: Under NO circumstances generate undergraduate, graduate, calculus, or econometrics questions. Restrict solely to high school WAEC/JAMB syllabus.${excludeNotice} Output raw JSON array of objects: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`
+        : `You are an experienced Economics professor. Generate exactly ${count} multiple-choice questions for a ${level} student on: "${topicTitle}".${excludeNotice} Format as raw JSON array: [{"question":"string","options":["string","string","string","string"],"correctAnswer":0,"explanation":"string"}]. No code blocks.`;
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${clientApiKey}`, {
         method: "POST",
@@ -303,7 +312,15 @@ export const generateQuestions = async (topicTitle: string, level: string, count
         if (text) {
           const parsed = JSON.parse(text);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
+            const clean: any[] = [];
+            for (const q of parsed) {
+              if (!isDuplicateQuestion(q, [...exclude, ...clean])) {
+                clean.push(q);
+              }
+            }
+            if (clean.length > 0) {
+              return clean;
+            }
           }
         }
       }
@@ -313,7 +330,7 @@ export const generateQuestions = async (topicTitle: string, level: string, count
   }
 
   // Seamless fallback for offline mode / unreachable backend
-  return generateOfflineQuestions(topicTitle, level, count);
+  return generateOfflineQuestions(topicTitle, level, count, exclude);
 };
 
 export const extractQuestionsFromPdf = async (pdfBase64: string, level: string, count: number = 5) => {

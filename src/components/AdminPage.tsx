@@ -4,7 +4,8 @@ import {
   saveQuestions, Question, getAllUsers, UserProfile, deleteUserAccount, 
   updateUserRole, getAdminStats, getAllQuestionsAdmin, updateQuestion, 
   deleteQuestion, getRecentDuels, setGlobalAnnouncement, getGlobalAnnouncement,
-  updateUserProfile, saveDailyChallenge, getDailyChallengesAdmin, deleteDailyChallenge, DailyChallenge
+  updateUserProfile, saveDailyChallenge, getDailyChallengesAdmin, deleteDailyChallenge, DailyChallenge,
+  isDuplicateQuestion
 } from '../firebase';
 import { SECONDARY_ROADMAP, SECONDARY_SS2_ROADMAP, SECONDARY_SS3_ROADMAP, UNDERGRADUATE_REAL_ROADMAP } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
@@ -378,15 +379,42 @@ export const AdminPage: React.FC = () => {
     }
 
     try {
+      // Prioritize same course and topic bank questions first
+      const sameCourseBank = bankQuestions.filter(q => 
+        q.topicId === selectedCourse || q.topicId === topicId
+      );
+      const sameLevelBank = bankQuestions.filter(q => 
+        (q.level === level || (isSecondaryGroup && typeof q.level === 'string' && q.level.startsWith('secondary'))) &&
+        !sameCourseBank.includes(q)
+      );
+      const otherBank = bankQuestions.filter(q => !sameCourseBank.includes(q) && !sameLevelBank.includes(q));
+
       const excludeList = [
-        ...bankQuestions.map(q => q.question),
-        ...generatedQuestions.map(q => q.question)
-      ];
+        ...generatedQuestions.map(q => q.question),
+        ...sameCourseBank.map(q => q.question),
+        ...sameLevelBank.map(q => q.question),
+        ...otherBank.map(q => q.question)
+      ].filter(Boolean);
+
       const questions = await generateQuestions(topicTitleStr, level, count, excludeList);
       if (!questions || questions.length === 0) {
         alert("Failed to generate questions or all generated questions were duplicates. Please try again.");
       } else {
-        setGeneratedQuestions(questions);
+        // Double-check against existing bank and previewed questions
+        const uniqueQs: any[] = [];
+        for (const q of questions) {
+          if (!isDuplicateQuestion(q, [...bankQuestions, ...generatedQuestions, ...uniqueQs])) {
+            uniqueQs.push(q);
+          } else {
+            console.log("Filtered out duplicate question in Admin preview:", q.question);
+          }
+        }
+
+        if (uniqueQs.length === 0) {
+          alert("All generated questions were duplicates of existing questions in the bank. Please try another subtopic or check your bank.");
+        } else {
+          setGeneratedQuestions(prev => [...prev, ...uniqueQs]);
+        }
       }
     } catch (error) {
       console.error("Error in handleGenerate:", error);
@@ -1057,13 +1085,22 @@ export const AdminPage: React.FC = () => {
                         <p className="text-[10px] font-bold text-sky-500 uppercase tracking-widest mb-1">AI Output</p>
                         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight font-sans">Generated Preview</h2>
                       </div>
-                      <button
-                        onClick={handleSave}
-                        disabled={loading}
-                        className="bg-sky-600 text-white px-6 sm:px-8 py-3.5 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-sky-500/20 hover:bg-sky-700 transition-all w-full sm:w-auto"
-                      >
-                        Save to Bank
-                      </button>
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <button
+                          onClick={() => setGeneratedQuestions([])}
+                          disabled={loading}
+                          className="px-5 py-3 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all w-full sm:w-auto text-center"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          onClick={handleSave}
+                          disabled={loading}
+                          className="bg-sky-600 text-white px-6 sm:px-8 py-3.5 sm:py-3 rounded-xl sm:rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-sky-500/20 hover:bg-sky-700 transition-all w-full sm:w-auto text-center"
+                        >
+                          Save {generatedQuestions.length} to Bank
+                        </button>
+                      </div>
                     </div>
                     <div className="grid gap-4 sm:gap-6">
                       {generatedQuestions.map((q, i) => (
@@ -1072,9 +1109,17 @@ export const AdminPage: React.FC = () => {
                             <span className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl sm:rounded-2xl flex items-center justify-center text-base sm:text-lg font-bold">
                               {i + 1}
                             </span>
-                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans">
+                            <p className="text-sm sm:text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-tight font-sans flex-1">
                               <MathText text={q.question} />
                             </p>
+                            <button
+                              type="button"
+                              onClick={() => setGeneratedQuestions(prev => prev.filter((_, qIdx) => qIdx !== i))}
+                              className="text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all shrink-0"
+                              title="Remove question"
+                            >
+                              <X size={16} />
+                            </button>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ml-0 sm:ml-14 md:ml-16">
                             {q.options.map((opt: string, idx: number) => (

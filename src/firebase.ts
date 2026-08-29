@@ -175,17 +175,96 @@ export const normalizeQuestionText = (text: string): string => {
     .trim();
 };
 
-export const isDuplicateQuestion = (newQuestionText: string, existingQuestionTexts: string[]): boolean => {
-  const normNew = normalizeQuestionText(newQuestionText);
+const STOP_WORDS_SET = new Set([
+  'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t', 'as',
+  'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'can', 'can\'t',
+  'cannot', 'could', 'couldn\'t', 'did', 'didn\'t', 'do', 'does', 'doesn\'t', 'doing', 'don\'t', 'down',
+  'during', 'each', 'few', 'for', 'from', 'further', 'had', 'hadn\'t', 'has', 'hasn\'t', 'have', 'haven\'t',
+  'having', 'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i', 'if', 'in', 'into',
+  'is', 'isn\'t', 'it', 'its', 'itself', 'let\'s', 'me', 'more', 'most', 'mustn\'t', 'my', 'myself', 'no',
+  'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out',
+  'over', 'own', 'same', 'shan\'t', 'she', 'should', 'shouldn\'t', 'so', 'some', 'such', 'than', 'that',
+  'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'these', 'they', 'this', 'those', 'through',
+  'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasn\'t', 'we', 'were', 'weren\'t', 'what', 'when',
+  'where', 'which', 'while', 'who', 'whom', 'why', 'with', 'won\'t', 'would', 'wouldn\'t', 'you', 'your',
+  'yours', 'yourself', 'yourselves', 'following', 'best', 'defines', 'defined', 'definition', 'statement',
+  'refers', 'referred', 'explain', 'explains', 'described', 'describes', 'example', 'examples', 'true',
+  'correct', 'incorrect', 'consider', 'economics', 'economic', 'given', 'identify', 'whichof', 'whatis'
+]);
+
+const tokenizeCoreWords = (text: string): string[] => {
+  if (!text) return [];
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP_WORDS_SET.has(w));
+};
+
+const getJaccardAndOverlap = (words1: string[], words2: string[]) => {
+  if (words1.length === 0 || words2.length === 0) return { jaccard: 0, overlap: 0 };
+  const set1 = new Set(words1);
+  const set2 = new Set(words2);
+  let intersection = 0;
+  for (const w of set1) {
+    if (set2.has(w)) intersection++;
+  }
+  const union = set1.size + set2.size - intersection;
+  const minSize = Math.min(set1.size, set2.size);
+  return {
+    jaccard: union === 0 ? 0 : intersection / union,
+    overlap: minSize === 0 ? 0 : intersection / minSize
+  };
+};
+
+export const isDuplicateQuestion = (
+  newQuestion: string | { question: string; options?: string[] },
+  existingQuestions: (string | { question: string; options?: string[] })[]
+): boolean => {
+  const qText = typeof newQuestion === 'string' ? newQuestion : newQuestion?.question;
+  if (!qText) return false;
+
+  const normNew = normalizeQuestionText(qText);
   if (!normNew) return false;
-  return existingQuestionTexts.some(existing => {
-    const normExist = normalizeQuestionText(existing);
+
+  const wordsNew = tokenizeCoreWords(qText);
+  const newOpts = (typeof newQuestion === 'object' && Array.isArray(newQuestion.options))
+    ? new Set(newQuestion.options.map(o => normalizeQuestionText(String(o))).filter(Boolean))
+    : null;
+
+  return existingQuestions.some(existing => {
+    const exText = typeof existing === 'string' ? existing : existing?.question;
+    if (!exText) return false;
+
+    const normExist = normalizeQuestionText(exText);
     if (!normExist) return false;
+
+    // 1. Direct normalized match
     if (normExist === normNew) return true;
-    // Overlap check for substantial length questions
-    if (normNew.length > 25 && normExist.length > 25) {
+
+    // 2. Overlap check for substantial length questions
+    if (normNew.length > 28 && normExist.length > 28) {
       if (normNew.includes(normExist) || normExist.includes(normNew)) return true;
     }
+
+    // 3. Option overlap (if 3 or more options match)
+    if (newOpts && typeof existing === 'object' && Array.isArray(existing.options)) {
+      let optMatches = 0;
+      for (const o of existing.options) {
+        if (newOpts.has(normalizeQuestionText(String(o)))) optMatches++;
+      }
+      if (optMatches >= 3) return true;
+    }
+
+    // 4. Core concept keyword Jaccard and Szymkiewicz–Simpson overlap
+    const wordsExist = tokenizeCoreWords(exText);
+    if (wordsNew.length >= 3 && wordsExist.length >= 3) {
+      const { jaccard, overlap } = getJaccardAndOverlap(wordsNew, wordsExist);
+      if (jaccard >= 0.58 || (overlap >= 0.72 && Math.min(wordsNew.length, wordsExist.length) >= 4)) {
+        return true;
+      }
+    }
+
     return false;
   });
 };

@@ -116,31 +116,118 @@ Make the tone deeply educational, intellectually stimulating, and perfectly tail
   
   const normText = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
 
-  const deduplicateQuestions = (rawQuestions: any[], excludeList: string[] = []) => {
-    const normExcludes = new Set((excludeList || []).map(e => normText(e)).filter(Boolean));
-    const seenInBatch = new Set<string>();
+  const STOP_WORDS = new Set([
+    'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t', 'as',
+    'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'can', 'can\'t',
+    'cannot', 'could', 'couldn\'t', 'did', 'didn\'t', 'do', 'does', 'doesn\'t', 'doing', 'don\'t', 'down',
+    'during', 'each', 'few', 'for', 'from', 'further', 'had', 'hadn\'t', 'has', 'hasn\'t', 'have', 'haven\'t',
+    'having', 'he', 'her', 'here', 'hers', 'herself', 'him', 'himself', 'his', 'how', 'i', 'if', 'in', 'into',
+    'is', 'isn\'t', 'it', 'its', 'itself', 'let\'s', 'me', 'more', 'most', 'mustn\'t', 'my', 'myself', 'no',
+    'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out',
+    'over', 'own', 'same', 'shan\'t', 'she', 'should', 'shouldn\'t', 'so', 'some', 'such', 'than', 'that',
+    'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'these', 'they', 'this', 'those', 'through',
+    'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasn\'t', 'we', 'were', 'weren\'t', 'what', 'when',
+    'where', 'which', 'while', 'who', 'whom', 'why', 'with', 'won\'t', 'would', 'wouldn\'t', 'you', 'your',
+    'yours', 'yourself', 'yourselves', 'following', 'best', 'defines', 'defined', 'definition', 'statement',
+    'refers', 'referred', 'explain', 'explains', 'described', 'describes', 'example', 'examples', 'true',
+    'correct', 'incorrect', 'consider', 'economics', 'economic', 'given', 'identify', 'whichof', 'whatis'
+  ]);
+
+  const tokenizeCoreWords = (text: string): string[] => {
+    if (!text) return [];
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+  };
+
+  const getJaccardAndOverlap = (words1: string[], words2: string[]) => {
+    if (words1.length === 0 || words2.length === 0) return { jaccard: 0, overlap: 0 };
+    const set1 = new Set(words1);
+    const set2 = new Set(words2);
+    let intersection = 0;
+    for (const w of set1) {
+      if (set2.has(w)) intersection++;
+    }
+    const union = set1.size + set2.size - intersection;
+    const minSize = Math.min(set1.size, set2.size);
+    return {
+      jaccard: union === 0 ? 0 : intersection / union,
+      overlap: minSize === 0 ? 0 : intersection / minSize
+    };
+  };
+
+  const isQuestionDuplicateOf = (q: any, ex: any): boolean => {
+    const qText = typeof q === 'string' ? q : q?.question;
+    const exText = typeof ex === 'string' ? ex : ex?.question;
+    if (!qText || !exText) return false;
+
+    const nQ = normText(qText);
+    const nEx = normText(exText);
+    if (!nQ || !nEx) return false;
+
+    // 1. Direct normalized string equality
+    if (nQ === nEx) return true;
+
+    // 2. Substantial substring overlap
+    if (nQ.length > 28 && nEx.length > 28) {
+      if (nQ.includes(nEx) || nEx.includes(nQ)) return true;
+    }
+
+    // 3. Option overlap (if 3 or more options match)
+    if (typeof q === 'object' && Array.isArray(q.options) && typeof ex === 'object' && Array.isArray(ex.options)) {
+      const qOpts = new Set(q.options.map((o: any) => normText(String(o))).filter(Boolean));
+      let optMatches = 0;
+      for (const o of ex.options) {
+        if (qOpts.has(normText(String(o)))) optMatches++;
+      }
+      if (optMatches >= 3) return true;
+    }
+
+    // 4. Core concept keyword similarity (Jaccard and Szymkiewicz–Simpson overlap)
+    const wordsQ = tokenizeCoreWords(qText);
+    const wordsEx = tokenizeCoreWords(exText);
+    if (wordsQ.length >= 3 && wordsEx.length >= 3) {
+      const { jaccard, overlap } = getJaccardAndOverlap(wordsQ, wordsEx);
+      // If 58%+ overall keyword match or 72%+ overlap of the shorter question's keywords
+      if (jaccard >= 0.58 || (overlap >= 0.72 && Math.min(wordsQ.length, wordsEx.length) >= 4)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const deduplicateQuestions = (rawQuestions: any[], excludeList: any[] = []) => {
     const filtered: any[] = [];
 
     for (const q of rawQuestions) {
       if (!q || !q.question) continue;
-      const n = normText(q.question);
-      if (!n) continue;
 
-      let isDup = normExcludes.has(n) || seenInBatch.has(n);
-      if (!isDup && n.length > 25) {
-        for (const ex of normExcludes) {
-          if (n.includes(ex) || ex.includes(n)) {
+      // Check against exclusions (existing bank questions & prior batches)
+      let isDup = false;
+      for (const ex of excludeList) {
+        if (isQuestionDuplicateOf(q, ex)) {
+          isDup = true;
+          console.log("Deduplication filtered out question matching exclude list:", q.question);
+          break;
+        }
+      }
+
+      // Check against questions already accepted in the current batch
+      if (!isDup) {
+        for (const accepted of filtered) {
+          if (isQuestionDuplicateOf(q, accepted)) {
             isDup = true;
+            console.log("Deduplication filtered out question matching batch duplicate:", q.question);
             break;
           }
         }
       }
 
       if (!isDup) {
-        seenInBatch.add(n);
         filtered.push(q);
-      } else {
-        console.log("Server deduplication filtered out duplicate question:", q.question);
       }
     }
 
@@ -160,8 +247,13 @@ Make the tone deeply educational, intellectually stimulating, and perfectly tail
 
     try {
       let attemptsWithoutProgress = 0;
-      while (allQuestions.length < totalNeeded && attemptsWithoutProgress < 3) {
+      while (allQuestions.length < totalNeeded && attemptsWithoutProgress < 5) {
         const currentBatchCount = Math.min(chunkSize, totalNeeded - allQuestions.length);
+        // Prioritize session questions first, then provided exclusions (up to 200 items)
+        const promptExcludes = [
+          ...allQuestions.map(q => q.question),
+          ...excludeList
+        ].slice(0, 200);
         const accumulatedExcludes = [
           ...excludeList,
           ...allQuestions.map(q => q.question)
@@ -194,8 +286,12 @@ CRITICAL CURRICULUM BOUNDARIES & STRICT INSTRUCTIONS:
    - Concise, direct question stems (1–2 sentences).
    - Exactly 4 realistic options (Option A, B, C, D) with one unambiguously correct answer and 3 plausible distractors typical of WAEC/JAMB.
    - Whenever variables or equations appear, format using inline LaTeX \\( ... \\).
-6. NO DUPLICATION: Do NOT repeat or generate questions similar to any of these excluded questions:
-${JSON.stringify(accumulatedExcludes.slice(-100))}
+6. STRICT ZERO-DUPLICATION & HIGH-DIVERSITY MANDATE:
+   - Every single question must be genuinely UNIQUE in both concept tested and phrasing.
+   - You MUST NOT repeat or closely rephrase any of the following questions (or test the exact same concept/scenario):
+${JSON.stringify(promptExcludes)}
+   - Do NOT simply swap synonyms or change the lead-in words.
+   - Each question must explore a distinctly different subtopic, angle, scenario, policy, or calculation.
 
 Format the output strictly as a JSON array matching this schema:
 [
@@ -221,8 +317,12 @@ REQUIREMENTS:
 3. CONCISE STEMS: Keep question stems clear and direct (1–2 sentences). No long preambles, no topic name echoes, no "Ref:" labels.
 4. CURRICULUM ROTATION: Spread questions across all subtopics mentioned in "${topicTitle}".
 5. CLEAN LATEX MATH: Whenever math symbols, equations, or variables appear, format using inline LaTeX \\( ... \\) (e.g. \\( GDP \\), \\( P = MC \\)).
-6. NO DUPLICATION: Do NOT repeat or generate questions similar to any of these excluded questions:
-${JSON.stringify(accumulatedExcludes.slice(-100))}
+6. STRICT ZERO-DUPLICATION & HIGH-DIVERSITY MANDATE:
+   - Every single question must be genuinely UNIQUE in both concept tested and phrasing.
+   - You MUST NOT repeat or closely rephrase any of the following questions (or test the exact same concept/scenario):
+${JSON.stringify(promptExcludes)}
+   - Do NOT simply swap synonyms or change the lead-in words.
+   - Each question must explore a distinctly different subtopic, angle, scenario, policy, or calculation.
 
 Format the output strictly as a JSON array matching this schema:
 [
@@ -241,7 +341,7 @@ Return only raw valid JSON array.`;
             contents: prompt,
             config: {
               responseMimeType: "application/json",
-              temperature: 0.85,
+              temperature: Math.min(0.95, 0.82 + attemptsWithoutProgress * 0.04),
             }
           });
           const parsed = JSON.parse(response.text || "[]");
