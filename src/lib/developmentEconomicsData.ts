@@ -36,7 +36,7 @@ Let cumulative share of population be on the horizontal axis ($p \\in [0, 1]$) a
 * **Line of Perfect Equality:** $L(p) = p$ (45-degree diagonal).
 * **Lorenz Curve:** $L(p) \\le p$ ($L'(p) > 0, L''(p) > 0$).
 
-```chart
+\`\`\`chart
 {
   "type": "area",
   "title": "Lorenz Curve and Area of Inequality (Gini Coefficient Calculation)",
@@ -54,7 +54,7 @@ Let cumulative share of population be on the horizontal axis ($p \\in [0, 1]$) a
     { "Cumulative_Population_Pct": 100, "Equality_Line": 100, "Lorenz_Curve": 100 }
   ]
 }
-```
+\`\`\`
 
 #### The Gini Coefficient ($G$):
 $$G = \\frac{\\text{Area between Equality Line and Lorenz Curve}}{\\text{Total Area under Equality Line}} = \\frac{A}{A + B} = 1 - 2 \\int_0^1 L(p) dp$$
@@ -110,7 +110,7 @@ The economy consists of two sectors:
 1. **Traditional Rural Sector:** Agrarian, zero or negligible marginal product of labor ($MP_L \\approx 0$, disguised unemployment). Workers receive average subsistence wage $\\bar{w}$.
 2. **Modern Industrial Sector:** Capitalist, high productivity ($MP_L > 0$). Pays a constant institutional urban wage $w_u = (1.30) \\bar{w}$.
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Lewis Dual-Sector Model: Industrial Capitalist Expansion and Reinvestment",
@@ -129,7 +129,7 @@ The economy consists of two sectors:
     { "Modern_Sector_Labor": 50, "MPL_Stage1": 3, "MPL_Stage2": 10, "MPL_Stage3": 20, "Urban_Wage": 15 }
   ]
 }
-```
+\`\`\`
 
 * **The Engine of Growth:** The capitalist sector extracts economic surplus ($Total Output - Total Wages Paid$). Reinvestment of this profit into capital accumulation shifts the $MP_L$ curve outward, absorbing more surplus agricultural labor without creating wage inflation.
 * **The Lewis Turning Point:** Occurs when surplus rural labor is fully exhausted. The rural supply curve becomes upward-sloping, requiring rising real wages across the entire economy.
@@ -189,13 +189,13 @@ $$Y = A \\prod_{i=1}^n q_i$$
 ### 5.2 The Colonial Origins of Comparative Development
 Daron Acemoglu, Simon Johnson, and James A. Robinson (2001) established the causal impact of institutions on long-run development using historical **Settler Mortality Rates** as an Instrumental Variable ($IV$):
 
-```mermaid
+\`\`\`mermaid
 graph LR
     A[Historical Settler Mortality in 18th Century] --> B[Colonial Settlement Strategy]
     B --> C[Early Historical Institutions]
     C --> D[Modern Institutional Quality Rule of Law]
     D --> E[Current Real GDP per Capita]
-```
+\`\`\`
 
 1. **Extractive Institutions (High Settler Mortality - e.g., Congo, West Africa):** Colonizers established coercive systems to extract natural resources without protecting private property rights for the indigenous population.
 2. **Inclusive Institutions (Low Settler Mortality - e.g., USA, Canada, Australia):** Colonizers settled in large numbers and created institutions that enforced property rights, constraints on government power, and equal legal access.

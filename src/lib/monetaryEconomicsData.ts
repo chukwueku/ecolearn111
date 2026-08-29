@@ -50,7 +50,7 @@ Dividing $M$ by $B$ gives the **Money Multiplier ($m$)**:
 $$m = \\frac{M}{B} = \\frac{1 + c}{c + r_d + e}$$
 $$M = m \\cdot B = \\left(\\frac{1 + c}{c + r_d + e}\\right) B$$
 
-```chart
+\`\`\`chart
 {
   "type": "bar",
   "title": "Money Multiplier Sensitivity to Reserve Ratios (rd) and Cash Preferences (c)",
@@ -65,7 +65,7 @@ $$M = m \\cdot B = \\left(\\frac{1 + c}{c + r_d + e}\\right) B$$
     { "Scenario": "Digital Economy (c=0.05, rd=0.1, e=0.01)", "Multiplier": 6.56 }
   ]
 }
-```
+\`\`\`
 
 #### 💡 Worked Mathematical Example 2.1: Calculating the Money Supply
 Suppose total checkable deposits $D = \\$800\\text{ billion}$, currency in circulation $C = \\$200\\text{ billion}$, required reserve ratio $r_d = 10\\%$, excess reserves $ER = \\$16\\text{ billion}$, and total monetary base $B = \\$296\\text{ billion}$.
@@ -134,7 +134,7 @@ Where $i_t$ is nominal interest rate, $r_t$ is real interest rate, and $\\pi_t^e
 ### 4.2 Theories of the Yield Curve (Term Structure)
 The yield curve plots bond yields against their maturities ($1\\text{M}, 2\\text{Y}, 5\\text{Y}, 10\\text{Y}, 30\\text{Y}$).
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Yield Curve Profiles: Normal, Inverted (Recession Signal), and Flat",
@@ -152,7 +152,7 @@ The yield curve plots bond yields against their maturities ($1\\text{M}, 2\\text
     { "Maturity_Years": 30, "Normal_Yield": 5.5, "Inverted_Yield": 3.8, "Flat_Yield": 4.5 }
   ]
 }
-```
+\`\`\`
 
 1. **Expectations Hypothesis:** An $n$-period long-term interest rate $i_{nt}$ equals the average of expected future 1-period short rates:
    $$i_{nt} = \\frac{1}{n} \\sum_{j=0}^{n-1} \\mathbb{E}_t [i_{1, t+j}]$$
@@ -166,7 +166,7 @@ The yield curve plots bond yields against their maturities ($1\\text{M}, 2\\text
 
 The Central Bank changes its policy rate ($MPR$), which ripples through the real economy via five distinct channels:
 
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Central Bank Raises Policy Rate MPR] --> B[Interest Rate Channel: Real r Rises]
     A --> C[Exchange Rate Channel: Capital Inflows]
@@ -182,7 +182,7 @@ graph TD
     G --> J
     H --> J
     I --> J
-```
+\`\`\`
 
 ---
 

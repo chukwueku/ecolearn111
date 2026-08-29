@@ -316,9 +316,9 @@ export const AdminPage: React.FC = () => {
     topics.forEach(t => { topicCounts[t.id] = 0; });
 
     bankQuestions.forEach(q => {
-      const matchLvl = (level === 'undergraduate' || level === 'advanced')
-        ? (q.level === 'undergraduate' || q.level === 'advanced')
-        : (q.level === level || q.level === 'secondary' || q.level.startsWith('secondary'));
+      const matchLvl = (level === 'undergraduate' || (level as string) === 'advanced')
+        ? (q.level === 'undergraduate' || (q.level as string) === 'advanced')
+        : (q.level === level || q.level === 'secondary' || (typeof q.level === 'string' && q.level.startsWith('secondary')));
 
       if (matchLvl) {
         if (topicCounts[q.topicId] !== undefined) {

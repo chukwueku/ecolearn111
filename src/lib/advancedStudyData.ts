@@ -1,9 +1,6 @@
 import { STATISTICAL_ECONOMICS_GUIDE } from './statisticalEconomicsData';
 import { MICRO_ECONOMICS_ADVANCED_GUIDE } from './microEconomicsData';
-import { MACRO_ECONOMICS_ADVANCED_GUIDE } from './macroEconomicsData';
-import { MONETARY_ECONOMICS_GUIDE } from './monetaryEconomicsData';
 import { DEVELOPMENT_ECONOMICS_GUIDE } from './developmentEconomicsData';
-import { FINANCIAL_ECONOMICS_GUIDE } from './financialEconomicsData';
 
 export const ADVANCED_STUDY_GUIDE: Record<string, string> = {"ug-econometrics":`
 # COMPREHENSIVE ECONOMETRICS STUDY GUIDE
@@ -6550,7 +6547,7 @@ The derivation of the modern expectations-augmented AS curve follows a structure
    $$ \\pi = \\pi^e + \\gamma(Y - Y^*) $$
    where $\\gamma = \\frac{\\alpha}{\\beta Y^*}$. This shows that inflation exceeds expected inflation when real output exceeds potential output (an inflationary gap).
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Figure 6.1: Deriving the Upward Sloping Aggregate Supply Curve",
@@ -6569,7 +6566,7 @@ The derivation of the modern expectations-augmented AS curve follows a structure
     {"key": "as_long_run", "name": "Long-Run AS (Potential GDP Y*=100)", "color": "#0f172a"}
   ]
 }
-```
+\`\`\`
 
 **6.2 Why Nominal Wages Are Sticky**
 If wages adjusted instantly and frictionlessly, the labor market would always clear, and the AS curve would be vertical even in the short term. However, in reality, nominal wages are sticky (slow to adjust). Key modern macroeconomic theories explain this friction:
@@ -6619,7 +6616,7 @@ To reduce inflation, the central bank must tighten monetary policy, which shifts
 $$ \text{Sacrifice Ratio} = \frac{\text{Cumulative % Loss of Real GDP}}{\text{Percentage Point Reduction in Inflation}} $$
 For instance, a sacrifice ratio of 2.0 implies that to reduce inflation from 6% to 2% (a 4 percentage point drop), the economy must sacrifice a cumulative 8% of annual GDP (e.g., a 4% output gap for two consecutive years).
 
-```chart
+\`\`\`chart
 {
   "type": "area",
   "title": "Figure 7.3: The Sacrifice Ratio - Output Loss vs. Disinflation Path",
@@ -6637,7 +6634,7 @@ For instance, a sacrifice ratio of 2.0 implies that to reduce inflation from 6% 
     {"key": "actual_gdp", "name": "Actual Real GDP", "color": "#f43f5e"}
   ]
 }
-```
+\`\`\`
 
 The shaded gap between the blue potential line and the red actual line represents the cumulative output lost to achieve a 6.0 percentage point reduction in inflation.
 
@@ -6906,10 +6903,6 @@ $$\\dot{b}(t) = (r - g)b(t) - s(t)$$
 
 `,
   "ug-micro": MICRO_ECONOMICS_ADVANCED_GUIDE,
-  "ug-macro": MACRO_ECONOMICS_ADVANCED_GUIDE,
-  "ug-monetary": MONETARY_ECONOMICS_GUIDE,
-  "ug-development": DEVELOPMENT_ECONOMICS_GUIDE,
-  "ug-financial": FINANCIAL_ECONOMICS_GUIDE,
   "ug-statistical": STATISTICAL_ECONOMICS_GUIDE,
   "uni-ch1": DEVELOPMENT_ECONOMICS_GUIDE
 };

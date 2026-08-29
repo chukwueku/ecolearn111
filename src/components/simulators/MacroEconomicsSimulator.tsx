@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, Scale, Info, Percent, Coins, ChevronDown, ChevronUp, BookOpen, Lightbulb } from 'lucide-react';
-import { InlineMath, BlockMath } from './MathComponents';
+import { InlineMath, BlockMath } from '../MathComponents';
 import {
   ResponsiveContainer,
   LineChart,
@@ -18,7 +18,7 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
-import { Input, ResultCard, ToggleGroup } from './simulators/SimulatorShared';
+import { Input, ResultCard, ToggleGroup } from './SimulatorShared';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -541,8 +541,8 @@ export const MacroEconomicsSimulator: React.FC<MacroSimulatorProps> = ({ mode, i
           <div className="space-y-4">
             <ResultCard label="Equilibrium National Income (Y)" value={`₦${result.equilibriumY}b`} icon={<Coins className="text-emerald-500" />} description={`Y = Multiplier (${result.multiplier}x) × Autonomous Spending (₦${result.autonomousSpending}b)`} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              <ResultCard label="Fiscal Budget Balance" value={`₦${result.budgetBalance}b`} icon={<Scale className="text-sky-500"} />} description="Taxes - Govt Spending" />
-              <ResultCard label="Keynesian Multiplier" value={`${result.multiplier}x`} icon={<TrendingUp className="text-indigo-500"} />} description="Magnification effect of spending" />
+              <ResultCard label="Fiscal Budget Balance" value={`₦${result.budgetBalance}b`} icon={<Scale className="text-sky-500" />} description="Taxes - Govt Spending" />
+              <ResultCard label="Keynesian Multiplier" value={`${result.multiplier}x`} icon={<TrendingUp className="text-indigo-500" />} description="Magnification effect of spending" />
             </div>
 
             <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-border space-y-2 mt-4">

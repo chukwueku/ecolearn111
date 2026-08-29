@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 async function startServer() {
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
   const app = express();
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -480,8 +480,6 @@ Return the response in JSON format as a raw array of objects matching this schem
       origin: "*",
     },
   });
-
-  const PORT = 3000;
 
   // --- Socket.io Logic for Live Challenges ---
   const rooms = new Map<string, { players: any[], questions: any[], status: 'waiting' | 'playing' | 'finished' }>();

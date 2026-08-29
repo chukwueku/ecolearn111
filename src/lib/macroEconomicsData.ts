@@ -60,7 +60,7 @@ Totally differentiating:
 $$d\\left(\\frac{M}{P}\\right) = k dY - h dr = 0 \\implies \\frac{dr}{dY}\\Bigg|_{LM} = \\frac{k}{h} > 0$$
 * The **LM curve slopes upward** because higher income $Y$ expands transaction demand for money, requiring higher interest rates $r$ to choke off speculative demand and restore equilibrium.
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Simultaneous Equilibrium in Goods and Money Markets (IS-LM Model)",
@@ -77,7 +77,7 @@ $$d\\left(\\frac{M}{P}\\right) = k dY - h dr = 0 \\implies \\frac{dr}{dY}\\Bigg|
     { "National_Income_Y": 1000, "IS_Curve": 2, "LM_Curve": 10 }
   ]
 }
-```
+\`\`\`
 
 #### 💡 Worked Mathematical Example 2.1: Solving the IS-LM Equilibrium
 Consider an economy with behavioral equations:
@@ -161,7 +161,7 @@ Where:
 * $u_t - u_n$ = Cyclical Unemployment (deviation from Non-Accelerating Inflation Rate of Unemployment, NAIRU)
 * $v_t$ = Exogenous Supply Shock (e.g., global oil spike)
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Expectations-Augmented Phillips Curve: Shift from Adaptive to Higher Expected Inflation",
@@ -179,7 +179,7 @@ Where:
     { "Unemployment_Rate_u": 7, "SRPC_Initial": -2, "SRPC_Shifted": 2, "LRPC": 0 }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -201,7 +201,7 @@ Where $s = \\text{Saving rate}$, $n = \\text{Population growth}$, $g = \\text{Te
 #### Steady-State Equilibrium ($k^*$):
 $$\\dot{k} = 0 \\implies s f(k^*) = (n + g + \\delta) k^*$$
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Solow-Swan Growth Model: Capital Accumulation and Steady-State Determination",
@@ -220,7 +220,7 @@ $$\\dot{k} = 0 \\implies s f(k^*) = (n + g + \\delta) k^*$$
     { "Capital_Per_Worker_k": 10, "Output_y": 6.3, "Investment_sfk": 1.89, "BreakEven_Inv": 1.0 }
   ]
 }
-```
+\`\`\`
 
 #### 💡 Worked Mathematical Example 6.1: Solow Steady-State Calculation
 Let $Y = K^{0.5} L^{0.5} \\implies y = k^{0.5}$. Saving rate $s = 0.30$, population growth $n = 0.02$, depreciation $\\delta = 0.03$, technological progress $g = 0$.

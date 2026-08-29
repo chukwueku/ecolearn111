@@ -84,7 +84,7 @@ $$e(p, \\bar{u}) = p \\cdot h(p, \\bar{u})$$
 The fundamental bridge between Marshallian and Hicksian demand is the **Slutsky Decomposition**:
 $$\\frac{\\partial x_i(p, I)}{\\partial p_j} = \\underbrace{\\frac{\\partial h_i(p, u)}{\\partial p_j}}_{\\text{Substitution Effect (SE)}} - \\underbrace{x_j(p, I) \\frac{\\partial x_i(p, I)}{\\partial I}}_{\\text{Income Effect (IE)}}$$
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Slutsky Decomposition: Income and Substitution Effects of Price Drop",
@@ -103,7 +103,7 @@ $$\\frac{\\partial x_i(p, I)}{\\partial p_j} = \\underbrace{\\frac{\\partial h_i
     { "Good_X": 100, "Initial_Budget": 0, "Compensated_Budget": 0, "Final_Budget": 25 }
   ]
 }
-```
+\`\`\`
 
 #### 💡 Worked Numerical Example 1.2: Slutsky Numerical Split
 Let $u(x_1, x_2) = x_1 x_2$, $I = 120$, $p_1 = 2$, $p_2 = 3$.
@@ -170,7 +170,7 @@ An allocation $(x^A, x^B)$ is **Pareto efficient** if there is no other feasible
 The **Contract Curve** characterizes the locus of all Pareto efficient points where indifference curves are tangent:
 $$\\text{MRS}_{1,2}^A = \\text{MRS}_{1,2}^B$$
 
-```chart
+\`\`\`chart
 {
   "type": "area",
   "title": "Edgeworth Box Contract Curve: Locus of Pareto Optimal Allocations",
@@ -187,7 +187,7 @@ $$\\text{MRS}_{1,2}^A = \\text{MRS}_{1,2}^B$$
     { "Good_1_Consumer_A": 100, "Contract_Curve_Good2": 100 }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -260,7 +260,7 @@ Consider a market with 2 firms (duopoly), market demand $P = a - b(q_1 + q_2)$, 
 #### Reaction Curves in Cournot Duopoly:
 $$q_1^*(q_2) = \\frac{a - c - b q_2}{2b} \\quad \\text{and} \\quad q_2^*(q_1) = \\frac{a - c - b q_1}{2b}$$
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Cournot Reaction Curves and Nash Equilibrium Point",
@@ -279,7 +279,7 @@ $$q_1^*(q_2) = \\frac{a - c - b q_2}{2b} \\quad \\text{and} \\quad q_2^*(q_1) = 
     { "Firm_1_Output": 80, "Firm2_Reaction": 0, "Firm1_Reaction": 90 }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -344,7 +344,7 @@ A single buyer of labor faces upward-sloping labor supply $w(L)$ ($w'(L) > 0$).
 $$\\text{Total Labor Cost: } TLC = w(L) \\cdot L$$
 $$\\text{Marginal Factor Cost: } MFC = \\frac{d(TLC)}{dL} = w(L) + L w'(L) > w(L)$$
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Monopsony Labor Market: Wage Exploitation and Employment Deadweight Loss",
@@ -362,7 +362,7 @@ $$\\text{Marginal Factor Cost: } MFC = \\frac{d(TLC)}{dL} = w(L) + L w'(L) > w(L
     { "Labor_Units": 50, "MRPL": 50, "Labor_Supply": 60, "MFC": 110 }
   ]
 }
-```
+\`\`\`
 
 * The monopsonist sets $MFC = MRPL$ to choose employment $L_M = 30$, and pays wage $w_M = w(30) = 40$.
 * Under perfect competition, $w_C = 50$ and $L_C = 50$.

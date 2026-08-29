@@ -37,7 +37,7 @@ $$D_{\\text{mac}} = \\frac{1}{P_0} \\sum_{t=1}^T \\frac{t \\cdot C}{(1 + y)^t} +
 $$D^* = \\frac{D_{\\text{mac}}}{1 + y}$$
 $$\\frac{\\Delta P}{P} \\approx -D^* \\cdot \\Delta y$$
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Bond Price Sensitivity to Interest Rate Shifts (Duration vs Convexity)",
@@ -54,7 +54,7 @@ $$\\frac{\\Delta P}{P} \\approx -D^* \\cdot \\Delta y$$
     { "Yield_YTM_Pct": 10, "Actual_Price": 76.8, "Duration_Approx": 75.0 }
   ]
 }
-```
+\`\`\`
 
 * **Convexity Adjustment:** Because the price-yield curve is convex ($P''(y) > 0$), adding the convexity term $\\frac{1}{2} \\text{Convexity} \\cdot (\\Delta y)^2$ provides exact second-order accuracy.
 
@@ -80,7 +80,7 @@ $$\\sigma_p^2 = w_1^2 \\sigma_1^2 + w_2^2 \\sigma_2^2 + 2 w_1 w_2 \\rho_{12} \\s
 * If $\\rho_{12} < 1$, the portfolio standard deviation $\\sigma_p$ is **strictly less than the weighted average of individual standard deviations** ($w_1 \\sigma_1 + w_2 \\sigma_2$).
 * If $\\rho_{12} = -1$, risk can be **completely eliminated** ($\\sigma_p = 0$).
 
-```chart
+\`\`\`chart
 {
   "type": "line",
   "title": "Markowitz Efficient Frontier: Risk-Return Profiles Under Different Asset Correlations",
@@ -98,7 +98,7 @@ $$\\sigma_p^2 = w_1^2 \\sigma_1^2 + w_2^2 \\sigma_2^2 + 2 w_1 w_2 \\rho_{12} \\s
     { "Portfolio_Risk_Sigma": 20, "Uncorrelated_rho0": 15.0, "Neg_Correlated_rhoMinus1": 17.5, "Pos_Correlated_rho1": 14.5 }
   ]
 }
-```
+\`\`\`
 
 #### 💡 Worked Numerical Example 2.1: Two-Asset Portfolio Optimization
 * Asset 1 (Equities): $E[R_1] = 14\\%$, $\\sigma_1 = 20\\%$

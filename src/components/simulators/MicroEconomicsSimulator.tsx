@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, Scale, Factory, Zap, Info, ChevronDown, ChevronUp, BookOpen, Lightbulb, Percent } from 'lucide-react';
+import { InlineMath, BlockMath } from '../MathComponents';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Input, ResultCard, ToggleGroup } from './SimulatorShared';
 import { clsx, type ClassValue } from 'clsx';
